@@ -1,7 +1,7 @@
-PWD c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas
+PWD c:\Projects\Proyecto-Final\Documentacion\LATEX
 INPUT C:\Users\HP02\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\CuidadoPersonas.tex
-OUTPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.log
+INPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\CuidadoPersonas.tex
+OUTPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.log
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\base\size12.clo
@@ -37,10 +37,10 @@ INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
-INPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.aux
-INPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.aux
-INPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.aux
-OUTPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.aux
+INPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
+INPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
+INPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
+OUTPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
@@ -53,7 +53,7 @@ INPUT .\Imagenes\LogoUTN.png
 INPUT .\Imagenes\LogoUTN.png
 INPUT .\Imagenes\LogoUTN.png
 INPUT .\Imagenes\LogoUTN.png
-OUTPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.pdf
+OUTPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.pdf
 INPUT .\Imagenes\LogoUTN.png
 INPUT .\Imagenes\LogoUTN.png
 INPUT .\Imagenes\LogoUTN.png
@@ -68,7 +68,7 @@ INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr17.tfm
 INPUT C:\Users\HP02\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr10.tfm
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
-INPUT c:\Users\HP02\Mi unidad\Facultad 5to año\PROYECTO FINAL\Documentacion\LATEX\CuidadoPersonas\build\CuidadoPersonas.aux
+INPUT c:\Projects\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\HP02\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb

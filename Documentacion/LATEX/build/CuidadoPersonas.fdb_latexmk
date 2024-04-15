@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1712426261.97477 "c:/Users/HP02/Mi unidad/Facultad 5to año/PROYECTO FINAL/Documentacion/LATEX/CuidadoPersonas/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1712426263.24378 0
+["pdflatex"] 1713220265.00155 "c:/Projects/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1713220266.30529 0
   "C:/Users/HP02/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1712418361 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/HP02/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1712419515 24235533 1ad59c86b41a966b58a7942d8b7e81c3 ""
   "C:/Users/HP02/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx10.tfm" 1136765053 1328 c834bbb027764024c09d3d2bf908b5f0 ""
@@ -34,10 +34,10 @@
   "C:/Users/HP02/AppData/Local/Programs/MiKTeX/tex/latex/graphics/keyval.sty" 1665067579 2671 7e67d78d9b88c845599a85b2d41f2e39 ""
   "C:/Users/HP02/AppData/Local/Programs/MiKTeX/tex/latex/graphics/trig.sty" 1665067579 4023 293ea1c16429fc0c4cf605f4da1791a9 ""
   "C:/Users/HP02/AppData/Local/Programs/MiKTeX/tex/latex/l3backend/l3backend-pdftex.def" 1710412547 29918 d08e4795c0778dfb000e82d9225c6ce2 ""
-  "CuidadoPersonas.tex" 1712426260 2297 16256ed838b2e59d65d870113e931eaa ""
+  "CuidadoPersonas.tex" 1713220262 2291 3f7a9417c19dfad9de918730f99e53d1 ""
   "Imagenes/LogoUTN.png" 1712420969 12626 e66b0cd860fb45faa188f715304b8a98 ""
-  "build/CuidadoPersonas.aux" 1712426262 194 05eaff20a35224c0a0d2a9aceff1100f "pdflatex"
-  "c:/Users/HP02/Mi unidad/Facultad 5to año/PROYECTO FINAL/Documentacion/LATEX/CuidadoPersonas/CuidadoPersonas.tex" 1712426260 2297 16256ed838b2e59d65d870113e931eaa ""
+  "build/CuidadoPersonas.aux" 1713220266 194 05eaff20a35224c0a0d2a9aceff1100f "pdflatex"
+  "c:/Projects/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1713220262 2291 3f7a9417c19dfad9de918730f99e53d1 ""
   (generated)
   "build/CuidadoPersonas.aux"
   "build/CuidadoPersonas.log"
