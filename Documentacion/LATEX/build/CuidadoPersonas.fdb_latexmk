@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1716863246.67179 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1716863249.2429 0
+["pdflatex"] 1716863400.33105 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1716863402.59307 0
   "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1716858251 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/Esteban/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1716244229 24241339 3077246b9c5114d998917a073f805713 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx10.tfm" 1136765053 1328 c834bbb027764024c09d3d2bf908b5f0 ""
@@ -127,12 +127,12 @@
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfrcs.sty" 1673775190 325 f9f16d12354225b7dd52a3321f085955 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/pgfgantt/pgfgantt.sty" 1515768374 49409 88c861f46c2f86a25c7b7d0c7b0072ed ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "CuidadoPersonas.tex" 1716863245 34870 6dba082fa7e2c0827d2a3b480da338c9 ""
+  "CuidadoPersonas.tex" 1716863396 34866 5ed40695e3a0b8c2d59e05ec619b5ec5 ""
   "Imagenes/LogoUTN.png" 1716241020 12626 e66b0cd860fb45faa188f715304b8a98 ""
   "Imagenes/Organigrama.jpg" 1716241652 14846 d878450e9f13b2f1e71b18b7a2b964bf ""
-  "build/CuidadoPersonas.aux" 1716863248 5139 6e92989805205e91428e0c01fd2b4cce "pdflatex"
-  "build/CuidadoPersonas.toc" 1716863248 3304 aca001c76d7bec0e12781c0c5aa85872 "pdflatex"
-  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1716863245 34870 6dba082fa7e2c0827d2a3b480da338c9 ""
+  "build/CuidadoPersonas.aux" 1716863402 5139 4213a46e0b2d19a51440f2db3b33564e "pdflatex"
+  "build/CuidadoPersonas.toc" 1716863402 3304 aca001c76d7bec0e12781c0c5aa85872 "pdflatex"
+  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1716863396 34866 5ed40695e3a0b8c2d59e05ec619b5ec5 ""
   (generated)
   "build/CuidadoPersonas.aux"
   "build/CuidadoPersonas.log"
