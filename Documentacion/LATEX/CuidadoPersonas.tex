@@ -5,6 +5,10 @@
 % Paquetes:
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
+\usepackage{tikz,color}
+\usepackage{pgf-pie}
+\usepackage{pgfgantt}
+\usepackage{pdflscape}
 
 % CUERPO
 \begin{document}
@@ -169,11 +173,67 @@
     Este proceso consiste en monitorear el impacto de las soluciones tecnológicas en la calidad de vida de las personas alcanzadas, utilizando indicadores clave de rendimiento (KPIs) para medir el éxito de las soluciones e identificar áreas de mejora.\newline
     Además, se implementa un proceso de mejora continua capaz de optimizar las soluciones tecnológicas, los procesos internos y las estrategias de negocio, haciendo uso y beneficio de la retroalimentación de los usuarios y los datos recopilados.
 
+    \newpage
+
 % Analisis de problemas
     \section{Análisis de problemas}
     El surgimiento de la iniciativa de realizar un software que se encargue de la gestión y organización de las tareas que implica estar al cuidado de otras personas, se origina en las complejas problemáticas con las que nos encontramos diariamente.\newline
     A fin de poder abordarlas con mayor exactitud y precisión, llevamos a cabo la realización de un cuestionario presentado a unas cincuenta personas, de diferentes edades, oficios y calidades de vida, con preguntas orientadas a sus experiencias en el cuidado de adultos mayores, niños pequeños, personas con alguna condición específica, etc. A partir del mismo, analizamos los resultados y concluimos en las diferentes problemáticas comunes.\newline
     \newline
+    \subsection{Gráficas de respuestas}
+    En esta sección presentamos las diferentes gráficas correspondientes a cada una de las preguntas realizadas en el relevamiento, que permiten posteriormente identificar potenciales usuarios, problemáticas, funcionalidades, etc.\newline
+    El relevamiento fue orientado a aquellas personas que se encuentran en posición de cuidador, ya sea profesionalmente o por algun vínculo en especial.
+    \subsubsection{¿Qué vínculo o relación tienen?}
+        \begin{tikzpicture}
+            \pie[explode={0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2}]
+            {35/Familiar, 
+            26/Hijos, 
+            14/Cuidador, 
+            7/Docente, 
+            7/Padres, 
+            7/Niñeros, 
+            4/Hermanos}
+        \end{tikzpicture}
+    \subsubsection{¿Cuáles son las principales problemáticas que enfrentan?}
+        \begin{tikzpicture}
+            \pie[explode={0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2}]
+            {30/Cansancio y disponibilidad, 
+            14/Comunicación, 
+            14/Desconocimiento, 
+            12/Organización, 
+            12/Responsabilidad, 
+            7/No responde, 
+            5/Daños y enfermedades, 
+            4/Movilidad y entorno, 
+            2/Cuidadores}
+        \end{tikzpicture}
+    \subsubsection{¿Cuáles son las principales formas de comunicación?}
+        \begin{tikzpicture}
+            \pie[explode={0.2, 0.2, 0.2, 0.2, 0.2}]
+            {37/Verbal, 
+            17/Escrito informal, 
+            16/No responde, 
+            16/Whatsapp, 
+            14/Escrito formal}
+        \end{tikzpicture}
+    \subsubsection{¿Cuéntan con ayuda profesional para el cuidado?}
+        \begin{tikzpicture}
+            \pie[explode={0.2, 0.2, 0.2}, rotate=270]
+            {58/Si, 
+            32/No, 
+            10/No responde}
+        \end{tikzpicture}
+    \subsubsection{¿Qué funcionalidades crees que te resultarían útiles en la aplicación?}
+        \begin{tikzpicture}
+            \pie[explode={0.2, 0.2, 0.2}, rotate=290]
+            {40/Sin responder,
+            14/Información y recursos,
+            12/Monitoreo y seguimiento,
+            11/Organización del cuidado,
+            9/Gestión de emergencias,
+            9/Gestión de medicación,
+            5/Comunicación y apoyo}
+        \end{tikzpicture}
     \subsection{Complejidad en la gestión de tareas de cuidado}
     Cuidar a otra persona implica realizar y controlar una gran variedad de tareas complejas, incluyendo:
     \begin{itemize}
@@ -194,6 +254,8 @@
     La falta de un sistema de recordatorios para la medicación puede aumentar el riesgo de errores en la administración de los medicamentos, con potenciales consecuencias negativas para la salud de la persona bajo cuidado.
     \subsection{Necesidades específicas no cubiertas por las soluciones existentes}
     Actualmente en el mercado no existe una herramienta que cuente con las funcionalidades necesarias para solucionar y gestionar todas los requerimientos que implican las problemáticas mencionadas arriba. 
+
+    \newpage
 
 % Analisis de Objetivos
     \section{Análisis de objetivos}
@@ -228,6 +290,8 @@
         \item Facilitar el acceso a recursos de apoyo y asesoramiento.
     \end{itemize}
 
+    \newpage
+    
 % Alternativas de Solución
     \section{Alternativas de solución}
     Actualmente en el mercado, no existe una aplicación que abarque de forma integral el cuidado de personas dependientes, ya sean adultos mayores, niños pequeños, o aquellos con condiciones particulares que requieran de atención y cuidado constante.\newline
@@ -236,8 +300,7 @@
     \subsection{Cuidarlos}
     Cuidarlos es una aplicación que facilita conectar aquellas personas con vocación de servicio en cuidar adultos mayores con aquellos que necesitan los cuidados.
     \subsubsection{Abstract}
-    Nuestra misión es generar un ecosistema que garantice acceder al mejor cuidado de las personas, que brinde oportunidades a quienes tienen vocación de servicio para destacarse y que seamos un medio para gestionar simple y eficientemente que la vida independiente en los hogares sea una realidad que mejore
-    significativamente la calidad de quienes sean parte. \newline
+    Nuestra misión es generar un ecosistema que garantice acceder al mejor cuidado de las personas, que brinde oportunidades a quienes tienen vocación de servicio para destacarse y que seamos un medio para gestionar simple y eficientemente que la vida independiente en los hogares sea una realidad que mejore significativamente la calidad de quienes sean parte. \newline
     Queremos que todos los que integramos Cuidarlos, los que se sumen como familiares, cuidadores, proveedores, financiadores dejen una verdadera huella positiva en el otro. Que las familias puedan sentir que quienes cuidan de sus seres queridos lo hacen con el mismo cariño, compromiso y respeto como si lo hicieran ellos. Que pueden estar tranquilos que las elecciones que hacen mejoran significativamente la calidad de vida de su ser querido. Deseamos que los cuidadores puedan desarrollarse y estén lo suficientemente formados académica y espiritualmente para dar lo mejor de sí en pos del bienestar de quienes cuidan y sus familias. Que sientan que haber estado en esa etapa de la vida fue significativo y que son parte de muchas familias que les agradecen y valoran contar con ellos. \newline
     Nosotros desde Cuidarlos queremos ser solamente el vehículo que desarrolle este ecosistema, permitiendo dejar esa huella tan significativa que implica cuidar del otro dando lo mejor de nosotros mismos. \newline
     \subsubsection{Funcionalidades}
@@ -256,7 +319,6 @@
     \end{itemize}
     \subsubsection{Conclusión}
     En conclusión, la aplicación \textit{Cuidarlos} facilita conectar aquellas personas que se dedican al cuidado de los adultos mayores, con quienes necesitan del servicio para sus familiares avanzados de edad. Permite un seguimiento, evaluación y coordinación entre los cuidadores y el adulto mayor, pero excluye de la participación a la persona al cuidado en cuestión. Desde nuestra aplicación, fomentamos e incluimos la participación del mismo, siendo un usuario más de la misma y atendiendo sus necesidades específicas.
-
     \subsection{MyTherapy}
     Esta aplicación, aborda la problemática desde el enfoque de la salud, permitiendo añadir y registrar recordatorios de pastillas y medicamentos, seguimiento del estado de salud de los adultos mayores en el día a día, reporte e informes del mismo para utilizar cómo respaldo en citas médicas, y conectividad con familiares para que los mismos puedan estar al pendiente de la situación.
     \subsubsection{Abstract}
@@ -279,8 +341,118 @@
     \subsubsection{Conclusión}
     En conclusión, \textit{MyTherapy} aborda de una manera completa la problemática relacionada con los recordatorios del plan de salud del adulto mayor. Pero no incluye una participación activa ni considera, a aquellas personas responsables del cuidado y de asegurar el bienestar de la persona en cuestión. Desde nuestra aplicación, fomentamos la comunicación y el interés constante de los cuidadores y familiares responsables, permitiendo la comunicación interna entre ellos, calendario de actividades y registro de signos vitales compartidos, para que estén al corriente de la situación de forma inmediata, efectiva y coordinada entre todos.
 
+    \newpage
 
+% Diagrama de Gantt
+    \section{Diagrama de Gantt}
+    Considerando una versión inicial del proyecto, elaboramos un diagrama de Gantt preliminar, con tareas definidas en alto nivel que abarquen el proceso integral de análisis, desarrollo e implementación de la aplicación en cuestión.
+    \subsection{Diagrama preliminar}
+    
+    \begin{landscape}
+        \begin{ganttchart}[
+            hgrid,
+            vgrid,
+            x unit=0.3cm,
+            canvas/.style={draw=black, fill=none, line width=0.75pt}, % Estilo del lienzo
+            bar/.style={fill=blue}, % Estilo de las barras
+            group right shift=0,
+            group top shift=0.7,
+            group height=.3,
+            group peaks width={0.2}
+        ]{1}{60}
 
+            % Título principal del año
+            \gantttitle{2024}{40}
+            \gantttitle{2025}{20} \\
+
+            % Títulos de los meses
+            \gantttitle{Mar}{4} 
+            \gantttitle{Abr}{4} 
+            \gantttitle{May}{4} 
+            \gantttitle{Jun}{4} 
+            \gantttitle{Jul}{4} 
+            \gantttitle{Ago}{4} 
+            \gantttitle{Sep}{4} 
+            \gantttitle{Oct}{4} 
+            \gantttitle{Nov}{4} 
+            \gantttitle{Dic}{4} 
+            \gantttitle{Ene}{4} 
+            \gantttitle{Feb}{4} 
+            \gantttitle{Mar}{4} 
+            \gantttitle{Abr}{4} 
+            \gantttitle{May}{4} \\
+
+            % Aquí puedes agregar tus tareas con las fechas correspondientes
+            \ganttgroup{Análisis}{1}{18} \\
+            \ganttbar[bar/.style={fill=cyan}]{Relevamiento}{1}{2} \\
+            \ganttbar[bar/.style={fill=cyan}]{Contexto}{3}{4} \\
+            \ganttbar[bar/.style={fill=cyan}]{Requerimientos}{5}{8} \\
+            \ganttbar[bar/.style={fill=cyan}]{Planificación}{7}{10} \\
+            \ganttbar[bar/.style={fill=cyan}]{Factibilidad}{11}{12} \\
+            \ganttbar[bar/.style={fill=cyan}]{Especificaciones}{13}{18} \\
+
+            \ganttgroup{Diseño}{19}{30} \\
+            \ganttbar[bar/.style={fill=red}]{Diseño de Arquitectura}{19}{22} \\
+            \ganttbar[bar/.style={fill=red}]{Diseño de Interfaz}{23}{26} \\
+            \ganttbar[bar/.style={fill=red}]{Prototipado}{27}{30} \\
+
+        \end{ganttchart}
+
+        \newpage
+
+        \begin{ganttchart}[
+            hgrid,
+            vgrid,
+            x unit=0.3cm,
+            canvas/.style={draw=black, fill=none, line width=0.75pt}, % Estilo del lienzo
+            bar/.style={fill=blue}, % Estilo de las barras
+            group right shift=0,
+            group top shift=0.7,
+            group height=.3,
+            group peaks width={0.2}
+        ]{1}{60}
+
+            % Título principal del año
+            \gantttitle{2024}{40}
+            \gantttitle{2025}{20} \\
+
+            % Títulos de los meses
+            \gantttitle{Mar}{4} 
+            \gantttitle{Abr}{4} 
+            \gantttitle{May}{4} 
+            \gantttitle{Jun}{4} 
+            \gantttitle{Jul}{4} 
+            \gantttitle{Ago}{4} 
+            \gantttitle{Sep}{4} 
+            \gantttitle{Oct}{4} 
+            \gantttitle{Nov}{4} 
+            \gantttitle{Dic}{4} 
+            \gantttitle{Ene}{4} 
+            \gantttitle{Feb}{4} 
+            \gantttitle{Mar}{4} 
+            \gantttitle{Abr}{4} 
+            \gantttitle{May}{4} \\
+
+            % Aquí puedes agregar tus tareas con las fechas correspondientes
+            \ganttgroup{Desarrollo}{19}{54} \\
+            \ganttbar[bar/.style={fill=green}]{Desarrollo de Arquitectura}{19}{22} \\
+            \ganttbar[bar/.style={fill=green}]{Modulo de Registro}{23}{30} \\
+            \ganttbar[bar/.style={fill=green}]{Modulo de Cuidados}{29}{40} \\
+            \ganttbar[bar/.style={fill=green}]{Modulo de Comunicacion}{39}{46} \\
+            \ganttbar[bar/.style={fill=green}]{Modulo de Comunicacion}{47}{54} \\ 
+
+            \ganttgroup{Testing}{37}{56} \\
+            \ganttbar[bar/.style={fill=purple}]{Interno}{37}{54} \\
+            \ganttbar[bar/.style={fill=purple}]{UAT}{49}{56} \\
+
+            \ganttgroup{Implementación}{53}{56} \\
+            \ganttbar[bar/.style={fill=yellow}]{Implementación}{53}{56} \\
+
+            \ganttgroup{Seguimiento}{55}{60} \\
+            \ganttbar[bar/.style={fill=orange}]{Implementación}{55}{60} \\
+
+        \end{ganttchart}
+    \end{landscape}
 
 
 
