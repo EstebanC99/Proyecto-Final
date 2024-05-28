@@ -9,6 +9,8 @@
 \usepackage{pgf-pie}
 \usepackage{pgfgantt}
 \usepackage{pdflscape}
+\usepackage[backend=biber]{biblatex}
+\bibliography{Recursos/Bibliografia}
 
 % CUERPO
 \begin{document}
@@ -296,13 +298,14 @@
     \section{Alternativas de solución}
     Actualmente en el mercado, no existe una aplicación que abarque de forma integral el cuidado de personas dependientes, ya sean adultos mayores, niños pequeños, o aquellos con condiciones particulares que requieran de atención y cuidado constante.\newline
     Las propuestas alternativas existentes en el mercado abarcan algunas de las problemáticas de forma independiente, pero no engloban la totalidad que ofrece nuestra aplicación.\newline
+    Nuestra iniciativa de solución surgió a partir de la necesidad real de nuestras propias experiencias, de conocidos y allegados que se encuentran estando a cargo de otras personas, en nuestra experiencia y la de ellos, se utilizan distintas herramientas para ayudar en algunas de las problemáticas, pero ninguna ofrece una solución que las englobe en su totalidad.\newline
     Entre las que encontramos e investigamos, destacamos dos que consideramos próximas al alcance del proyecto en cuestión.
     \subsection{Cuidarlos}
     Cuidarlos es una aplicación que facilita conectar aquellas personas con vocación de servicio en cuidar adultos mayores con aquellos que necesitan los cuidados.
     \subsubsection{Abstract}
     Nuestra misión es generar un ecosistema que garantice acceder al mejor cuidado de las personas, que brinde oportunidades a quienes tienen vocación de servicio para destacarse y que seamos un medio para gestionar simple y eficientemente que la vida independiente en los hogares sea una realidad que mejore significativamente la calidad de quienes sean parte. \newline
     Queremos que todos los que integramos Cuidarlos, los que se sumen como familiares, cuidadores, proveedores, financiadores dejen una verdadera huella positiva en el otro. Que las familias puedan sentir que quienes cuidan de sus seres queridos lo hacen con el mismo cariño, compromiso y respeto como si lo hicieran ellos. Que pueden estar tranquilos que las elecciones que hacen mejoran significativamente la calidad de vida de su ser querido. Deseamos que los cuidadores puedan desarrollarse y estén lo suficientemente formados académica y espiritualmente para dar lo mejor de sí en pos del bienestar de quienes cuidan y sus familias. Que sientan que haber estado en esa etapa de la vida fue significativo y que son parte de muchas familias que les agradecen y valoran contar con ellos. \newline
-    Nosotros desde Cuidarlos queremos ser solamente el vehículo que desarrolle este ecosistema, permitiendo dejar esa huella tan significativa que implica cuidar del otro dando lo mejor de nosotros mismos. \newline
+    Nosotros desde Cuidarlos queremos ser solamente el vehículo que desarrolle este ecosistema, permitiendo dejar esa huella tan significativa que implica cuidar del otro dando lo mejor de nosotros mismos.\cite{Cuidarlos}
     \subsubsection{Funcionalidades}
     Las funcionalidades en común entre ambas aplicaciones son las siguientes:
     \begin{itemize}
@@ -322,7 +325,7 @@
     \subsection{MyTherapy}
     Esta aplicación, aborda la problemática desde el enfoque de la salud, permitiendo añadir y registrar recordatorios de pastillas y medicamentos, seguimiento del estado de salud de los adultos mayores en el día a día, reporte e informes del mismo para utilizar cómo respaldo en citas médicas, y conectividad con familiares para que los mismos puedan estar al pendiente de la situación.
     \subsubsection{Abstract}
-    Sabemos que llevar al día su medicación y cumplir con sus metas diarias es más fácil decirlo que hacerlo. En MyTherapy nos esforzamos por hacer su vida más fácil. Nuestra misión es simplificar su tratamiento sin importar lo complejo que sea y hacer posible que usted tenga el control de su salud. Somos un equipo internacional formado por diseñadores, desarrolladores y entusiastas de la salud digital, y todos compartimos el mismo objetivo, ayudarle de la mejor manera posible.
+    Sabemos que llevar al día su medicación y cumplir con sus metas diarias es más fácil decirlo que hacerlo. En MyTherapy nos esforzamos por hacer su vida más fácil. Nuestra misión es simplificar su tratamiento sin importar lo complejo que sea y hacer posible que usted tenga el control de su salud. Somos un equipo internacional formado por diseñadores, desarrolladores y entusiastas de la salud digital, y todos compartimos el mismo objetivo, ayudarle de la mejor manera posible. \cite{MyTherapy}
     \subsubsection{Funcionalidades}
     Dentro de las funciones compartidas por ambas aplicaciones tenemos:
     \begin{itemize}
@@ -340,6 +343,18 @@
     \end{itemize}
     \subsubsection{Conclusión}
     En conclusión, \textit{MyTherapy} aborda de una manera completa la problemática relacionada con los recordatorios del plan de salud del adulto mayor. Pero no incluye una participación activa ni considera, a aquellas personas responsables del cuidado y de asegurar el bienestar de la persona en cuestión. Desde nuestra aplicación, fomentamos la comunicación y el interés constante de los cuidadores y familiares responsables, permitiendo la comunicación interna entre ellos, calendario de actividades y registro de signos vitales compartidos, para que estén al corriente de la situación de forma inmediata, efectiva y coordinada entre todos.
+    \subsection{Herramientas adicionales}
+    Como mencionamos previamente, al no abarcar la totalidad de la problemática, Las personas utilizan estas aplicaciones sumadas a herramientas o métodos para comunicar y establecer las indicaciones. Dentra de las mismas podemos encontrar:
+    \begin{itemize}
+        \item \textbf{Whatsapp:} Utilizada para comunicarse entre las personas que están a cargo, cuidadores e incluso la persona que se encuentra al cuidado en caso de que esto sea posible.
+        \item \textbf{Anotadores o pizarras:} En ellas se dejan escritas y detalladas la indicaciones médicas, horarios, nombres de medicamentos y sus cantidades. Estas anotaciones en general se encuentran donde reside la persona al cuidado y están a la vista de todos para que puedan ser consultadas en todo momento.
+        \item \textbf{Calendarios:} Otra de las herramientas son los calendarios tanto físicos como los propios de cada dispositivo móvil. En ellos se dejan recordatorios de turnos, terapias y actividades.
+        \item \textbf{Alarmas:} Se utilizan alarmas de dispositivos, programadas en ciertos horarios a modo de recordatorio de medicamentos, con descripciones que indican que medicamento se debe administrar y en que cantidad.
+    \end{itemize}
+    \subsection{En resumen}
+    La principal diferencia entre las alternativas que se utilizan en conjunto actualmente y la solución que proponemos, es que esta última tiene integradas todas las funcionalidades y brinda solución a todas las problemáticas de forma conjunta. Mediante la aplicación se podrá registrar y llevar seguimiento de todas las tareas que se llevaban a cabo en dos o más herramientas. \newline
+    Otra de las cuestiones que se tienen en cuenta es que al utilizar distintas herramientas y aplicaciones muchas veces la información se encuentra desactualizada, la comunicación no es clara y es fácil que se pierda o existan errores. Al tener toda la información y medios de comunicación sobre indicaciones o medicamentos en un solo lugar estas problemáticas se solucionan o minimizan los riesgos de que ocurran. \newline
+    Por otro lado, teniendo en cuenta las herramientas como alarmas o calendarios, mediante la solución que proponemos, los horarios y fechas de las distintas actividades, se encontrará disponible para que pueda ser consultada y actualizada para todos los cuidadores en todo momento. Muchas veces, cuando hay más de un cuidador a cargo de una persona, ambos deben concordar en tener las aplicaciones descargadas, establecer los mismos horarios y notificaciones en los dispositivos propios de cada uno. Lo que conlleva a que debido a olvidos o falta de comunicación queden mal establecidos los mismos.
 
     \newpage
 
@@ -347,6 +362,7 @@
     \section{Diagrama de Gantt}
     Considerando una versión inicial del proyecto, elaboramos un diagrama de Gantt preliminar, con tareas definidas en alto nivel que abarquen el proceso integral de análisis, desarrollo e implementación de la aplicación en cuestión.
     \subsection{Diagrama preliminar}
+    Cada uno de los recuadros del diagrama es equivalente a una \textit{semana}. Además, tomamos como definición que cada mes tiene \textit{cuatro semanas}.
     
     \begin{landscape}
         \begin{ganttchart}[
@@ -455,5 +471,5 @@
     \end{landscape}
 
 
-
+    \printbibliography[heading=bibintoc]
 \end{document}
