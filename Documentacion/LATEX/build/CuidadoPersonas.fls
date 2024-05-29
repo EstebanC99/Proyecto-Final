@@ -293,10 +293,13 @@ INPUT .\Imagenes\Organigrama.jpg
 INPUT .\Imagenes\Organigrama.jpg
 INPUT .\Imagenes\Organigrama.jpg
 INPUT .\Imagenes\Organigrama.jpg
+INPUT C:\Users\Esteban\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\tcrm1200.tfm
 INPUT C:\Users\Esteban\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
 INPUT c:\GitRepositorios\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.aux
 INPUT c:\GitRepositorios\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.run.xml
 OUTPUT c:\GitRepositorios\Proyecto-Final\Documentacion\LATEX\build\CuidadoPersonas.run.xml
+INPUT C:\Users\Esteban\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
+INPUT C:\Users\Esteban\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1200.pk
 INPUT C:\Users\Esteban\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\Esteban\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\Esteban\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb

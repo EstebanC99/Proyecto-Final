@@ -1,14 +1,16 @@
 # Fdb version 4
-["biber build/CuidadoPersonas"] 1716939948.76539 "build/CuidadoPersonas.bcf" "build/CuidadoPersonas.bbl" "build/CuidadoPersonas" 1716939957.63921 0
+["biber build/CuidadoPersonas"] 1716939948.76539 "build/CuidadoPersonas.bcf" "build/CuidadoPersonas.bbl" "build/CuidadoPersonas" 1716953657.77656 0
   "Recursos/Bibliografia.bib" 1716939441 363 4ed5c6f62508a42537aafc2f926ee283 ""
-  "build/CuidadoPersonas.bcf" 1716939957 108616 6c450d67efc4388c9e9ad8ab13fc332d "pdflatex"
+  "build/CuidadoPersonas.bcf" 1716953657 108616 6c450d67efc4388c9e9ad8ab13fc332d "pdflatex"
   (generated)
   "build/CuidadoPersonas.bbl"
   "build/CuidadoPersonas.blg"
   (rewritten before read)
-["pdflatex"] 1716939954.69863 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1716939957.64009 0
+["pdflatex"] 1716953654.32108 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1716953657.7779 0
   "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1716939566 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
+  "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1200.pk" 1716953260 14064 a471a7201bd8d7549bb2ffb22a61a2ae ""
   "C:/Users/Esteban/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1716244229 24241339 3077246b9c5114d998917a073f805713 ""
+  "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/fonts/tfm/jknappen/ec/tcrm1200.tfm" 993062508 1444 95ffe0f19b974d50849790c8225c7ef7 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx10.tfm" 1136765053 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx12.tfm" 1136765053 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmcsc10.tfm" 1136765053 1300 63a6111ee6274895728663cf4b4e7e81 ""
@@ -158,14 +160,14 @@
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/pgfgantt/pgfgantt.sty" 1515768374 49409 88c861f46c2f86a25c7b7d0c7b0072ed ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "CuidadoPersonas.tex" 1716939944 38287 57e7bc73b10df1e4048af052334be0a3 ""
+  "CuidadoPersonas.tex" 1716953653 52689 bfa2d92c97e7d190118eb3855e29ef08 ""
   "Imagenes/LogoUTN.png" 1716241020 12626 e66b0cd860fb45faa188f715304b8a98 ""
   "Imagenes/Organigrama.jpg" 1716241652 14846 d878450e9f13b2f1e71b18b7a2b964bf ""
-  "build/CuidadoPersonas.aux" 1716939957 5830 17f0c1fee1cb7550975f2d86debc0acd "pdflatex"
+  "build/CuidadoPersonas.aux" 1716953657 5830 2cfe085a75e079be067fa9c878970e4a "pdflatex"
   "build/CuidadoPersonas.bbl" 1716939951 3072 205a2c67d0147541b13fc9b851ace92d "biber build/CuidadoPersonas"
-  "build/CuidadoPersonas.run.xml" 1716939957 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
-  "build/CuidadoPersonas.toc" 1716939957 3488 88b5a8e9ce906f7bff610d3ea2efca37 "pdflatex"
-  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1716939944 38287 57e7bc73b10df1e4048af052334be0a3 ""
+  "build/CuidadoPersonas.run.xml" 1716953657 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
+  "build/CuidadoPersonas.toc" 1716953657 3488 54509ff8e0c7fd43503257cffc14a1b1 "pdflatex"
+  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1716953653 52689 bfa2d92c97e7d190118eb3855e29ef08 ""
   (generated)
   "build/CuidadoPersonas.aux"
   "build/CuidadoPersonas.bcf"
