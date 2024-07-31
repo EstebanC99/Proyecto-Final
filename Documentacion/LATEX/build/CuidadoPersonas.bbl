@@ -19,6 +19,76 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global/global}
+    \entry{ConsejoProfesionalCienciasInformaticas}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=f549a050f0437e4efeec98f8b46e9133}{%
+           family={Ciencias\bibnamedelima Informáticas},
+           familyi={C\bibinitperiod\bibinitdelim I\bibinitperiod},
+           given={Consejo\bibnamedelima Profesional},
+           giveni={C\bibinitperiod\bibinitdelim P\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+      }
+      \strng{namehash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{fullhash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{fullhashraw}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{bibnamehash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{authorbibnamehash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{authornamehash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{authorfullhash}{f549a050f0437e4efeec98f8b46e9133}
+      \strng{authorfullhashraw}{f549a050f0437e4efeec98f8b46e9133}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Honorarios Recomendados}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://cpcipc.org.ar/honorarios-recomendados/
+      \endverb
+      \verb{url}
+      \verb https://cpcipc.org.ar/honorarios-recomendados/
+      \endverb
+    \endentry
+    \entry{TerminosCondiciones1}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=49797d50fe59407d861feeb9be2a3774}{%
+           family={Gabinete\bibnamedelimb de\bibnamedelimb Ministros\bibnamedelima Argentina},
+           familyi={G\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim A\bibinitperiod},
+           given={Jefatura},
+           giveni={J\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+      }
+      \strng{namehash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{fullhash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{fullhashraw}{49797d50fe59407d861feeb9be2a3774}
+      \strng{bibnamehash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{authorbibnamehash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{authornamehash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{authorfullhash}{49797d50fe59407d861feeb9be2a3774}
+      \strng{authorfullhashraw}{49797d50fe59407d861feeb9be2a3774}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Términos y Condiciones de Aplicación}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2020}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.argentina.gob.ar/sites/default/files/terminos_y_condiciones_aplicacion_cuidar_-_covid_19_-_v5.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.argentina.gob.ar/sites/default/files/terminos_y_condiciones_aplicacion_cuidar_-_covid_19_-_v5.pdf
+      \endverb
+    \endentry
     \entry{Cuidarlos}{online}{}{}
       \name{author}{1}{}{%
         {{hash=047bb3325acea674b81fd07386728ff1}{%
@@ -50,6 +120,180 @@
       \endverb
       \verb{url}
       \verb https://www.cuidarlos.com/
+      \endverb
+    \endentry
+    \entry{Ley11723}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=bd0fcee26e6e07981b2786f6db0a47be}{%
+           family={Nación\bibnamedelima Argentina},
+           familyi={N\bibinitperiod\bibinitdelim A\bibinitperiod},
+           given={Honorable\bibnamedelima Congreso},
+           giveni={H\bibinitperiod\bibinitdelim C\bibinitperiod},
+           prefix={de\bibnamedelima la},
+           prefixi={d\bibinitperiod\bibinitdelim l\bibinitperiod}}}%
+      }
+      \strng{namehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{bibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorbibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authornamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \field{extraname}{1}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Ley 11723: Propiedad Intelectual}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{1933}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/propiedad-intelectual
+      \endverb
+      \verb{url}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/propiedad-intelectual
+      \endverb
+    \endentry
+    \entry{Ley25326}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=bd0fcee26e6e07981b2786f6db0a47be}{%
+           family={Nación\bibnamedelima Argentina},
+           familyi={N\bibinitperiod\bibinitdelim A\bibinitperiod},
+           given={Honorable\bibnamedelima Congreso},
+           giveni={H\bibinitperiod\bibinitdelim C\bibinitperiod},
+           prefix={de\bibnamedelima la},
+           prefixi={d\bibinitperiod\bibinitdelim l\bibinitperiod}}}%
+      }
+      \strng{namehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{bibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorbibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authornamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \field{extraname}{2}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Ley 25326: Datos Peronales}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2000}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/datos-personales
+      \endverb
+      \verb{url}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/datos-personales
+      \endverb
+    \endentry
+    \entry{Ley26388}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=bd0fcee26e6e07981b2786f6db0a47be}{%
+           family={Nación\bibnamedelima Argentina},
+           familyi={N\bibinitperiod\bibinitdelim A\bibinitperiod},
+           given={Honorable\bibnamedelima Congreso},
+           giveni={H\bibinitperiod\bibinitdelim C\bibinitperiod},
+           prefix={de\bibnamedelima la},
+           prefixi={d\bibinitperiod\bibinitdelim l\bibinitperiod}}}%
+      }
+      \strng{namehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{fullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{bibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorbibnamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authornamehash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhash}{bd0fcee26e6e07981b2786f6db0a47be}
+      \strng{authorfullhashraw}{bd0fcee26e6e07981b2786f6db0a47be}
+      \field{extraname}{3}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Ley 26388: Delitos Informáticos}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2008}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/delitos-informaticos
+      \endverb
+      \verb{url}
+      \verb https://www.argentina.gob.ar/justicia/derechofacil/leysimple/delitos-informaticos
+      \endverb
+    \endentry
+    \entry{TerminosCondiciones3}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8c677bee99d56381f1034b4f02d247be}{%
+           family={S.A.},
+           familyi={S\bibinitperiod},
+           given={BEX\bibnamedelima Technology},
+           giveni={B\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+      }
+      \strng{namehash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{fullhash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{fullhashraw}{8c677bee99d56381f1034b4f02d247be}
+      \strng{bibnamehash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{authorbibnamehash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{authornamehash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{authorfullhash}{8c677bee99d56381f1034b4f02d247be}
+      \strng{authorfullhashraw}{8c677bee99d56381f1034b4f02d247be}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Términos y Condiciones App de Salud}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2018}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.bextsa.com/sites/default/files/aplicacion-de-salud/Terminos-y-condiciones-Apps-Salud.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.bextsa.com/sites/default/files/aplicacion-de-salud/Terminos-y-condiciones-Apps-Salud.pdf
+      \endverb
+    \endentry
+    \entry{TerminosCondiciones2}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=ad3e5304ce9e2770c55b6a8b9e7fd251}{%
+           family={Salud},
+           familyi={S\bibinitperiod},
+           given={ASI},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{fullhash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{fullhashraw}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{bibnamehash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{authorbibnamehash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{authornamehash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{authorfullhash}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \strng{authorfullhashraw}{ad3e5304ce9e2770c55b6a8b9e7fd251}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Términos y Condiciones APP}
+      \field{urlday}{29}
+      \field{urlmonth}{7}
+      \field{urlyear}{2024}
+      \field{year}{2020}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://asi.com.ar/terminos-y-condiciones-app/
+      \endverb
+      \verb{url}
+      \verb https://asi.com.ar/terminos-y-condiciones-app/
       \endverb
     \endentry
     \entry{MyTherapy}{online}{}{}

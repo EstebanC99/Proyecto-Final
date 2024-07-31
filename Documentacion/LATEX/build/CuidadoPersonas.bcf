@@ -2374,6 +2374,14 @@
   <bcf:section number="0">
     <bcf:citekey order="1" intorder="1">Cuidarlos</bcf:citekey>
     <bcf:citekey order="2" intorder="1">MyTherapy</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">Ley25326</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">Ley26388</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">Ley11723</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">TerminosCondiciones1</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">TerminosCondiciones2</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">TerminosCondiciones3</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">Ley25326</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">ConsejoProfesionalCienciasInformaticas</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">
