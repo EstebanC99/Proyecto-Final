@@ -800,6 +800,392 @@
     \par Tomando en cuenta los calcules de costos de personal y el hecho de no tener por el momento costos de materiales y servicios, el costo total de presupuesto se traduce en el siguiente:
     \[ Total = Total Personal + Total Materiales Servicios = \$15000 USD \]
 
+    \newpage
+
+% Análisis de Factibilidad
+    \section{Análisis de datos}
+    \par A modo de mostrar el análisis y modelado de datos, incluimos un diagrama preliminar elaborado en \textbf{SQL Server}.
+    \\
+    \subsection{Diagrama de datos}
+    \par \includegraphics[width=1\textwidth]{Imagenes/DER.png}
+
+    \newpage
+
+% Metodología a Utilizar
+    \section{Metodología a utilizar}
+    \par Falta info para completar aca.
+
+    \newpage
+
+% Tamaño del Sistema
+    \section{Cálculo del tamaño del sistema}
+    \par Para realizar el cálculo del tamaño del sistema, elaboramos un análisis de cuáles van a ser las funcionalidades principales del sistema y los módulos necesarios para el funcionamiento principal de la aplicación. A continuación describiremos brevemente cada uno de ellos.
+    \subsection{Iniciar Sesión}
+    \par Los usuarios pueden acceder al sistema a través de la opción de \textit{"Iniciar sesión"} disponible en la primera pantalla de la aplicación, la cual también ofrece la opción de \textit{"Registrarse"}.
+    \par Al seleccionar \textit{"Iniciar sesión"}, se mostrará la pantalla de autenticación. En esta, los usuarios deberán completar los campos:
+    \begin{itemize}
+        \item Usuario
+        \item Contraseña
+    \end{itemize}
+    \par Estos datos deben coincidir con los proporcionados al momento de la creación de la cuenta. 
+    \par Al presionar el botón \textit{"Ingresar"}, el sistema verificará la validez de la información ingresada. Si los datos son correctos, se permitirá el acceso al menú principal de la aplicación. Si alguno de los campos es incorrecto, se mostrará un mensaje de error debajo de los campos correspondientes, informando al usuario del problema e impidiendo el acceso.
+    \par Adicionalmente, esta pantalla incluye un botón de recuperación de contraseña (\textit{"¿Olvidaste tu contraseña?"}) que enviará un correo de restablecimiento al email registrado en la cuenta, en caso de que el usuario no recuerde la misma.
+    \par Finalmente, para quienes aún no tengan una cuenta, se incluye el botón \textit{"Crear cuenta"}, acompañado del mensaje \textit{"¿Aún no tienes cuenta?"}. Al pulsarlo, el sistema redirigirá a la pantalla de registro.
+    \par Por otro lado, el inicio de sesión y el registro de un usuario son procesos separados. Esto significa que una persona puede estar registrada en el sistema sin haber creado un usuario y contraseña de acceso. Esto es posible porque la aplicación está diseñada para permitir que los datos de usuarios que no tienen los medios o capacidades para utilizarla sean ingresados a través de sus responsables o cuidadores. En estos casos, podría haber usuarios que no hayan iniciado sesión anteriormente, pero que deseen hacerlo por primera vez. En tal situación, el sistema deberá redirigirlos a una pantalla donde puedan crear sus credenciales de acceso (usuario y contraseña) por primera vez.
+    \subsection{ABM de Usuarios}
+    \par Este módulo permite gestionar eficientemente a los usuarios mediante las siguientes acciones:
+    \begin{itemize}
+        \item \textbf{Alta de usuarios:} Registrar nuevos usuarios e ingresar sus datos personales.
+        \item \textbf{Baja de usuarios:} Eliminar usuarios cuando sea necesario, revocando su acceso al sistema.
+        \item \textbf{Modificación de datos:} Actualizar información personal de los usuarios, como nombres, datos de contacto o incluso cambiar su rol dentro del sistema.
+    \end{itemize}
+    \par Consideraciones adicionales:
+    \begin{itemize}
+        \item No es posible crear un usuario si alguno de los campos obligatorios no ha sido completado.
+        \item Un usuario puede estar registrado solo una vez en el sistema, por lo que se debe validar que no exista.
+        \item Es obligatorio que el usuario acepte los Términos y Condiciones para completar el registro; en caso de no aceptarlos, no se procesará la creación de la cuenta.
+    \end{itemize}
+    \subsection{Menú Principal}
+    \par La pantalla del menú principal es la interfaz central del sistema, desde la cual los usuarios pueden acceder a las diferentes funcionalidades de la aplicación. Esta será la pantalla predeterminada a la que se regresará cada vez que se presione el ícono de la aplicación en las distintas pantallas donde esté disponible.
+    \par El menú principal cuenta con dos botones principales ubicados en la parte superior:
+    \begin{itemize}
+        \item \textbf{Perfil:} Al presionar este ícono, se despliega una pantalla que muestra el perfil del usuario, incluyendo todos sus datos personales. Desde aquí, es posible modificar la información del mismo.
+        \item \textbf{Configuración:} Este botón despliega un menú con opciones relacionadas a la configuración del sistema.
+    \end{itemize}
+    \par Ambas pantallas de configuración y perfil contarán con un botón que permite regresar fácilmente al menú principal.
+    \par Además, la pantalla del menú principal presenta varios botones que permiten acceder a las funcionalidades claves del sistema, cada uno de ellos enlazados a su respectiva sección:
+    \begin{itemize}
+        \item Mi calendario
+        \item Mi equipo
+        \item Chats
+        \item Datos
+        \item Personas a cargo
+        \item Emergencia
+        \item Mi salud
+    \end{itemize}
+    \par Al presionar cualquiera de estos botones, el usuario será dirigido a la pantalla correspondiente, permitiendo un acceso rápido y eficiente a las diversas funciones de la aplicación.
+    \subsection{Mi Perfil}
+    \par El módulo \textit{Mi perfil} permite a los usuarios visualizar y editar su información personal. La pantalla principal del perfil incluye los datos personales del usuario. Cada uno de los campos cuenta con un ícono de edición, lo que permite al usuario actualizar sus datos de manera sencilla. La interfaz es clara y accesible, mostrando un ícono de perfil en la parte superior y un botón de navegación para volver a la pantalla anterior. Además, la información está organizada de manera ordenada, con botones para modificar cada uno de los campos de manera independiente.
+    \subsection{Configuración}
+    \par El módulo de \textit{Configuración} brinda a los usuarios diversas opciones para gestionar su cuenta y mantener la seguridad de su información.
+    \begin{itemize}
+        \item \textbf{Términos y condiciones:} Permite acceder a una pantalla que muestra los términos y condiciones aceptados al crear la cuenta. Los usuarios pueden revisarlos en cualquier momento y regresar al menú anterior mediante un botón de navegación.
+        \item \textbf{Seguridad y privacidad:} Incluye dos opciones.
+        \item \textbf{Cambio de contraseña:} Facilita la modificación de la contraseña, siguiendo el mismo procedimiento descrito en la sección de recuperación de contraseña.
+        \item \textbf{Eliminación de cuenta:} Ofrece la opción de eliminar la cuenta de usuario. Antes de proceder, se solicita confirmación mediante un mensaje de advertencia. Si el usuario confirma, la cuenta se eliminará de forma definitiva; si elige cancelar, no se realizarán cambios.
+        \item \textbf{Cerrar sesión:} Permite al usuario cerrar la sesión y regresar automáticamente a la pantalla de inicio.
+    \end{itemize}
+    \subsection{ABM de Responsables}
+    \par El módulo de \textit{Administración, Baja y Modificación (ABM) de Responsables} permite gestionar a los usuarios que tienen asociados a otros usuarios, conocidos como responsables. Ellos poseen permisos adicionales que les permiten modificar los datos personales de los usuarios y realizar otras acciones específicas.
+    \par Desde la pantalla del menú principal, al presionar el botón \textit{"Mi equipo"}, los usuarios accederán a una interfaz que muestra todos los responsables y cuidadores asociados. Este módulo permite gestionar los permisos y accesos de cada miembro del equipo de cuidado del usuario a través de las siguientes funcionalidades:
+    \begin{itemize}
+        \item \textbf{Alta de responsables:} Facilita el registro de nuevos cuidadores en el equipo.
+        \item \textbf{Baja de responsables:} Permite eliminar a un responsable o cuidador del equipo de cuidado. Esta acción revocará su acceso y permisos en el sistema.
+        \item \textbf{Modificación de responsables:} Ofrece la opción de actualizar los permisos de cada miembro del equipo. Desde la pantalla de gestión, el usuario podrá acceder a los detalles del cuidador seleccionado y realizar las modificaciones necesarias.
+    \end{itemize}
+    \par Desde esta interfaz, los usuarios podrán tener un registro claro de quienes componen su equipo de cuidado, así como gestionar eficazmente sus accesos y permisos.
+    \subsection{ABM de Cuidadores}
+    \par Los cuidadores son personas encargadas de realizar diversas actividades de cuidado para el usuario. Por esta razón, es fundamental que tengan acceso a ciertas funcionalidades e información del usuario. Desde la pantalla del menú principal, al presionar el botón \textit{"Mi equipo"}, los usuarios accederán a una interfaz que muestra todos los responsables y cuidadores asociados. Este módulo permite gestionar los permisos y accesos de cada miembro del equipo de cuidado a través de las siguientes funcionalidades:
+    \begin{itemize}
+        \item \textbf{Alta de cuidadores:} Esta opción permite a los usuarios agregar nuevos cuidadores a su equipo. Una vez registrado, se le asignarán los permisos correspondientes para acceder a las funcionalidades necesarias.
+        \item \textbf{Baja de cuidadores:} Esta funcionalidad permite a los usuarios eliminar a un cuidador del equipo. Al realizar esta acción, se revocará de inmediato su acceso y permisos en el sistema, garantizando que solo los cuidadores activos puedan interactuar con la información del usuario.
+        \item \textbf{Modificación de cuidadores:} A través de esta opción, los usuarios pueden actualizar los permisos de los cuidadores existentes. Desde la interfaz, podrán acceder a los detalles de cada cuidador y realizar los cambios necesarios de manera sencilla y eficiente.
+    \end{itemize}
+    \par Este módulo facilita la gestión del equipo de cuidado, asegurando que los usuarios puedan agregar, eliminar o modificar cuidadores según sus necesidades.
+    \subsection{ABM de Personas a Cargo}
+    \par Desde el menú principal, los usuarios pueden acceder al módulo \textit{ABM de Personas a Cargo} mediante el botón \textit{“Personas a cargo”}. Este módulo permite gestionar a los responsables y cuidadores en los que forma parte del equipo de cuidado de otros usuarios, facilitando así el alta, baja y modificación de los datos de las personas a su cargo.
+    \par Al ingresar, se mostrará un listado de todas las personas que están bajo la responsabilidad del usuario, diferenciando entre las secciones correspondientes a responsables y cuidadores. Desde esta interfaz, los usuarios pueden acceder a los datos y funcionalidades de las personas a su cargo.
+    \par Las funcionalidades disponibles incluyen:
+    \begin{itemize}
+        \item \textbf{Modificar datos:} Permite actualizar la información de la persona a cargo, siempre que los permisos lo permitan, seleccionando el perfil correspondiente para realizar los cambios necesarios.
+        \item \textbf{Eliminar:} Ofrece la opción de eliminar a una persona del equipo de cuidado, revocando su acceso y cualquier funcionalidad asociada.
+    \end{itemize}
+    \par Además, este módulo facilita la creación de cuentas para personas que no cuentan con los medios o habilidades necesarias para usar la aplicación. Este proceso es esencial para llevar un registro de su estado de salud y actividades.
+    \par Para crear una cuenta, se presentará un campo inicial donde se consultará si la cuenta será para el usuario que está realizando el registro o si se están ingresando datos para otra persona. Esta opción es crucial, dado que la aplicación está diseñada para aquellos que cuidan a otros que, en muchos casos, no pueden utilizar un celular debido a su condición.
+    \par Al seleccionar la opción de registro para otra persona, se deberán completar los siguientes campos:
+    \begin{itemize}
+        \item Nombre
+        \item Apellido
+        \item Documento
+        \item Fecha de nacimiento
+        \item Correo electrónico
+        \item Imagen
+    \end{itemize}
+    \par Una vez que se hayan completado correctamente todos los campos y superadas las validaciones correspondientes, el usuario deberá aceptar los \textit{“Términos y condiciones”} marcando la casilla correspondiente. Finalmente, debe presionar el botón \textit{“Crear cuenta”} para registrar el alta de la misma.
+    \subsection{Gestión de Agenda}
+    \par Una de las funcionalidades principales del sistema es la \textit{Gestión de Agenda}, donde se registran actividades, eventos, recordatorios de medicamentos y cualquier otra información que el usuario o su equipo considere relevante recordar. Desde la pantalla del menú principal, los usuarios pueden acceder a esta función.
+    \par En la pantalla de gestión de agenda se presentará un listado de todas las notificaciones agendadas, cada una de las cuales mostrará:
+    \begin{itemize}
+        \item Fecha
+        \item Hora
+        \item Descripción
+    \end{itemize}
+    \par Cada ítem del listado funcionará como una notificación de celular. Al presionar el botón de registro, se conectará con el correo electrónico que el usuario ingresó al crear su cuenta, permitiendo la visualización de los registros en Google Calendar.
+    \par Además, los ítems del listado pueden ser modificados o eliminados únicamente si la fecha y hora de la actividad aún no han transcurrido. Esto asegura que los usuarios mantengan control sobre su agenda.
+    \par Las notificaciones se enviarán al celular del usuario, así como también a los cuidadores o responsables designados, garantizando que todos estén informados sobre las actividades y recordatorios relevantes.
+    \subsection{Chats}
+    \par El módulo \textit{Chats} permite a los usuarios comunicarse de manera efectiva con su equipo. Para acceder a esta funcionalidad, simplemente deben presionar el botón de \textit{"Chats"} en el menú principal.
+    \par En la pantalla de chats, se presentará un listado organizado en secciones, que incluirá:
+    \begin{itemize}
+        \item Mi chat
+        \item Soy responsable
+        \item Soy cuidador
+    \end{itemize}
+    \par Dependiendo de la situación del usuario, se mostrarán los chats correspondientes, y el usuario podrá acceder a ellos y realizar acciones según los permisos asignados.
+    \par Cada persona cuenta con un chat que facilita la comunicación con los miembros de su equipo. En este espacio, es posible enviar mensajes de texto o imágenes. Además, cada mensaje enviado quedará registrado con el nombre del usuario, así como la fecha y hora de envío, garantizando un seguimiento claro de la comunicación.
+    \subsection{Análisis de Datos}
+    \par Al módulo \textit{Análisis de Datos} se puede acceder desde la pantalla del menú principal. En esta sección, se presentará un conjunto de gráficos y conclusiones que reflejan el análisis de datos de cada uno de los usuarios. Esta visualización facilitará la comprensión de la información y permitirá tomar decisiones informadas sobre el cuidado y la gestión de la salud.
+    \par Además, las personas que forman parte del equipo de trabajo del usuario podrán acceder a estos datos, siempre que cuenten con los permisos necesarios, asegurando así una colaboración eficaz y el seguimiento adecuado de la situación del usuario.
+    \subsection{Emergencia}
+    \par El botón de \textit{Emergencia} es una funcionalidad esencial que permite al usuario solicitar ayuda de manera rápida y eficiente. Desde el menú principal de la aplicación, el usuario puede presionar el botón designado como \textit{"Emergencia"}.
+    \par Al activar este botón, se enviará una notificación instantánea a todos los miembros del equipo de la persona, incluidos responsables y cuidadores. Esta notificación informará a cada uno de ellos que el usuario está solicitando asistencia inmediata.
+    \par La notificación incluirá información relevante, como la identificación del usuario que ha activado la emergencia, lo que permitirá a los miembros del equipo actuar con rapidez y eficacia. Además, se garantizará que la comunicación sea clara, para que los responsables y cuidadores comprendan la urgencia de la situación y puedan responder de acuerdo a la necesidad del usuario.
+    \par Esta función está diseñada para ofrecer tranquilidad tanto al usuario como a su equipo, asegurando que la ayuda en momentos críticos.
+    \subsection{Gestión de Salud}
+    \par El módulo \textit{"Mi salud"} ofrece a los usuarios un espacio personal para gestionar su historial médico de forma integral. En esta sección, los usuarios pueden registrar y consultar una amplia variedad de información relacionada con su salud, incluyendo:
+    \begin{itemize}
+        \item \textbf{Hábitos de vida:} Permite llevar un registro detallado de hábitos como alimentación, ejercicio, sueño y consumo de sustancias, facilitando el seguimiento de los estilos de vida saludables.
+        \item \textbf{Recomendaciones médicas:} Muestra las recomendaciones personalizadas proporcionadas por los profesionales de la salud, basadas en la información registrada en el sistema.
+        \item \textbf{Eventos de salud:} Permite registrar eventos relevantes como hospitalizaciones, consultas médicas y otros acontecimientos significativos para la salud del usuario.
+    \end{itemize}
+    \par Esta información es de gran utilidad para los usuarios, ya que les permite tener un control completo sobre su salud. Además, los miembros del equipo de cuidado del usuario pueden acceder a esta información, siempre y cuando cuenten con los permisos correspondientes, para brindar una atención.
+    \subsection{Gestión de Eventos}
+    \par El módulo de \textit{Gestión de Eventos} tiene como objetivo permitir a los usuarios y a su equipo de cuidado registrar, consultar y analizar eventos relacionados con la salud y el bienestar del usuario. Este módulo, accesible desde la pantalla de \textit{"Mi salud"}, proporciona un contexto más amplio para comprender la evolución del estado de salud del usuario a lo largo del tiempo.
+    \par Desde allí se podrá:
+    \begin{itemize}
+        \item \textbf{Registrar eventos:} El sistema permitirá registrar diversos tipos de eventos, tales como citas médicas, hospitalizaciones, tratamientos, cambios en la medicación, intervenciones quirúrgicas y eventos relacionados con el estado de ánimo y el bienestar general.
+        \item \textbf{Gestionar estados de ánimo:} Tanto el usuario como su equipo podrán registrar el estado de ánimo de forma periódica, lo que permitirá identificar patrones y tendencias en el bienestar emocional.
+        \item \textbf{Agregar notas:} El módulo permitirá añadir notas y observaciones relevantes a cada evento, facilitando así un seguimiento detallado de la evolución del estado de salud.
+        \item \textbf{Visualizar línea de tiempo:}  Los eventos registrados se presentarán en una línea de tiempo visual, lo que facilitará la identificación de patrones y tendencias a lo largo del tiempo.
+        \item \textbf{Generar informes personalizados:} El sistema en el módulo \textit{Datos}, podrá generar informes personalizados basados en los datos registrados, permitiendo identificar áreas de mejora y tomar decisiones informadas sobre el cuidado de la salud.
+    \end{itemize}
+    \par El usuario podrá registrar eventos, estados de ánimo y notas de forma autónoma y los miembros del equipo de cuidado podrán agregar eventos y consultar la información registrada por el usuario, siempre y cuando cuenten con los permisos correspondientes.
+
+    \newpage
+
+% Análisis de Riesgos
+    \section{Análisis de riesgos}
+    \par A continuación detallaremos los riesgos encontrados en el desarrollo de la aplicación, junto con su plan de contingencia asociado.
+    \subsection{Riesgos}
+    \par En primer lugar enumeramos los riegos con sus activos asociados:
+    \begin{center}
+        \begin{adjustbox}{width=1\textwidth}
+            \begin{tabular}{ |c|c|c| }
+                \hline
+                \rowcolor{lightgray} \textbf{ID} & \textbf{Nombre} & \textbf{Activos asociados} \\
+                \hline    
+                \textbf{1} & Riesgo de Privacidad y Seguridad de Datos & Base de datos \\
+                \hline
+                \textbf{2} & Riesgo de Integración de IA & Aplicación \\
+                \hline
+                \textbf{3} & Riesgo de Escalabilidad & Base de datos \\
+                \hline
+                \textbf{4} & Riesgo de Usabilidad & Aplicación \\
+                \hline
+                \textbf{5} & Riesgo de Disponibilidad del Sistema & Aplicación \\
+                \hline
+            \end{tabular}
+        \end{adjustbox}
+    \end{center}
+    \subsection{Análisis cualitativo}
+    \par Para el análisis cualitativo de los riesgos, tomaremos en cuenta las siguientes equivalencias:
+    \begin{center}
+        \begin{adjustbox}{width=1\textwidth}
+            \begin{tabular}{ |c|c|c| }
+                \hline
+                \rowcolor{lightgray} \textbf{Valor} & \textbf{Probabilidad} & \textbf{Impacto} \\
+                \hline    
+                \textbf{1} & Muy improbable (menor al 3\%) & Muy bajo \\
+                \hline
+                \textbf{2} & Poco probable (3\% - 10\%) & Bajo \\
+                \hline
+                \textbf{3} & Probable (10\% - 30\%) & Medio \\
+                \hline
+                \textbf{4} & Altamente probable (30\% - 60\%) & Alto \\
+                \hline
+                \textbf{5} & Casi cierto (mayor al 60\%) & Muy alto \\
+                \hline
+            \end{tabular}
+        \end{adjustbox}
+    \end{center}
+    \par De esta forma, el análisis caulitativo resulta en:
+    \begin{center}
+        \begin{adjustbox}{width=1\textwidth}
+            \begin{tabular}{ |c|c|c|c|c| }
+                \hline
+                \rowcolor{lightgray} \textbf{ID} & \textbf{Riesgo} & \textbf{Probailidad (P)} & \textbf{Impacto (I)} & \textbf{Severidad (P*I)} \\
+                \hline    
+                \textbf{1} & Riesgo de Privacidad y Seguridad de Datos & 3 & 5 & 15 \\
+                \hline
+                \textbf{2} & Riesgo de Integración de IA & 4 & 4 & 16 \\
+                \hline
+                \textbf{3} & Riesgo de Escalabilidad & 2 & 4 & 8 \\
+                \hline
+                \textbf{4} & Riesgo de Usabilidad & 2 & 2 & 4 \\
+                \hline
+                \textbf{5} & Riesgo de Disponibilidad del Sistema & 2 & 5 & 10 \\
+                \hline
+            \end{tabular}
+        \end{adjustbox}
+    \end{center}
+    \subsection{Riesgo 1 - Privacidad y Seguridad de Datos}
+    \subsubsection{Análisis}
+    \par \textbf{ID:} 1.
+    \par \textbf{Especificación:} Riesgo de Privacidad y Seguridad de Datos.
+    \par \textbf{Clasificación:} 1. Acciones de las personas - 1.2. Deliberadas - 1.2.3. Robo.
+    \par \textbf{Descripción:}  La aplicación gestionará información sensible relacionada con la salud y datos personales de los usuarios, lo que la convierte en un posible objetivo para ciberataques y otras amenazas de seguridad. El acceso no autorizado a estos datos puede tener serias repercusiones en términos de privacidad, legales y reputación.
+    \par \textbf{Actividad/Prácticas:} Las prácticas de acceso a la aplicación, visualización y modificación de los datos personales y médicos de los usuarios, así como el almacenamiento de dicha información.
+    \par \textbf{Rol/Competencias:} Desarrolladores de la aplicación (para implementar seguridad en el diseño y desarrollo) y usuarios finales (para asegurar el uso seguro de la app).
+    \par \textbf{Activos involucrados:}
+    \begin{itemize}
+        \item Datos personales y médicos de los usuarios: incluye información como el historial médico, el estado de salud, contactos de emergencia y recordatorios médicos.
+        \item Infraestructura de la aplicación: servidores y sistemas de almacenamiento donde se alojan estos datos sensibles.
+    \end{itemize}
+    \par \textbf{Factores analizados:}
+    \begin{itemize}
+        \item \textbf{Contacto:} Regular. El contacto con los datos sensibles es permanente mientras se utiliza la aplicación.
+        \item \textbf{Capacidad de la amenaza:} Alta. Debido a la sensibilidad de los datos y el atractivo de estos para ataques.
+        \item \textbf{Capacidad de resistencia:} Media. Dependiendo de la implementación de medidas de seguridad y autenticación.
+    \end{itemize}
+    \par \textbf{Sobre el activo:}
+    \begin{itemize}
+        \item \textbf{Productividad:} Media. Las funciones pueden verse afectadas si se materializa un incidente de seguridad.
+        \item \textbf{Costo de reemplazo:} Los costos inherentes en tiempo usados para verificar la información y reconstruirla.
+        \item \textbf{Sensibilidad:}
+        \begin{itemize}
+            \item \textbf{Reputación:} Alta. Una filtración o acceso no autorizado podría dañar la confianza en la aplicación.
+            \item \textbf{Legal/Regulatoria:} Alta. Puede generar sanciones.
+        \end{itemize}
+        \item \textbf{Volumen:} Alta. Más activos en riesgo equivalen a una mayor magnitud de pérdida si ocurre un evento de acuerdo a su escala.
+    \end{itemize}
+    \par \textbf{Según la amenaza:}
+    \begin{itemize}
+        \item \textbf{Internas/Externas:} El agente puede ser interno o externo.
+        \item \textbf{Acción:} Uso indebido, divulgación y modificación.
+    \end{itemize}
+    \par \textbf{Sobre la organización:}
+    \begin{itemize}
+        \item \textbf{Detección:} Puede detectarse al momento de materializarse el riesgo.
+        \item \textbf{Respuesta:} La recuperación de los datos a su valor real y resolucion de las acciones legales previstas en caso de robo.
+    \end{itemize}
+    \par \textbf{Consecuencias:}
+    \begin{itemize}
+        \item Pérdida de confianza de los usuarios: si ocurre una filtración de datos, los usuarios podrían abandonar la plataforma.
+        \item Multas legales y regulatorias: en caso de incumplir con las leyes de protección de datos.
+        \item Riesgos para la salud de los usuarios: un acceso no autorizado a los datos de salud puede tener repercusiones directas en el cuidado y atención que reciben los usuarios.
+    \end{itemize}
+    \subsubsection{Tratamientos}
+    \par \textbf{Estrategias:}
+    \begin{itemize}
+        \item \textbf{Evitar:} Limitar algunas funcionalidades de la aplicación para evitar la recopilación o almacenamiento de datos sensibles en caso de que la seguridad no pueda garantizarse adecuadamente.
+        \item \textbf{Mitigar:}
+        \begin{itemize}
+            \item Implementar cifrado de datos para proteger la información sensible.
+            \item Usar autenticación multifactor y controles de acceso basados en roles para limitar el acceso según la necesidad de cada usuario. 
+            \item Asegurar el cumplimiento de normativas, aplicando los requisitos para el manejo de datos de salud. 
+            \item Realizar pruebas de infiltración y evaluaciones de vulnerabilidades para identificar posibles riesgos antes de que puedan ser explotados.
+        \end{itemize} 
+    \end{itemize}
+    \par \textbf{Controles:}
+    \begin{itemize}
+        \item Controles de Acceso: Usar autenticación multifactor y controles de acceso basados en roles para limitar el acceso según la necesidad de cada usuario.
+        \item Controles de Acceso: Registrar y auditar accesos a la información sensible.
+        \item Controles de infraestructura: Establecer un plan de respuesta a incidentes que incluya protocolos de notificación a los usuarios afectados, contención y recuperación de datos.
+    \end{itemize}
+    \par \textbf{Riesgo residual:}
+    \begin{itemize}
+        \item Mitigación del riesgo de datos sensibles con cifrado de datos en un 80\%.
+        \item El aumento de los controles y auditorías reducirán la probabilidad de ocurrencia en aproximadamente un 50\%.
+    \end{itemize}
+    \subsubsection{Planes}
+    \par \textbf{Disparadores:}
+    \begin{itemize}
+        \item Detección de acceso no autorizado.
+        \item Alertas de seguridad en el sistema (por ejemplo, intentos fallidos de inicio de sesión).
+    \end{itemize}
+    \par \textbf{Contingencia:}
+    \begin{itemize}
+        \item Procedimientos de respuesta ante incidente: notificación de incidentes a los usuarios afectados.
+        \item Realizar auditoría sobre los accesos y registros.
+    \end{itemize}
+    \par \textbf{Recuperación:} Restauración y validación de datos y cambio de claves.
+    \par \textbf{Continuidad de negocio:} Continuar con las actividades utilizando las diferentes opciones de comunicación para coordinación de tareas.
+    \par \textbf{Controles de garantía de los planes:}
+    \begin{itemize}
+        \item Capacitación de los usuarios.
+        \item Exposición de posibles consecuencias legales en términos y condiciones.
+    \end{itemize}
+    \subsection{Riesgo 2 - Integración de IA}
+    \subsubsection{Análisis}
+    \par \textbf{ID:} 2.
+    \par \textbf{Especificación:} Riesgo de Integración de IA.
+    \par \textbf{Clasificación:} 2. Fallas de Sistemas y Tecnologías - 2.3. Sistemas - 2.3.3. Integración.
+    \par \textbf{Descripción:} La integración de inteligencia artificial para consultar sobre posibles problemas de salud presenta desafíos técnicos y éticos. La precisión de las respuestas depende de la calidad y cantidad de datos médicos de los usuarios, y la complejidad de los modelos de IA implica dificultades en el entrenamiento y mantenimiento, lo que podría llevar a respuestas incorrectas o incompletas.
+    \par \textbf{Actividad/Prácticas:} Diseño e integración de modelos de IA , así como el análisis y procesamiento de datos médicos de usuarios.
+    \par \textbf{Rol/Competencias:} Desarrolladores, analistas.
+    \par \textbf{Activos involucrados:}
+    \begin{itemize}
+        \item Modelos que deben ser implementados, ajustados y supervisados para asegurar que sus respuestas sean fiables.
+        \item Datos de salud de usuarios: Necesarios para alimentar y entrenar el modelo de IA.
+    \end{itemize}
+    \par \textbf{Factores analizados:}
+    \begin{itemize}
+        \item \textbf{Contacto:} Regular e intencional.  El modelo de IA interactúa de forma continua con los datos de salud para realizar respuestas.
+        \item \textbf{Capacidad de la amenaza:} Media.
+        \item \textbf{Capacidad de resistencia:} Media/Alta. Si se detectan los errores, se puede volver a consultar y/o informar a los desarrolladores del error.
+    \end{itemize}
+    \par \textbf{Sobre el activo:}
+    \begin{itemize}
+        \item \textbf{Productividad:} Posible impacto en la eficiencia del sistema si las respuestas son inexactas o requieren constante ajuste.
+        \item \textbf{Costo de reemplazo:} Los costos inherentes en tiempo usados para verificar la información y reconstruirla.
+        \item \textbf{Sensibilidad:}
+        \begin{itemize}
+            \item \textbf{Reputación:} Alta. Si la IA falla o no es precisa en sus respuestas.
+            \item \textbf{Legal/Regulatoria:} Alta. La falta de precisión o completitud en la IA podría exponer al sistema a normativas estrictas o posibles demandas.
+        \end{itemize}
+        \item \textbf{Volumen:} Alta. Mayor cantidad de errores equivalen a un mayor impacto si ocurre.
+    \end{itemize}
+    \par \textbf{Consecuencias:}
+    \begin{itemize}
+        \item Respuestas imprecisas pueden llevar a decisiones erróneas que afecten la salud de los usuarios.
+        \item Desconfianza de los usuarios: La percepción de que la IA no es confiable podría afectar a la frecuencia de uso por parte de los usuarios.
+        \item Problemas regulatorios: Posibles sanciones legales si las predicciones de IA no cumplen con normativas.
+    \end{itemize}
+    \subsubsection{Tratamientos}
+    \par \textbf{Estrategias:}
+    \begin{itemize}
+        \item \textbf{Mitigar:}
+        \begin{itemize}
+            \item Limitar el alcance de la IA para no basar decisiones críticas exclusivamente en las respuestas del modelo, utilizando la IA solo como soporte.
+            \item Implementar procedimientos de limpieza y validación de datos para mejorar la precisión de las predicciones.
+            \item Auditar regularmente las respuestas de la IA para detectar y corregir errores.
+        \end{itemize} 
+    \end{itemize}
+    \par \textbf{Controles:}
+    \begin{itemize}
+        \item Implementar políticas de seguridad y privacidad específicas para el manejo de datos de salud, con controles de acceso, monitoreo y cifrado de datos.
+        \item Estandarizar una evaluación periódica del rendimiento de los modelos de IA implementados.
+    \end{itemize}
+    \par \textbf{Riesgo residual:}
+    \begin{itemize}
+        \item El módulo de IA podría seguir generando respuestas que no son precisas.
+        \item Al utilizar la IA solo como soporte y no como herramienta de toma de decisiones, algunos usuarios pueden interpretar las recomendaciones de manera incorrecta.
+    \end{itemize}
+    \subsubsection{Planes}
+    \par \textbf{Disparadores:} Respuestas sin coherencia o errores en el módulo de IA.
+    \par \textbf{Contingencia:} Notificar a los usuarios de la aplicación en caso de detectar informes por respuestas erróneas.
+    \par \textbf{Recuperación:} Realizar ajustes o reentrenamiento del modelo para corregir problemas, utilizando datos de respaldo o cambiando de modelo de IA utilizado.
+    \par \textbf{Continuidad de negocio:}
+    \begin{itemize}
+        \item Simplificar o limitar las consultas que pueden realizarse.
+        \item Inhabilitar el módulo temporalmente.
+    \end{itemize}
+    \par \textbf{Controles de garantía de los planes:}
+    \begin{itemize}
+        \item Monitoreos regulares sobre las interacciones con el módulo de IA.
+        \item Revisión de informes de errores por parte de usuarios.
+    \end{itemize}
+
 
 
 

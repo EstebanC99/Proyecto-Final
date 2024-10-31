@@ -1,60 +1,89 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {section}{\numberline {1}Analisis de la organización}{4}{}%
-\contentsline {subsection}{\numberline {1.1}BubiSoft}{4}{}%
-\contentsline {subsection}{\numberline {1.2}Misión}{4}{}%
-\contentsline {subsection}{\numberline {1.3}Visión}{4}{}%
-\contentsline {subsection}{\numberline {1.4}Objetivos principales}{5}{}%
-\contentsline {subsection}{\numberline {1.5}Objetivos secundarios}{5}{}%
-\contentsline {subsection}{\numberline {1.6}Organigrama}{5}{}%
-\contentsline {subsection}{\numberline {1.7}Matriz FODA}{6}{}%
-\contentsline {subsection}{\numberline {1.8}Procesos principales}{8}{}%
-\contentsline {section}{\numberline {2}Análisis de problemas}{11}{}%
-\contentsline {subsection}{\numberline {2.1}Gráficas de respuestas}{11}{}%
-\contentsline {subsubsection}{\numberline {2.1.1}¿Qué vínculo o relación tienen?}{11}{}%
-\contentsline {subsubsection}{\numberline {2.1.2}¿Cuáles son las principales problemáticas que enfrentan?}{12}{}%
-\contentsline {subsubsection}{\numberline {2.1.3}¿Cuáles son las principales formas de comunicación?}{14}{}%
-\contentsline {subsubsection}{\numberline {2.1.4}¿Cuéntan con ayuda profesional para el cuidado?}{16}{}%
-\contentsline {subsubsection}{\numberline {2.1.5}¿Qué funcionalidades crees que te resultarían útiles en la aplicación?}{18}{}%
-\contentsline {subsection}{\numberline {2.2}Complejidad en la gestión de tareas de cuidado}{20}{}%
-\contentsline {subsection}{\numberline {2.3}Falta de organización y centralización de información}{20}{}%
-\contentsline {subsection}{\numberline {2.4}Dificultad en la comunicación y coordinación entre cuidadores}{20}{}%
-\contentsline {subsection}{\numberline {2.5}Falta de herramientas para la gestión de actividades y turnos médicos}{20}{}%
-\contentsline {subsection}{\numberline {2.6}Ausencia de un sistema de recordatorios para la medicación}{20}{}%
-\contentsline {subsection}{\numberline {2.7}Necesidades específicas no cubiertas por las soluciones existentes}{21}{}%
-\contentsline {section}{\numberline {3}Análisis de objetivos}{22}{}%
-\contentsline {subsection}{\numberline {3.1}Optimizar la gestión de tareas}{22}{}%
-\contentsline {subsection}{\numberline {3.2}Mejorar la comunicación y coordinación}{22}{}%
-\contentsline {subsection}{\numberline {3.3}Brindar herramientas para la gestión de la salud}{22}{}%
-\contentsline {subsection}{\numberline {3.4}Atender las necesidades específicas de cada caso}{23}{}%
-\contentsline {subsection}{\numberline {3.5}Promover el bienestar del cuidador}{23}{}%
-\contentsline {section}{\numberline {4}Alternativas de solución}{24}{}%
-\contentsline {subsection}{\numberline {4.1}Cuidarlos}{24}{}%
-\contentsline {subsubsection}{\numberline {4.1.1}Abstract}{24}{}%
-\contentsline {subsubsection}{\numberline {4.1.2}Funcionalidades}{25}{}%
-\contentsline {subsubsection}{\numberline {4.1.3}Conclusión}{25}{}%
-\contentsline {subsection}{\numberline {4.2}MyTherapy}{25}{}%
-\contentsline {subsubsection}{\numberline {4.2.1}Abstract}{26}{}%
-\contentsline {subsubsection}{\numberline {4.2.2}Funcionalidades}{26}{}%
-\contentsline {subsubsection}{\numberline {4.2.3}Conclusión}{26}{}%
-\contentsline {subsection}{\numberline {4.3}Herramientas adicionales}{27}{}%
-\contentsline {subsection}{\numberline {4.4}En resumen}{27}{}%
-\contentsline {section}{\numberline {5}Diagrama de Gantt}{29}{}%
-\contentsline {subsection}{\numberline {5.1}Diagrama preliminar}{29}{}%
-\contentsline {section}{\numberline {6}Análisis de factibilidad}{32}{}%
-\contentsline {subsection}{\numberline {6.1}Factibilidad operacional}{32}{}%
-\contentsline {subsubsection}{\numberline {6.1.1}Factores operativos funcionales}{32}{}%
-\contentsline {subsubsection}{\numberline {6.1.2}Factores operativos no funcionales}{34}{}%
-\contentsline {subsection}{\numberline {6.2}Análisis de factibilidad técnica}{35}{}%
-\contentsline {subsubsection}{\numberline {6.2.1}Base de datos}{36}{}%
-\contentsline {subsubsection}{\numberline {6.2.2}Desarrollo}{36}{}%
-\contentsline {subsubsection}{\numberline {6.2.3}Compatibilidad con dispositivos}{37}{}%
-\contentsline {subsubsection}{\numberline {6.2.4}Controlador de versiones}{37}{}%
-\contentsline {subsection}{\numberline {6.3}Factibilidad legal}{37}{}%
-\contentsline {subsubsection}{\numberline {6.3.1}Normativas nacionales}{37}{}%
-\contentsline {subsubsection}{\numberline {6.3.2}Términos y condiciones de la aplicación}{39}{}%
-\contentsline {subsubsection}{\numberline {6.3.3}Política de privacidad}{42}{}%
-\contentsline {subsection}{\numberline {6.4}Factibilidad económico-financiera}{43}{}%
-\contentsline {subsubsection}{\numberline {6.4.1}Costos de personal}{44}{}%
-\contentsline {subsubsection}{\numberline {6.4.2}Costos de materiales y servicios}{45}{}%
-\contentsline {subsubsection}{\numberline {6.4.3}Total del presupueto}{45}{}%
-\contentsline {section}{Referencias}{46}{}%
+\contentsline {section}{\numberline {1}Analisis de la organización}{5}{}%
+\contentsline {subsection}{\numberline {1.1}BubiSoft}{5}{}%
+\contentsline {subsection}{\numberline {1.2}Misión}{5}{}%
+\contentsline {subsection}{\numberline {1.3}Visión}{5}{}%
+\contentsline {subsection}{\numberline {1.4}Objetivos principales}{6}{}%
+\contentsline {subsection}{\numberline {1.5}Objetivos secundarios}{6}{}%
+\contentsline {subsection}{\numberline {1.6}Organigrama}{6}{}%
+\contentsline {subsection}{\numberline {1.7}Matriz FODA}{7}{}%
+\contentsline {subsection}{\numberline {1.8}Procesos principales}{9}{}%
+\contentsline {section}{\numberline {2}Análisis de problemas}{12}{}%
+\contentsline {subsection}{\numberline {2.1}Gráficas de respuestas}{12}{}%
+\contentsline {subsubsection}{\numberline {2.1.1}¿Qué vínculo o relación tienen?}{12}{}%
+\contentsline {subsubsection}{\numberline {2.1.2}¿Cuáles son las principales problemáticas que enfrentan?}{13}{}%
+\contentsline {subsubsection}{\numberline {2.1.3}¿Cuáles son las principales formas de comunicación?}{15}{}%
+\contentsline {subsubsection}{\numberline {2.1.4}¿Cuéntan con ayuda profesional para el cuidado?}{17}{}%
+\contentsline {subsubsection}{\numberline {2.1.5}¿Qué funcionalidades crees que te resultarían útiles en la aplicación?}{19}{}%
+\contentsline {subsection}{\numberline {2.2}Complejidad en la gestión de tareas de cuidado}{21}{}%
+\contentsline {subsection}{\numberline {2.3}Falta de organización y centralización de información}{21}{}%
+\contentsline {subsection}{\numberline {2.4}Dificultad en la comunicación y coordinación entre cuidadores}{21}{}%
+\contentsline {subsection}{\numberline {2.5}Falta de herramientas para la gestión de actividades y turnos médicos}{21}{}%
+\contentsline {subsection}{\numberline {2.6}Ausencia de un sistema de recordatorios para la medicación}{21}{}%
+\contentsline {subsection}{\numberline {2.7}Necesidades específicas no cubiertas por las soluciones existentes}{22}{}%
+\contentsline {section}{\numberline {3}Análisis de objetivos}{23}{}%
+\contentsline {subsection}{\numberline {3.1}Optimizar la gestión de tareas}{23}{}%
+\contentsline {subsection}{\numberline {3.2}Mejorar la comunicación y coordinación}{23}{}%
+\contentsline {subsection}{\numberline {3.3}Brindar herramientas para la gestión de la salud}{23}{}%
+\contentsline {subsection}{\numberline {3.4}Atender las necesidades específicas de cada caso}{24}{}%
+\contentsline {subsection}{\numberline {3.5}Promover el bienestar del cuidador}{24}{}%
+\contentsline {section}{\numberline {4}Alternativas de solución}{25}{}%
+\contentsline {subsection}{\numberline {4.1}Cuidarlos}{25}{}%
+\contentsline {subsubsection}{\numberline {4.1.1}Abstract}{25}{}%
+\contentsline {subsubsection}{\numberline {4.1.2}Funcionalidades}{26}{}%
+\contentsline {subsubsection}{\numberline {4.1.3}Conclusión}{26}{}%
+\contentsline {subsection}{\numberline {4.2}MyTherapy}{26}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Abstract}{27}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}Funcionalidades}{27}{}%
+\contentsline {subsubsection}{\numberline {4.2.3}Conclusión}{27}{}%
+\contentsline {subsection}{\numberline {4.3}Herramientas adicionales}{28}{}%
+\contentsline {subsection}{\numberline {4.4}En resumen}{28}{}%
+\contentsline {section}{\numberline {5}Diagrama de Gantt}{30}{}%
+\contentsline {subsection}{\numberline {5.1}Diagrama preliminar}{30}{}%
+\contentsline {section}{\numberline {6}Análisis de factibilidad}{33}{}%
+\contentsline {subsection}{\numberline {6.1}Factibilidad operacional}{33}{}%
+\contentsline {subsubsection}{\numberline {6.1.1}Factores operativos funcionales}{33}{}%
+\contentsline {subsubsection}{\numberline {6.1.2}Factores operativos no funcionales}{35}{}%
+\contentsline {subsection}{\numberline {6.2}Análisis de factibilidad técnica}{36}{}%
+\contentsline {subsubsection}{\numberline {6.2.1}Base de datos}{37}{}%
+\contentsline {subsubsection}{\numberline {6.2.2}Desarrollo}{37}{}%
+\contentsline {subsubsection}{\numberline {6.2.3}Compatibilidad con dispositivos}{38}{}%
+\contentsline {subsubsection}{\numberline {6.2.4}Controlador de versiones}{38}{}%
+\contentsline {subsection}{\numberline {6.3}Factibilidad legal}{38}{}%
+\contentsline {subsubsection}{\numberline {6.3.1}Normativas nacionales}{38}{}%
+\contentsline {subsubsection}{\numberline {6.3.2}Términos y condiciones de la aplicación}{40}{}%
+\contentsline {subsubsection}{\numberline {6.3.3}Política de privacidad}{43}{}%
+\contentsline {subsection}{\numberline {6.4}Factibilidad económico-financiera}{44}{}%
+\contentsline {subsubsection}{\numberline {6.4.1}Costos de personal}{45}{}%
+\contentsline {subsubsection}{\numberline {6.4.2}Costos de materiales y servicios}{46}{}%
+\contentsline {subsubsection}{\numberline {6.4.3}Total del presupueto}{46}{}%
+\contentsline {section}{\numberline {7}Análisis de datos}{47}{}%
+\contentsline {subsection}{\numberline {7.1}Diagrama de datos}{47}{}%
+\contentsline {section}{\numberline {8}Metodología a utilizar}{48}{}%
+\contentsline {section}{\numberline {9}Cálculo del tamaño del sistema}{49}{}%
+\contentsline {subsection}{\numberline {9.1}Iniciar Sesión}{49}{}%
+\contentsline {subsection}{\numberline {9.2}ABM de Usuarios}{50}{}%
+\contentsline {subsection}{\numberline {9.3}Menú Principal}{50}{}%
+\contentsline {subsection}{\numberline {9.4}Mi Perfil}{51}{}%
+\contentsline {subsection}{\numberline {9.5}Configuración}{51}{}%
+\contentsline {subsection}{\numberline {9.6}ABM de Responsables}{52}{}%
+\contentsline {subsection}{\numberline {9.7}ABM de Cuidadores}{53}{}%
+\contentsline {subsection}{\numberline {9.8}ABM de Personas a Cargo}{53}{}%
+\contentsline {subsection}{\numberline {9.9}Gestión de Agenda}{54}{}%
+\contentsline {subsection}{\numberline {9.10}Chats}{55}{}%
+\contentsline {subsection}{\numberline {9.11}Análisis de Datos}{56}{}%
+\contentsline {subsection}{\numberline {9.12}Emergencia}{56}{}%
+\contentsline {subsection}{\numberline {9.13}Gestión de Salud}{56}{}%
+\contentsline {subsection}{\numberline {9.14}Gestión de Eventos}{57}{}%
+\contentsline {section}{\numberline {10}Análisis de riesgos}{59}{}%
+\contentsline {subsection}{\numberline {10.1}Riesgos}{59}{}%
+\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{59}{}%
+\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{59}{}%
+\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{59}{}%
+\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{61}{}%
+\contentsline {subsubsection}{\numberline {10.3.3}Planes}{62}{}%
+\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{63}{}%
+\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{63}{}%
+\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{64}{}%
+\contentsline {subsubsection}{\numberline {10.4.3}Planes}{65}{}%
+\contentsline {section}{Referencias}{66}{}%
