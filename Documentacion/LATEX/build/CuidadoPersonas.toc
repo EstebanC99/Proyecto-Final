@@ -86,4 +86,10 @@
 \contentsline {subsubsection}{\numberline {10.4.1}Análisis}{63}{}%
 \contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{64}{}%
 \contentsline {subsubsection}{\numberline {10.4.3}Planes}{65}{}%
-\contentsline {section}{Referencias}{66}{}%
+\contentsline {section}{\numberline {11}Diseño}{66}{}%
+\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{66}{}%
+\contentsline {subsection}{\numberline {11.2}Accesibilidad}{66}{}%
+\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{66}{}%
+\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{66}{}%
+\contentsline {subsection}{\numberline {11.5}Prototipo}{67}{}%
+\contentsline {section}{Referencias}{68}{}%

@@ -1,13 +1,13 @@
 # Fdb version 4
-["biber build/CuidadoPersonas"] 0 "build/CuidadoPersonas.bcf" "build/CuidadoPersonas.bbl" "build/CuidadoPersonas" 1730341847.76759 -1
+["biber build/CuidadoPersonas"] 0 "build/CuidadoPersonas.bcf" "build/CuidadoPersonas.bbl" "build/CuidadoPersonas" 1730343927.1588 -1
   "Recursos/Bibliografia.bib" 1722387411 2322 98b7398011f3cca573e23d5f73ba9047 ""
-  "build/CuidadoPersonas.bcf" 1730341847 109187 ffda6b4a50fcaf2a797225ab464187a4 "pdflatex"
+  "build/CuidadoPersonas.bcf" 1730343926 109187 ffda6b4a50fcaf2a797225ab464187a4 "pdflatex"
   (generated)
   "build/CuidadoPersonas.bbl"
   "build/CuidadoPersonas.blg"
   (rewritten before read)
-["pdflatex"] 1730341843.07093 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1730341847.76922 0
-  "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1722386607 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
+["pdflatex"] 1730343921.59242 "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" "build/CuidadoPersonas.pdf" "CuidadoPersonas" 1730343927.15978 0
+  "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1730343530 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcbx1200.pk" 1722295260 15080 1bc82cedface80fb01237499d6eca9a6 ""
   "C:/Users/Esteban/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1200.pk" 1716953260 14064 a471a7201bd8d7549bb2ffb22a61a2ae ""
   "C:/Users/Esteban/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1716244229 24241339 3077246b9c5114d998917a073f805713 ""
@@ -176,17 +176,21 @@
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/tools/array.sty" 1700599895 12667 e4b5eb11e4b7239e6c8a52bbe074a6c6 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/varwidth/varwidth.sty" 1238469540 10894 d359a13923460b2a73d4312d613554c8 ""
+  "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/wrapfig/wrapfig.sty" 1044403200 26220 3701aebf80ccdef248c0c20dd062fea9 ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
   "C:/Users/Esteban/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1656236919 4937 4ce600ce9bd4ec84d0250eb6892fcf4f ""
-  "CuidadoPersonas.tex" 1730341836 120942 eaf799b8ac396c15e62329280124a404 ""
+  "CuidadoPersonas.tex" 1730343920 123986 6a36a1bb998280395ecafac509e02b4e ""
   "Imagenes/DER.png" 1730338595 105674 e9b3cb90b504b9ac7e078a0d543487f2 ""
+  "Imagenes/IterativoIncremental.png" 1730342246 35584 87e45a5672097f8cbadbba62b405a6a9 ""
   "Imagenes/LogoUTN.png" 1716241020 12626 e66b0cd860fb45faa188f715304b8a98 ""
+  "Imagenes/MenuPrincipal.jpg" 1730342855 57745 502784f90c4a0e7dd06ac188ea8eb7f7 ""
   "Imagenes/Organigrama.jpg" 1716241652 14846 d878450e9f13b2f1e71b18b7a2b964bf ""
-  "build/CuidadoPersonas.aux" 1730341847 12354 ff570d649f8508675dff3c625c135f86 "pdflatex"
+  "Imagenes/Reportes.jpg" 1730342864 60743 2fb58076d30bf4ef82914029a9e81e6d ""
+  "build/CuidadoPersonas.aux" 1730343926 13023 394c681332f0494a4bb44dc823a4bcb6 "pdflatex"
   "build/CuidadoPersonas.bbl" 1722387434 14026 fbaeb0e5fc79189b15fe5b18eafe3f0a "biber build/CuidadoPersonas"
-  "build/CuidadoPersonas.run.xml" 1730341847 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
-  "build/CuidadoPersonas.toc" 1730341847 6917 46abfe861bd0016ef2a87f0715ac66cf "pdflatex"
-  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1730341836 120942 eaf799b8ac396c15e62329280124a404 ""
+  "build/CuidadoPersonas.run.xml" 1730343926 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
+  "build/CuidadoPersonas.toc" 1730343926 7340 221817319fadd8d31ef6321931cb2ae8 "pdflatex"
+  "c:/GitRepositorios/Proyecto-Final/Documentacion/LATEX/CuidadoPersonas.tex" 1730343920 123986 6a36a1bb998280395ecafac509e02b4e ""
   (generated)
   "build/CuidadoPersonas.aux"
   "build/CuidadoPersonas.bcf"

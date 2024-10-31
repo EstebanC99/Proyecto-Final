@@ -13,6 +13,7 @@
 \usepackage[table]{xcolor}
 \usepackage{multirow}
 \usepackage{adjustbox}
+\usepackage{wrapfig}
 \bibliography{Recursos/Bibliografia}
 
 % CUERPO
@@ -813,7 +814,11 @@
 
 % Metodología a Utilizar
     \section{Metodología a utilizar}
-    \par Falta info para completar aca.
+    \par La metodología que adoptaremos a lo largo del desarrollo del proyecto es la \textbf{Iterativa Incremental}. Resulta adecuada para el proyecto gracias a la flexibilidad y adaptabilidad que ofrece a lo largo del tiempo de vida del mismo. En ella descomponemos el desarrollo en ciclos donde se adicionan diferentes módulos y/o funcionalidades, obteniendo así las diferentes versiones.
+    \par De esta forma el sistema se desarrolla poco a poco, permitiéndonos obtener un feedback continuo, responder a las posibles mejoras y reaccionar a los cambios en los requerimientos.
+    \\
+    \par \includegraphics[width=1\textwidth]{Imagenes/IterativoIncremental.png}
+    
 
     \newpage
 
@@ -1186,7 +1191,36 @@
         \item Revisión de informes de errores por parte de usuarios.
     \end{itemize}
 
+    \newpage
 
+    \section{Diseño}
+    \begin{wrapfigure}{r}{0.25\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{Imagenes/MenuPrincipal.jpg}
+    \end{wrapfigure}
+    \par \textbf{CareWell} está pensada para usuarios de cualquier edad que deseen llevar un control personal de salud para sí mismos o alguien cercano, asi como también orientada a usuarios que tengan a cargo o se dediquen al cuidado de personas dependientes que requieren especial atención y seguimiento.
+    \par En función de los usuarios a los que apuntamos, la app debe cumplir con los siguientes puntos.
+    \subsection{Intefaz sencilla e intuitiva}
+    \begin{wrapfigure}{l}{0.25\textwidth}
+        \centering
+        \includegraphics[width=0.25\textwidth]{Imagenes/Reportes.jpg}
+    \end{wrapfigure}
+    \par Fuentes grandes y de fácil legibilidad son prioridad en el desarrollo de la aplicación para facilitar el acceso a personas de avanzada edad.
+    \par La navegación simplificada facilita al usuario el recorrido sobre las diferentes funcionalidades de la app, sin entrar en dudas o cuestionamientos de cómo utilizar la misma.
+    \subsection{Accesibilidad}
+    \par Los iconos grandes facilitan la identificación de las funcionalidades y minimizan el error de clickeo al intentar acceder a los diferentes menu.
+    \subsection{Seguridad y privacidad}
+    \par La aplicación ofrece acceso seguro y fácil registro a través de la interconectividad de plataformas como Google y vinculación de cuentas Gmail a los usuarios.
+    \subsection{Estadísiticas y reportes}
+    \par Estos informes presentan estadísticas y visualización de progresos de manera visual y fácilmente comprensible, permitiendo una interpretación rápida y clara del estado de salud del usuario o personas a cargo, dependiendo el caso. 
+    \par Esta funcionalidad ayuda a los cuidadores a observar patrones, complemento de información a los profesionales en citas médicas y facilita la toma de decisiones informadas respecto a la atención y el cuidado diario.
+    \subsection{Prototipo}
+    \par Link de acceso al prototipo: 
+    \\
+    \url{https://www.figma.com/proto/astJTII0caYQpHNw2D0fNu/Care-Well?node-id=224-894&node-type=frame&t=PZPE0Pp9Ef0Die3J-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=109%3A332}.
+
+    
+    
 
 
     \newpage
