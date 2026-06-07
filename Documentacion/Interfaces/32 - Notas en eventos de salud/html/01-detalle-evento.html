@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+    box-shadow: 0 1px 0 #EDF1F1;
+    flex-shrink: 0;
+  }
+  .app-bar .back { color: #16201F; display: inline-flex; cursor: pointer; }
+  .app-bar .title {
+    font-size: 16px; font-weight: 700; color: #16201F;
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chip-category {
+    background: #FFF1F2;
+    color: #E11D48;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .scroll-area {
+    height: calc(844px - 28px - 56px);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .content { padding-bottom: 96px; }
+
+  /* Card del evento */
+  .event-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .event-date {
+    font-size: 13px;
+    color: #9AA5A5;
+    margin-bottom: 6px;
+  }
+  .event-body {
+    font-size: 15px;
+    font-weight: 700;
+    color: #16201F;
+    margin-bottom: 8px;
+  }
+  .event-obs {
+    font-size: 14px;
+    color: #566060;
+    line-height: 1.5;
+  }
+
+  /* Seccion notas */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #566060;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 12px 16px 8px;
+  }
+
+  /* Tarjeta de nota */
+  .note-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 0 16px 8px;
+    border-left: 3px solid #E11D48;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .note-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .avatar-m { background: #C9EDE8; color: #0A3D38; }
+  .avatar-l { background: #FCE2DA; color: #7A2E1A; }
+
+  .note-author { font-size: 13px; font-weight: 700; color: #16201F; }
+  .note-sep { font-size: 13px; color: #9AA5A5; }
+  .note-time { font-size: 11px; color: #9AA5A5; }
+  .note-body { font-size: 14px; color: #16201F; line-height: 1.5; }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 24px; right: 16px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #E11D48;
+    display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(225,29,72,0.35);
+    z-index: 10;
+  }
+
+  /* Anotaciones */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <span class="back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </span>
+    <span class="title">Control cardiológico</span>
+    <span class="chip-category">Cita médica</span>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area">
+    <div class="content">
+
+      <!-- Card del evento -->
+      <div class="event-card">
+        <div class="event-date">2 de junio de 2026</div>
+        <div class="event-body">Dr. Martín Sosa · Hospital Italiano</div>
+        <div class="event-obs">Resultados dentro de los parámetros normales. Repetir análisis en 3 meses.</div>
+      </div>
+
+      <!-- Sección notas -->
+      <div class="section-label">Notas del equipo</div>
+
+      <!-- Nota 1 -->
+      <div class="note-card">
+        <div class="note-header">
+          <div class="avatar avatar-m">M</div>
+          <span class="note-author">María García</span>
+          <span class="note-sep">·</span>
+          <span class="note-time">2 jun · 14:32</span>
+        </div>
+        <div class="note-body">El médico indicó repetir análisis en 3 meses. Solicitar turno a fin de mes.</div>
+      </div>
+
+      <!-- Nota 2 -->
+      <div class="note-card">
+        <div class="note-header">
+          <div class="avatar avatar-l">L</div>
+          <span class="note-author">Laura Méndez</span>
+          <span class="note-sep">·</span>
+          <span class="note-time">3 jun · 09:15</span>
+        </div>
+        <div class="note-body">Acordado con Alicia hacer los análisis en Fleni.</div>
+      </div>
+
+    </div>
+
+    <!-- FAB -->
+    <div class="fab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 56px; right: 4px;">Chip tipo evento en AppBar · identifica categoria a golpe de vista</div>
+  <div class="annotation" style="top: 200px; left: 4px;">Borde izq rosa 3dp · señaliza modulo Mi salud en cada nota</div>
+  <div class="annotation" style="top: 310px; right: 4px;">Autoria + timestamp visibles · nombre bold · hora discreta</div>
+  <div class="annotation" style="top: 490px; left: 4px;">FAB fijo sobre el scroll · unico punto de entrada para nueva nota</div>
+
+</body>
+</html>

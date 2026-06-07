@@ -1,0 +1,20 @@
+USER STORY: Registro de usuario
+PRIORIDAD: 1
+MÓDULO: Autenticación
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como persona que cuida a otros, quiero registrarme en la aplicación creando una cuenta con mis datos personales y credenciales, para acceder al sistema y comenzar a gestionar el cuidado.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde la primera pantalla de la aplicación se ofrece la opción "Registrarse" / "Crear cuenta", acompañada del mensaje "¿Aún no tienes cuenta?".
+- El formulario solicita los datos personales y las credenciales de acceso (email y contraseña).
+- El campo "Teléfono" es obligatorio en el formulario de registro.
+- No es posible crear la cuenta si algún campo obligatorio no fue completado.
+- El sistema valida que el usuario no exista previamente (un usuario solo puede registrarse una vez).
+- Es obligatorio aceptar los Términos y Condiciones marcando la casilla correspondiente para completar el registro; si no se aceptan, no se procesa la creación de la cuenta.
+- Una vez superadas las validaciones, la cuenta se crea y el usuario puede iniciar sesión.
+
+NOTAS / RESTRICCIONES:
+- El registro y el inicio de sesión son procesos separados: una persona puede estar registrada sin tener credenciales (los datos los carga un responsable o cuidador).
+- Los datos personales suministrados deben ser verdaderos, completos y actualizados (según Términos y Condiciones).

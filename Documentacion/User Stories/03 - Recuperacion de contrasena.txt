@@ -1,0 +1,15 @@
+USER STORY: Recuperación de contraseña
+PRIORIDAD: 3
+MÓDULO: Autenticación
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario que olvidó su contraseña, quiero solicitar un restablecimiento desde la pantalla de inicio de sesión, para recuperar el acceso a mi cuenta.
+
+CRITERIOS DE ACEPTACIÓN:
+- La pantalla de inicio de sesión incluye el botón "¿Olvidaste tu contraseña?".
+- Al activarlo, el sistema envía un correo de restablecimiento al email registrado en la cuenta.
+- El flujo permite establecer una nueva contraseña.
+
+NOTAS / RESTRICCIONES:
+- El procedimiento de cambio de contraseña es el mismo que el descrito en la sección de Configuración.

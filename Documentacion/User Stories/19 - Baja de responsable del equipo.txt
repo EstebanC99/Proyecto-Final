@@ -1,0 +1,14 @@
+USER STORY: Baja de responsable del equipo
+PRIORIDAD: 19
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero eliminar a un responsable del equipo de cuidado, para revocar su acceso cuando ya no debe participar.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se ofrece la opción de baja de responsables.
+- Al dar de baja al responsable, se revocan de inmediato su acceso y permisos en el sistema.
+
+NOTAS / RESTRICCIONES:
+- Solo el rol Responsable puede administrar el equipo y sus permisos.

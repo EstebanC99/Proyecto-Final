@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+
+  .screen {
+    padding: 0 24px;
+    display: flex; flex-direction: column; align-items: center;
+    height: calc(844px - 28px);
+  }
+
+  /* Logo block */
+  .brand { text-align: center; margin-top: 52px; margin-bottom: 0; }
+  .brand .logo-mark { display: block; margin: 0 auto 12px; }
+  .brand .wordmark { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .brand .wordmark .care { color: #16201F; }
+  .brand .wordmark .well { color: #1A8C82; }
+
+  /* Icon hero */
+  .icon-hero {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: #C9EDE8;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 36px;
+  }
+
+  /* Text block */
+  .title {
+    font-size: 24px; font-weight: 700; color: #16201F;
+    text-align: center; margin-top: 28px; line-height: 1.25;
+  }
+  .body-text {
+    font-size: 16px; font-weight: 400; color: #566060;
+    text-align: center; margin-top: 12px; line-height: 1.5;
+    width: 100%;
+  }
+  .body-text strong { color: #16201F; font-weight: 700; }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%; height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 32px;
+  }
+  .btn-link {
+    font-size: 14px; font-weight: 600; color: #1A8C82;
+    text-align: center; margin-top: 16px; min-height: 48px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="screen">
+    <!-- Logo -->
+    <div class="brand">
+      <svg class="logo-mark" viewBox="0 0 80 80" width="64" height="64" role="img" aria-label="CareWell">
+        <defs><linearGradient id="detMark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A095"/><stop offset="1" stop-color="#16786F"/></linearGradient></defs>
+        <circle cx="40" cy="40" r="40" fill="url(#detMark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <div class="wordmark"><span class="care">Care</span><span class="well">Well</span></div>
+    </div>
+
+    <!-- Icon hero circle -->
+    <div class="icon-hero">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="#1A8C82"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    </div>
+
+    <!-- Title -->
+    <div class="title">Primera vez por aca</div>
+
+    <!-- Body text -->
+    <div class="body-text">
+      Encontramos tu perfil en CareWell. Para acceder, primero necesitas crear
+      una contraseña para tu cuenta <strong>maria@ejemplo.com</strong>.
+    </div>
+
+    <!-- Primary CTA -->
+    <div class="btn-primary">Crear mi contraseña</div>
+
+    <!-- Secondary link -->
+    <div class="btn-link">No soy yo &middot; Ir al inicio</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:62px; right:6px;">Logo 64 dp (mas pequeno que login) · sin tagline</div>
+  <div class="annotation" style="top:218px; left:6px;">Circulo 96 dp · primaryContainer #C9EDE8 · person_add 48 dp primary</div>
+  <div class="annotation" style="top:376px; right:6px;">Persona detectada sin credenciales · email viene del intento de login previo</div>
+  <div class="annotation" style="top:560px; left:6px;">PrimaryButton · navega a formulario [02] · push slide-left</div>
+  <div class="annotation" style="top:636px; right:6px;">Link "No soy yo" · popUntil Login · limpia email precargado</div>
+</body>
+</html>

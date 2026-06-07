@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  .doc-title {
+    text-align: center; font-size: 13px; font-weight: 700; color: #566060;
+    padding: 12px 24px 4px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .panel { padding: 8px 24px 0; }
+  .state-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; color: #FFFFFF;
+    border-radius: 999px; padding: 3px 10px; margin-bottom: 10px;
+  }
+  .tag-media { background: #E0A100; }
+  .tag-fuerte { background: #2E9E5B; }
+
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .value { flex: 1; font-size: 16px; color: #16201F; }
+  .input .suffix { font-size: 18px; color: #566060; }
+
+  .meter-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .segments { display: flex; gap: 6px; width: 58%; }
+  .seg { flex: 1; height: 6px; border-radius: 999px; background: #EDF1F1; }
+  .seg.medium { background: #E0A100; }
+  .seg.strong { background: #2E9E5B; }
+  .meter-label { font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+  .meter-label.medium { color: #E0A100; }
+  .meter-label.strong { color: #2E9E5B; }
+
+  .hint { font-size: 12px; color: #566060; margin-top: 8px; }
+
+  .big-divider { height: 1px; background: #C5CECE; margin: 28px 24px; }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 120px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="doc-title">PasswordStrengthMeter — estados Media y Fuerte</div>
+
+  <!-- Estado MEDIA -->
+  <div class="panel">
+    <span class="state-tag tag-media">MEDIA · score 3</span>
+    <div class="field-label">Contraseña</div>
+    <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="value">Maria2024</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+    <div class="meter-row">
+      <div class="segments"><div class="seg medium"></div><div class="seg medium"></div><div class="seg"></div></div>
+      <div class="meter-label medium">Media</div>
+    </div>
+    <div class="hint">Sumá un símbolo (ej. ! ? #) para reforzarla.</div>
+  </div>
+
+  <div class="big-divider"></div>
+
+  <!-- Estado FUERTE -->
+  <div class="panel">
+    <span class="state-tag tag-fuerte">FUERTE · score 4–5</span>
+    <div class="field-label">Contraseña</div>
+    <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="value">Maria_2024!cuido</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+    <div class="meter-row">
+      <div class="segments"><div class="seg strong"></div><div class="seg strong"></div><div class="seg strong"></div></div>
+      <div class="meter-label strong">Fuerte <span class="md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span></div>
+    </div>
+    <div class="hint">¡Buena elección! Tu contraseña es segura.</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:175px; right:6px;">2/3 segmentos #E0A100 (warning) · etiqueta acompaña al color</div>
+  <div class="annotation" style="top:245px; left:6px;">Hint contextual sugiere cómo mejorar</div>
+  <div class="annotation" style="top:520px; right:6px;">3/3 segmentos #2E9E5B (success) + check 14dp</div>
+  <div class="annotation" style="top:590px; left:6px;">Se actualiza on-change · liveRegion para lector</div>
+</body>
+</html>

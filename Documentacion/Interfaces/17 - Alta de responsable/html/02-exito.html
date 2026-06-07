@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* Contenido centrado verticalmente */
+  .success-container {
+    height: calc(844px - 28px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px 32px;
+  }
+
+  /* Circulo de icono */
+  .success-circle {
+    width: 112px; height: 112px; border-radius: 50%;
+    background: #D8F0E1;
+    display: flex; align-items: center; justify-content: center;
+    color: #2E9E5B;
+    flex-shrink: 0;
+  }
+
+  /* Titulo */
+  .success-title {
+    font-size: 22px; font-weight: 700; color: #16201F;
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  /* Body */
+  .success-body {
+    font-size: 15px; color: #566060;
+    text-align: center; line-height: 1.55;
+    max-width: 300px;
+    margin-top: 12px;
+  }
+  .success-body strong { color: #16201F; font-weight: 700; }
+
+  /* Boton primario */
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    margin-top: 40px;
+    width: 100%; max-width: 320px;
+    cursor: pointer;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Success content -->
+  <div class="success-container">
+
+    <!-- Circulo con icono CHECK_CIRCLE -->
+    <div class="success-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="80" height="80" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>
+    </div>
+
+    <!-- Titulo -->
+    <div class="success-title">Responsable agregado</div>
+
+    <!-- Body -->
+    <div class="success-body">
+      <strong>Carlos Pérez</strong> ya es parte del equipo de cuidado de Alicia.
+      Recibirá una notificación.
+    </div>
+
+    <!-- Boton primario -->
+    <div class="btn-primary">Volver al equipo</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:200px; left:6px;">Sin AppBar: el flujo se completo, no tiene sentido semantico volver al formulario</div>
+  <div class="annotation" style="top:380px; right:6px;">Circulo 112px / icono 80px: celebracion visual sobria, tono de cuidado profesional</div>
+  <div class="annotation" style="top:530px; left:6px;">Nombre del nuevo responsable en bold: feedback especifico, no generico</div>
+  <div class="annotation" style="top:640px; right:6px;">Notificacion push al nuevo responsable: ver US de notificaciones para el flujo completo</div>
+  <div class="annotation" style="top:740px; left:6px;">Boton unico: zero decision fatigue al final del flujo</div>
+
+</body>
+</html>

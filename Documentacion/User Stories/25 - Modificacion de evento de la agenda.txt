@@ -1,0 +1,14 @@
+USER STORY: Modificación de evento de la agenda
+PRIORIDAD: 25
+MÓDULO: Agenda
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro del equipo de cuidado, quiero modificar un evento o recordatorio de la agenda, para corregir o ajustar la información antes de que ocurra.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se permite modificar un ítem de la agenda únicamente si su fecha y hora aún no transcurrieron.
+- Los cambios se reflejan en el listado de la agenda.
+
+NOTAS / RESTRICCIONES:
+- Los ítems ya vencidos no pueden modificarse, para asegurar el control y la integridad del histórico de la agenda.

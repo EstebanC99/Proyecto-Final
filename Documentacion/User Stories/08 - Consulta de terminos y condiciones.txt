@@ -1,0 +1,15 @@
+USER STORY: Consulta de Términos y Condiciones
+PRIORIDAD: 8
+MÓDULO: Configuración
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero acceder a los Términos y Condiciones desde la Configuración, para revisar en cualquier momento las condiciones que acepté al crear mi cuenta.
+
+CRITERIOS DE ACEPTACIÓN:
+- En el módulo de Configuración existe la opción "Términos y condiciones".
+- Al seleccionarla se muestra una pantalla con los términos y condiciones aceptados al crear la cuenta.
+- El usuario puede regresar al menú anterior mediante un botón de navegación.
+
+NOTAS / RESTRICCIONES:
+- El contenido de los T&C está definido en la sección de Factibilidad legal del documento del proyecto.

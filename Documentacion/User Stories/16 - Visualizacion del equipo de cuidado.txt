@@ -1,0 +1,16 @@
+USER STORY: Visualización del equipo de cuidado
+PRIORIDAD: 16
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero ver a todos los responsables y cuidadores asociados a una persona, para tener un registro claro de quiénes componen el equipo de cuidado.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se accede mediante el botón "Mi equipo" del menú principal.
+- Se muestra una interfaz con todos los responsables y cuidadores asociados a la persona seleccionada en el menú principal.
+- Desde la interfaz se pueden gestionar los permisos y accesos de cada miembro.
+
+NOTAS / RESTRICCIONES:
+- Equipo de cuidado: red de responsables y cuidadores asociados a una persona.
+- El equipo mostrado corresponde a la persona de contexto seleccionada en el menú principal (ver US-05b).

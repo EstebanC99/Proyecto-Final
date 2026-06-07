@@ -1,0 +1,17 @@
+USER STORY: Registro de estados de ánimo
+PRIORIDAD: 31
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero registrar el estado de ánimo de forma periódica, para identificar patrones y tendencias en el bienestar emocional de la persona.
+
+CRITERIOS DE ACEPTACIÓN:
+- Tanto el usuario como su equipo pueden registrar el estado de ánimo periódicamente.
+- Los registros permiten identificar patrones y tendencias en el bienestar emocional.
+- El último estado de ánimo registrado se refleja en el menú principal (Home) mediante un indicador visual en el tile "Mi salud" (badge/ícono con el ánimo más reciente de la persona de contexto), dando visibilidad al estado de ánimo más allá de la sección de Salud (ver US-05).
+
+NOTAS / RESTRICCIONES:
+- El registro autónomo lo realiza el usuario; el equipo lo realiza según permisos.
+- Los estados de ánimo registrados y mostrados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Decisión de diseño (presencia en Home): se opta por un indicador en el tile "Mi salud" (no un widget de resumen independiente) para mantener el layout 2x2 del Home sin agregar una tarjeta nueva. El indicador se actualiza al cambiar la persona de contexto o registrar un nuevo ánimo. La forma exacta del indicador queda sujeta a definición de disenador-ui.

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  .appbar { height: 56px; display: flex; align-items: center; padding: 0 12px; }
+  .back {
+    width: 48px; height: 48px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #16201F;
+  }
+
+  .screen { padding: 0 24px; }
+
+  .step-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .track { flex: 1; height: 6px; background: #EDF1F1; border-radius: 999px; overflow: hidden; }
+  .track .fill { width: 50%; height: 100%; background: #1A8C82; border-radius: 999px; }
+  .step-count { font-size: 13px; font-weight: 500; color: #566060; white-space: nowrap; }
+
+  .title { font-size: 24px; font-weight: 700; color: #16201F; line-height: 32px; margin-top: 24px; }
+  .subtitle { font-size: 14px; color: #566060; margin-top: 4px; margin-bottom: 16px; }
+
+  .field { margin-top: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input.error { border: 2px solid #D14343; padding: 0 15px; }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .value { flex: 1; font-size: 16px; }
+  .input .placeholder { color: #9AA5A5; }
+  .input .filled { color: #16201F; }
+  .helper-line { height: 18px; font-size: 12px; color: #566060; padding-top: 3px; padding-left: 2px; }
+  .error-line {
+    height: 18px; font-size: 12px; color: #D14343; padding-top: 3px; padding-left: 2px;
+    display: flex; align-items: center; gap: 4px; font-weight: 500;
+  }
+
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 20px;
+  }
+  .login-link { text-align: center; font-size: 14px; color: #566060; margin-top: 14px; }
+  .login-link .link { color: #1A8C82; font-weight: 700; margin-left: 4px; }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 120px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="appbar">
+    <div class="back md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>
+  </div>
+
+  <div class="screen">
+    <div class="step-row">
+      <div class="track"><div class="fill"></div></div>
+      <div class="step-count">Paso 1 de 2</div>
+    </div>
+
+    <div class="title">Creá tu cuenta</div>
+    <div class="subtitle">Empecemos con tus datos personales.</div>
+
+    <div class="field">
+      <div class="field-label">Nombre</div>
+      <div class="input error"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span><span class="value placeholder">Ej. María</span></div>
+      <div class="error-line"><span class="md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></span> Ingresá tu nombre.</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Apellido</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span><span class="value filled">González</span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Email</div>
+      <div class="input error"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span><span class="value filled">maria@correo</span></div>
+      <div class="error-line"><span class="md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></span> Ingresá un email válido.</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Teléfono</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></span><span class="value filled">+54 9 11 1234 5678</span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="btn-primary">Continuar</div>
+    <div class="login-link">¿Ya tenés cuenta?<span class="link">Iniciar sesión</span></div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:240px; right:6px;">Borde 2dp error #D14343 · fondo sigue surface</div>
+  <div class="annotation" style="top:300px; left:6px;">Estado siempre con ícono ⚠ + texto, nunca solo color</div>
+  <div class="annotation" style="top:380px; right:6px;">Campo válido vuelve a reposo, sin marca verde</div>
+  <div class="annotation" style="top:470px; left:6px;">Error labelSmall #D14343 en línea reservada</div>
+  <div class="annotation" style="top:700px; right:6px;">"Continuar" enfoca primer campo inválido, no avanza</div>
+</body>
+</html>

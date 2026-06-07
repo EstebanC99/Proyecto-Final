@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  .appbar { height: 56px; display: flex; align-items: center; padding: 0 12px; }
+  .back {
+    width: 48px; height: 48px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #16201F;
+  }
+  .appbar .brand-chip { display: flex; align-items: center; gap: 7px; margin-left: 4px; }
+  .appbar .brand-chip .name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .appbar .brand-chip .name .well { color: #1A8C82; }
+
+  .screen { padding: 0 24px; }
+
+  .step-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .track { flex: 1; height: 6px; background: #EDF1F1; border-radius: 999px; overflow: hidden; }
+  .track .fill { width: 100%; height: 100%; background: #1A8C82; border-radius: 999px; }
+  .step-count { font-size: 13px; font-weight: 500; color: #566060; white-space: nowrap; }
+
+  .title { font-size: 24px; font-weight: 700; color: #16201F; line-height: 32px; margin-top: 24px; }
+  .subtitle { font-size: 14px; color: #566060; margin-top: 4px; margin-bottom: 16px; }
+
+  .field { margin-top: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .value { flex: 1; font-size: 16px; }
+  .input .placeholder { color: #9AA5A5; }
+  .input .dots { letter-spacing: 2px; color: #16201F; }
+  .input .suffix { font-size: 18px; color: #566060; }
+
+  /* strength meter */
+  .meter-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .segments { display: flex; gap: 6px; flex: 1; max-width: 60%; }
+  .seg { flex: 1; height: 6px; border-radius: 999px; background: #EDF1F1; }
+  .meter-label { font-size: 12px; font-weight: 500; color: #566060; }
+
+  .helper-line { height: 18px; font-size: 12px; color: #566060; padding-top: 3px; padding-left: 2px; }
+
+  /* checkbox */
+  .tyc { display: flex; gap: 12px; margin-top: 24px; align-items: flex-start; }
+  .checkbox {
+    width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px; color: #9AA5A5;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tyc-text { font-size: 14px; color: #16201F; line-height: 20px; }
+  .tyc-text .link { color: #1A8C82; font-weight: 700; text-decoration: underline; }
+
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 32px;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 120px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="appbar">
+    <div class="back md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>
+    <div class="brand-chip">
+      <svg viewBox="0 0 80 80" width="28" height="28" role="img" aria-label="CareWell">
+        <defs><linearGradient id="ab2Mark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A095"/><stop offset="1" stop-color="#16786F"/></linearGradient></defs>
+        <circle cx="40" cy="40" r="40" fill="url(#ab2Mark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <span class="name">Care<span class="well">Well</span></span>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="step-row">
+      <div class="track"><div class="fill"></div></div>
+      <div class="step-count">Paso 2 de 2</div>
+    </div>
+
+    <div class="title">Creá tu contraseña</div>
+    <div class="subtitle">Vas a usarla junto con tu email para entrar.</div>
+
+    <div class="field">
+      <div class="field-label">Contraseña</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="value dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+      <div class="meter-row">
+        <div class="segments"><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
+        <div class="meter-label">Mínimo 8 caracteres</div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <div class="field-label">Confirmar contraseña</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="value dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="tyc">
+      <div class="checkbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div>
+      <div class="tyc-text">Acepto los <span class="link">Términos y Condiciones</span> y la <span class="link">Política de Privacidad</span>.</div>
+    </div>
+
+    <div class="btn-primary">Crear cuenta</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:96px; right:6px;">StepProgressBar 100% (anim 50%→100% al entrar)</div>
+  <div class="annotation" style="top:300px; left:6px;">Toggle 👁 mostrar/ocultar · tap target 48dp</div>
+  <div class="annotation" style="top:360px; right:6px;">PasswordStrengthMeter: 3 segmentos vacíos #EDF1F1</div>
+  <div class="annotation" style="top:600px; left:6px;">Checkbox 22dp · fila tappable ≥48dp · links subrayados abren bottom sheet</div>
+  <div class="annotation" style="top:730px; right:6px;">"Crear cuenta" valida pass, match y T&C al pulsar</div>
+</body>
+</html>

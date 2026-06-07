@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+  <linearGradient id="teal" gradientUnits="userSpaceOnUse" x1="70" y1="70" x2="450" y2="450">
+  <stop offset="0" stop-color="rgb(51, 194, 166)"/>
+  <stop offset="1" stop-color="rgb(12, 104, 124)"/>
+  </linearGradient></defs>
+  <polyline points="332.0,378.9 324.2,384.6 316.1,389.9 307.6,394.6 298.9,398.8 289.9,402.4 280.7,405.4 271.4,407.9 261.9,409.8 252.3,411.1 242.7,411.9 233.0,412.0 223.3,411.5 213.7,410.4 204.2,408.7 194.7,406.4 185.5,403.6 176.4,400.2 167.6,396.2 159.1,391.7 150.8,386.7 142.8,381.1 135.3,375.1 128.1,368.6 121.3,361.7 115.0,354.4 109.1,346.7 103.7,338.7 98.8,330.3 94.5,321.7 90.7,312.8 87.4,303.6 84.8,294.3 82.7,284.9 81.2,275.3 80.3,265.7 80.0,256.0 80.3,246.3 81.2,236.7 82.7,227.1 84.8,217.7 87.4,208.4 90.7,199.2 94.5,190.3 98.8,181.7 103.7,173.3 109.1,165.3 115.0,157.6 121.3,150.3 128.1,143.4 135.3,136.9 142.8,130.9 150.8,125.3 159.1,120.3 167.6,115.8 176.4,111.8 185.5,108.4 194.7,105.6 204.2,103.3 213.7,101.6 223.3,100.5 233.0,100.0 242.7,100.1 252.3,100.9 261.9,102.2 271.4,104.1 280.7,106.6 289.9,109.6 298.9,113.2 307.6,117.4 316.1,122.1 324.2,127.4 332.0,133.1" fill="none" stroke="url(#teal)" stroke-linecap="round" stroke-linejoin="round" stroke-width="46"/>
+  <line x1="192" y1="210" x2="262" y2="232" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="262" y1="232" x2="332" y2="208" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="192" y1="210" x2="170" y2="255" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="170" y1="255" x2="262" y2="342" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="332" y1="208" x2="354" y2="252" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="354" y1="252" x2="262" y2="342" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="262" y1="268" x2="262" y2="232" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="262" y1="268" x2="170" y2="255" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="262" y1="268" x2="354" y2="252" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <line x1="262" y1="268" x2="262" y2="342" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="192" cy="210" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+  <circle cx="262" cy="232" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+  <circle cx="332" cy="208" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+  <circle cx="170" cy="255" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+  <circle cx="354" cy="252" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+  <circle cx="262" cy="268" r="16" fill="rgb(246, 152, 56)"/>
+  <circle cx="262" cy="342" r="11" fill="rgb(255, 255, 255)" stroke="rgb(22, 128, 140)" stroke-width="4"/>
+</svg>

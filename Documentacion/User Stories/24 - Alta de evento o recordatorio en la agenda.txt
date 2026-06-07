@@ -1,0 +1,16 @@
+USER STORY: Alta de evento o recordatorio en la agenda
+PRIORIDAD: 24
+MÓDULO: Agenda
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro del equipo de cuidado, quiero registrar una actividad, evento o recordatorio de medicamento en la agenda, para no olvidar las tareas importantes del cuidado.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se puede crear un nuevo ítem indicando Fecha, Hora y Descripción.
+- El ítem creado aparece en el listado de la agenda.
+- El ítem queda configurado para generar una notificación al celular en el momento correspondiente.
+- Cuando el usuario visualiza su propio contexto, puede crear eventos en su propia agenda.
+
+NOTAS / RESTRICCIONES:
+- La integración con Google Calendar (conexión con el correo del usuario para visualizar registros) queda reservada como integración con terceros a futuro, fuera del MVP.

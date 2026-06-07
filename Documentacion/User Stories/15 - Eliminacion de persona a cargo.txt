@@ -1,0 +1,14 @@
+USER STORY: Eliminación de persona a cargo
+PRIORIDAD: 15
+MÓDULO: Personas a cargo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero eliminar a una persona del equipo de cuidado, para dejar de gestionarla cuando ya no corresponde.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el módulo "Personas a cargo" se ofrece la opción de eliminar a una persona.
+- Al eliminarla, se revoca su acceso y cualquier funcionalidad asociada.
+
+NOTAS / RESTRICCIONES:
+- La acción está condicionada por el esquema de roles y permisos (RBAC).

@@ -1,0 +1,15 @@
+USER STORY: Cierre de sesión
+PRIORIDAD: 10
+MÓDULO: Configuración
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero cerrar sesión desde la Configuración, para finalizar de forma segura mi uso de la aplicación.
+
+CRITERIOS DE ACEPTACIÓN:
+- En Configuración existe la opción "Cerrar sesión".
+- Al activarla, el usuario cierra su sesión.
+- El sistema regresa automáticamente a la pantalla de inicio.
+
+NOTAS / RESTRICCIONES:
+- Ninguna adicional.

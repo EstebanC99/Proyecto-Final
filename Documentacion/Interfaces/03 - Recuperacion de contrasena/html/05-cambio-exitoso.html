@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* Screen content: centrado verticalmente */
+  .screen {
+    padding: 0 24px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* Logo block */
+  .brand { text-align: center; margin-top: 52px; }
+  .brand .logo-mark { display: block; margin: 0 auto 12px; }
+  .brand .wordmark { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .brand .wordmark .care { color: #16201F; }
+  .brand .wordmark .well { color: #1A8C82; }
+
+  /* Success icon container */
+  .success-container {
+    width: 112px; height: 112px; border-radius: 56px;
+    background: #D8F0E1;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 40px;
+  }
+
+  /* Title */
+  .title {
+    font-size: 28px; font-weight: 700; color: #16201F;
+    letter-spacing: -0.5px; margin-top: 24px; text-align: center;
+    line-height: 1.2;
+  }
+
+  /* Body */
+  .body-text {
+    font-size: 15px; color: #566060; margin-top: 8px;
+    text-align: center; line-height: 1.6;
+    padding: 0 12px;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 36px;
+    width: 100%;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Sin AppBar: pantalla de cierre del flujo -->
+  <div class="screen">
+    <!-- Logo CareWell -->
+    <div class="brand">
+      <svg class="logo-mark" viewBox="0 0 80 80" width="64" height="64" role="img" aria-label="CareWell">
+        <defs><linearGradient id="successMark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A095"/><stop offset="1" stop-color="#16786F"/></linearGradient></defs>
+        <circle cx="40" cy="40" r="40" fill="url(#successMark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <div class="wordmark"><span class="care">Care</span><span class="well">Well</span></div>
+    </div>
+
+    <!-- Ícono de éxito -->
+    <div class="success-container md-icon" style="color: #2E9E5B;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="80" height="80" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>
+    </div>
+
+    <!-- Título -->
+    <div class="title">&#161;Contrase&#241;a actualizada!</div>
+
+    <!-- Cuerpo -->
+    <div class="body-text">
+      Tu nueva contrase&#241;a est&#225; activa.<br>
+      Ya pod&#233;s iniciar sesi&#243;n.
+    </div>
+
+    <!-- Botón principal -->
+    <div class="btn-primary">Ir al inicio de sesi&#243;n</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 36px; right: 6px;">Sin AppBar · pantalla final del flujo · back bloqueado (stack limpio)</div>
+  <div class="annotation" style="top: 180px; left: 6px;">Logo 64 dp: mismo que 03-nueva-contrasena, da continuidad de marca en el deep link</div>
+  <div class="annotation" style="top: 360px; right: 6px;">successContainer #D8F0E1 · CHECK_CIRCLE 80 dp success #2E9E5B</div>
+  <div class="annotation" style="top: 530px; left: 6px;">displaySmall 28 sp bold · unico titular de este tamano en el flujo</div>
+  <div class="annotation" style="top: 640px; right: 6px;">pushReplacement al Login · limpia el stack de recuperacion</div>
+</body>
+</html>

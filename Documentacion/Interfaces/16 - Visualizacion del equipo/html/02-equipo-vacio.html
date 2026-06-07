@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 8px 0 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+
+  /* Empty state container */
+  .empty-container {
+    height: calc(844px - 28px - 56px);
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 24px 24px 0;
+  }
+
+  /* Chip contexto */
+  .chip-context {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #C9EDE8; border-radius: 12px;
+    padding: 8px 16px;
+    align-self: flex-start;
+  }
+  .chip-context .label { font-size: 13px; color: #566060; }
+  .chip-context .name { font-size: 13px; font-weight: 700; color: #16201F; }
+
+  /* Empty illustration area */
+  .empty-center {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding-bottom: 48px;
+  }
+
+  .empty-circle {
+    width: 88px; height: 88px; border-radius: 50%;
+    background: #C9EDE8;
+    display: flex; align-items: center; justify-content: center;
+    color: #1A8C82;
+  }
+
+  .empty-title {
+    font-size: 20px; font-weight: 700; color: #16201F;
+    margin-top: 20px; text-align: center;
+  }
+
+  .empty-body {
+    font-size: 14px; color: #566060; text-align: center;
+    line-height: 1.55; max-width: 280px;
+    margin-top: 8px;
+  }
+
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    margin-top: 32px;
+    width: 100%; max-width: 280px;
+    cursor: pointer;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar (sin ADD: CTA unica es el boton primario) -->
+  <div class="app-bar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Mi equipo</span>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-container">
+
+    <!-- Chip de contexto (siempre visible) -->
+    <div class="chip-context">
+      <span class="label">Viendo equipo de:</span>
+      <span class="name">Alicia Rodríguez</span>
+    </div>
+
+    <!-- Centro: ilustracion + texto + accion -->
+    <div class="empty-center">
+
+      <div class="empty-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+
+      <div class="empty-title">Equipo sin miembros</div>
+
+      <div class="empty-body">
+        Agregá responsables y cuidadores para coordinar el cuidado de Alicia.
+      </div>
+
+      <div class="btn-primary">Agregar miembro</div>
+
+    </div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:88px; right:6px;">Sin ADD en AppBar: evita fragmentar la atencion; CTA unica en pantalla</div>
+  <div class="annotation" style="top:200px; left:6px;">Chip de contexto siempre presente: el usuario sabe de quien se habla</div>
+  <div class="annotation" style="top:430px; right:6px;">Centrado vertical real: el contenido no queda pegado al top</div>
+  <div class="annotation" style="top:600px; left:6px;">Nombre "Alicia" en el body refuerza el contexto sin leer el chip</div>
+  <div class="annotation" style="top:680px; right:6px;">Boton primario 56px: objetivo tactico cumplido, ancho 280px max</div>
+
+</body>
+</html>

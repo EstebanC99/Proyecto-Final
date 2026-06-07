@@ -1,0 +1,16 @@
+USER STORY: Eliminación de cuenta
+PRIORIDAD: 11
+MÓDULO: Configuración
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero eliminar mi cuenta desde la Configuración, para ejercer mi derecho a la supresión de mis datos personales.
+
+CRITERIOS DE ACEPTACIÓN:
+- En Configuración, dentro de "Seguridad y privacidad", existe la opción "Eliminación de cuenta".
+- Antes de proceder se solicita confirmación mediante un mensaje de advertencia.
+- Si el usuario confirma, la cuenta se elimina de forma definitiva.
+- Si el usuario cancela, no se realizan cambios.
+
+NOTAS / RESTRICCIONES:
+- Da cumplimiento al derecho de supresión de datos de la Ley N° 25.326 de Protección de Datos Personales.

@@ -1,0 +1,16 @@
+USER STORY: Creación de credenciales por primera vez
+PRIORIDAD: 4
+MÓDULO: Autenticación
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como persona que fue registrada por un responsable o cuidador pero aún no tiene credenciales, quiero crear mi usuario y contraseña la primera vez que ingreso, para poder acceder a la aplicación por mí mismo.
+
+CRITERIOS DE ACEPTACIÓN:
+- Si una persona registrada nunca inició sesión y desea hacerlo por primera vez, accede de forma manual a la pantalla de creación de credenciales mediante el enlace "Mi cuenta fue creada por otro" disponible en la pantalla de inicio de sesión (no hay redirección automática).
+- En esa pantalla la persona puede crear su usuario y contraseña de acceso.
+- Tras crear las credenciales, la persona puede iniciar sesión normalmente.
+
+NOTAS / RESTRICCIONES:
+- Una Persona puede existir en el sistema sin credenciales (cargada por responsables/cuidadores cuando no puede usar la app).
+- Esta historia conecta el concepto de Persona sin acceso con el de Usuario con acceso.

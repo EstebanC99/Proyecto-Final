@@ -1,0 +1,18 @@
+USER STORY: Alta de responsable en el equipo
+PRIORIDAD: 17
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero agregar a otro responsable al equipo de cuidado, para compartir la gestión de los datos de la persona a cargo.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se ofrece una opción de alta de responsables claramente diferenciada del alta de cuidadores (US-20).
+- La acción abre el formulario de alta de responsable, que asigna el rol "Responsable" de forma explícita (el miembro NO se registra como cuidador).
+- Se registra al nuevo responsable en el equipo con el rol "Responsable".
+- El responsable agregado obtiene por defecto permisos amplios (editar datos de la persona, gestionar agenda y gestionar equipo), ajustables luego desde Mi equipo.
+
+NOTAS / RESTRICCIONES:
+- El responsable gestiona los datos de la persona a cargo y administra el equipo y sus permisos.
+- Diferencia de flujo con US-20 (alta de cuidador): "Mi equipo" expone DOS acciones de alta distintas; cada una fija el rol del miembro (responsable o cuidador) y un conjunto de permisos por defecto diferente. El rol no debe quedar fijado siempre en "Responsable".
+- Nota para dev-flutter: verificar que el alta de cuidador (US-20) NO reutilice el flujo de responsable dejando el rol fijo en "Responsable"; el rol debe determinarse por la acción/formulario elegido.

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .appbar {
+    height: 56px; background: #FFF;
+    border-bottom: 1px solid #EDF1F1;
+    display: flex; align-items: center;
+    padding: 0 4px 0 4px; gap: 4px; flex-shrink: 0;
+  }
+  .appbar-btn {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .appbar-title {
+    flex: 1; font-size: 16px; font-weight: 700;
+    color: #16201F; text-align: center; padding-right: 48px;
+  }
+  .member-header {
+    background: #FFF;
+    border-bottom: 1px solid #EDF1F1;
+    padding: 20px 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #FCE2DA;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: #7A2E1A;
+    flex-shrink: 0;
+  }
+  .member-info { display: flex; flex-direction: column; gap: 4px; }
+  .member-name { font-size: 16px; font-weight: 700; color: #16201F; }
+  .member-badge {
+    display: inline-flex; align-items: center;
+    background: #FCE2DA; color: #7A2E1A;
+    font-size: 12px; font-weight: 600;
+    border-radius: 100px; padding: 2px 10px;
+    width: fit-content;
+  }
+  .member-email { font-size: 13px; color: #566060; }
+  .section-title {
+    font-size: 14px; font-weight: 700; color: #16201F;
+    margin: 16px 16px 8px 16px;
+  }
+  .section-title span { color: #1A8C82; }
+  .permissions-list { background: #FFF; }
+  .permission-row {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 56px; padding: 0 16px;
+    border-bottom: 1px solid #EDF1F1;
+  }
+  .permission-row:last-child { border-bottom: none; }
+  .permission-label { font-size: 15px; font-weight: 500; color: #16201F; }
+  .btn-primary {
+    position: absolute; bottom: 24px; left: 16px; right: 16px;
+    height: 56px; background: #1A8C82; color: #FFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="appbar">
+    <div class="appbar-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="appbar-title">Permisos de Sandra</div>
+  </div>
+
+  <!-- Header del miembro -->
+  <div class="member-header">
+    <div class="avatar">S</div>
+    <div class="member-info">
+      <div class="member-name">Sandra Ruiz</div>
+      <div class="member-badge">Cuidadora</div>
+      <div class="member-email">sandra@ejemplo.com</div>
+    </div>
+  </div>
+
+  <!-- Titulo de seccion -->
+  <div class="section-title">Permisos sobre <span>Alicia Rodriguez</span></div>
+
+  <!-- Lista de permisos -->
+  <div class="permissions-list">
+
+    <div class="permission-row">
+      <span class="permission-label">Ver datos personales</span>
+      <!-- Toggle ON -->
+      <div style="width:40px;height:22px;background:#1A8C82;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-end;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+    <div class="permission-row">
+      <span class="permission-label">Ver agenda</span>
+      <!-- Toggle ON -->
+      <div style="width:40px;height:22px;background:#1A8C82;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-end;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+    <div class="permission-row">
+      <span class="permission-label">Editar agenda</span>
+      <!-- Toggle OFF -->
+      <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+    <div class="permission-row">
+      <span class="permission-label">Ver historial de salud</span>
+      <!-- Toggle OFF -->
+      <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+    <div class="permission-row">
+      <span class="permission-label">Enviar alertas de emergencia</span>
+      <!-- Toggle OFF -->
+      <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+    <div class="permission-row">
+      <span class="permission-label">Gestionar equipo</span>
+      <!-- Toggle OFF -->
+      <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+    </div>
+
+  </div>
+
+  <!-- Boton primario fijo al fondo -->
+  <div class="btn-primary">Guardar cambios</div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:58px; right:6px;">AppBar centrado con ARROW_BACK a la izquierda · simetria de padding</div>
+  <div class="annotation" style="top:148px; left:6px;">Badge salmon #FCE2DA/#7A2E1A diferencia al Cuidador del Responsable (#C9EDE8/#1A8C82)</div>
+  <div class="annotation" style="top:318px; right:6px;">Cuidador: solo 2 ON por defecto · acceso de escritura requiere habilitacion explicita</div>
+  <div class="annotation" style="top:510px; left:6px;">Toggle OFF = gris #C5CECE · 4 de 6 permisos restringidos por defecto en este rol</div>
+  <div class="annotation" style="top:744px; right:6px;">PrimaryButton fijo al fondo · height 56dp · radius 16dp</div>
+
+</body>
+</html>

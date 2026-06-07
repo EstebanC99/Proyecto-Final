@@ -1,0 +1,14 @@
+USER STORY: Eliminación de evento de la agenda
+PRIORIDAD: 26
+MÓDULO: Agenda
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro del equipo de cuidado, quiero eliminar un evento o recordatorio de la agenda, para quitar actividades que ya no corresponden.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se permite eliminar un ítem de la agenda únicamente si su fecha y hora aún no transcurrieron.
+- El ítem eliminado desaparece del listado de la agenda.
+
+NOTAS / RESTRICCIONES:
+- Los ítems ya vencidos no pueden eliminarse, para mantener el control sobre la agenda.

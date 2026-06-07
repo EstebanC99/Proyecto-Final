@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 8px 0 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .icon-btn-primary {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #1A8C82;
+    display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF; flex-shrink: 0;
+    margin-left: auto;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+
+  /* Scroll content */
+  .scroll-content {
+    height: calc(844px - 28px - 56px);
+    overflow-y: auto;
+    padding: 0 16px 88px;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* Chip contexto */
+  .chip-context {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #C9EDE8; border-radius: 12px;
+    padding: 8px 16px;
+    margin-top: 16px;
+  }
+  .chip-context .label { font-size: 13px; color: #566060; }
+  .chip-context .name { font-size: 13px; font-weight: 700; color: #16201F; }
+
+  /* Section header */
+  .section-header {
+    font-size: 12px; font-weight: 600; color: #566060;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin: 20px 0 8px;
+  }
+
+  /* Member card */
+  .member-card {
+    background: #FFFFFF; border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 8px;
+    min-height: 72px;
+    cursor: pointer;
+  }
+
+  /* Avatar */
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #C9EDE8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #0A3D38;
+    flex-shrink: 0;
+  }
+
+  /* Member info */
+  .member-info { flex: 1; min-width: 0; }
+  .member-name {
+    font-size: 15px; font-weight: 700; color: #16201F;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .member-self { font-size: 13px; font-weight: 400; color: #566060; margin-left: 4px; }
+  .member-email {
+    font-size: 13px; color: #566060; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* Member right column */
+  .member-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 6px; flex-shrink: 0;
+  }
+
+  /* Badges */
+  .badge {
+    font-size: 11px; font-weight: 600;
+    border-radius: 999px; padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .badge-responsable { background: #C9EDE8; color: #0A3D38; }
+  .badge-cuidador { background: #FCE2DA; color: #7A2E1A; }
+
+  .chevron { color: #9AA5A5; display: flex; align-items: center; }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 24px; right: 16px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #1A8C82; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(26,140,130,0.35);
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Mi equipo</span>
+    <div class="icon-btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll-content">
+
+    <!-- Chip de contexto -->
+    <div class="chip-context">
+      <span class="label">Viendo equipo de:</span>
+      <span class="name">Alicia Rodríguez</span>
+    </div>
+
+    <!-- Sección RESPONSABLES -->
+    <div class="section-header">Responsables</div>
+
+    <!-- Card responsable 1 (Vos) -->
+    <div class="member-card">
+      <div class="avatar">L</div>
+      <div class="member-info">
+        <div class="member-name">
+          Laura García
+          <span class="member-self">(Vos)</span>
+        </div>
+        <div class="member-email">lauragarcia@email.com</div>
+      </div>
+      <div class="member-right">
+        <span class="badge badge-responsable">Responsable</span>
+        <div class="chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card responsable 2 -->
+    <div class="member-card">
+      <div class="avatar">M</div>
+      <div class="member-info">
+        <div class="member-name">Martín López</div>
+        <div class="member-email">martin.lopez@email.com</div>
+      </div>
+      <div class="member-right">
+        <span class="badge badge-responsable">Responsable</span>
+        <div class="chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección CUIDADORES -->
+    <div class="section-header">Cuidadores</div>
+
+    <!-- Card cuidadora -->
+    <div class="member-card">
+      <div class="avatar" style="background:#FCE2DA; color:#7A2E1A;">S</div>
+      <div class="member-info">
+        <div class="member-name">Sandra Ruiz</div>
+        <div class="member-email">sandra.ruiz@email.com</div>
+      </div>
+      <div class="member-right">
+        <span class="badge badge-cuidador">Cuidadora</span>
+        <div class="chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <div class="fab">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:86px; right:6px;">ADD en AppBar y FAB: redundancia intencional para accesibilidad</div>
+  <div class="annotation" style="top:152px; left:6px;">Chip contextualiza la persona: clave si hay multiples personas a cargo</div>
+  <div class="annotation" style="top:320px; right:6px;">"(Vos)" identifica al usuario autenticado sin ambiguedad</div>
+  <div class="annotation" style="top:490px; left:6px;">Tap en card navega a gestion de permisos (US-18/21 segun rol)</div>
+  <div class="annotation" style="top:730px; right:6px;">FAB 56px: objetivo tactico minimo 48px cumplido</div>
+
+</body>
+</html>

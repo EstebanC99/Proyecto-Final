@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* Pantalla de exito: centrada verticalmente */
+  .success-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  /* Logo CareWell */
+  .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  .brand .wordmark {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-top: 10px;
+  }
+  .brand .wordmark .care { color: #16201F; }
+  .brand .wordmark .well { color: #1A8C82; }
+
+  /* Contenedor del icono check */
+  .check-container {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: #D8F0E1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  /* Textos */
+  .success-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #16201F;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .success-body {
+    font-size: 16px;
+    font-weight: 400;
+    color: #566060;
+    line-height: 1.5;
+    margin-bottom: 40px;
+  }
+
+  /* Boton primario */
+  .btn-primary {
+    width: 100%;
+    height: 56px;
+    background: #1A8C82;
+    color: #FFFFFF;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Pantalla de exito -->
+  <div class="success-screen">
+
+    <!-- Logo CareWell -->
+    <div class="brand">
+      <svg viewBox="0 0 80 80" width="64" height="64" role="img" aria-label="CareWell">
+        <defs>
+          <linearGradient id="successMark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#21A095"/>
+            <stop offset="1" stop-color="#16786F"/>
+          </linearGradient>
+        </defs>
+        <circle cx="40" cy="40" r="40" fill="url(#successMark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <div class="wordmark">
+        <span class="care">Care</span><span class="well">Well</span>
+      </div>
+    </div>
+
+    <!-- Contenedor del icono de check -->
+    <div class="check-container">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="80" height="80" fill="#2E9E5B"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>
+    </div>
+
+    <!-- Titulo y cuerpo -->
+    <div class="success-title">Contrasena actualizada!</div>
+    <div class="success-body">Tu nueva contrasena ya esta activa.</div>
+
+    <!-- CTA -->
+    <div class="btn-primary">Volver a Configuracion</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 100px; right: 6px;">Sin AppBar: pantalla de exito completa, mismo patron que US-01 registro</div>
+  <div class="annotation" style="top: 320px; left: 6px;">CHECK_CIRCLE 80dp en circulo 112dp bg successContainer #D8F0E1</div>
+  <div class="annotation" style="top: 500px; right: 6px;">popUntil('/settings'): go('/settings') · sesion sigue activa (a diferencia de US-03)</div>
+  <div class="annotation" style="top: 680px; left: 6px;">CTA unico: sin distracciones. No hay back util despues del cambio exitoso</div>
+
+</body>
+</html>

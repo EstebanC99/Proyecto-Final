@@ -1,0 +1,16 @@
+USER STORY: Visualización del perfil propio
+PRIORIDAD: 6
+MÓDULO: Perfil de usuario (Mi Perfil)
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero visualizar mi información personal en la pantalla "Mi Perfil", para consultar mis datos registrados en cualquier momento.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se accede a "Mi Perfil" desde el botón Perfil del menú principal.
+- La pantalla muestra todos los datos personales del usuario de forma ordenada.
+- Presenta un ícono de perfil en la parte superior.
+- Incluye un botón de navegación para volver a la pantalla anterior.
+
+NOTAS / RESTRICCIONES:
+- La interfaz debe ser clara y accesible, con fuentes legibles e íconos grandes (requisitos de usabilidad y accesibilidad).

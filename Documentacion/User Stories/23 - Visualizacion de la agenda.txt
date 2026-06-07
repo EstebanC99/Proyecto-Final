@@ -1,0 +1,18 @@
+USER STORY: Visualización de la agenda
+PRIORIDAD: 23
+MÓDULO: Agenda
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro del equipo de cuidado, quiero ver el listado de actividades y recordatorios agendados, para conocer las tareas, eventos y recordatorios de medicamentos relevantes.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se accede a la gestión de agenda desde el menú principal ("Mi calendario").
+- Se presenta un listado de todas las notificaciones agendadas de la persona seleccionada en el menú principal.
+- Cada ítem muestra Fecha, Hora y Descripción.
+- Cada ítem funciona como una notificación del celular.
+- Cuando el usuario visualiza su propio contexto, puede crear eventos en su propia agenda.
+
+NOTAS / RESTRICCIONES:
+- La agenda registra actividades, eventos, recordatorios de medicamentos y cualquier otra información que el equipo considere relevante recordar.
+- La agenda mostrada corresponde a la persona de contexto seleccionada en el menú principal (ver US-05b).

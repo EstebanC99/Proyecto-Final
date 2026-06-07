@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; position: relative; z-index: 3;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* Paso 2 al fondo (visible bajo el scrim claro) */
+  .bg { padding: 0 24px; }
+  .appbar { height: 56px; display: flex; align-items: center; padding: 0 12px; }
+  .back { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #16201F; }
+  .step-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .track { flex: 1; height: 6px; background: #EDF1F1; border-radius: 999px; overflow: hidden; }
+  .track .fill { width: 100%; height: 100%; background: #1A8C82; border-radius: 999px; }
+  .step-count { font-size: 13px; font-weight: 500; color: #566060; }
+  .title { font-size: 24px; font-weight: 700; margin-top: 24px; }
+  .subtitle { font-size: 14px; color: #566060; margin-top: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin: 20px 0 6px; }
+  .input { height: 56px; background: #FFFFFF; border: 1px solid #C5CECE; border-radius: 12px; display: flex; align-items: center; padding: 0 16px; gap: 12px; }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .dots { letter-spacing: 2px; flex: 1; }
+  .input .suffix { font-size: 18px; color: #566060; }
+
+  /* Scrim de bloqueo @30% */
+  .scrim { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.30); z-index: 1; }
+
+  /* Card de progreso */
+  .loading-card {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 260px; background: #FFFFFF; border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(22,32,31,0.12);
+    padding: 28px 24px; text-align: center; z-index: 2;
+  }
+  .spinner {
+    width: 48px; height: 48px; margin: 0 auto 16px;
+    border-radius: 999px;
+    border: 4px solid #EDF1F1;
+    border-top-color: #1A8C82;
+    border-right-color: #1A8C82;
+  }
+  .loading-card .main { font-size: 16px; font-weight: 600; color: #16201F; }
+  .loading-card .sub { font-size: 14px; color: #566060; margin-top: 4px; }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 120px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="bg">
+    <div class="appbar"><div class="back md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div></div>
+    <div class="step-row">
+      <div class="track"><div class="fill"></div></div>
+      <div class="step-count">Paso 2 de 2</div>
+    </div>
+    <div class="title">Creá tu contraseña</div>
+    <div class="subtitle">Vas a usarla junto con tu email para entrar.</div>
+    <div class="field-label">Contraseña</div>
+    <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+    <div class="field-label">Confirmar contraseña</div>
+    <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+  </div>
+
+  <div class="scrim"></div>
+
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <div class="main">Creando tu cuenta…</div>
+    <div class="sub">Esto toma un momento.</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:90px; right:6px;">Scrim negro @30% · barrierDismissible false · bloquea tap y back</div>
+  <div class="annotation" style="top:360px; left:6px;">Card surface · radiusLg 16 · elev2 · padding 24</div>
+  <div class="annotation" style="top:470px; right:6px;">CircularProgressIndicator 48dp · color primary · stroke 4</div>
+  <div class="annotation" style="top:560px; left:6px;">Evita doble submit · liveRegion "Creando tu cuenta…"</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+USER STORY: Baja de cuidador del equipo
+PRIORIDAD: 22
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero eliminar a un cuidador del equipo de cuidado, para revocar su acceso cuando ya no participa del cuidado.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se ofrece la opción de baja de cuidadores.
+- Al dar de baja al cuidador, se revocan de inmediato su acceso y permisos en el sistema.
+- Solo los cuidadores activos pueden interactuar con la información del usuario.
+
+NOTAS / RESTRICCIONES:
+- Solo el rol Responsable puede administrar el equipo y sus permisos.

@@ -1,0 +1,15 @@
+USER STORY: Modificación de permisos de responsable
+PRIORIDAD: 18
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero actualizar los permisos de otro responsable del equipo, para ajustar su nivel de acceso según las necesidades del cuidado.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se accede a los detalles del responsable seleccionado.
+- Se permite actualizar los permisos de ese miembro del equipo.
+- Los cambios de permisos se reflejan en los accesos del responsable.
+
+NOTAS / RESTRICCIONES:
+- La administración de permisos es una atribución del rol Responsable.

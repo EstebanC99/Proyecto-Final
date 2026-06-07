@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .app-bar-icon { color: #16201F; display: inline-flex; }
+  .app-bar-title { font-size: 18px; font-weight: 700; color: #16201F; }
+
+  .screen {
+    padding: 24px 24px 0;
+    background: #F6F8F8;
+    height: calc(844px - 28px - 56px);
+    overflow: hidden;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #16201F;
+    margin-bottom: 4px;
+  }
+  .section-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: #566060;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Campo */
+  .field { margin-bottom: 4px; }
+  .field-label {
+    font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px;
+  }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input.focus { border: 2px solid #1A8C82; }
+  .input .prefix { color: #566060; display: inline-flex; flex-shrink: 0; }
+  .input .value { flex: 1; font-size: 16px; color: #16201F; letter-spacing: 3px; }
+  .input .suffix { color: #566060; display: inline-flex; flex-shrink: 0; }
+
+  /* Helper reservado */
+  .field-helper {
+    height: 18px;
+    font-size: 12px;
+    color: #566060;
+    padding: 2px 4px 0;
+    margin-bottom: 8px;
+  }
+
+  /* PasswordStrengthMeter */
+  .strength-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    margin-bottom: 2px;
+  }
+  .strength-segments {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+  .strength-segment {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #EDF1F1;
+  }
+  .strength-segment.active-strong { background: #2E9E5B; }
+  .strength-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #2E9E5B;
+    white-space: nowrap;
+  }
+
+  /* Boton primario */
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 8px;
+    border: none;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <span class="app-bar-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </span>
+    <span class="app-bar-title">Cambiar contrasena</span>
+  </div>
+
+  <!-- Formulario -->
+  <div class="screen">
+
+    <div class="section-title">Nueva contrasena</div>
+    <div class="section-subtitle">Tu nueva contrasena reemplazara la actual.</div>
+
+    <!-- Campo: Contrasena actual -->
+    <div class="field">
+      <div class="field-label">Contrasena actual</div>
+      <div class="input">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </span>
+        <span class="value">••••••••</span>
+        <span class="suffix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        </span>
+      </div>
+      <div class="field-helper"></div>
+    </div>
+
+    <!-- Campo: Nueva contrasena -->
+    <div class="field">
+      <div class="field-label">Nueva contrasena</div>
+      <div class="input focus">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </span>
+        <span class="value">••••••••••••</span>
+        <span class="suffix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        </span>
+      </div>
+      <!-- PasswordStrengthMeter: 3/3 Fuerte -->
+      <div class="strength-meter">
+        <div class="strength-segments">
+          <div class="strength-segment active-strong"></div>
+          <div class="strength-segment active-strong"></div>
+          <div class="strength-segment active-strong"></div>
+        </div>
+        <span class="strength-label">Fuerte</span>
+      </div>
+      <div class="field-helper"></div>
+    </div>
+
+    <!-- Campo: Confirmar nueva contrasena -->
+    <div class="field">
+      <div class="field-label">Confirmar nueva contrasena</div>
+      <div class="input">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </span>
+        <span class="value">••••••••••••</span>
+      </div>
+      <div class="field-helper"></div>
+    </div>
+
+    <!-- Boton -->
+    <div class="btn-primary">Guardar cambios</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 64px; right: 6px;">headlineMedium 24px 700: titulo de la accion, no del modulo</div>
+  <div class="annotation" style="top: 220px; left: 6px;">Contrasena actual: verificacion de identidad dentro de sesion activa</div>
+  <div class="annotation" style="top: 390px; right: 6px;">PasswordStrengthMeter 3/3 Fuerte: visible solo cuando el campo tiene contenido</div>
+  <div class="annotation" style="top: 530px; left: 6px;">Mismo procedimiento que recuperacion (US-03): contrasena actual para verificar identidad</div>
+  <div class="annotation" style="top: 680px; right: 6px;">Boton siempre habilitado: validacion al pulsar, no continua</div>
+
+</body>
+</html>

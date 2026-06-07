@@ -1,0 +1,20 @@
+USER STORY: Inicio de sesión
+PRIORIDAD: 2
+MÓDULO: Autenticación
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario registrado, quiero iniciar sesión con mi email y contraseña, para acceder al menú principal y a las funcionalidades de la aplicación.
+
+CRITERIOS DE ACEPTACIÓN:
+- La pantalla de autenticación presenta los campos "Email" y "Contraseña".
+- Los datos ingresados deben coincidir con los proporcionados al crear la cuenta.
+- Al presionar "Ingresar", el sistema verifica la validez de la información.
+- Si los datos son correctos, se permite el acceso al menú principal.
+- Si algún campo es incorrecto, se muestra un mensaje de error debajo del campo correspondiente y se impide el acceso.
+- La pantalla incluye accesos a recuperación de contraseña y a registro de cuenta.
+
+NOTAS / RESTRICCIONES:
+- El inicio de sesión y el registro son procesos separados.
+- El identificador de acceso es el email; la implementación admite además el nombre de usuario, pero la pantalla solicita el email.
+- Por el momento se considera que el acceso a Internet es mandatorio.

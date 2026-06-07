@@ -1,0 +1,15 @@
+USER STORY: Visualización de línea de tiempo de eventos
+PRIORIDAD: 33
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero visualizar los eventos de salud registrados en una línea de tiempo, para identificar fácilmente patrones y tendencias a lo largo del tiempo.
+
+CRITERIOS DE ACEPTACIÓN:
+- Los eventos registrados se presentan en una línea de tiempo visual.
+- La visualización facilita la identificación de patrones y tendencias en la evolución de la salud.
+
+NOTAS / RESTRICCIONES:
+- El acceso a la información de salud está condicionado por los permisos del usuario.
+- La línea de tiempo mostrada corresponde a la persona de contexto seleccionada en el menú principal (ver US-05b).

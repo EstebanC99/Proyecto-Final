@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 16px 0 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+
+  /* Scroll content */
+  .scroll-content {
+    height: calc(844px - 28px - 56px);
+    overflow-y: auto;
+    padding: 16px 24px 32px;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* Subtitulo de contexto */
+  .subtitle {
+    font-size: 14px; color: #566060; line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  .subtitle strong { color: #16201F; font-weight: 700; }
+
+  /* Campo */
+  .field-label {
+    font-size: 13px; font-weight: 500; color: #566060;
+    margin-bottom: 6px;
+  }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { color: #566060; display: inline-flex; flex-shrink: 0; }
+  .input .placeholder { flex: 1; font-size: 16px; color: #9AA5A5; }
+
+  /* Helper text (espacio reservado) */
+  .helper {
+    height: 18px; font-size: 12px; color: transparent;
+    margin-top: 4px; padding-left: 4px;
+    line-height: 18px;
+  }
+
+  /* Bloque de permisos */
+  .permissions-block {
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .permissions-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #EDF1F1;
+  }
+  .permissions-title {
+    font-size: 15px; font-weight: 700; color: #16201F;
+  }
+  .permissions-body {
+    font-size: 13px; color: #566060;
+    margin-top: 4px; line-height: 1.45;
+  }
+
+  /* Permission row */
+  .perm-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    min-height: 52px;
+  }
+  .perm-row + .perm-row {
+    border-top: 1px solid #EDF1F1;
+  }
+  .perm-label {
+    font-size: 14px; color: #16201F; flex: 1;
+  }
+
+  /* Toggle switch CSS (estado ON) */
+  .toggle {
+    width: 40px; height: 22px;
+    background: #1A8C82;
+    border-radius: 999px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    top: 2px; left: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  /* Boton primario */
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    margin-top: 28px;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Agregar responsable</span>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll-content">
+
+    <!-- Subtitulo de contexto -->
+    <div class="subtitle">
+      El responsable podrá gestionar datos y coordinar el cuidado de
+      <strong>Alicia Rodríguez</strong>.
+    </div>
+
+    <!-- Campo email -->
+    <div class="field-label">Email del responsable</div>
+    <div class="input">
+      <span class="prefix">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      </span>
+      <span class="placeholder">email del nuevo responsable</span>
+    </div>
+    <!-- Helper text reservado (invisible en estado normal) -->
+    <div class="helper">&nbsp;</div>
+
+    <!-- Bloque de permisos -->
+    <div class="permissions-block">
+
+      <div class="permissions-header">
+        <div class="permissions-title">Permisos asignados</div>
+        <div class="permissions-body">El responsable obtendrá acceso completo. Podés ajustarlo después.</div>
+      </div>
+
+      <div class="perm-row">
+        <span class="perm-label">Editar datos de la persona</span>
+        <div class="toggle"></div>
+      </div>
+
+      <div class="perm-row">
+        <span class="perm-label">Gestionar agenda</span>
+        <div class="toggle"></div>
+      </div>
+
+      <div class="perm-row">
+        <span class="perm-label">Gestionar equipo</span>
+        <div class="toggle"></div>
+      </div>
+
+    </div>
+
+    <!-- Boton primario -->
+    <div class="btn-primary">Agregar responsable</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:86px; right:6px;">Subtitulo refuerza el contexto: de quien se cuida y que podra hacer el nuevo responsable</div>
+  <div class="annotation" style="top:220px; left:6px;">Helper text 18px reservado: evita layout shift al mostrar errores</div>
+  <div class="annotation" style="top:380px; right:6px;">Permisos full por defecto: reduce friccion · ajustables en US-18</div>
+  <div class="annotation" style="top:570px; left:6px;">"Podes ajustarlo despues": reduce ansiedad de decision al confirmar</div>
+  <div class="annotation" style="top:700px; right:6px;">Boton siempre activo: validacion al pulsar, no antes (menos friccion)</div>
+
+</body>
+</html>

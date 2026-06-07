@@ -1,0 +1,20 @@
+USER STORY: Selección de persona a cargo en el menú principal
+PRIORIDAD: 5
+MÓDULO: Menú principal
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como Responsable con más de una persona a cargo, quiero seleccionar qué persona estoy visualizando desde el menú principal, para que toda la información de las secciones de la app (agenda, equipo, salud, emergencia) corresponda a la persona seleccionada.
+
+CRITERIOS DE ACEPTACIÓN:
+- El menú principal muestra de forma visible qué persona está siendo visualizada actualmente.
+- El usuario puede cambiar la persona seleccionada sin salir del flujo principal.
+- Al cambiar la selección, todas las secciones (Mi calendario, Mi equipo, Mi salud, Emergencia) actualizan su contenido para mostrar la información de la persona recién seleccionada.
+- Si el usuario tiene solo una persona a cargo, el selector muestra esa persona sin opción de cambio.
+- Si el usuario no tiene personas a cargo, se indica que debe agregar una primero.
+
+NOTAS / RESTRICCIONES:
+- La selección persiste durante la sesión.
+- La persona seleccionada actúa como filtro global de contexto sobre las pantallas secundarias: Mi calendario (Agenda), Mi equipo, Personas a cargo (detalle), Mi salud y Emergencia.
+- La persona seleccionada también condiciona el módulo de emergencia (a quién corresponde la alerta).
+- Cuando el propio usuario es la persona de contexto seleccionada, accede a todas las funcionalidades de registro sobre sus propios datos sin restricción de permisos de equipo.

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #16201F 0%, #1E2E2D 60%, #0F2233 100%);
+    color: #FFFFFF;
+    user-select: none;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Reloj */
+  .lock-clock {
+    text-align: center;
+    margin-top: 52px;
+  }
+  .lock-time {
+    font-size: 64px; font-weight: 300; letter-spacing: -2px;
+    color: #FFFFFF; line-height: 1;
+  }
+  .lock-date {
+    font-size: 16px; color: rgba(255,255,255,0.75);
+    margin-top: 8px; font-weight: 400;
+  }
+
+  /* Area de notificaciones */
+  .notifications-area {
+    margin-top: 40px;
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 0 16px;
+  }
+
+  /* Card de notificacion */
+  .notif-card {
+    background: rgba(255,255,255,0.14);
+    border-radius: 16px;
+    padding: 14px 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .notif-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .notif-logo {
+    width: 24px; height: 24px; border-radius: 12px;
+    background: #1A8C82;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #FFFFFF;
+    flex-shrink: 0;
+  }
+  .notif-app-name {
+    font-size: 13px; font-weight: 700; color: #FFFFFF; flex: 1;
+  }
+  .notif-time {
+    font-size: 12px; color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+  }
+
+  .notif-divider {
+    height: 1px; background: rgba(255,255,255,0.15);
+    margin-bottom: 10px;
+  }
+
+  .notif-title {
+    font-size: 14px; font-weight: 700; color: #FFFFFF;
+    margin-bottom: 3px;
+  }
+  .notif-body {
+    font-size: 13px; color: rgba(255,255,255,0.8);
+    line-height: 1.4;
+  }
+
+  /* Indicador de desbloqueo */
+  .unlock-indicator {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .unlock-bar {
+    width: 48px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.4);
+  }
+  .unlock-text {
+    font-size: 11px; color: rgba(255,255,255,0.4);
+    letter-spacing: 0.5px;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 50;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar (simulado para lock screen) -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Reloj del lock screen -->
+  <div class="lock-clock">
+    <div class="lock-time">9:41</div>
+    <div class="lock-date">Jueves 5 de junio</div>
+  </div>
+
+  <!-- Notificaciones -->
+  <div class="notifications-area">
+
+    <!-- Notificacion 1 -->
+    <div class="notif-card">
+      <div class="notif-header">
+        <div class="notif-logo">C</div>
+        <div class="notif-app-name">CareWell</div>
+        <div class="notif-time">&middot;&nbsp;ahora</div>
+      </div>
+      <div class="notif-divider"></div>
+      <div class="notif-title">Recordatorio de salud &mdash; Alicia</div>
+      <div class="notif-body">Toma de medicacion &middot; 09:00 AM</div>
+    </div>
+
+    <!-- Notificacion 2 -->
+    <div class="notif-card">
+      <div class="notif-header">
+        <div class="notif-logo">C</div>
+        <div class="notif-app-name">CareWell</div>
+        <div class="notif-time">&middot;&nbsp;hace 4 min</div>
+      </div>
+      <div class="notif-divider"></div>
+      <div class="notif-title">Recordatorio de salud &mdash; Alicia</div>
+      <div class="notif-body">Cita medica &middot; 15:30</div>
+    </div>
+
+  </div>
+
+  <!-- Indicador de desbloqueo -->
+  <div class="unlock-indicator">
+    <div class="unlock-bar"></div>
+    <div class="unlock-text">DESLIZAR PARA DESBLOQUEAR</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="right: 6px; top: 190px;">
+    Pantalla de referencia para dev — no es una pantalla de la app
+  </div>
+
+  <div class="annotation" style="left: 6px; top: 330px;">
+    Notificaciones locales (flutter_local_notifications) — no requieren conexion
+  </div>
+
+  <div class="annotation" style="right: 6px; top: 490px;">
+    Se envian a TODOS los miembros del equipo con permisos sobre la persona
+  </div>
+
+  <div class="annotation" style="left: 6px; top: 600px;">
+    Tap en card: abre la app directo al evento correspondiente
+  </div>
+
+</body>
+</html>

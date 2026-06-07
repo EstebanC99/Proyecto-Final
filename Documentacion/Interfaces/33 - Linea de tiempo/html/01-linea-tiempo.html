@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .status-bar .icons { font-size: 11px; }
+
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 10px;
+    box-shadow: 0 1px 0 #EDF1F1;
+    flex-shrink: 0;
+  }
+  .app-bar .back { color: #16201F; display: inline-flex; }
+  .app-bar .title {
+    font-size: 16px; font-weight: 700; color: #16201F;
+    flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chip-persona {
+    background: #FFF1F2;
+    color: #E11D48;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .scroll-area {
+    height: calc(844px - 28px - 56px);
+    overflow: hidden;
+  }
+
+  /* Timeline */
+  .timeline { padding: 8px 16px 24px; }
+
+  .tl-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  .tl-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .tl-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .tl-line {
+    width: 2px;
+    flex: 1;
+    background: #EDF1F1;
+    margin: 4px 0;
+    min-height: 12px;
+  }
+
+  .tl-card {
+    flex: 1;
+    background: #FFF;
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    margin-bottom: 12px;
+  }
+
+  .tl-chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+
+  .tl-date {
+    font-size: 11px;
+    color: #9AA5A5;
+    margin-bottom: 2px;
+  }
+
+  .tl-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #16201F;
+  }
+
+  .tl-body {
+    font-size: 12px;
+    color: #566060;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* Anotaciones */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 132px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <span class="back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </span>
+    <span class="title">Linea de tiempo</span>
+    <span class="chip-persona">Alicia Rodriguez</span>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area">
+    <div class="timeline">
+
+      <!-- Evento 1: Cita medica -->
+      <div class="tl-row">
+        <div class="tl-left">
+          <div class="tl-dot" style="background:#E11D48;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card">
+          <span class="tl-chip" style="background:#FFF1F2; color:#E11D48;">Cita medica</span>
+          <div class="tl-date">Jun 2026</div>
+          <div class="tl-title">Control cardiologico</div>
+          <div class="tl-body">Dr. Martin Sosa &nbsp;·&nbsp; Hospital Italiano</div>
+        </div>
+      </div>
+
+      <!-- Evento 2: Medicacion -->
+      <div class="tl-row">
+        <div class="tl-left">
+          <div class="tl-dot" style="background:#2563EB;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card">
+          <span class="tl-chip" style="background:#EFF6FF; color:#2563EB;">Medicacion</span>
+          <div class="tl-date">May 2026</div>
+          <div class="tl-title">Ajuste de dosis &mdash; Atenolol</div>
+          <div class="tl-body">Indicado por el cardiologo</div>
+        </div>
+      </div>
+
+      <!-- Evento 3: Bienestar -->
+      <div class="tl-row">
+        <div class="tl-left">
+          <div class="tl-dot" style="background:#16A34A;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card">
+          <span class="tl-chip" style="background:#F0FDF4; color:#16A34A;">Bienestar</span>
+          <div class="tl-date">Abr 2026</div>
+          <div class="tl-title">Alta psicologica</div>
+          <div class="tl-body">Finalizo ciclo de 12 sesiones</div>
+        </div>
+      </div>
+
+      <!-- Evento 4: Hospitalizacion -->
+      <div class="tl-row">
+        <div class="tl-left">
+          <div class="tl-dot" style="background:#E11D48;"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card">
+          <span class="tl-chip" style="background:#FFF1F2; color:#E11D48;">Hospitalizacion</span>
+          <div class="tl-date">Mar 2026</div>
+          <div class="tl-title">Internacion 3 dias</div>
+          <div class="tl-body">Clinica Santa Isabel &nbsp;·&nbsp; UCI</div>
+        </div>
+      </div>
+
+      <!-- Evento 5: Tratamiento (ultimo, sin linea) -->
+      <div class="tl-row">
+        <div class="tl-left">
+          <div class="tl-dot" style="background:#7C3AED;"></div>
+          <!-- Sin tl-line: ultimo evento -->
+        </div>
+        <div class="tl-card">
+          <span class="tl-chip" style="background:#F5F3FF; color:#7C3AED;">Tratamiento</span>
+          <div class="tl-date">Feb 2026</div>
+          <div class="tl-title">Inicio fisioterapia</div>
+          <div class="tl-body">Sesiones martes y jueves</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 60px; right: 4px;">Chip persona en AppBar · sin ambiguedad cuando se cuida a mas de una persona</div>
+  <div class="annotation" style="top: 210px; left: 4px;">Color del dot = color del chip · lenguaje semantico por categoria</div>
+  <div class="annotation" style="top: 380px; right: 4px;">Linea neutra #EDF1F1 · guia visual sin competir con el contenido</div>
+  <div class="annotation" style="top: 560px; left: 4px;">Timeline vertical · mas reciente arriba · tap en tarjeta navega al detalle</div>
+  <div class="annotation" style="top: 700px; right: 4px;">Ultimo evento sin linea · indica el fin del historial registrado</div>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+  .screen { padding: 0 24px; }
+  .brand { text-align: center; margin-top: 52px; margin-bottom: 30px; }
+  .brand .logo-mark { display: block; margin: 0 auto 14px; }
+  .brand .wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .brand .wordmark .care { color: #16201F; }
+  .brand .wordmark .well { color: #1A8C82; }
+  .brand .tagline { font-size: 14px; color: #566060; margin-top: 4px; }
+  .field { margin-top: 16px; }
+  .field:first-of-type { margin-top: 0; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input.disabled { background: #EDF1F1; }
+  .input.disabled .prefix, .input.disabled .suffix { color: #9AA5A5; }
+  .input.disabled .value, .input.disabled .dots { color: #7A8585; }
+  .input .prefix { color: #566060; display: inline-flex; }
+  .input .value { flex: 1; font-size: 16px; color: #16201F; }
+  .input .placeholder { color: #9AA5A5; }
+  .input .dots { letter-spacing: 2px; color: #16201F; font-size: 16px; }
+  .input .suffix { color: #566060; display: inline-flex; }
+  .forgot { text-align: right; margin-top: 12px; font-size: 13px; font-weight: 600; color: #9AA5A5; }
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 20px;
+  }
+  .btn-primary.loading { background: #C5CECE; }
+  .or-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 22px 0; color: #9AA5A5; font-size: 13px;
+  }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: #C5CECE; }
+  .register-block {
+    text-align: center; font-size: 14px; color: #566060;
+    border: 1px dashed #1A8C82; border-radius: 12px; padding: 16px 8px;
+  }
+  .register-block .link { color: #1A8C82; font-weight: 700; margin-left: 4px; }
+  .spinner {
+    width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #FFFFFF; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 132px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="screen">
+    <div class="brand">
+      <svg class="logo-mark" viewBox="0 0 80 80" width="72" height="72" role="img" aria-label="CareWell">
+        <defs><linearGradient id="loginMark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A095"/><stop offset="1" stop-color="#16786F"/></linearGradient></defs>
+        <circle cx="40" cy="40" r="40" fill="url(#loginMark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <div class="wordmark"><span class="care">Care</span><span class="well">Well</span></div>
+      <div class="tagline">Cuidá en equipo</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Email</div>
+      <div class="input disabled">
+        <span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+        <span class="value">maria@ejemplo.com</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Contraseña</div>
+      <div class="input disabled">
+        <span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
+        <span class="value dots">••••••••</span>
+        <span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span>
+      </div>
+    </div>
+
+    <div class="forgot">¿Olvidaste tu contraseña?</div>
+
+    <div class="btn-primary loading" style="gap:10px; cursor:default;">
+      <div class="spinner"></div>
+      <span>Verificando…</span>
+    </div>
+
+    <div class="or-divider">o</div>
+
+    <div class="register-block">
+      ¿No tenés cuenta?<span class="link">Crear cuenta</span>
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:300px; right:6px;">Inputs deshabilitados (#EDF1F1) durante la petición</div>
+  <div class="annotation" style="top:470px; left:6px;">Enlaces secundarios atenuados mientras carga</div>
+  <div class="annotation" style="top:560px; right:6px;">Botón en estado loading: spinner + "Verificando…"</div>
+  <div class="annotation" style="top:660px; left:6px;">Inputs deshabilitados + spinner en botón · sin overlay oscuro (carga liviana)</div>
+</body>
+</html>

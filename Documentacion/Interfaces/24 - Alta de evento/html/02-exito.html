@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* Contenido centrado verticalmente */
+  .success-container {
+    height: calc(844px - 28px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px 36px;
+    text-align: center;
+  }
+
+  /* Círculo de ícono — azul módulo */
+  .success-circle {
+    width: 112px; height: 112px; border-radius: 50%;
+    background: #E0F2FE;
+    display: flex; align-items: center; justify-content: center;
+    color: #0284C7;
+    flex-shrink: 0;
+    margin-bottom: 28px;
+  }
+
+  /* Título */
+  .success-title {
+    font-size: 22px; font-weight: 700; color: #16201F;
+    margin-bottom: 12px;
+  }
+
+  /* Body */
+  .success-body {
+    font-size: 15px; color: #566060;
+    text-align: center; line-height: 1.55;
+    max-width: 300px;
+    margin-bottom: 40px;
+  }
+  .success-body strong { color: #16201F; font-weight: 700; }
+
+  /* Botón primario módulo */
+  .btn-primary-module {
+    height: 56px; background: #0284C7; color: #FFFFFF;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    width: 100%; max-width: 320px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(2,132,199,0.25);
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Success content -->
+  <div class="success-container">
+
+    <!-- Círculo con CHECK_CIRCLE azul módulo -->
+    <div class="success-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="80" height="80" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>
+    </div>
+
+    <!-- Título -->
+    <div class="success-title">Evento guardado</div>
+
+    <!-- Body -->
+    <div class="success-body">
+      <strong>Toma de medicaci&oacute;n</strong> qued&oacute; agendado para el 5 de junio a las 09:00.
+      El equipo recibir&aacute; una notificaci&oacute;n.
+    </div>
+
+    <!-- Botón primario -->
+    <div class="btn-primary-module">Ver agenda</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:180px; left:6px;">Sin AppBar: el flujo se completó · volver al formulario no tiene sentido semántico</div>
+  <div class="annotation" style="top:330px; right:6px;">Círculo 112px bg #E0F2FE · ícono azul módulo: coherencia cromática con el módulo agenda</div>
+  <div class="annotation" style="top:490px; left:6px;">Nombre del evento en bold: feedback específico confirma qué se guardó</div>
+  <div class="annotation" style="top:640px; right:6px;">Mención de notificación al equipo: refuerza el valor colaborativo del producto</div>
+  <div class="annotation" style="top:730px; left:6px;">Botón único: zero decision fatigue al final del flujo</div>
+
+</body>
+</html>

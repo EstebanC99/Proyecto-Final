@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    display: flex; align-items: center;
+    padding: 0 8px 0 4px; gap: 4px;
+    border-bottom: 1px solid #EDF1F1;
+    flex-shrink: 0;
+  }
+  .app-bar-btn {
+    width: 40px; height: 40px; display: flex; align-items: center;
+    justify-content: center; border-radius: 20px; color: #16201F;
+    flex-shrink: 0;
+  }
+  .app-bar-title {
+    flex: 1; font-size: 18px; font-weight: 700; color: #16201F;
+    padding-left: 4px;
+  }
+  .app-bar-action {
+    width: 36px; height: 36px; border-radius: 18px;
+    background: #0284C7; display: flex; align-items: center;
+    justify-content: center; color: #FFFFFF; margin-right: 4px;
+  }
+
+  /* Chip de contexto */
+  .context-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #E0F2FE; color: #0284C7;
+    border-radius: 999px; padding: 6px 14px;
+    font-size: 13px; font-weight: 500;
+    margin: 12px 16px;
+  }
+
+  /* Lista de eventos (fondo debajo del scrim) */
+  .scroll-content { padding: 0; }
+
+  .date-group-label {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    color: #566060; letter-spacing: 0.5px;
+    padding: 8px 16px 6px;
+  }
+
+  .event-card {
+    background: #FFFFFF; border-radius: 12px;
+    padding: 14px 16px; margin: 0 16px 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .event-card.highlighted {
+    border: 2px solid #0284C7;
+    box-shadow: 0 2px 12px rgba(2,132,199,0.25);
+  }
+  .event-card.dimmed { opacity: 0.45; }
+
+  .event-time {
+    min-width: 44px; font-size: 14px; font-weight: 700;
+    color: #0284C7; padding-top: 1px;
+  }
+  .event-body { flex: 1; }
+  .event-title { font-size: 15px; font-weight: 700; color: #16201F; }
+  .event-meta {
+    font-size: 13px; color: #566060; margin-top: 3px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .event-past .event-time { color: #9AA5A5; }
+  .event-past .event-title { color: #566060; }
+  .lock-icon { opacity: 0.5; }
+
+  /* Scrim overlay */
+  .scrim {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.40);
+    z-index: 10;
+  }
+
+  /* Dialog */
+  .dialog-wrapper {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20; padding: 0 24px;
+  }
+  .dialog {
+    background: #FFFFFF; border-radius: 28px;
+    padding: 24px; width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.24);
+  }
+  .dialog-icon {
+    display: flex; justify-content: center;
+    margin-bottom: 14px; color: #E0A100;
+  }
+  .dialog-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    text-align: center; margin-bottom: 12px;
+  }
+  .dialog-body {
+    font-size: 14px; color: #566060;
+    text-align: center; line-height: 1.5;
+    margin-bottom: 22px;
+  }
+  .dialog-body strong { color: #16201F; font-weight: 600; }
+
+  .btn-destructive {
+    width: 100%; height: 44px;
+    background: #D14343; color: #FFFFFF;
+    border-radius: 12px; border: none;
+    font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; letter-spacing: 0.1px;
+  }
+  .btn-cancel {
+    width: 100%; height: 44px;
+    background: #FFFFFF; color: #16201F;
+    border-radius: 12px; border: 1px solid #C5CECE;
+    font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; margin-top: 8px;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 50;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="app-bar-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="app-bar-title">Mi calendario</div>
+    <div class="app-bar-action">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8H8v-1c0-2 4-3 4-3s4 1 4 3v1z"/></svg>
+    </div>
+  </div>
+
+  <!-- Chip contexto -->
+  <div class="context-chip">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21h19.2v-1.8c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    Alicia Rodriguez
+  </div>
+
+  <!-- Lista de eventos (fondo) -->
+  <div class="scroll-content">
+    <div class="date-group-label">HOY · 5 JUN</div>
+
+    <!-- Evento resaltado (el que se va a eliminar) -->
+    <div class="event-card highlighted">
+      <div class="event-time">09:00</div>
+      <div class="event-body">
+        <div class="event-title">Toma de medicacion</div>
+        <div class="event-meta">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#566060"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+          Recordatorio activo
+        </div>
+      </div>
+    </div>
+
+    <!-- Otros eventos (atenuados por el scrim) -->
+    <div class="event-card dimmed event-past">
+      <div class="event-time" style="color:#9AA5A5;">08:00</div>
+      <div class="event-body">
+        <div class="event-title" style="color:#566060;">Fisioterapia</div>
+        <div class="event-meta">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#9AA5A5" class="lock-icon"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          Vencida
+        </div>
+      </div>
+    </div>
+
+    <div class="date-group-label" style="margin-top:4px;">MAÑANA · 6 JUN</div>
+
+    <div class="event-card dimmed">
+      <div class="event-time">15:30</div>
+      <div class="event-body">
+        <div class="event-title">Control medico</div>
+        <div class="event-meta">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#566060"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+          Recordatorio activo
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrim -->
+  <div class="scrim"></div>
+
+  <!-- Dialog -->
+  <div class="dialog-wrapper">
+    <div class="dialog">
+      <div class="dialog-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+      </div>
+      <div class="dialog-title">Eliminar este evento?</div>
+      <div class="dialog-body">
+        <strong>Toma de medicacion</strong> &middot; 10 jun &middot; 09:00<br>
+        El evento y su recordatorio se eliminarán.<br>
+        Esta accion no se puede deshacer.
+      </div>
+      <div class="btn-destructive">Eliminar evento</div>
+      <div class="btn-cancel">Cancelar</div>
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="right: 6px; top: 132px; z-index: 60;">
+    Evento resaltado: usuario confirma visualmente cual va a eliminar
+  </div>
+
+  <div class="annotation" style="left: 6px; top: 290px; z-index: 60;">
+    Scrim atenua el resto sin ocultar el contexto
+  </div>
+
+  <div class="annotation" style="right: 6px; top: 500px; z-index: 60;">
+    WARNING en amarillo — destructivo sin alarma excesiva
+  </div>
+
+  <div class="annotation" style="left: 6px; top: 640px; z-index: 60;">
+    Solo eventos futuros eliminables; vencidos se mantienen en historico
+  </div>
+
+  <div class="annotation" style="right: 6px; top: 730px; z-index: 60;">
+    Boton destructivo arriba — jerarquia M3 para dialogs de confirmacion
+  </div>
+
+</body>
+</html>

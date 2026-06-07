@@ -1,0 +1,19 @@
+USER STORY: Consulta de recomendaciones médicas
+PRIORIDAD: 29
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero consultar las recomendaciones médicas, para conocer las pautas personalizadas asociadas a la salud de la persona.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el módulo "Mi salud" se muestran las recomendaciones médicas personalizadas.
+- Las recomendaciones las genera/deriva el sistema a partir de la información ya registrada (hábitos de vida y eventos de salud); el usuario NO las carga manualmente.
+- La pantalla es de solo lectura: no existe alta, edición ni baja de recomendaciones por parte del usuario.
+- Si todavía no hay datos suficientes, se muestra un estado vacío que invita a seguir registrando hábitos y eventos de salud.
+
+NOTAS / RESTRICCIONES:
+- La aplicación no sustituye la opinión médica; las recomendaciones no constituyen diagnóstico ni reemplazan la consulta con un profesional de la salud.
+- Decisión de alcance: en el MVP las recomendaciones son derivadas por el sistema a partir de los registros del usuario; NO se contempla una US de "alta de recomendación médica" ni la carga por parte de profesionales. La lógica de derivación corre del lado del backend; el frontend solo las consulta.
+- Los miembros del equipo acceden según permisos.
+- Las recomendaciones mostradas corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).

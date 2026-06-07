@@ -1,0 +1,19 @@
+USER STORY: Eliminación de evento de salud
+PRIORIDAD: 30
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero eliminar un evento de salud registrado por error o que ya no corresponde, para mantener la consistencia del historial sin tener que modificar registros existentes.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi salud" / gestión de eventos se ofrece la opción de eliminar un evento de salud.
+- Antes de eliminar, se solicita confirmación mediante un mensaje de advertencia que aclara que la acción es definitiva.
+- Si el usuario confirma, el evento se elimina (junto con sus notas asociadas) y deja de mostrarse en la lista y en la línea de tiempo (ver US-33); si cancela, no se realizan cambios.
+- No se ofrece la opción de modificar un evento de salud; la única acción correctiva disponible es la eliminación.
+
+NOTAS / RESTRICCIONES:
+- Restricción de diseño: los eventos de salud no son modificables para preservar la integridad y trazabilidad del historial médico. La eliminación con confirmación es la vía prevista para corregir errores.
+- El usuario puede eliminar eventos de forma autónoma; los miembros del equipo según permisos.
+- Los eventos eliminados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Complementa US-30 (alta) y US-32 (notas).

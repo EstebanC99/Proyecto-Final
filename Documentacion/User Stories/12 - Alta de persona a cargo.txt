@@ -1,0 +1,19 @@
+USER STORY: Alta de persona a cargo
+PRIORIDAD: 12
+MÓDULO: Personas a cargo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero registrar a una persona bajo mi cuidado que no puede usar la aplicación, para llevar un registro de su estado de salud y actividades.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se accede al alta desde el módulo "Personas a cargo" del menú principal.
+- Al crear una cuenta, un campo inicial consulta si la cuenta es para el propio usuario o para otra persona.
+- Al elegir "para otra persona", se completan los campos: Nombre, Apellido, Documento, Fecha de nacimiento, Correo electrónico e Imagen.
+- El sistema aplica las validaciones correspondientes sobre los campos.
+- El usuario debe aceptar los Términos y Condiciones marcando la casilla correspondiente.
+- Al presionar "Crear cuenta" se registra el alta de la persona a cargo.
+
+NOTAS / RESTRICCIONES:
+- Pensado para personas que no cuentan con los medios o habilidades para usar la aplicación (su condición les impide usar un celular).
+- La persona puede quedar registrada sin credenciales de acceso.

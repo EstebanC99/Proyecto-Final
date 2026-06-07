@@ -1,0 +1,15 @@
+USER STORY: Modificación de datos de persona a cargo
+PRIORIDAD: 14
+MÓDULO: Personas a cargo
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro de un equipo de cuidado con permisos, quiero modificar los datos de una persona a mi cargo, para mantener su información actualizada.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el listado de personas a cargo se selecciona el perfil correspondiente.
+- Se permite actualizar la información de la persona a cargo.
+- La modificación solo es posible si los permisos del usuario lo permiten.
+
+NOTAS / RESTRICCIONES:
+- La acción está condicionada por el esquema de roles y permisos (RBAC).

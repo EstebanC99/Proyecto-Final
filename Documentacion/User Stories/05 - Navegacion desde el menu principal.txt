@@ -1,0 +1,21 @@
+USER STORY: Navegación desde el menú principal
+PRIORIDAD: 5
+MÓDULO: Menú principal
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero contar con un menú principal centralizado, para acceder de forma rápida y eficiente a todas las funcionalidades de la aplicación.
+
+CRITERIOS DE ACEPTACIÓN:
+- El menú principal es la pantalla central y predeterminada a la que se regresa al presionar el ícono de la aplicación.
+- En la parte superior presenta accesos a "Perfil" y "Configuración".
+- Presenta botones de acceso a las funcionalidades clave del MVP: Mi calendario (Agenda), Mi equipo, Personas a cargo, Emergencia y Mi salud.
+- Al presionar cualquier botón, el usuario es dirigido a la pantalla correspondiente.
+- Las pantallas de Perfil y Configuración cuentan con un botón para regresar al menú principal.
+- El menú principal incorpora un selector de persona a cargo que define la persona de contexto; la información de las secciones a las que se navega corresponde a la persona seleccionada (ver US-05b).
+- El acceso a "Mi salud" refleja el último estado de ánimo registrado de la persona de contexto mediante un indicador visual (badge/ícono en el tile "Mi salud"), de modo que el estado de ánimo tenga presencia en el Home y no solo dentro de la sección de Salud (ver US-31).
+- Si la persona de contexto no tiene un estado de ánimo registrado, el indicador se muestra en estado neutro o no se muestra, sin romper el layout.
+
+NOTAS / RESTRICCIONES:
+- Los accesos a "Chats" y "Datos" (Análisis de datos) descritos en el documento quedan reservados para iteraciones posteriores; no forman parte del MVP.
+- El tap sobre el tile "Mi salud" (con o sin indicador de ánimo) navega siempre al módulo "Mi salud"; el indicador es informativo y no agrega un destino de navegación nuevo.

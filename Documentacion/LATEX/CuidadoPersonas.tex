@@ -616,18 +616,18 @@
         \item Server-side (back-end).
         \item Client-side (front-end).
     \end{itemize}
-    \par En cuanto al back-end del mismo, se realizará utilizando \textbf{.NET 8}, junto con el IDE de \textbf{Visual Studio 2022 Professional Edition}. Los motivos de la elección son los siguientes:
+    \par En cuanto al back-end del mismo, se realizará utilizando \textbf{.NET 10}, junto con el IDE de \textbf{Visual Studio 2022 Professional Edition}. Los motivos de la elección son los siguientes:
     \begin{itemize}
         \item Amplio conocimiento en el lenguaje y manejo del IDE.
         \item Tecnología actualizada multiplataforma.
         \item Soporte del lenguaje hasta el año 2026 por parte de Microsoft.
     \end{itemize}
-    \par En términos del front-end, el mismo consta de una aplicación mobile, desarrollo en el cuál el equipo no cuenta con amplio conocimiento. Por este motivo, investigando y consultando con expertos del tema, y evaluando beneficios y costos, la elección se decanta por la utilización de \textbf{MAUI} (antiguamente conocido cómo Xamarin). Este es el nuevo framework de desarrollo que ofrece Microsoft a través de Visual Studio. Las razones son:
+    \par En términos del front-end, el mismo consta de una aplicación mobile, desarrollo en el cuál el equipo no cuenta con amplio conocimiento. Por este motivo, investigando y consultando con expertos del tema, y evaluando beneficios y costos, la elección se decanta por la utilización de \textbf{Flutter}. Las razones son:
     \begin{itemize}
-        \item Permite el desarrollo de aplicaciones de escritorio, mobile, consola, web, etc. Centralizadas en un mismo proyecto y utilizando código de C\#.
-        \item Mismo lenguaje de programación e IDE tanto en back cómo en front. Aprovechando el conocimiento actual del equipo en estos.
+        \item Permite el desarrollo de aplicaciones de escritorio, mobile, consola, web, etc. Centralizadas en un mismo proyecto y utilizando código Dart.
+        \item Lenguaje de programación similartanto en back cómo en front. Aprovechando el conocimiento actual del equipo en estos.
         \item Aprendizaje y utilización de tecnología actualizada y nueva en el mercado.
-        \item Buena documentación y soporte por parte de Microsoft.
+        \item Buena documentación y soporte por parte de Google.
     \end{itemize}
     \par El back-end estará hosteado en un servidor web, mientras que la aplicación podrá ser descargada desde Google Play Store. Consideramos, en principio, que el acceso a Internet será mandatorio, pero se evaluará a futuro la posibilidad de hacerlo opcional para ciertas tareas.
     \subsubsection{Compatibilidad con dispositivos}
@@ -829,14 +829,14 @@
     \par Los usuarios pueden acceder al sistema a través de la opción de \textit{"Iniciar sesión"} disponible en la primera pantalla de la aplicación, la cual también ofrece la opción de \textit{"Registrarse"}.
     \par Al seleccionar \textit{"Iniciar sesión"}, se mostrará la pantalla de autenticación. En esta, los usuarios deberán completar los campos:
     \begin{itemize}
-        \item Usuario
+        \item Email
         \item Contraseña
     \end{itemize}
-    \par Estos datos deben coincidir con los proporcionados al momento de la creación de la cuenta. 
+    \par Estos datos deben coincidir con los proporcionados al momento de la creación de la cuenta. El identificador de acceso es el \textit{email} del usuario; si bien la implementación admite además el nombre de usuario, la pantalla de inicio de sesión solicita el email.
     \par Al presionar el botón \textit{"Ingresar"}, el sistema verificará la validez de la información ingresada. Si los datos son correctos, se permitirá el acceso al menú principal de la aplicación. Si alguno de los campos es incorrecto, se mostrará un mensaje de error debajo de los campos correspondientes, informando al usuario del problema e impidiendo el acceso.
     \par Adicionalmente, esta pantalla incluye un botón de recuperación de contraseña (\textit{"¿Olvidaste tu contraseña?"}) que enviará un correo de restablecimiento al email registrado en la cuenta, en caso de que el usuario no recuerde la misma.
     \par Finalmente, para quienes aún no tengan una cuenta, se incluye el botón \textit{"Crear cuenta"}, acompañado del mensaje \textit{"¿Aún no tienes cuenta?"}. Al pulsarlo, el sistema redirigirá a la pantalla de registro.
-    \par Por otro lado, el inicio de sesión y el registro de un usuario son procesos separados. Esto significa que una persona puede estar registrada en el sistema sin haber creado un usuario y contraseña de acceso. Esto es posible porque la aplicación está diseñada para permitir que los datos de usuarios que no tienen los medios o capacidades para utilizarla sean ingresados a través de sus responsables o cuidadores. En estos casos, podría haber usuarios que no hayan iniciado sesión anteriormente, pero que deseen hacerlo por primera vez. En tal situación, el sistema deberá redirigirlos a una pantalla donde puedan crear sus credenciales de acceso (usuario y contraseña) por primera vez.
+    \par Por otro lado, el inicio de sesión y el registro de un usuario son procesos separados. Esto significa que una persona puede estar registrada en el sistema sin haber creado un usuario y contraseña de acceso. Esto es posible porque la aplicación está diseñada para permitir que los datos de usuarios que no tienen los medios o capacidades para utilizarla sean ingresados a través de sus responsables o cuidadores. En estos casos, podría haber usuarios que no hayan iniciado sesión anteriormente, pero que deseen hacerlo por primera vez. En tal situación, el acceso a la creación de credenciales es \textit{manual}: la pantalla de inicio de sesión ofrece el enlace \textit{"Mi cuenta fue creada por otro"}, que conduce a la pantalla donde la persona puede crear sus credenciales de acceso (email y contraseña) por primera vez. No existe una redirección automática.
     \subsection{ABM de Usuarios}
     \par Este módulo permite gestionar eficientemente a los usuarios mediante las siguientes acciones:
     \begin{itemize}
@@ -846,7 +846,7 @@
     \end{itemize}
     \par Consideraciones adicionales:
     \begin{itemize}
-        \item No es posible crear un usuario si alguno de los campos obligatorios no ha sido completado.
+        \item No es posible crear un usuario si alguno de los campos obligatorios no ha sido completado. El formulario de registro exige, además de los datos personales y las credenciales (email y contraseña), el \textbf{teléfono} como campo obligatorio.
         \item Un usuario puede estar registrado solo una vez en el sistema, por lo que se debe validar que no exista.
         \item Es obligatorio que el usuario acepte los Términos y Condiciones para completar el registro; en caso de no aceptarlos, no se procesará la creación de la cuenta.
     \end{itemize}
@@ -868,7 +868,8 @@
         \item Emergencia
         \item Mi salud
     \end{itemize}
-    \par Al presionar cualquiera de estos botones, el usuario será dirigido a la pantalla correspondiente, permitiendo un acceso rápido y eficiente a las diversas funciones de la aplicación.
+    \par Al presionar cualquiera de estos botones, el usuario será dirigido a la pantalla correspondiente, permitiendo un acceso rápido y eficiente a las diversas funciones de la aplicación. El acceso a \textit{"Mi salud"} incorpora además un indicador visual que refleja el último estado de ánimo registrado de la persona de contexto, de modo que el bienestar emocional tenga presencia en el menú principal sin necesidad de ingresar a la sección de salud.
+    \par Adicionalmente, el menú principal incorpora un \textbf{selector de persona a cargo} que define la persona de contexto que el usuario está visualizando. Esta selección actúa como un filtro global que condiciona la información mostrada en las pantallas secundarias (Mi calendario, Mi equipo, Personas a cargo, Mi salud y Emergencia), de modo que un responsable que cuida a más de una persona pueda alternar entre ellas y ver en cada caso la información correspondiente. El menú muestra de forma visible la persona seleccionada y permite cambiarla sin abandonar el flujo principal; la selección persiste durante la sesión. Si el usuario tiene una única persona a cargo, esta se muestra sin opción de cambio, y si no tiene ninguna se le indica que debe agregar una primero. La persona de contexto también determina a quién corresponde la alerta del módulo de emergencia. Cuando el propio usuario es la persona de contexto seleccionada, accede a todas las funcionalidades de registro sobre sus propios datos sin restricción de permisos de equipo: el propio usuario siempre puede registrar sobre su propio perfil sin requerir pertenecer a un equipo de cuidado.
     \subsection{Mi Perfil}
     \par El módulo \textit{Mi perfil} permite a los usuarios visualizar y editar su información personal. La pantalla principal del perfil incluye los datos personales del usuario. Cada uno de los campos cuenta con un ícono de edición, lo que permite al usuario actualizar sus datos de manera sencilla. La interfaz es clara y accesible, mostrando un ícono de perfil en la parte superior y un botón de navegación para volver a la pantalla anterior. Además, la información está organizada de manera ordenada, con botones para modificar cada uno de los campos de manera independiente.
     \subsection{Configuración}
@@ -884,19 +885,31 @@
     \par El módulo de \textit{Administración, Baja y Modificación (ABM) de Responsables} permite gestionar a los usuarios que tienen asociados a otros usuarios, conocidos como responsables. Ellos poseen permisos adicionales que les permiten modificar los datos personales de los usuarios y realizar otras acciones específicas.
     \par Desde la pantalla del menú principal, al presionar el botón \textit{"Mi equipo"}, los usuarios accederán a una interfaz que muestra todos los responsables y cuidadores asociados. Este módulo permite gestionar los permisos y accesos de cada miembro del equipo de cuidado del usuario a través de las siguientes funcionalidades:
     \begin{itemize}
-        \item \textbf{Alta de responsables:} Facilita el registro de nuevos cuidadores en el equipo.
-        \item \textbf{Baja de responsables:} Permite eliminar a un responsable o cuidador del equipo de cuidado. Esta acción revocará su acceso y permisos en el sistema.
+        \item \textbf{Alta de responsables:} Facilita el registro de nuevos responsables en el equipo. Esta acción es independiente del alta de cuidadores y asigna explícitamente el rol \textit{Responsable}, otorgando por defecto permisos amplios (editar datos de la persona, gestionar agenda y gestionar equipo), ajustables posteriormente.
+        \item \textbf{Baja de responsables:} Permite eliminar a un responsable del equipo de cuidado. Esta acción revocará su acceso y permisos en el sistema.
         \item \textbf{Modificación de responsables:} Ofrece la opción de actualizar los permisos de cada miembro del equipo. Desde la pantalla de gestión, el usuario podrá acceder a los detalles del cuidador seleccionado y realizar las modificaciones necesarias.
     \end{itemize}
     \par Desde esta interfaz, los usuarios podrán tener un registro claro de quienes componen su equipo de cuidado, así como gestionar eficazmente sus accesos y permisos.
     \subsection{ABM de Cuidadores}
     \par Los cuidadores son personas encargadas de realizar diversas actividades de cuidado para el usuario. Por esta razón, es fundamental que tengan acceso a ciertas funcionalidades e información del usuario. Desde la pantalla del menú principal, al presionar el botón \textit{"Mi equipo"}, los usuarios accederán a una interfaz que muestra todos los responsables y cuidadores asociados. Este módulo permite gestionar los permisos y accesos de cada miembro del equipo de cuidado a través de las siguientes funcionalidades:
     \begin{itemize}
-        \item \textbf{Alta de cuidadores:} Esta opción permite a los usuarios agregar nuevos cuidadores a su equipo. Una vez registrado, se le asignarán los permisos correspondientes para acceder a las funcionalidades necesarias.
+        \item \textbf{Alta de cuidadores:} Esta opción permite a los usuarios agregar nuevos cuidadores a su equipo, mediante una acción diferenciada del alta de responsables. El alta de cuidador asigna explícitamente el rol \textit{Cuidador} y, una vez registrado, se le asignan permisos iniciales más restringidos que los de un responsable (por defecto, acceso de solo lectura a datos personales y agenda), ajustables posteriormente. El rol del miembro lo determina la acción de alta elegida y no debe quedar fijado en \textit{Responsable}.
         \item \textbf{Baja de cuidadores:} Esta funcionalidad permite a los usuarios eliminar a un cuidador del equipo. Al realizar esta acción, se revocará de inmediato su acceso y permisos en el sistema, garantizando que solo los cuidadores activos puedan interactuar con la información del usuario.
         \item \textbf{Modificación de cuidadores:} A través de esta opción, los usuarios pueden actualizar los permisos de los cuidadores existentes. Desde la interfaz, podrán acceder a los detalles de cada cuidador y realizar los cambios necesarios de manera sencilla y eficiente.
     \end{itemize}
     \par Este módulo facilita la gestión del equipo de cuidado, asegurando que los usuarios puedan agregar, eliminar o modificar cuidadores según sus necesidades.
+    \subsubsection{Catálogo de permisos del sistema}
+    \par El control de acceso basado en roles (RBAC) se apoya en un catálogo cerrado de permisos que se asignan a cada miembro del equipo de cuidado. El sistema define exactamente \textbf{siete} permisos, cuya combinación determina las acciones que un responsable o cuidador puede realizar sobre la persona a cargo:
+    \begin{itemize}
+        \item \textbf{Ver ficha de salud:} consultar la información de salud de la persona a cargo.
+        \item \textbf{Editar ficha de salud:} modificar la ficha de salud de la persona a cargo.
+        \item \textbf{Gestionar agenda:} crear, modificar y eliminar eventos y recordatorios de la agenda.
+        \item \textbf{Registrar eventos de salud:} dar de alta eventos de salud (consultas, hospitalizaciones, etc.).
+        \item \textbf{Registrar hábitos de vida:} dar de alta y mantener los hábitos de vida.
+        \item \textbf{Activar emergencia:} activar el botón de emergencia para la persona a cargo.
+        \item \textbf{Administrar equipo de cuidado:} gestionar los miembros del equipo, sus roles y sus permisos.
+    \end{itemize}
+    \par Cabe recordar que cuando el propio usuario es la persona de contexto seleccionada, accede a todas las funcionalidades de registro sobre sus propios datos sin restricción de permisos de equipo (véase la sección \textit{Menú Principal} y la regla transversal de contexto propio).
     \subsection{ABM de Personas a Cargo}
     \par Desde el menú principal, los usuarios pueden acceder al módulo \textit{ABM de Personas a Cargo} mediante el botón \textit{“Personas a cargo”}. Este módulo permite gestionar a los responsables y cuidadores en los que forma parte del equipo de cuidado de otros usuarios, facilitando así el alta, baja y modificación de los datos de las personas a su cargo.
     \par Al ingresar, se mostrará un listado de todas las personas que están bajo la responsabilidad del usuario, diferenciando entre las secciones correspondientes a responsables y cuidadores. Desde esta interfaz, los usuarios pueden acceder a los datos y funcionalidades de las personas a su cargo.
@@ -925,9 +938,11 @@
         \item Hora
         \item Descripción
     \end{itemize}
-    \par Cada ítem del listado funcionará como una notificación de celular. Al presionar el botón de registro, se conectará con el correo electrónico que el usuario ingresó al crear su cuenta, permitiendo la visualización de los registros en Google Calendar.
+    \par Cada ítem del listado funcionará como una notificación de celular. La vinculación con Google Calendar (visualización de los registros en el calendario de Google) queda reservada a futuro como integración con servicios de terceros.
     \par Además, los ítems del listado pueden ser modificados o eliminados únicamente si la fecha y hora de la actividad aún no han transcurrido. Esto asegura que los usuarios mantengan control sobre su agenda.
-    \par Las notificaciones se enviarán al celular del usuario, así como también a los cuidadores o responsables designados, garantizando que todos estén informados sobre las actividades y recordatorios relevantes.
+    \par En el MVP, los eventos se crean con un tipo genérico y el formulario de alta no expone la selección del tipo de evento de agenda; la clasificación por tipo queda reservada para iteraciones posteriores.
+    \par En cuanto a las notificaciones, en el MVP se implementan como \textbf{notificaciones locales} programadas en el dispositivo del usuario que origina la acción. El envío real a los dispositivos de los demás cuidadores o responsables designados requiere backend (notificaciones push) y queda fuera del alcance del MVP (véase la sección \textit{Limitaciones conocidas del MVP}).
+    \par La gestión de la agenda sobre una persona a cargo está condicionada por los permisos del equipo de cuidado; no obstante, el propio usuario siempre puede registrar sobre su propio perfil sin requerir pertenecer a un equipo de cuidado. En consecuencia, cuando el usuario visualiza su propio contexto puede crear eventos en su propia agenda sin restricción de permisos.
     \subsection{Chats}
     \par El módulo \textit{Chats} permite a los usuarios comunicarse de manera efectiva con su equipo. Para acceder a esta funcionalidad, simplemente deben presionar el botón de \textit{"Chats"} en el menú principal.
     \par En la pantalla de chats, se presentará un listado organizado en secciones, que incluirá:
@@ -943,28 +958,48 @@
     \par Además, las personas que forman parte del equipo de trabajo del usuario podrán acceder a estos datos, siempre que cuenten con los permisos necesarios, asegurando así una colaboración eficaz y el seguimiento adecuado de la situación del usuario.
     \subsection{Emergencia}
     \par El botón de \textit{Emergencia} es una funcionalidad esencial que permite al usuario solicitar ayuda de manera rápida y eficiente. Desde el menú principal de la aplicación, el usuario puede presionar el botón designado como \textit{"Emergencia"}.
-    \par Al activar este botón, se enviará una notificación instantánea a todos los miembros del equipo de la persona, incluidos responsables y cuidadores. Esta notificación informará a cada uno de ellos que el usuario está solicitando asistencia inmediata.
-    \par La notificación incluirá información relevante, como la identificación del usuario que ha activado la emergencia, lo que permitirá a los miembros del equipo actuar con rapidez y eficacia. Además, se garantizará que la comunicación sea clara, para que los responsables y cuidadores comprendan la urgencia de la situación y puedan responder de acuerdo a la necesidad del usuario.
+    \par Al activar este botón se genera una notificación instantánea destinada a los miembros del equipo de la persona, incluidos responsables y cuidadores, que informa que el usuario está solicitando asistencia inmediata.
+    \par La notificación incluirá información relevante, como la identificación del usuario que ha activado la emergencia y de la persona de contexto a la que corresponde la alerta, lo que permitirá a los miembros del equipo actuar con rapidez y eficacia. Además, se garantizará que la comunicación sea clara, para que los responsables y cuidadores comprendan la urgencia de la situación y puedan responder de acuerdo a la necesidad del usuario.
+    \par En el MVP, la notificación de emergencia es \textbf{local} en el dispositivo del usuario que la origina; el envío real a los dispositivos de los demás miembros del equipo de cuidado requiere backend (notificaciones push) y queda fuera del alcance del MVP (véase la sección \textit{Limitaciones conocidas del MVP}).
     \par Esta función está diseñada para ofrecer tranquilidad tanto al usuario como a su equipo, asegurando que la ayuda en momentos críticos.
     \subsection{Gestión de Salud}
     \par El módulo \textit{"Mi salud"} ofrece a los usuarios un espacio personal para gestionar su historial médico de forma integral. En esta sección, los usuarios pueden registrar y consultar una amplia variedad de información relacionada con su salud, incluyendo:
     \begin{itemize}
-        \item \textbf{Hábitos de vida:} Permite llevar un registro detallado de hábitos como alimentación, ejercicio, sueño y consumo de sustancias, facilitando el seguimiento de los estilos de vida saludables.
-        \item \textbf{Recomendaciones médicas:} Muestra las recomendaciones personalizadas proporcionadas por los profesionales de la salud, basadas en la información registrada en el sistema.
-        \item \textbf{Eventos de salud:} Permite registrar eventos relevantes como hospitalizaciones, consultas médicas y otros acontecimientos significativos para la salud del usuario.
+        \item \textbf{Hábitos de vida:} Permite llevar un registro detallado de hábitos como alimentación, ejercicio, sueño y consumo de sustancias, facilitando el seguimiento de los estilos de vida saludables. El módulo ofrece un ABM completo: alta, consulta del detalle e histórico, modificación y eliminación (con confirmación) de los registros de hábitos.
+        \item \textbf{Recomendaciones médicas:} Muestra recomendaciones personalizadas derivadas automáticamente por el sistema a partir de la información registrada por el usuario (hábitos de vida y eventos de salud). Es una sección de solo lectura: el usuario no carga, edita ni elimina recomendaciones. Estas recomendaciones no constituyen opinión médica ni diagnóstico.
+        \item \textbf{Eventos de salud:} Permite registrar eventos relevantes como hospitalizaciones, consultas médicas y otros acontecimientos significativos para la salud del usuario. Por integridad del historial médico, los eventos de salud no se pueden modificar una vez registrados; ante un error, el evento puede eliminarse (con confirmación) y registrarse nuevamente. Para añadir información sin alterar el evento original se utilizan notas.
     \end{itemize}
-    \par Esta información es de gran utilidad para los usuarios, ya que les permite tener un control completo sobre su salud. Además, los miembros del equipo de cuidado del usuario pueden acceder a esta información, siempre y cuando cuenten con los permisos correspondientes, para brindar una atención.
+    \par Esta información es de gran utilidad para los usuarios, ya que les permite tener un control completo sobre su salud. Además, los miembros del equipo de cuidado del usuario pueden acceder a esta información, siempre y cuando cuenten con los permisos correspondientes, para brindar una atención. Cabe aclarar que la restricción por permisos aplica únicamente cuando se visualiza a otra persona a cargo: el propio usuario siempre puede registrar sobre su propio perfil sin requerir pertenecer a un equipo de cuidado, por lo que cuando se visualiza a sí mismo puede registrar sus propios hábitos de vida y eventos de salud sin restricción.
     \subsection{Gestión de Eventos}
     \par El módulo de \textit{Gestión de Eventos} tiene como objetivo permitir a los usuarios y a su equipo de cuidado registrar, consultar y analizar eventos relacionados con la salud y el bienestar del usuario. Este módulo, accesible desde la pantalla de \textit{"Mi salud"}, proporciona un contexto más amplio para comprender la evolución del estado de salud del usuario a lo largo del tiempo.
     \par Desde allí se podrá:
     \begin{itemize}
         \item \textbf{Registrar eventos:} El sistema permitirá registrar diversos tipos de eventos, tales como citas médicas, hospitalizaciones, tratamientos, cambios en la medicación, intervenciones quirúrgicas y eventos relacionados con el estado de ánimo y el bienestar general.
-        \item \textbf{Gestionar estados de ánimo:} Tanto el usuario como su equipo podrán registrar el estado de ánimo de forma periódica, lo que permitirá identificar patrones y tendencias en el bienestar emocional.
+        \item \textbf{Gestionar estados de ánimo:} Tanto el usuario como su equipo podrán registrar el estado de ánimo de forma periódica, lo que permitirá identificar patrones y tendencias en el bienestar emocional. El último estado de ánimo registrado de la persona de contexto se reflejará además en el menú principal mediante un indicador visual sobre el acceso a \textit{"Mi salud"}, dándole presencia fuera de la sección de salud.
         \item \textbf{Agregar notas:} El módulo permitirá añadir notas y observaciones relevantes a cada evento, facilitando así un seguimiento detallado de la evolución del estado de salud.
         \item \textbf{Visualizar línea de tiempo:}  Los eventos registrados se presentarán en una línea de tiempo visual, lo que facilitará la identificación de patrones y tendencias a lo largo del tiempo.
         \item \textbf{Generar informes personalizados:} El sistema en el módulo \textit{Datos}, podrá generar informes personalizados basados en los datos registrados, permitiendo identificar áreas de mejora y tomar decisiones informadas sobre el cuidado de la salud.
     \end{itemize}
-    \par El usuario podrá registrar eventos, estados de ánimo y notas de forma autónoma y los miembros del equipo de cuidado podrán agregar eventos y consultar la información registrada por el usuario, siempre y cuando cuenten con los permisos correspondientes.
+    \par El usuario podrá registrar eventos, estados de ánimo y notas de forma autónoma y los miembros del equipo de cuidado podrán agregar eventos y consultar la información registrada por el usuario, siempre y cuando cuenten con los permisos correspondientes. Esta restricción por permisos rige cuando se visualiza a otra persona a cargo; el propio usuario siempre puede registrar eventos de salud propios cuando se visualiza a sí mismo, sin requerir pertenecer a un equipo de cuidado.
+    \par Cabe destacar que los eventos de salud son inmutables una vez creados: no admiten modificación, sino únicamente su eliminación con confirmación previa, a fin de preservar la integridad y trazabilidad del historial médico.
+    \subsection{Reglas de negocio transversales}
+    \par Además de las reglas propias de cada módulo, el sistema define reglas transversales que condicionan el comportamiento general de la aplicación:
+    \begin{itemize}
+        \item \textbf{Contexto propio sobre RBAC:} cuando el usuario se visualiza a sí mismo como persona de contexto, accede de forma completa a todas las funcionalidades de registro (agenda, salud, eventos de salud, hábitos y emergencia) sobre sus propios datos, sin necesidad de pertenecer a un equipo de cuidado ni de contar con permisos asignados. La restricción por permisos (RBAC) rige únicamente cuando la persona de contexto es \textit{otra} persona a cargo.
+        \item \textbf{Persona sin credenciales:} una persona puede existir en el sistema sin credenciales de acceso, cargada por un responsable o cuidador. La creación de credenciales por primera vez es un proceso separado del registro y se inicia de forma manual desde la pantalla de inicio de sesión.
+        \item \textbf{Filtro global de contexto:} la persona de contexto seleccionada en el menú principal actúa como filtro global sobre las pantallas secundarias y determina, entre otros, el destinatario de la alerta de emergencia.
+    \end{itemize}
+    \subsection{Limitaciones conocidas del MVP}
+    \par A fin de reflejar de manera transparente el estado de la implementación, se documentan las siguientes limitaciones conocidas de la versión MVP. Estas limitaciones no comprometen la validez funcional del sistema, sino que delimitan su alcance actual y anticipan trabajo reservado para iteraciones posteriores, en muchos casos sujeto a la integración con el backend.
+    \begin{itemize}
+        \item \textbf{Notificaciones locales:} las notificaciones de agenda y de emergencia son locales en el dispositivo del usuario que origina la acción. El envío real a otros dispositivos del equipo de cuidado requiere backend (notificaciones push) y queda fuera del alcance del MVP. Adicionalmente, la zona horaria está fijada a Argentina, al tocar la notificación no se navega automáticamente al evento asociado y no hay soporte para iOS.
+        \item \textbf{Recuperación de contraseña:} en el MVP se implementa únicamente la solicitud de envío del correo de restablecimiento. La pantalla para establecer una nueva contraseña requiere la integración con el backend (deep-link con token) y queda pendiente.
+        \item \textbf{Rol en el perfil:} la pantalla de \textit{Mi perfil} muestra siempre el rol \textit{Responsable} como valor fijo (placeholder). El rol real del usuario se mostrará una vez integrado el módulo de equipo de cuidado con RBAC completo.
+        \item \textbf{Alta de miembro del equipo (capa demo):} en la implementación demo, al agregar un miembro al equipo siempre se crea una persona placeholder con un nombre derivado del email, sin buscar una persona existente. En producción, el sistema vinculará al usuario ya existente a partir de su email.
+        \item \textbf{Baja de miembro del equipo (capa demo):} en la implementación demo, la baja de un miembro elimina la asignación. En producción, la baja debería marcar la asignación como inactiva, preservando su trazabilidad histórica.
+        \item \textbf{Tipo de evento de agenda:} los eventos de agenda se crean con un tipo genérico; el formulario de alta no expone la selección del tipo de evento en el MVP.
+        \item \textbf{Foto de la persona a cargo:} la interfaz visual para la foto de la persona a cargo está presente, pero la captura real (selección desde galería o cámara) está pendiente de integración.
+    \end{itemize}
 
     \newpage
 

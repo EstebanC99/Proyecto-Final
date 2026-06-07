@@ -1,0 +1,18 @@
+USER STORY: Activación del botón de emergencia
+PRIORIDAD: 34
+MÓDULO: Emergencia
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario, quiero activar un botón de emergencia desde el menú principal, para solicitar ayuda de manera rápida y eficiente en una situación crítica.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el menú principal existe un botón designado como "Emergencia".
+- Al activarlo, se genera una notificación instantánea que informa que se está solicitando asistencia inmediata.
+- La notificación incluye la identificación del usuario que activó la emergencia y de la persona de contexto a la que corresponde la alerta.
+- La comunicación es clara para que el equipo comprenda la urgencia y pueda responder según la necesidad.
+
+NOTAS / RESTRICCIONES:
+- Funcionalidad esencial pensada para ofrecer tranquilidad tanto al usuario como a su equipo en momentos críticos.
+- La alerta y los destinatarios se determinan según la persona de contexto seleccionada en el menú principal (ver US-05b).
+- En el MVP la notificación es local en el dispositivo del usuario que origina la emergencia. El envío real a los dispositivos de los demás miembros del equipo de cuidado (responsables y cuidadores) requiere backend (notificaciones push) y queda fuera del alcance del MVP.

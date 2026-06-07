@@ -1,0 +1,15 @@
+USER STORY: Edición del perfil propio
+PRIORIDAD: 7
+MÓDULO: Perfil de usuario (Mi Perfil)
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero editar mi información personal desde "Mi Perfil", para mantener mis datos actualizados.
+
+CRITERIOS DE ACEPTACIÓN:
+- Cada campo del perfil cuenta con un ícono de edición.
+- El usuario puede modificar cada campo de manera independiente.
+- Los cambios se guardan y se reflejan en el perfil.
+
+NOTAS / RESTRICCIONES:
+- Es responsabilidad del usuario mantener actualizada la información que brinda.

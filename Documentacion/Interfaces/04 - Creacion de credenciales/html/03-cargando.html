@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    display: flex; align-items: center;
+    padding: 0 4px 0 4px;
+    border-bottom: 1px solid #C5CECE;
+  }
+  .app-bar .back-btn {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9AA5A5; flex-shrink: 0;
+  }
+  .app-bar .bar-title {
+    font-size: 18px; font-weight: 600; color: #16201F;
+    margin-left: 4px;
+  }
+
+  .screen { padding: 0 24px; }
+
+  /* Email readonly block (disabled visual) */
+  .email-readonly {
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: #EDF1F1;
+    border: 1px solid #C5CECE;
+    border-radius: 12px;
+  }
+  .email-readonly .er-label {
+    font-size: 12px; color: #9AA5A5; margin-bottom: 2px;
+  }
+  .email-readonly .er-value {
+    font-size: 15px; font-weight: 700; color: #9AA5A5;
+  }
+
+  /* Fields */
+  .field { margin-top: 20px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #9AA5A5; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #EDF1F1; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { color: #9AA5A5; display: inline-flex; }
+  .input .value { flex: 1; font-size: 16px; color: #9AA5A5; }
+  .input .dots { letter-spacing: 2px; color: #9AA5A5; font-size: 20px; }
+  .input .suffix { color: #9AA5A5; display: inline-flex; }
+
+  /* Password strength meter (atenuado) */
+  .strength-meter {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px; opacity: 0.5;
+  }
+  .strength-meter .segments {
+    display: flex; gap: 4px; flex: 1;
+  }
+  .strength-meter .seg {
+    flex: 1; height: 4px; border-radius: 2px;
+  }
+  .strength-meter .seg.filled-strong { background: #2E9E5B; }
+  .strength-meter .label {
+    font-size: 12px; font-weight: 600; color: #2E9E5B;
+    white-space: nowrap;
+  }
+
+  /* Checkbox T&C (fijo, no interactivo) */
+  .checkbox-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 24px; min-height: 48px; opacity: 0.5;
+  }
+  .checkbox-row .cb-icon { color: #566060; display: inline-flex; flex-shrink: 0; }
+  .checkbox-row .cb-text {
+    font-size: 14px; color: #566060; line-height: 1.4;
+  }
+  .checkbox-row .cb-text strong { color: #1A8C82; font-weight: 700; }
+
+  /* Spinner */
+  .spinner {
+    width: 22px; height: 22px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #FFF;
+    border-radius: 50%;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar (back inactivo durante carga) -->
+  <div class="app-bar">
+    <div class="back-btn md-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="bar-title">Crea tu contrasena</span>
+  </div>
+
+  <div class="screen">
+
+    <!-- Email readonly (disabled visual) -->
+    <div class="email-readonly">
+      <div class="er-label">Tu email de acceso sera</div>
+      <div class="er-value">maria@ejemplo.com</div>
+    </div>
+
+    <!-- Nueva contraseña (disabled) -->
+    <div class="field">
+      <div class="field-label">Nueva contrasena</div>
+      <div class="input">
+        <span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
+        <span class="value dots">••••••••••••</span>
+        <span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span>
+      </div>
+      <div class="strength-meter">
+        <div class="segments">
+          <div class="seg filled-strong"></div>
+          <div class="seg filled-strong"></div>
+          <div class="seg filled-strong"></div>
+        </div>
+        <span class="label">Fuerte</span>
+      </div>
+    </div>
+
+    <!-- Confirmar contraseña (disabled) -->
+    <div class="field">
+      <div class="field-label">Confirmar contrasena</div>
+      <div class="input">
+        <span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
+        <span class="value dots">••••••••••••</span>
+      </div>
+    </div>
+
+    <!-- Checkbox T&C (fijo) -->
+    <div class="checkbox-row">
+      <span class="cb-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+      </span>
+      <span class="cb-text">Acepto los <strong>Terminos y Condiciones</strong></span>
+    </div>
+
+    <!-- Boton loading -->
+    <div class="btn-primary" style="background:#C5CECE; display:flex; gap:10px; height:56px; border-radius:16px; align-items:center; justify-content:center; margin-top:24px;">
+      <div class="spinner"></div>
+      <span style="color:#FFFFFF; font-size:16px; font-weight:700;">Creando acceso...</span>
+    </div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:36px; left:6px;">ARROW_BACK inactivo durante el request · PopScope canPop: false</div>
+  <div class="annotation" style="top:152px; right:6px;">Inputs deshabilitados durante el request · bg surfaceVariant #EDF1F1</div>
+  <div class="annotation" style="top:420px; left:6px;">Checkbox fijo · no interactivo durante carga</div>
+  <div class="annotation" style="top:580px; right:6px;">Spinner en boton · bg #C5CECE · texto "Creando acceso..."</div>
+</body>
+</html>

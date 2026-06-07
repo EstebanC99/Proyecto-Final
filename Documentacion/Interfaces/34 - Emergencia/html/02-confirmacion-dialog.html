@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #FFF8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* AppBar (fondo atenuado) */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    box-shadow: 0 1px 0 #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 8px 0 4px; gap: 4px;
+    opacity: 0.45;
+  }
+  .app-bar-back {
+    width: 44px; height: 44px; display: flex;
+    align-items: center; justify-content: center;
+    color: #D14343; border-radius: 22px;
+  }
+  .app-bar-title {
+    font-size: 22px; font-weight: 700;
+    color: #D14343; letter-spacing: -0.3px;
+  }
+
+  /* Contenido de fondo atenuado */
+  .bg-content {
+    padding: 20px 24px 0;
+    display: flex; flex-direction: column; align-items: center;
+    opacity: 0.45;
+  }
+  .context-chip {
+    background: #FFF1F2; border: 1px solid #FECDD3;
+    border-radius: 999px; padding: 6px 16px;
+    font-size: 13px; font-weight: 600; color: #E11D48;
+    margin-bottom: 12px;
+  }
+  .body-hint {
+    font-size: 16px; color: #566060; text-align: center;
+    line-height: 1.45; margin-bottom: 16px; padding: 0 4px;
+  }
+  .notificados-card {
+    width: 100%; background: #FFFFFF; border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(22,32,31,0.06);
+  }
+  .notificados-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .notificados-header span { font-size: 14px; font-weight: 700; color: #16201F; }
+  .person-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid #EDF1F1;
+  }
+  .person-row:last-child { border-bottom: none; }
+  .person-name { flex: 1; font-size: 14px; color: #16201F; }
+  .chip-role { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+  .chip-responsable { background: #C9EDE8; color: #0A3D38; }
+  .chip-cuidadora   { background: #FCE2DA; color: #7A2E1A; }
+  .emergency-zone {
+    display: flex; flex-direction: column; align-items: center; margin: 28px 0 8px;
+  }
+  .pulse-wrapper {
+    position: relative; width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ring-outer {
+    position: absolute; width: 160px; height: 160px;
+    border-radius: 50%; background: rgba(209,67,67,0.08);
+  }
+  .ring-inner {
+    position: absolute; width: 140px; height: 140px;
+    border-radius: 50%; background: rgba(209,67,67,0.13);
+  }
+  .emergency-btn {
+    width: 120px; height: 120px; border-radius: 50%; background: #D14343;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(209,67,67,0.45); gap: 6px; z-index: 1;
+  }
+  .emergency-btn-label { color: white; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+
+  /* Overlay + Dialog */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+  }
+  .dialog {
+    background: #FFFFFF; border-radius: 28px;
+    margin: 24px; width: calc(100% - 48px); overflow: hidden;
+  }
+  .dialog-stripe { height: 6px; background: #D14343; }
+  .dialog-body { padding: 24px; }
+  .dialog-icon { text-align: center; margin-bottom: 14px; color: #D14343; }
+  .dialog-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    text-align: center; margin-bottom: 10px;
+  }
+  .dialog-text {
+    font-size: 14px; color: #566060; text-align: center;
+    line-height: 1.5; margin-bottom: 20px;
+  }
+  .dialog-text strong { color: #16201F; }
+  .btn-confirmar {
+    height: 48px; background: #D14343; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: white;
+    margin-bottom: 10px;
+  }
+  .btn-cancelar {
+    height: 44px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #1A8C82;
+  }
+
+  /* Anotaciones */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 200;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- Pantalla de fondo atenuada -->
+  <div class="app-bar">
+    <div class="app-bar-back md-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="app-bar-title">Emergencia</div>
+  </div>
+
+  <div class="bg-content">
+    <div class="context-chip">Alicia Rodríguez</div>
+    <div class="body-hint">
+      Al activar la emergencia, todos los miembros del equipo recibirán una notificación inmediata.
+    </div>
+    <div class="notificados-card">
+      <div class="notificados-header">
+        <span class="md-icon" style="color:#D14343;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.61c0-1.18.68-2.26 1.76-2.73 1.17-.52 2.61-.91 4.24-.91zM4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm1.13 1.1C4.76 14.04 4.39 14 4 14c-.99 0-1.93.21-2.78.58C.48 14.9 0 15.62 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29zM20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4 3.43c0-.81-.48-1.53-1.22-1.85C21.93 14.21 20.99 14 20 14c-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24v-1.57zM12 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/></svg>
+        </span>
+        <span>Se notificará a (3 personas):</span>
+      </div>
+      <div class="person-row">
+        <span class="md-icon" style="color:#566060;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="person-name">María García</span>
+        <span class="chip-role chip-responsable">Responsable</span>
+      </div>
+      <div class="person-row">
+        <span class="md-icon" style="color:#566060;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="person-name">Carlos Pérez</span>
+        <span class="chip-role chip-responsable">Responsable</span>
+      </div>
+      <div class="person-row">
+        <span class="md-icon" style="color:#566060;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+        <span class="person-name">Laura Méndez</span>
+        <span class="chip-role chip-cuidadora">Cuidadora</span>
+      </div>
+    </div>
+    <div class="emergency-zone">
+      <div class="pulse-wrapper">
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <div class="emergency-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="white"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+          <span class="emergency-btn-label">EMERGENCIA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay + Dialog -->
+  <div class="overlay">
+    <div class="dialog">
+      <div class="dialog-stripe"></div>
+      <div class="dialog-body">
+
+        <div class="dialog-icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M7.58 4.08L6.15 2.65C3.75 4.48 2.17 7.3 2.03 10.5h2c.15-2.65 1.51-4.97 3.55-6.42zm12.39 6.42h2c-.15-3.2-1.73-6.02-4.12-7.85l-1.42 1.43c2.02 1.45 3.39 3.77 3.54 6.42zM18 11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2v-5zm-6 11c.14 0 .27-.01.4-.04.65-.14 1.18-.58 1.44-1.18.1-.24.16-.51.16-.78h-4c0 1.1.9 2 2 2z"/></svg>
+        </div>
+
+        <div class="dialog-title">¿Activar emergencia?</div>
+
+        <div class="dialog-text">
+          Se enviará una notificación urgente a <strong>3 miembros</strong> del equipo de cuidado de Alicia. Usá esto solo ante una situación real.
+        </div>
+
+        <div class="btn-confirmar">Sí, enviar alerta</div>
+        <div class="btn-cancelar">Cancelar</div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:80px; left:6px;">Pantalla de fondo al 45% de opacidad — contexto visible, no interactuable</div>
+  <div class="annotation" style="top:390px; right:6px;">Franja roja superior — zona de peligro visible antes de leer el texto</div>
+  <div class="annotation" style="top:530px; left:6px;">Dialog 2 pasos · franja roja = zona peligro · "Si, enviar" full-width reduce hesitacion en emergencia real</div>
+  <div class="annotation" style="top:680px; right:6px;">barrierDismissible: false — overlay oscuro no cierra el dialog</div>
+
+</body>
+</html>

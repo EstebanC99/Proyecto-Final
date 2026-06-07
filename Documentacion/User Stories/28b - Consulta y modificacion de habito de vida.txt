@@ -1,0 +1,19 @@
+USER STORY: Consulta y modificación de hábito de vida
+PRIORIDAD: 28
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero ver el detalle de un hábito registrado y poder modificarlo, para corregir errores de carga y mantener actualizada la información de seguimiento.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde la lista de hábitos de "Mi salud", al seleccionar un hábito (o su categoría) se accede a su detalle e histórico de registros.
+- Desde el detalle se ofrece la opción de modificar el registro seleccionado.
+- Se permite actualizar los datos del hábito (por ejemplo, categoría, valor, fecha/hora y observaciones).
+- Los cambios se reflejan de inmediato en la lista y el histórico de hábitos.
+
+NOTAS / RESTRICCIONES:
+- El usuario puede modificar sus hábitos de forma autónoma; los miembros del equipo según permisos.
+- Los hábitos consultados y modificados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Complementa US-28 (alta) y US-28c (baja) para completar el ABM de hábitos.
+- Nota para dev-flutter: el diseño de US-28 ya prevé navegación a "detalle + histórico" al tocar la card; faltaba documentar la consulta y la edición. Implementar la pantalla de detalle y el flujo de edición.

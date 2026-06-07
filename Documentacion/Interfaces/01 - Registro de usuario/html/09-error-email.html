@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  .appbar { height: 56px; display: flex; align-items: center; padding: 0 12px; }
+  .back { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #16201F; }
+
+  .screen { padding: 0 24px; }
+
+  .step-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .track { flex: 1; height: 6px; background: #EDF1F1; border-radius: 999px; overflow: hidden; }
+  .track .fill { width: 100%; height: 100%; background: #1A8C82; border-radius: 999px; }
+  .step-count { font-size: 13px; font-weight: 500; color: #566060; white-space: nowrap; }
+
+  /* Error banner */
+  .banner {
+    background: #FBE3E3; border-radius: 12px; padding: 16px; margin-top: 20px;
+  }
+  .banner-top { display: flex; gap: 10px; }
+  .banner-top .icon { font-size: 18px; color: #D14343; line-height: 20px; }
+  .banner-top .text { font-size: 14px; color: #D14343; line-height: 20px; }
+  .banner-top .text strong { font-weight: 700; }
+  .banner-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-login {
+    background: #1A8C82; color: #FFFFFF; font-size: 14px; font-weight: 700;
+    border-radius: 12px; padding: 10px 16px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-change {
+    color: #1A8C82; font-size: 14px; font-weight: 700;
+    padding: 10px 12px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .title { font-size: 24px; font-weight: 700; margin-top: 24px; }
+  .subtitle { font-size: 14px; color: #566060; margin-top: 4px; margin-bottom: 14px; }
+
+  .field { margin-top: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input { height: 56px; background: #FFFFFF; border: 1px solid #C5CECE; border-radius: 12px; display: flex; align-items: center; padding: 0 16px; gap: 12px; }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .dots { letter-spacing: 2px; flex: 1; }
+  .input .suffix { font-size: 18px; color: #566060; }
+
+  .meter-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .segments { display: flex; gap: 6px; width: 58%; }
+  .seg { flex: 1; height: 6px; border-radius: 999px; background: #2E9E5B; }
+  .meter-label { font-size: 12px; font-weight: 500; color: #2E9E5B; }
+
+  .tyc { display: flex; gap: 12px; margin-top: 16px; align-items: flex-start; }
+  .checkbox {
+    width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px; color: #1A8C82;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tyc-text { font-size: 14px; color: #16201F; line-height: 20px; }
+  .tyc-text .link { color: #1A8C82; font-weight: 700; text-decoration: underline; }
+
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 18px;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 118px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="appbar"><div class="back md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div></div>
+
+  <div class="screen">
+    <div class="step-row">
+      <div class="track"><div class="fill"></div></div>
+      <div class="step-count">Paso 2 de 2</div>
+    </div>
+
+    <div class="banner">
+      <div class="banner-top">
+        <span class="icon md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></span>
+        <span class="text">Ya existe una cuenta con <strong>tucorreo@ejemplo.com</strong>.</span>
+      </div>
+      <div class="banner-actions">
+        <div class="btn-login">Iniciar sesión</div>
+        <div class="btn-change">Cambiar email</div>
+      </div>
+    </div>
+
+    <div class="title">Creá tu contraseña</div>
+    <div class="subtitle">Vas a usarla junto con tu email para entrar.</div>
+
+    <div class="field">
+      <div class="field-label">Contraseña</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+      <div class="meter-row">
+        <div class="segments"><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
+        <div class="meter-label">Fuerte <span class="md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span></div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:14px;">
+      <div class="field-label">Confirmar contraseña</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span><span class="dots">••••••••</span><span class="suffix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span></div>
+    </div>
+
+    <div class="tyc">
+      <div class="checkbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+      <div class="tyc-text">Acepto los <span class="link">Términos y Condiciones</span> y la <span class="link">Política de Privacidad</span>.</div>
+    </div>
+
+    <div class="btn-primary">Crear cuenta</div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:110px; right:6px;">InlineErrorBanner · fondo errorContainer #FBE3E3 · solo para 409</div>
+  <div class="annotation" style="top:170px; left:6px;">2 acciones: Iniciar sesión (primaria) / Cambiar email</div>
+  <div class="annotation" style="top:520px; right:6px;">Valores conservados: pass, confirmación y fortaleza Fuerte</div>
+  <div class="annotation" style="top:640px; left:6px;">Checkbox sigue marcado (#1A8C82) tras el error</div>
+  <div class="annotation" style="top:710px; right:6px;">Reintentar mismo email vuelve a fallar; banner persiste</div>
+</body>
+</html>

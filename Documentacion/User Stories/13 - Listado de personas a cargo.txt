@@ -1,0 +1,17 @@
+USER STORY: Listado de personas a cargo
+PRIORIDAD: 13
+MÓDULO: Personas a cargo
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro de un equipo de cuidado, quiero ver el listado de las personas que están bajo mi responsabilidad, para acceder a sus datos y funcionalidades.
+
+CRITERIOS DE ACEPTACIÓN:
+- Se accede mediante el botón "Personas a cargo" del menú principal.
+- Se muestra un listado de todas las personas bajo la responsabilidad del usuario.
+- El listado diferencia las secciones donde el usuario participa como responsable y donde participa como cuidador.
+- Desde el listado se puede acceder a los datos y funcionalidades de cada persona a cargo.
+
+NOTAS / RESTRICCIONES:
+- El acceso a los datos y acciones depende de los permisos del usuario sobre cada persona.
+- Al abrir el detalle de una persona, esta queda establecida como persona de contexto en el menú principal y condiciona la información del resto de las secciones (ver US-05b).

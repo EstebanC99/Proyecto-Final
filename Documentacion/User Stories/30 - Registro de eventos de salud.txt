@@ -1,0 +1,20 @@
+USER STORY: Registro de eventos de salud
+PRIORIDAD: 30
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero registrar eventos de salud relevantes, para llevar un seguimiento de la evolución del estado de salud de la persona.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi salud" se accede a la gestión de eventos.
+- Se permite registrar eventos como citas médicas, hospitalizaciones, tratamientos, cambios en la medicación, intervenciones quirúrgicas y eventos relacionados con el bienestar general.
+- El usuario puede registrar eventos de forma autónoma.
+- Los miembros del equipo de cuidado pueden agregar eventos siempre que cuenten con los permisos correspondientes.
+- El usuario puede registrar eventos de salud propios cuando se visualiza a sí mismo.
+
+NOTAS / RESTRICCIONES:
+- Los eventos registrados y mostrados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Los eventos de salud NO se pueden modificar una vez registrados, para preservar la integridad y trazabilidad del historial médico. Si un evento es incorrecto, debe eliminarse (ver US-30b) y, de corresponder, registrarse nuevamente.
+- Para añadir información adicional sin alterar el evento original se utilizan notas (ver US-32).
+- Esta US cubre el alta. La eliminación se documenta en US-30b. No existe una US de modificación de eventos de salud (restricción intencional).

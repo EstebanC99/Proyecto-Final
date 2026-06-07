@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .app-bar-icon { color: #16201F; display: inline-flex; }
+  .app-bar-title { font-size: 18px; font-weight: 700; color: #16201F; }
+
+  .settings-list { background: #F6F8F8; }
+  .section-header {
+    font-size: 13px; font-weight: 500; color: #566060;
+    padding: 12px 24px 4px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .settings-card { background: #FFFFFF; }
+  .settings-item {
+    min-height: 56px;
+    display: flex; align-items: center;
+    padding: 0 16px 0 24px;
+    border-bottom: 1px solid #C5CECE;
+    position: relative;
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .item-icon { color: #566060; display: inline-flex; flex-shrink: 0; margin-right: 16px; }
+  .item-label { flex: 1; font-size: 16px; font-weight: 400; color: #16201F; }
+  .item-chevron { color: #566060; display: inline-flex; }
+
+  /* Activo error: Eliminar cuenta */
+  .settings-item.active-error {
+    background: #FBE3E3;
+    border-left: 3px solid #D14343;
+    padding-left: 21px;
+  }
+  .settings-item.active-error .item-icon { color: #D14343; }
+  .settings-item.active-error .item-label { color: #D14343; font-weight: 600; }
+  .settings-item.active-error .item-chevron { color: #D14343; }
+
+  /* Destructivo neutro */
+  .settings-item.destructive .item-icon { color: #D14343; }
+  .settings-item.destructive .item-label { color: #D14343; }
+  .settings-item.destructive .item-chevron { color: #D14343; }
+
+  .section-gap { height: 8px; }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <span class="app-bar-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </span>
+    <span class="app-bar-title">Configuracion</span>
+  </div>
+
+  <!-- Settings list -->
+  <div class="settings-list">
+
+    <!-- CUENTA -->
+    <div class="section-header">Cuenta</div>
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </span>
+        <span class="item-label">Mi Perfil</span>
+        <span class="item-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- SEGURIDAD Y PRIVACIDAD -->
+    <div class="section-header">Seguridad y privacidad</div>
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </span>
+        <span class="item-label">Cambio de contrasena</span>
+        <span class="item-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+      </div>
+      <!-- Item activo error: Eliminar cuenta -->
+      <div class="settings-item active-error">
+        <span class="item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </span>
+        <span class="item-label">Eliminar cuenta</span>
+        <span class="item-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- LEGAL -->
+    <div class="section-header">Legal</div>
+    <div class="settings-card">
+      <div class="settings-item">
+        <span class="item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </span>
+        <span class="item-label">Terminos y condiciones</span>
+        <span class="item-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <!-- SESION -->
+    <div class="section-header">Sesion</div>
+    <div class="settings-card">
+      <div class="settings-item destructive">
+        <span class="item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        </span>
+        <span class="item-label">Cerrar sesion</span>
+        <span class="item-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 64px; right: 6px;">Hub de settings: cada item es el punto de entrada a su US</div>
+  <div class="annotation" style="top: 238px; right: 6px;">Cambio contrasena: estado neutro — sin resaltar en este flujo</div>
+  <div class="annotation" style="top: 298px; left: 6px;">Item activo error: bg errorContainer #FBE3E3, borde izq 3dp #D14343 — distingue la zona destructiva del activo primario de US-08/09</div>
+  <div class="annotation" style="top: 460px; right: 6px;">Seccion Sesion: solo Cerrar sesion; Eliminar cuenta quedo en Seguridad y Privacidad por ser una accion de cuenta, no de sesion</div>
+  <div class="annotation" style="top: 590px; left: 6px;">Tap: showDialog (modal), sin push de ruta — la confirmacion es un overlay, no una pantalla nueva</div>
+
+</body>
+</html>

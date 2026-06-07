@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 12px 0 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+  /* ADD circular en AppBar — azul módulo */
+  .app-bar-add {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #0284C7;
+    display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF; flex-shrink: 0;
+  }
+
+  /* Chip de contexto */
+  .context-chip {
+    display: inline-flex; align-items: center;
+    background: #E0F2FE; color: #0284C7;
+    font-size: 13px; font-weight: 600;
+    border-radius: 999px; padding: 6px 14px;
+    margin: 12px 16px;
+    gap: 6px;
+  }
+
+  /* Scroll content */
+  .scroll-content {
+    height: calc(844px - 28px - 56px - 52px);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Group label de fecha */
+  .date-group-label {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: #566060;
+    padding: 16px 16px 6px;
+  }
+
+  /* Tarjeta de evento */
+  .event-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    margin: 0 16px 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .event-card.past {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  /* Columna hora */
+  .event-time-col {
+    display: flex; flex-direction: column;
+    align-items: flex-end;
+    min-width: 44px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .event-time {
+    font-size: 14px; font-weight: 700; color: #0284C7;
+    line-height: 1.2;
+  }
+  .event-ampm {
+    font-size: 11px; color: #566060;
+    line-height: 1.2; margin-top: 1px;
+  }
+
+  /* Separador vertical */
+  .event-divider {
+    width: 1px; background: #EDF1F1;
+    flex-shrink: 0; border-radius: 1px;
+  }
+
+  /* Columna contenido */
+  .event-content {
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 4px;
+  }
+  .event-title-row {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .event-title {
+    font-size: 15px; font-weight: 700; color: #16201F;
+    flex: 1; line-height: 1.2;
+  }
+  .event-desc {
+    font-size: 13px; color: #566060;
+    line-height: 1.4;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 240px;
+  }
+  .event-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 4px;
+  }
+
+  /* Chip recordatorio */
+  .chip-reminder {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #E0F2FE; color: #0284C7;
+    font-size: 11px; font-weight: 600;
+    border-radius: 999px; padding: 3px 10px;
+  }
+
+  /* Lock icon para eventos pasados */
+  .lock-icon {
+    display: inline-flex; align-items: center;
+    color: #9AA5A5; flex-shrink: 0;
+  }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 24px; right: 16px;
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: #0284C7;
+    display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(2,132,199,0.35);
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Mi calendario</span>
+    <div class="app-bar-add">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+  </div>
+
+  <!-- Chip de contexto -->
+  <div class="context-chip">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+    Alicia Rodr&iacute;guez
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll-content">
+
+    <!-- Grupo: HOY -->
+    <div class="date-group-label">HOY &middot; 5 JUN</div>
+
+    <!-- Evento 1: futuro (mañana temprano, hoy) -->
+    <div class="event-card">
+      <div class="event-time-col">
+        <span class="event-time">09:00</span>
+        <span class="event-ampm">AM</span>
+      </div>
+      <div class="event-divider"></div>
+      <div class="event-content">
+        <div class="event-title-row">
+          <span class="event-title">Toma de medicaci&oacute;n</span>
+        </div>
+        <div class="event-desc">Amoxicilina 500mg &middot; con desayuno</div>
+        <div class="event-chips">
+          <div class="chip-reminder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            Recordatorio
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evento 2: pasado (opacity 0.5 + lock) -->
+    <div class="event-card past">
+      <div class="event-time-col">
+        <span class="event-time">08:00</span>
+        <span class="event-ampm">AM</span>
+      </div>
+      <div class="event-divider"></div>
+      <div class="event-content">
+        <div class="event-title-row">
+          <span class="event-title">Fisioterapia</span>
+          <span class="lock-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </span>
+        </div>
+        <div class="event-desc">Ejercicios de movilidad &middot; Lic. Gómez</div>
+      </div>
+    </div>
+
+    <!-- Grupo: MAÑANA -->
+    <div class="date-group-label">MA&Ntilde;ANA &middot; 6 JUN</div>
+
+    <!-- Evento 3: futuro -->
+    <div class="event-card">
+      <div class="event-time-col">
+        <span class="event-time">15:30</span>
+        <span class="event-ampm">PM</span>
+      </div>
+      <div class="event-divider"></div>
+      <div class="event-content">
+        <div class="event-title-row">
+          <span class="event-title">Control m&eacute;dico</span>
+        </div>
+        <div class="event-desc">Dr. Mart&iacute;nez &middot; Cl&iacute;nica del Sur, consultorio 4</div>
+        <div class="event-chips">
+          <div class="chip-reminder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            Recordatorio
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evento 4: futuro -->
+    <div class="event-card">
+      <div class="event-time-col">
+        <span class="event-time">18:00</span>
+        <span class="event-ampm">PM</span>
+      </div>
+      <div class="event-divider"></div>
+      <div class="event-content">
+        <div class="event-title-row">
+          <span class="event-title">Llamada familiar</span>
+        </div>
+        <div class="event-desc">Videollamada con los hijos &middot; WhatsApp</div>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <div class="fab">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+
+  </div><!-- /scroll-content -->
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:64px; right:6px;">ADD circular 40px bg #0284C7 en AppBar: acción principal visible sin desplazar la vista</div>
+  <div class="annotation" style="top:168px; left:6px;">Chip contexto: persona a cargo activa · tap para cambiar persona (multi-personas)</div>
+  <div class="annotation" style="top:310px; right:6px;">Eventos vencidos: opacity 0.5 + LOCK · no editables ni eliminables (integridad del histórico)</div>
+  <div class="annotation" style="top:550px; left:6px;">DateGroupLabel: "HOY" / "MAÑANA" para inmediatez; luego día abreviado</div>
+  <div class="annotation" style="top:710px; right:6px;">FAB 56dp bg #0284C7 · sombra azul · redundante con ADD AppBar por convención Material</div>
+
+</body>
+</html>

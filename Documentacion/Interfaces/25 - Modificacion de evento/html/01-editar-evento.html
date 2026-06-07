@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 16px 0 4px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+
+  /* Scroll content */
+  .scroll-content {
+    height: calc(844px - 28px - 56px);
+    overflow-y: auto;
+    padding: 20px 24px 40px;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* Banner informativo */
+  .banner-info {
+    background: #E0F2FE; color: #0284C7;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px; line-height: 1.45; font-weight: 500;
+  }
+  .banner-info .banner-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* Campo con label externo */
+  .field { margin-bottom: 16px; }
+  .field-label {
+    font-size: 13px; font-weight: 500; color: #566060;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-label .label-icon { color: #566060; display: inline-flex; }
+
+  /* Input estándar habilitado */
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { color: #566060; display: inline-flex; flex-shrink: 0; }
+  .input .value { flex: 1; font-size: 15px; color: #16201F; }
+
+  /* Textarea habilitada */
+  .textarea-wrap {
+    min-height: 80px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex;
+    padding: 12px 16px; gap: 12px;
+    align-items: flex-start;
+  }
+  .textarea-wrap .prefix { color: #566060; display: inline-flex; flex-shrink: 0; padding-top: 1px; }
+  .textarea-content {
+    flex: 1; font-size: 15px; color: #16201F;
+    line-height: 1.5;
+  }
+
+  /* Fila de notificación */
+  .notification-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #EDF1F1;
+  }
+  .notification-left {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .notification-icon { color: #566060; display: inline-flex; }
+  .notification-label-block { display: flex; flex-direction: column; gap: 2px; }
+  .notification-label-main { font-size: 15px; font-weight: 600; color: #16201F; }
+  .notification-label-sub { font-size: 12px; color: #566060; }
+
+  /* Toggle ON — azul módulo */
+  .toggle-on {
+    width: 44px; height: 24px;
+    background: #0284C7;
+    border-radius: 999px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .toggle-on::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    top: 2px; left: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+
+  /* Botón primario módulo */
+  .btn-primary-module {
+    height: 56px; background: #0284C7; color: #FFFFFF;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+    margin-top: 28px; width: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(2,132,199,0.25);
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Editar evento</span>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll-content">
+
+    <!-- Banner informativo -->
+    <div class="banner-info">
+      <span class="banner-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+      </span>
+      Solo pod&eacute;s modificar eventos futuros.
+    </div>
+
+    <!-- Campo: Fecha -->
+    <div class="field">
+      <div class="field-label">
+        <span class="label-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+        </span>
+        Fecha *
+      </div>
+      <div class="input">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+        </span>
+        <span class="value">10/06/2026</span>
+      </div>
+    </div>
+
+    <!-- Campo: Hora -->
+    <div class="field">
+      <div class="field-label">
+        <span class="label-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </span>
+        Hora *
+      </div>
+      <div class="input">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </span>
+        <span class="value">15:30</span>
+      </div>
+    </div>
+
+    <!-- Campo: Descripción -->
+    <div class="field">
+      <div class="field-label">
+        <span class="label-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </span>
+        Descripci&oacute;n *
+      </div>
+      <div class="textarea-wrap">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        </span>
+        <div class="textarea-content">Control m&eacute;dico mensual</div>
+      </div>
+    </div>
+
+    <!-- Fila de notificación -->
+    <div class="notification-row">
+      <div class="notification-left">
+        <span class="notification-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        </span>
+        <div class="notification-label-block">
+          <div class="notification-label-main">Enviar recordatorio</div>
+          <div class="notification-label-sub">Notificaci&oacute;n al equipo en la fecha y hora</div>
+        </div>
+      </div>
+      <div class="toggle-on"></div>
+    </div>
+
+    <!-- Botón primario -->
+    <div class="btn-primary-module">Guardar cambios</div>
+
+  </div><!-- /scroll-content -->
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:88px; left:6px;">Banner azul: informativo, no de error · orienta sin generar ansiedad</div>
+  <div class="annotation" style="top:210px; right:6px;">Campos pre-cargados con valores actuales: reduce reingreso de datos</div>
+  <div class="annotation" style="top:440px; left:6px;">Solo editable si fecha > ahora · validado en submit</div>
+  <div class="annotation" style="top:590px; right:6px;">ARROW_BACK con cambios pendientes dispara bottom sheet "Descartar cambios"</div>
+  <div class="annotation" style="top:720px; left:6px;">Mismo formulario que US-24: reutilización de componentes · consistencia</div>
+
+</body>
+</html>

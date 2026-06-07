@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #FFFFFF;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* Layout principal */
+  .screen {
+    display: flex; flex-direction: column;
+    height: calc(844px - 28px);
+    padding: 32px 24px 32px;
+  }
+
+  /* Zona central de confirmacion */
+  .central {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding-top: 32px;
+  }
+
+  /* Icono de exito */
+  .success-circle {
+    width: 88px; height: 88px; border-radius: 50%;
+    background: #D8F0E1;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .success-title {
+    font-size: 24px; font-weight: 700; color: #16201F;
+    text-align: center; margin-top: 20px;
+  }
+
+  .success-body {
+    font-size: 16px; color: #566060; text-align: center;
+    line-height: 1.5; margin-top: 8px; padding: 0 8px;
+  }
+
+  /* Card de notificados */
+  .notificados-card {
+    width: 100%; background: #F6F8F8; border-radius: 12px;
+    padding: 16px; margin: 20px 0 0;
+  }
+  .person-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 0; border-bottom: 1px solid #EDF1F1;
+  }
+  .person-row:last-child { border-bottom: none; }
+  .person-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .person-name { font-size: 14px; font-weight: 600; color: #16201F; }
+  .person-role { font-size: 12px; color: #566060; }
+  .notificado-badge {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; color: #2E9E5B; font-weight: 600;
+  }
+
+  /* Timestamp */
+  .timestamp {
+    font-size: 12px; color: #9AA5A5; text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Boton volver */
+  .btn-volver {
+    height: 52px; border: 2px solid #1A8C82; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #1A8C82;
+    margin-top: auto;
+    flex-shrink: 0;
+  }
+
+  /* Anotaciones */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="screen">
+
+    <!-- Zona central -->
+    <div class="central">
+
+      <!-- Icono de exito -->
+      <div class="success-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="#2E9E5B"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>
+      </div>
+
+      <div class="success-title">Alerta enviada</div>
+
+      <div class="success-body">
+        3 personas fueron notificadas. Permanece donde estas si es seguro hacerlo.
+      </div>
+
+      <!-- Card de notificados -->
+      <div class="notificados-card">
+
+        <div class="person-row">
+          <span class="md-icon" style="color:#2E9E5B;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </span>
+          <div class="person-info">
+            <span class="person-name">Maria Garcia</span>
+            <span class="person-role">Responsable</span>
+          </div>
+          <div class="notificado-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            notificada
+          </div>
+        </div>
+
+        <div class="person-row">
+          <span class="md-icon" style="color:#2E9E5B;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </span>
+          <div class="person-info">
+            <span class="person-name">Carlos Perez</span>
+            <span class="person-role">Responsable</span>
+          </div>
+          <div class="notificado-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            notificado
+          </div>
+        </div>
+
+        <div class="person-row">
+          <span class="md-icon" style="color:#2E9E5B;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </span>
+          <div class="person-info">
+            <span class="person-name">Laura Mendez</span>
+            <span class="person-role">Cuidadora</span>
+          </div>
+          <div class="notificado-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            notificada
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Timestamp -->
+      <div class="timestamp">Alerta enviada a las 14:32:07</div>
+
+    </div>
+
+    <!-- Boton volver al inicio -->
+    <div class="btn-volver">Volver al inicio</div>
+
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:50px; right:6px;">Sin AppBar — pantalla terminal, el stack se limpia con go()</div>
+  <div class="annotation" style="top:150px; left:6px;">SuccessCircle 88dp #D8F0E1 — token successContainer del sistema de diseno</div>
+  <div class="annotation" style="top:390px; right:6px;">Lista nominada con check — confirma quien recibio la alerta individualmente</div>
+  <div class="annotation" style="top:590px; left:6px;">Timestamp HH:mm:ss — registro informal · hora del servidor, no del dispositivo</div>
+  <div class="annotation" style="top:730px; right:6px;">Sin boton primario — evita re-envio accidental desde esta pantalla</div>
+
+</body>
+</html>

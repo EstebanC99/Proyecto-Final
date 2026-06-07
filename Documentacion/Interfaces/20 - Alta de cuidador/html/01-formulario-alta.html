@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .appbar {
+    height: 56px; background: #FFF;
+    border-bottom: 1px solid #EDF1F1;
+    display: flex; align-items: center;
+    padding: 0 4px; gap: 4px; flex-shrink: 0;
+  }
+  .appbar-btn {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .appbar-title {
+    flex: 1; font-size: 16px; font-weight: 700;
+    color: #16201F; text-align: center; padding-right: 48px;
+  }
+  .content { padding: 20px 16px 96px 16px; overflow-y: auto; height: calc(844px - 28px - 56px); }
+  .subtitle {
+    font-size: 14px; color: #566060; line-height: 1.55;
+    margin-bottom: 24px;
+  }
+  .subtitle strong { color: #16201F; font-weight: 700; }
+  /* Campo email */
+  .field { margin-bottom: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFF;
+    border: 1px solid #C5CECE; border-radius: 12px;
+    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { color: #566060; display: inline-flex; flex-shrink: 0; }
+  .input .placeholder { color: #9AA5A5; font-size: 16px; }
+  .helper-text { font-size: 12px; color: #566060; margin-top: 6px; }
+  /* Sección permisos */
+  .section-title {
+    font-size: 14px; font-weight: 700; color: #16201F;
+    margin: 28px 0 8px 0;
+  }
+  .permissions-list {
+    background: #FFF; border-radius: 12px; overflow: hidden;
+  }
+  .permission-row {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 56px; padding: 0 16px;
+    border-bottom: 1px solid #EDF1F1;
+  }
+  .permission-row:last-child { border-bottom: none; }
+  .permission-label { font-size: 15px; font-weight: 500; color: #16201F; }
+  .note-text {
+    font-size: 13px; color: #566060; font-style: italic;
+    margin: 12px 0 32px 0; line-height: 1.45;
+  }
+  /* Boton primario fijo */
+  .btn-primary {
+    position: absolute; bottom: 24px; left: 16px; right: 16px;
+    height: 56px; background: #1A8C82; color: #FFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 136px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="appbar">
+    <div class="appbar-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="appbar-title">Agregar cuidador</div>
+  </div>
+
+  <!-- Contenido con scroll -->
+  <div class="content">
+
+    <!-- Subtítulo -->
+    <p class="subtitle">
+      El cuidador accederá a las funciones que vos autorices para el cuidado de <strong>Alicia Rodríguez</strong>.
+    </p>
+
+    <!-- Campo email -->
+    <div class="field">
+      <div class="field-label">Email del cuidador</div>
+      <div class="input">
+        <span class="prefix">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </span>
+        <span class="placeholder">correo@ejemplo.com</span>
+      </div>
+      <div class="helper-text">Debe tener una cuenta en CareWell</div>
+    </div>
+
+    <!-- Titulo sección permisos -->
+    <div class="section-title">Permisos iniciales</div>
+
+    <!-- Lista de permisos (restrictivos por defecto para cuidador) -->
+    <div class="permissions-list">
+
+      <div class="permission-row">
+        <span class="permission-label">Ver datos personales</span>
+        <!-- Toggle ON -->
+        <div style="width:40px;height:22px;background:#1A8C82;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-end;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+      <div class="permission-row">
+        <span class="permission-label">Ver agenda</span>
+        <!-- Toggle ON -->
+        <div style="width:40px;height:22px;background:#1A8C82;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-end;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+      <div class="permission-row">
+        <span class="permission-label">Editar agenda</span>
+        <!-- Toggle OFF -->
+        <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+      <div class="permission-row">
+        <span class="permission-label">Ver historial de salud</span>
+        <!-- Toggle OFF -->
+        <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+      <div class="permission-row">
+        <span class="permission-label">Enviar alertas de emergencia al equipo</span>
+        <!-- Toggle OFF -->
+        <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+      <div class="permission-row">
+        <span class="permission-label">Gestionar equipo</span>
+        <!-- Toggle OFF -->
+        <div style="width:40px;height:22px;background:#C5CECE;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-start;flex-shrink:0;"><div style="width:16px;height:16px;background:#FFF;border-radius:50%;"></div></div>
+      </div>
+
+    </div>
+
+    <!-- Nota informativa -->
+    <p class="note-text">Podés ajustar estos permisos en cualquier momento desde Mi equipo.</p>
+
+  </div>
+
+  <!-- Botón primario fijo -->
+  <div class="btn-primary">Agregar cuidador</div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:58px; right:6px;">AppBar identico a US-18 · coherencia del modulo Mi equipo</div>
+  <div class="annotation" style="top:148px; left:6px;">Campo email con helper text · validacion en cliente antes de llamar API</div>
+  <div class="annotation" style="top:330px; right:6px;">Permisos restrictivos por defecto para cuidador (vs full para responsable)</div>
+  <div class="annotation" style="top:578px; left:6px;">Nota italic reduce presion decisional · el usuario sabe que puede cambiar despues</div>
+  <div class="annotation" style="top:744px; right:6px;">Boton deshabilitado si campo email vacio · opacity 0.5</div>
+
+</body>
+</html>

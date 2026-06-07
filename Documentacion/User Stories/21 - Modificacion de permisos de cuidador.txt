@@ -1,0 +1,15 @@
+USER STORY: Modificación de permisos de cuidador
+PRIORIDAD: 21
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero actualizar los permisos de un cuidador existente, para controlar a qué información y funcionalidades puede acceder.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se accede a los detalles del cuidador seleccionado.
+- Se permite actualizar los permisos del cuidador de manera sencilla.
+- Los cambios se reflejan en los accesos del cuidador.
+
+NOTAS / RESTRICCIONES:
+- El acceso del cuidador a datos sensibles (salud, datos personales) está siempre supeditado a los permisos otorgados.

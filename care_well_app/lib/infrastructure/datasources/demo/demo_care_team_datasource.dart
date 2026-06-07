@@ -1,0 +1,85 @@
+import '../../../domain/datasources/datasources.dart';
+import '../../../domain/entities/entities.dart';
+import 'demo_seed.dart';
+
+/// Implementación demo (en memoria) de [CareTeamDatasource].
+class DemoCareTeamDatasource implements CareTeamDatasource {
+  final List<Rol> _roles = [DemoSeed.rolResponsable, DemoSeed.rolCuidador];
+
+  final List<AsignacionCuidado> _asignaciones = [
+    DemoSeed.asignacionCarlos,
+    DemoSeed.asignacionLaura,
+    DemoSeed.asignacionMaria,
+  ];
+
+  @override
+  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
+    String personaCuidadaId,
+  ) async {
+    await Future.delayed(Duration.zero);
+    return _asignaciones
+        .where((a) => a.personaCuidada.id == personaCuidadaId)
+        .toList();
+  }
+
+  @override
+  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
+    String colaboradorId,
+  ) async {
+    await Future.delayed(Duration.zero);
+    return _asignaciones
+        .where((a) => a.personaColaborador.id == colaboradorId)
+        .toList();
+  }
+
+  @override
+  Future<AsignacionCuidado> crearAsignacion(
+    AsignacionCuidado asignacion,
+  ) async {
+    await Future.delayed(Duration.zero);
+    final ts = DateTime.now().millisecondsSinceEpoch.toString();
+    final nueva = AsignacionCuidado(
+      id: 'asi_$ts',
+      personaCuidada: asignacion.personaCuidada,
+      personaColaborador: asignacion.personaColaborador,
+      rol: asignacion.rol,
+      estado: asignacion.estado,
+      fechaAlta: asignacion.fechaAlta,
+    );
+    _asignaciones.add(nueva);
+    return nueva;
+  }
+
+  @override
+  Future<AsignacionCuidado> actualizarAsignacion(
+    AsignacionCuidado asignacion,
+  ) async {
+    await Future.delayed(Duration.zero);
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacion.id);
+    if (idx < 0) throw Exception('Asignación no encontrada: ${asignacion.id}');
+    _asignaciones[idx] = asignacion;
+    return asignacion;
+  }
+
+  @override
+  Future<void> eliminarAsignacion(String asignacionId) async {
+    await Future.delayed(Duration.zero);
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    _asignaciones.removeAt(idx);
+  }
+
+  @override
+  Future<List<Rol>> getRoles() async {
+    await Future.delayed(Duration.zero);
+    return List.unmodifiable(_roles);
+  }
+
+  @override
+  Future<Rol> getRolById(String rolId) async {
+    await Future.delayed(Duration.zero);
+    final rol = _roles.where((r) => r.id == rolId).firstOrNull;
+    if (rol == null) throw Exception('Rol no encontrado: $rolId');
+    return rol;
+  }
+}

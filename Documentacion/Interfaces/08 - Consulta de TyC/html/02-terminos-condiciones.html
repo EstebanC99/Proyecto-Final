@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #FFFFFF;
+    color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #C5CECE;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+    position: relative; z-index: 10;
+  }
+  .app-bar-icon { color: #16201F; display: inline-flex; }
+  .app-bar-title { font-size: 18px; font-weight: 700; color: #16201F; }
+
+  /* Content area */
+  .content-area {
+    position: relative;
+    height: calc(844px - 28px - 56px - 40px);
+    overflow: hidden;
+    padding: 16px 24px 0;
+    background: #FFFFFF;
+  }
+
+  .update-date {
+    font-size: 12px;
+    color: #566060;
+    margin-bottom: 20px;
+  }
+
+  .tyc-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #16201F;
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  .tyc-section-title:first-of-type { margin-top: 0; }
+
+  .tyc-body {
+    font-size: 14px;
+    font-weight: 400;
+    color: #16201F;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  /* Fade gradient al pie del contenido */
+  .content-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 48px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    pointer-events: none;
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: #FFFFFF;
+    font-size: 12px;
+    color: #9AA5A5;
+    border-top: 1px solid #C5CECE;
+  }
+
+  /* Anotaciones */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar fija -->
+  <div class="app-bar">
+    <span class="app-bar-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </span>
+    <span class="app-bar-title">Terminos y condiciones</span>
+  </div>
+
+  <!-- Area de contenido (overflow hidden para simular scroll) -->
+  <div class="content-area">
+    <div class="update-date">Ultima actualizacion: enero 2025</div>
+
+    <div class="tyc-section-title">1. ACEPTACION DE TERMINOS</div>
+    <div class="tyc-body">
+      Al registrarse y utilizar CareWell, el Usuario acepta los presentes Terminos y Condiciones
+      en su totalidad. Si no esta de acuerdo con alguna de sus disposiciones, debera abstenerse
+      de utilizar la aplicacion.
+    </div>
+
+    <div class="tyc-section-title">2. USO DEL SERVICIO</div>
+    <div class="tyc-body">
+      CareWell es una herramienta de apoyo para la coordinacion del cuidado de personas.
+      No reemplaza la atencion medica profesional ni constituye asesoramiento medico, legal
+      o de otra indole. El uso de la aplicacion no exime al Usuario de consultar a los
+      profesionales correspondientes.
+    </div>
+
+    <div class="tyc-section-title">3. RESPONSABILIDAD DEL USUARIO</div>
+    <div class="tyc-body">
+      Los datos personales suministrados deben ser verdaderos, completos y actualizados.
+      El Usuario es responsable de mantener la confidencialidad de sus credenciales de acceso
+      y de todas las actividades que ocurran bajo su cuenta.
+    </div>
+
+    <div class="tyc-section-title">4. PRIVACIDAD Y DATOS</div>
+    <div class="tyc-body">
+      Los datos personales son tratados conforme a la Ley 25.326 de Proteccion de Datos
+      Personales (Argentina) y normativas complementarias. CareWell no vende ni cede datos
+      personales a terceros sin consentimiento expreso del titular.
+    </div>
+
+    <!-- Gradiente de fade al pie -->
+    <div class="content-fade"></div>
+  </div>
+
+  <!-- Scroll hint fijo al pie -->
+  <div class="scroll-hint">
+    Desliza para leer mas
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 64px; right: 6px;">AppBar fija: ARROW_BACK siempre accesible, no colapsa al hacer scroll</div>
+  <div class="annotation" style="top: 200px; left: 6px;">Encabezados: 14px 700, cuerpo 14px 400, line-height 1.6</div>
+  <div class="annotation" style="top: 450px; right: 6px;">Gradiente fade indica que el texto continua mas abajo</div>
+  <div class="annotation" style="top: 780px; left: 6px;">Mismo contenido T&C que aparece en registro (US-01): solo lectura, sin boton Aceptar</div>
+
+</body>
+</html>

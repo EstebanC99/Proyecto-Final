@@ -1,0 +1,15 @@
+USER STORY: Agregado de notas a eventos de salud
+PRIORIDAD: 32
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero añadir notas y observaciones a un evento de salud, para facilitar un seguimiento detallado de la evolución del estado de salud.
+
+CRITERIOS DE ACEPTACIÓN:
+- El módulo de gestión de eventos permite agregar notas y observaciones relevantes a cada evento.
+- Las notas quedan asociadas al evento correspondiente.
+
+NOTAS / RESTRICCIONES:
+- El usuario puede registrar notas de forma autónoma; el equipo según permisos.
+- Las notas se aplican sobre eventos de la persona de contexto seleccionada en el menú principal (ver US-05b).

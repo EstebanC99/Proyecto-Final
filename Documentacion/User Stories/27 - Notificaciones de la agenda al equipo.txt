@@ -1,0 +1,15 @@
+USER STORY: Notificaciones de la agenda al equipo
+PRIORIDAD: 27
+MÓDULO: Agenda
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como miembro del equipo de cuidado, quiero recibir notificaciones de los eventos agendados, para estar informado de las actividades y recordatorios relevantes en tiempo y forma.
+
+CRITERIOS DE ACEPTACIÓN:
+- Al agendar un evento o recordatorio, se programa una notificación local en el dispositivo del usuario que origina la acción.
+- La notificación recuerda al usuario la actividad o recordatorio en la fecha y hora correspondientes.
+
+NOTAS / RESTRICCIONES:
+- En el MVP las notificaciones son locales en el dispositivo del usuario que origina la acción. El envío real a los dispositivos de los demás miembros del equipo de cuidado requiere backend (notificaciones push) y queda fuera del alcance del MVP.
+- La zona horaria está fijada a Argentina; al tocar la notificación no se navega automáticamente al evento; no hay soporte iOS.

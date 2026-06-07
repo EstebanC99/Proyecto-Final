@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .status-bar .icons { font-size: 11px; letter-spacing: 0.5px; }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    display: flex; align-items: center;
+    padding: 0 8px 0 8px; gap: 4px;
+    border-bottom: 1px solid #C5CECE;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+  }
+  .app-bar-btn {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; border-radius: 20px; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F;
+    flex: 1; padding-left: 4px;
+  }
+
+  /* Scroll content */
+  .scroll-content {
+    height: calc(844px - 28px - 56px);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* Profile header */
+  .profile-header {
+    background: #FFFFFF; padding: 24px;
+    display: flex; flex-direction: column; align-items: center;
+    border-bottom: 1px solid #C5CECE; flex-shrink: 0;
+  }
+  .avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #C9EDE8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 700; color: #0A3D38;
+  }
+  .profile-name {
+    margin-top: 12px; font-size: 20px; font-weight: 700;
+    color: #16201F; text-align: center;
+  }
+  .profile-badge {
+    margin-top: 8px; background: #C9EDE8; color: #0A3D38;
+    font-size: 12px; font-weight: 600; border-radius: 999px;
+    padding: 4px 12px; display: inline-block;
+  }
+
+  /* Data section */
+  .data-section { background: #F6F8F8; flex: 1; overflow: hidden; }
+
+  /* Data row */
+  .data-row {
+    min-height: 64px; padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+    background: #FFFFFF; border-bottom: 1px solid #C5CECE;
+  }
+  .data-row-icon {
+    color: #566060; display: flex; align-items: center;
+    flex-shrink: 0; width: 20px;
+  }
+  .data-row-content {
+    display: flex; flex-direction: column; gap: 2px; flex: 1;
+  }
+  .data-row-label {
+    font-size: 13px; color: #566060; font-weight: 400; line-height: 1.3;
+  }
+  .data-row-value {
+    font-size: 16px; color: #16201F; font-weight: 500; line-height: 1.4;
+  }
+  .edit-btn {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1A8C82; flex-shrink: 0; border-radius: 24px;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 138px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="app-bar-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <div class="app-bar-title">Alicia Rodriguez</div>
+    <div class="app-bar-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </div>
+  </div>
+
+  <div class="scroll-content">
+
+    <!-- Profile header -->
+    <div class="profile-header">
+      <div class="avatar">A</div>
+      <div class="profile-name">Alicia Rodriguez</div>
+      <div class="profile-badge">Persona a cargo</div>
+    </div>
+
+    <!-- Data rows -->
+    <div class="data-section">
+
+      <!-- Nombre -->
+      <div class="data-row">
+        <div class="data-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div class="data-row-content">
+          <span class="data-row-label">Nombre completo</span>
+          <span class="data-row-value">Alicia Rodriguez</span>
+        </div>
+        <div class="edit-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </div>
+      </div>
+
+      <!-- DNI (sin EDIT) -->
+      <div class="data-row">
+        <div class="data-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h2v3H9V4zm4 10h-2v2H9v-2H7v-2h2v-2h2v2h2v2z"/></svg>
+        </div>
+        <div class="data-row-content">
+          <span class="data-row-label">DNI</span>
+          <span class="data-row-value">23.456.789</span>
+        </div>
+        <!-- sin EDIT: identificador de sistema -->
+      </div>
+
+      <!-- Fecha de nac. (sin EDIT) -->
+      <div class="data-row">
+        <div class="data-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+        </div>
+        <div class="data-row-content">
+          <span class="data-row-label">Fecha de nac.</span>
+          <span class="data-row-value">15/03/1942</span>
+        </div>
+        <!-- sin EDIT: requiere proceso especial -->
+      </div>
+
+      <!-- Email -->
+      <div class="data-row">
+        <div class="data-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="data-row-content">
+          <span class="data-row-label">Email</span>
+          <span class="data-row-value">alicia@ejemplo.com</span>
+        </div>
+        <div class="edit-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top: 86px; right: 4px;">
+    MORE_VERT → opciones: Eliminar persona (US-15) · solo para Responsable
+  </div>
+
+  <div class="annotation" style="top: 310px; left: 4px;">
+    DNI y Fecha de nac. sin lapiz · identificadores no modificables directamente
+  </div>
+
+  <div class="annotation" style="top: 470px; right: 4px;">
+    EDIT 20dp color #1A8C82 · tap target 48x48dp · edicion inline campo por campo
+  </div>
+
+  <div class="annotation" style="top: 600px; left: 4px;">
+    Solo Responsable con permiso ve botones EDIT · Cuidador ve solo lectura
+  </div>
+
+</body>
+</html>

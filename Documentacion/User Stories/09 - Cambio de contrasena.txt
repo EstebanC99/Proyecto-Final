@@ -1,0 +1,16 @@
+USER STORY: Cambio de contraseña
+PRIORIDAD: 9
+MÓDULO: Configuración
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario autenticado, quiero cambiar mi contraseña desde la sección de Seguridad y privacidad, para mantener la seguridad de mi cuenta.
+
+CRITERIOS DE ACEPTACIÓN:
+- En Configuración, dentro de "Seguridad y privacidad", existe la opción "Cambio de contraseña".
+- El flujo permite establecer una nueva contraseña.
+- Tras el cambio, la nueva contraseña queda activa para los próximos inicios de sesión.
+
+NOTAS / RESTRICCIONES:
+- El procedimiento es el mismo que el de recuperación de contraseña.
+- Se recomienda solicitar contraseñas seguras y confiables (requisito de seguridad).

@@ -1,0 +1,17 @@
+USER STORY: Registro de hábitos de vida
+PRIORIDAD: 28
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero registrar hábitos de vida de la persona, para hacer seguimiento de sus estilos de vida saludables.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el módulo "Mi salud" se pueden registrar hábitos como alimentación, ejercicio, sueño y consumo de sustancias.
+- Se lleva un registro detallado que facilita el seguimiento en el tiempo.
+- El usuario puede registrar sus propios hábitos de vida cuando se visualiza a sí mismo como persona de contexto.
+
+NOTAS / RESTRICCIONES:
+- Los miembros del equipo de cuidado pueden acceder a esta información siempre que cuenten con los permisos correspondientes.
+- Los hábitos registrados y mostrados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Esta US cubre el alta. La consulta del detalle, la modificación y la baja de un hábito se documentan en US-28b (modificación y detalle) y US-28c (baja), completando el ABM del módulo.

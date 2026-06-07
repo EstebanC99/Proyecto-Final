@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600;
+  }
+  .status-bar .icons { letter-spacing: 0.5px; font-size: 11px; }
+  .md-icon { display: inline-flex; align-items: center; vertical-align: middle; }
+
+  /* App bar */
+  .appbar { height: 56px; display: flex; align-items: center; padding: 0 12px; }
+  .back {
+    width: 48px; height: 48px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #16201F;
+  }
+  .appbar .brand-chip { display: flex; align-items: center; gap: 7px; margin-left: 4px; }
+  .appbar .brand-chip .name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .appbar .brand-chip .name .well { color: #1A8C82; }
+
+  .screen { padding: 0 24px; }
+
+  /* Step progress */
+  .step-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+  .track {
+    flex: 1; height: 6px; background: #EDF1F1; border-radius: 999px; overflow: hidden;
+  }
+  .track .fill { width: 50%; height: 100%; background: #1A8C82; border-radius: 999px; }
+  .step-count { font-size: 13px; font-weight: 500; color: #566060; white-space: nowrap; }
+
+  .title { font-size: 24px; font-weight: 700; color: #16201F; line-height: 32px; margin-top: 24px; }
+  .subtitle { font-size: 14px; color: #566060; margin-top: 4px; margin-bottom: 16px; }
+
+  /* Fields */
+  .field { margin-top: 4px; }
+  .field-label { font-size: 13px; font-weight: 500; color: #566060; margin-bottom: 6px; }
+  .input {
+    height: 56px; background: #FFFFFF; border: 1px solid #C5CECE;
+    border-radius: 12px; display: flex; align-items: center;
+    padding: 0 16px; gap: 12px;
+  }
+  .input .prefix { font-size: 18px; color: #566060; }
+  .input .value { flex: 1; font-size: 16px; }
+  .input .placeholder { color: #9AA5A5; }
+  .input .filled { color: #16201F; }
+  .helper-line { height: 18px; font-size: 12px; color: #566060; padding-top: 3px; padding-left: 2px; }
+
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-top: 20px;
+  }
+  .login-link { text-align: center; font-size: 14px; color: #566060; margin-top: 14px; }
+  .login-link .link { color: #1A8C82; font-weight: 700; margin-left: 4px; }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 120px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="appbar">
+    <div class="back md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>
+    <div class="brand-chip">
+      <svg viewBox="0 0 80 80" width="28" height="28" role="img" aria-label="CareWell">
+        <defs><linearGradient id="ab1Mark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A095"/><stop offset="1" stop-color="#16786F"/></linearGradient></defs>
+        <circle cx="40" cy="40" r="40" fill="url(#ab1Mark)"/>
+        <path d="M40 16 C25.6 16 14 27.6 14 42 C14 56.4 25.6 68 40 68 C47.5 68 54.2 64.8 58.9 59.8 C54.8 62.8 49.6 64.6 44 64.6 C30.2 64.6 19 53.4 19 39.6 C19 28.6 26.1 19.3 36 16.0 C37.3 16 38.6 16 40 16 Z" fill="#FFFFFF" opacity="0.92"/>
+        <circle cx="42.5" cy="34" r="7.2" fill="#F2785C"/>
+        <path d="M42.5 43.5 C35.4 43.5 30 48.7 29.6 55.6 C29.5 57.2 30.7 58.6 32.3 58.6 L52.7 58.6 C54.3 58.6 55.5 57.2 55.4 55.6 C55 48.7 49.6 43.5 42.5 43.5 Z" fill="#F2785C"/>
+      </svg>
+      <span class="name">Care<span class="well">Well</span></span>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="step-row">
+      <div class="track"><div class="fill"></div></div>
+      <div class="step-count">Paso 1 de 2</div>
+    </div>
+
+    <div class="title">Creá tu cuenta</div>
+    <div class="subtitle">Empecemos con tus datos personales.</div>
+
+    <div class="field">
+      <div class="field-label">Nombre</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span><span class="value placeholder">Ej. María</span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Apellido</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span><span class="value placeholder">Ej. González</span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Email</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></span><span class="value placeholder">tucorreo@ejemplo.com</span></div>
+      <div class="helper-line">Lo usarás para iniciar sesión.</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Teléfono</div>
+      <div class="input"><span class="prefix md-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></span><span class="value placeholder">+54 9 11 1234 5678</span></div>
+      <div class="helper-line"></div>
+    </div>
+
+    <div class="btn-primary">Continuar</div>
+    <div class="login-link">¿Ya tenés cuenta?<span class="link">Iniciar sesión</span></div>
+  </div>
+
+  <!-- Anotaciones -->
+  <div class="annotation" style="top:96px; right:6px;">StepProgressBar 50% · track 6dp #EDF1F1, fill #1A8C82</div>
+  <div class="annotation" style="top:200px; left:6px;">headlineMedium 24/700</div>
+  <div class="annotation" style="top:420px; right:6px;">Helper persistente bajo Email</div>
+  <div class="annotation" style="top:300px; left:6px;">Línea helper reservada 18dp evita saltos de layout</div>
+  <div class="annotation" style="top:700px; right:6px;">PrimaryButton 56dp · valida al pulsar</div>
+</body>
+</html>

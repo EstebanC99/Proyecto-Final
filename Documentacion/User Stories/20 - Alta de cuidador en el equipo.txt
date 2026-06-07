@@ -1,0 +1,18 @@
+USER STORY: Alta de cuidador en el equipo
+PRIORIDAD: 20
+MÓDULO: Mi equipo
+ROL: Responsable
+
+DESCRIPCIÓN:
+Como responsable, quiero agregar un cuidador al equipo de cuidado, para que pueda realizar tareas de cuidado y acceder a la información necesaria.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde "Mi equipo" se ofrece una opción de alta de cuidadores claramente diferenciada del alta de responsables (US-17).
+- La acción abre el formulario de alta de cuidador, que asigna el rol "Cuidador" de forma explícita (el miembro NO se registra como responsable).
+- El nuevo miembro queda registrado en el equipo con el rol "Cuidador".
+- Una vez registrado, al cuidador se le asignan permisos iniciales más restringidos que los de un responsable (por defecto: ver datos personales y ver agenda activados; el resto desactivado), ajustables luego desde Mi equipo (US-21).
+
+NOTAS / RESTRICCIONES:
+- El cuidador realiza tareas de cuidado y accede a funcionalidades según los permisos otorgados.
+- Diferencia de flujo con US-17 (alta de responsable): "Mi equipo" expone DOS acciones de alta distintas; el rol del miembro lo determina la acción/formulario elegido, no un valor fijo.
+- Nota para dev-flutter (BUG REPORTADO): se detectó que el alta desde "Mi equipo" registra siempre al miembro como responsable y no permite dar de alta cuidadores. Revisar que el formulario de alta diferencie el tipo de miembro y persista el rol "Cuidador" cuando se usa este flujo, sin reutilizar el rol fijo del alta de responsable.

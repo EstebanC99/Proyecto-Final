@@ -1,0 +1,18 @@
+USER STORY: Eliminación de hábito de vida
+PRIORIDAD: 28
+MÓDULO: Mi salud
+ROL: Ambos
+
+DESCRIPCIÓN:
+Como usuario o miembro del equipo de cuidado, quiero eliminar un registro de hábito de vida, para depurar registros erróneos o que ya no corresponden.
+
+CRITERIOS DE ACEPTACIÓN:
+- Desde el detalle/histórico de un hábito (ver US-28b) se ofrece la opción de eliminar el registro seleccionado.
+- Antes de eliminar, se solicita confirmación mediante un mensaje de advertencia.
+- Si el usuario confirma, el registro se elimina y deja de mostrarse en la lista y el histórico; si cancela, no se realizan cambios.
+
+NOTAS / RESTRICCIONES:
+- El usuario puede eliminar sus hábitos de forma autónoma; los miembros del equipo según permisos.
+- A diferencia de los eventos de salud (US-30), los hábitos de vida sí admiten modificación y baja, ya que no constituyen historial médico clínico.
+- Los hábitos eliminados corresponden a la persona de contexto seleccionada en el menú principal (ver US-05b).
+- Complementa US-28 (alta) y US-28b (consulta y modificación) para completar el ABM de hábitos.
