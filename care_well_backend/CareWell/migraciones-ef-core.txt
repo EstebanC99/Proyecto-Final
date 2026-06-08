@@ -1,0 +1,91 @@
+===========================================================================
+ CareWell Backend - Flujo de migraciones con EF Core 10
+===========================================================================
+
+Regla mental:
+  - "migrations add"   -> traduce tu modelo (codigo C#) a un script de cambios.
+  - "database update"  -> ejecuta esos scripts contra SQL Server.
+
+  Si cambio el modelo -> SIEMPRE "add" antes de "update".
+  Si solo cambio la connection string (u otra cosa que no toca el modelo) ->
+  NO hace falta migracion.
+
+---------------------------------------------------------------------------
+ CICLO CORRECTO (cada vez que toco el modelo)
+---------------------------------------------------------------------------
+
+1) HACER EL CAMBIO EN EL MODELO
+   - Crear la entidad en CareWell.Domain.
+   - Crear su IEntityTypeConfiguration en CareWell.Repository/Config
+     (con su ToTable("t_<Entidad>") segun la convencion de prefijo t_).
+   - Si corresponde, agregarla como DbSet o como relacion.
+   (Hasta aca la base de datos todavia no sabe nada del cambio.)
+
+2) GENERAR LA MIGRACION
+   Compara el modelo actual contra el snapshot de la ultima migracion y
+   genera el diff:
+
+     dotnet ef migrations add <NombreDescriptivo> --project CareWell.Repository --startup-project CareWell.API
+
+   - El nombre debe describir el cambio, no ser generico.
+     Ej: AgregarUsuarioYRol, AgregarRelacionPersonaEquipo.
+   - Genera 3 cosas en CareWell.Repository/Migrations:
+       * <timestamp>_<Nombre>.cs        (metodos Up / Down)
+       * <timestamp>_<Nombre>.Designer.cs
+       * CareWellDbContextModelSnapshot.cs  (actualizado)
+
+3) REVISAR LA MIGRACION GENERADA  (no saltear)
+   - Abrir el archivo de migracion y mirar el metodo Up().
+   - Verificar tablas, columnas, tipos, longitudes, FKs e indices.
+   - Aca se detectan errores de config ANTES de tocar la base
+     (ej: relacion mal armada, columna de mas, nvarchar(max) por
+     olvidar el HasMaxLength).
+
+4) APLICAR A LA BASE
+     dotnet ef database update --project CareWell.Repository --startup-project CareWell.API
+
+   - Recien aca se ejecuta el Up() contra la base CareWell y se registra
+     la fila en la tabla __EFMigrationsHistory.
+
+---------------------------------------------------------------------------
+ SOBRE EL ERROR PendingModelChangesWarning
+---------------------------------------------------------------------------
+
+  "The model for context 'CareWellDbContext' has pending changes.
+   Add a new migration before updating the database."
+
+  Causa: se cambio el modelo pero se corrio "database update" SIN generar
+  antes la migracion con "migrations add".
+  "database update" NO inspecciona el modelo: solo aplica migraciones ya
+  existentes.
+
+  Solucion: correr "migrations add <Nombre>", revisar el Up(), y luego
+  "database update".
+
+  (Esta validacion existe desde EF Core 8+ como red de seguridad: si el
+   modelo actual no coincide con el snapshot de la ultima migracion, lo
+   trata como error en vez de aplicar algo desfasado.)
+
+---------------------------------------------------------------------------
+ UTILES PARA EL DIA A DIA
+---------------------------------------------------------------------------
+
+- Migracion mal generada y TODAVIA NO aplicada a la base:
+    dotnet ef migrations remove --project CareWell.Repository --startup-project CareWell.API
+  Luego ajustar el modelo y volver a generarla.
+  (No editar a mano el snapshot.)
+
+- Migracion YA aplicada a la base: NO borrarla asi.
+  Opciones:
+    * Generar una migracion nueva que corrija, o
+    * Revertir primero: dotnet ef database update <MigracionAnterior>
+      (y despues remove si hace falta).
+
+- Una migracion por unidad logica de cambio (no acumular 10 entidades en
+  una sola). Historial mas legible y reversion mas facil. La migracion
+  inicial grande es la excepcion aceptable.
+
+- Si falta la herramienta: dotnet tool install --global dotnet-ef
+  (o "dotnet tool update --global dotnet-ef" para alinear con EF Core 10).
+
+===========================================================================

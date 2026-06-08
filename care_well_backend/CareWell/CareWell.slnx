@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="CareWell.API/CareWell.API.csproj" />
+  <Project Path="CareWell.BusinessService/CareWell.BusinessService.csproj" />
+  <Project Path="CareWell.Commands/CareWell.Commands.csproj" />
+  <Project Path="CareWell.DataViews/CareWell.DataViews.csproj" />
+  <Project Path="CareWell.Domain/CareWell.Domain.csproj" />
+  <Project Path="CareWell.Global/CareWell.Global.csproj" />
+  <Project Path="CareWell.Queries/CareWell.Queries.csproj" />
+  <Project Path="CareWell.Repository/CareWell.Repository.csproj" />
+</Solution>
