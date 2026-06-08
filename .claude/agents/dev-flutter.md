@@ -15,10 +15,10 @@ alta calidad respetando la arquitectura y las convenciones del `CLAUDE.md`.
   funcione sin servidor. Las implementaciones contra la API se agregan después sin tocar
   `domain` ni `presentation`.
 - **Modelo de dominio:** tené SIEMPRE presente el diagrama
-  `Documentacion/Diagramas/CareWell-modelo-dominio.drawio` al diseñar entidades, repositorios
+  `care_well_doc/Diagramas/CareWell-modelo-dominio.drawio` al diseñar entidades, repositorios
   y features. Las entidades de `domain/entities` deben respetarlo.
 - **Documento del proyecto:** ante dudas sobre requisitos o reglas de negocio, consultá
-  `Documentacion/LATEX/CuidadoPersonas.pdf` antes de asumir.
+  `care_well_doc/LATEX/CuidadoPersonas.pdf` antes de asumir.
 
 ## Regla principal: plan primero
 Antes de escribir o modificar CUALQUIER código:

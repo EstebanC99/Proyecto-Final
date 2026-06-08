@@ -2,7 +2,7 @@
 
 > Memoria de proyecto para Claude Code. Se lee automáticamente al inicio de cada sesión.
 > La raíz del repositorio (PROYECTO-FINAL) contiene el frontend móvil (Flutter, en
-> `care_well_app/`) y la documentación del proyecto (`Documentacion/`). El backend vive en
+> `care_well_app/`) y la documentación del proyecto (`care_well_doc/`). El backend vive en
 > un repositorio separado y se desarrolla de forma desacoplada; no es alcance de este repo.
 
 ## 1. Qué es este proyecto
@@ -17,7 +17,7 @@ PROYECTO-FINAL/                  # raíz del repo (Claude Code corre acá)
 ├── .claude/agents/              # agentes de Claude Code
 ├── care_well_app/               # app Flutter (frontend) — ver sección 5
 │   └── lib/ ...
-├── Documentacion/
+├── care_well_doc/
 │   ├── Diagramas/               # diagramas (modelo de dominio .drawio, etc.)
 │   └── LATEX/                   # documentación en LaTeX
 │       ├── Imagenes/  Recursos/  build/
@@ -31,9 +31,9 @@ PROYECTO-FINAL/                  # raíz del repo (Claude Code corre acá)
 Cuando cualquier agente necesite información sobre la aplicación (requisitos, alcance, reglas
 de negocio, módulos, análisis funcional, decisiones de diseño), debe consultar las fuentes del
 proyecto antes de asumir:
-- **Documento del proyecto:** `Documentacion/LATEX/CuidadoPersonas.pdf` (fuente editable:
-  `Documentacion/LATEX/CuidadoPersonas.tex`). Es la fuente de verdad sobre la aplicación.
-- **Modelo de dominio (ER):** `Documentacion/Diagramas/CareWell-modelo-dominio.drawio`.
+- **Documento del proyecto:** `care_well_doc/LATEX/CuidadoPersonas.pdf` (fuente editable:
+  `care_well_doc/LATEX/CuidadoPersonas.tex`). Es la fuente de verdad sobre la aplicación.
+- **Modelo de dominio (ER):** `care_well_doc/Diagramas/CareWell-modelo-dominio.drawio`.
 
 `arquitecto-software` y `dev-flutter` deben **tener presente el diagrama de modelo de dominio**
 al tomar decisiones, modelar o implementar. `analista-funcional` es el único agente que
@@ -104,7 +104,7 @@ y no conoce a las otras capas.
   - **Cuidador:** realiza tareas de cuidado; accede a funcionalidades según permisos.
 - **Equipo de cuidado:** red de responsables y cuidadores asociados a una persona.
 
-> El modelo de dominio vigente está en `Documentacion/Diagramas/CareWell-modelo-dominio.drawio`
+> El modelo de dominio vigente está en `care_well_doc/Diagramas/CareWell-modelo-dominio.drawio`
 > y lo mantiene el agente `arquitecto-software`.
 
 ## 8. Alcance — MVP
@@ -141,8 +141,8 @@ Subcarpetas por concepto dentro de cada capa, alineadas al MVP (nombres en ingl�
   un plan numerado y espera confirmación antes de codificar.
 - `disenador-ui`: diseña pantallas, flujos e interacciones; produce specs y widgets de presentación.
 - `analista-funcional`: mantiene y modifica la documentación del proyecto en LaTeX
-  (`Documentacion/LATEX/`). Es el único agente que toca la documentación.
+  (`care_well_doc/LATEX/`). Es el único agente que toca la documentación.
 
 ## 11. Comandos útiles
 - App (en `care_well_app/`): `flutter pub get` · `flutter analyze` · `flutter test` · `dart format .`
-- Documentación (en `Documentacion/LATEX/`): `latexmk -pdf CuidadoPersonas.tex`
+- Documentación (en `care_well_doc/LATEX/`): `latexmk -pdf CuidadoPersonas.tex`

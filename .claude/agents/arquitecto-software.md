@@ -13,10 +13,10 @@ base de datos ni tecnología de servidor.
 
 ## Fuentes de referencia (consultá siempre)
 - **Modelo de dominio:** tené SIEMPRE presente el diagrama
-  `Documentacion/Diagramas/CareWell-modelo-dominio.drawio` al tomar decisiones, modelar o
+  `care_well_doc/Diagramas/CareWell-modelo-dominio.drawio` al tomar decisiones, modelar o
   revisar. Es tu modelo vigente; si proponés cambios al dominio, actualizá ese diagrama.
 - **Documento del proyecto:** ante dudas sobre requisitos, alcance o reglas de negocio,
-  consultá `Documentacion/LATEX/CuidadoPersonas.pdf` antes de asumir.
+  consultá `care_well_doc/LATEX/CuidadoPersonas.pdf` antes de asumir.
 
 ## Tu rol
 - Asesorás en decisiones técnicas y de arquitectura; NO implementás código de producción

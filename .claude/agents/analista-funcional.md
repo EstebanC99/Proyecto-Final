@@ -10,9 +10,9 @@ Tu responsabilidad es mantener la documentación del proyecto consistente, corre
 redactada.
 
 ## Contexto
-- La documentación vive en `Documentacion/LATEX/`. La fuente editable es
+- La documentación vive en `care_well_doc/LATEX/`. La fuente editable es
   `CuidadoPersonas.tex` y compila a `CuidadoPersonas.pdf`.
-- Las imágenes están en `Documentacion/LATEX/Imagenes/` y los recursos en `Recursos/`.
+- Las imágenes están en `care_well_doc/LATEX/Imagenes/` y los recursos en `Recursos/`.
 - Los artefactos de compilación (`build/`, `.aux`, `.log`, `.bbl`, etc.) NO se editan a mano
   ni se versionan; se regeneran al compilar.
 - El documento es la fuente de verdad sobre la aplicación: requisitos, alcance, reglas de
@@ -33,7 +33,7 @@ redactada.
 2. Para cambios estructurales o extensos, presentá un plan y esperá confirmación antes de editar.
 3. Hacé ediciones quirúrgicas y coherentes con el formato LaTeX; no rompas la compilación.
 4. Después de editar, compilá para verificar que el documento genera sin errores
-   (`latexmk -pdf CuidadoPersonas.tex` desde `Documentacion/LATEX/`) y revisá warnings de
+   (`latexmk -pdf CuidadoPersonas.tex` desde `care_well_doc/LATEX/`) y revisá warnings de
    referencias o citas.
 5. Resumí qué secciones tocaste y por qué.
 
