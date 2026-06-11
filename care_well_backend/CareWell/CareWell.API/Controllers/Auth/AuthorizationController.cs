@@ -1,32 +1,36 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
+using CareWell.DataViews.Auth;
 using CareWell.Queries.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareWell.API.Controllers.Auth
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthorizationController : ControllerBase
     {
         private ILoginBusinessService LoginBusinessService { get; set; }
+        private IRefrescarTokenBusinessService RefrescarTokenBusinessService { get; set; }
 
-        public AuthorizationController(ILoginBusinessService loginBusinessService)
+        public AuthorizationController(ILoginBusinessService loginBusinessService,
+                                       IRefrescarTokenBusinessService refrescarTokenBusinessService)
         {
             this.LoginBusinessService = loginBusinessService;
+            this.RefrescarTokenBusinessService = refrescarTokenBusinessService;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginQuery query)
+        public LoginDataView Login([FromBody] LoginQuery query)
         {
-            try
-            {
-                var loginDataView = this.LoginBusinessService.Login(query);
-                return this.Ok(loginDataView);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized(new { mensaje = "Credenciales inválidas." });
-            }
+            return this.LoginBusinessService.Login(query);
+        }
+
+        [HttpPost("refresh-token")]
+        public LoginDataView Refresh([FromBody] RefrescarTokenQuery query)
+        {
+            return this.RefrescarTokenBusinessService.Refrescar(query);
         }
     }
 }

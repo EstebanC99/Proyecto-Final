@@ -19,6 +19,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IPasswordHasherDomainService, PasswordHasherBusinessService>();
             services.AddScoped<ITokenAutorizacionBusinessService, TokenAutorizacionBusinessService>();
             services.AddScoped<ILoginBusinessService, LoginBusinessService>();
+            services.AddScoped<IRefrescarTokenBusinessService, RefrescarTokenBusinessService>();
 
             #endregion
 

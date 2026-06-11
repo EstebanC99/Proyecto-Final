@@ -1,3 +1,4 @@
+using CareWell.API.Filters;
 using CareWell.BusinessService;
 using CareWell.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiResultFilter>();
+});
 
 builder.Services.AddRepositories();
 builder.Services.AddBusinessServices();

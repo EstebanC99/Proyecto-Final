@@ -1,9 +1,10 @@
-﻿using CareWell.Queries.Auth;
+﻿using CareWell.DataViews.Auth;
+using CareWell.Queries.Auth;
 
 namespace CareWell.BusinessService.Abstractions.Auth
 {
     public interface ITokenAutorizacionBusinessService
     {
-        string GenerarTokenAcceso(GenerarTokenAccesoQuery query);
+        AccessTokenDataView GenerarTokenAcceso(GenerarTokenAccesoQuery query);
     }
 }

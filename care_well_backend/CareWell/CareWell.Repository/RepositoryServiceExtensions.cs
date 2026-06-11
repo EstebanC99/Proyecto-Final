@@ -11,6 +11,12 @@ namespace CareWell.Repository
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEntityLoaderRepository, EntityLoaderRepository>();
 
+            #region Autorizacion
+
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            #endregion
+
             #region Business Repos
 
             services.AddScoped<IPersonaRepository, PersonaRepository>();

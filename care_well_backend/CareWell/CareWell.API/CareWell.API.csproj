@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CareWell.BusinessService.Abstractions\CareWell.BusinessService.Abstractions.csproj" />
     <ProjectReference Include="..\CareWell.BusinessService\CareWell.BusinessService.csproj" />
+    <ProjectReference Include="..\CareWell.Global\CareWell.Global.csproj" />
     <ProjectReference Include="..\CareWell.Repository\CareWell.Repository.csproj" />
   </ItemGroup>
 

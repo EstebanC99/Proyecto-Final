@@ -1,9 +1,11 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.Commands.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareWell.API.Controllers.Auth
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class CuentaController : ControllerBase
@@ -16,10 +18,9 @@ namespace CareWell.API.Controllers.Auth
         }
 
         [HttpPost("crear")]
-        public IActionResult Crear([FromBody] CrearCuentaCommand command)
+        public void Crear([FromBody] CrearCuentaCommand command)
         {
             this.CrearCuentaBusinessService.Crear(command);
-            return this.NoContent();
         }
     }
 }

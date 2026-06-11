@@ -32,8 +32,7 @@ namespace CareWell.BusinessService.Auth
                 throw new UnauthorizedAccessException();
 
             var expiracion = DateTime.UtcNow.AddMinutes(30);
-
-            var token = this.TokenAutorizacionBusinessService.GenerarTokenAcceso(new GenerarTokenAccesoQuery
+            var accessTokenDataView = this.TokenAutorizacionBusinessService.GenerarTokenAcceso(new GenerarTokenAccesoQuery
             {
                 UsuarioID = usuario.ID,
                 Email = usuario.NombreUsuario
@@ -41,10 +40,11 @@ namespace CareWell.BusinessService.Auth
 
             return new LoginDataView
             {
-                AccessToken = token,
+                AccessToken = accessTokenDataView.AccessToken,
                 Expiracion = expiracion,
                 UsuarioID = usuario.ID,
-                Email = usuario.NombreUsuario
+                Email = usuario.NombreUsuario,
+                RefreshToken = accessTokenDataView.RefreshToken
             };
         }
     }
