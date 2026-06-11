@@ -3,6 +3,7 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="CareWell.API/CareWell.API.csproj" />
+  <Project Path="CareWell.BusinessService.Abstractions/CareWell.BusinessService.Abstractions.csproj" />
   <Project Path="CareWell.BusinessService/CareWell.BusinessService.csproj" />
   <Project Path="CareWell.Commands/CareWell.Commands.csproj" />
   <Project Path="CareWell.DataViews/CareWell.DataViews.csproj" />

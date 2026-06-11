@@ -22,6 +22,31 @@ namespace CareWell.Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AsignacionCuidadoPermisoCuidado", b =>
+                {
+                    b.Property<int>("ID_AsignacionCuidado")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ID_PermisoCuidado")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AsignacionCuidadoID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermisosID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_AsignacionCuidado", "ID_PermisoCuidado");
+
+                    b.HasIndex("AsignacionCuidadoID");
+
+                    b.HasIndex("ID_PermisoCuidado");
+
+                    b.HasIndex("PermisosID");
+
+                    b.ToTable("t_AsignacionCuidadoPermisoCuidado", (string)null);
+                });
+
             modelBuilder.Entity("CareWell.Domain.Agenda.EventoAgenda", b =>
                 {
                     b.Property<int>("ID")
@@ -115,7 +140,7 @@ namespace CareWell.Repository.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("ID_Estado");
+                        .HasColumnName("ID_EstadoUsuario");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
@@ -261,12 +286,7 @@ namespace CareWell.Repository.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ID_RolCuidado")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("ID_RolCuidado");
 
                     b.ToTable("t_PermisoCuidado", (string)null);
                 });
@@ -280,25 +300,6 @@ namespace CareWell.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("ID_TipoRolCuidado")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ID_TipoRolCuidado");
-
-                    b.ToTable("t_RolCuidado", (string)null);
-                });
-
-            modelBuilder.Entity("CareWell.Domain.EquipoCuidado.TipoRolCuidado", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID_TipoRolCuidado");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -306,7 +307,7 @@ namespace CareWell.Repository.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("t_TipoRolCuidado", (string)null);
+                    b.ToTable("t_RolCuidado", (string)null);
                 });
 
             modelBuilder.Entity("CareWell.Domain.General.Persona", b =>
@@ -337,7 +338,6 @@ namespace CareWell.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ImagenPath")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -593,6 +593,33 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_TipoHabitoVida", (string)null);
                 });
 
+            modelBuilder.Entity("AsignacionCuidadoPermisoCuidado", b =>
+                {
+                    b.HasOne("CareWell.Domain.EquipoCuidado.AsignacionCuidado", null)
+                        .WithMany()
+                        .HasForeignKey("AsignacionCuidadoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CareWell.Domain.EquipoCuidado.AsignacionCuidado", null)
+                        .WithMany()
+                        .HasForeignKey("ID_AsignacionCuidado")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("CareWell.Domain.EquipoCuidado.PermisoCuidado", null)
+                        .WithMany()
+                        .HasForeignKey("ID_PermisoCuidado")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CareWell.Domain.EquipoCuidado.PermisoCuidado", null)
+                        .WithMany()
+                        .HasForeignKey("PermisosID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CareWell.Domain.Agenda.EventoAgenda", b =>
                 {
                     b.HasOne("CareWell.Domain.General.Persona", "Persona")
@@ -694,28 +721,6 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("PersonaCuidada");
 
                     b.Navigation("Rol");
-                });
-
-            modelBuilder.Entity("CareWell.Domain.EquipoCuidado.PermisoCuidado", b =>
-                {
-                    b.HasOne("CareWell.Domain.EquipoCuidado.RolCuidado", "Rol")
-                        .WithMany("Permisos")
-                        .HasForeignKey("ID_RolCuidado")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
-                });
-
-            modelBuilder.Entity("CareWell.Domain.EquipoCuidado.RolCuidado", b =>
-                {
-                    b.HasOne("CareWell.Domain.EquipoCuidado.TipoRolCuidado", "Tipo")
-                        .WithMany()
-                        .HasForeignKey("ID_TipoRolCuidado")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Tipo");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>
@@ -821,11 +826,6 @@ namespace CareWell.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Persona");
-                });
-
-            modelBuilder.Entity("CareWell.Domain.EquipoCuidado.RolCuidado", b =>
-                {
-                    b.Navigation("Permisos");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>

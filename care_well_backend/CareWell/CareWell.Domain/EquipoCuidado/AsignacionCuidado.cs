@@ -13,5 +13,7 @@ namespace CareWell.Domain.EquipoCuidado
         public virtual EstadoAsignacionCuidado Estado { get; private set; }
 
         public virtual DateTime FechaAlta { get; private set; }
+
+        public virtual List<PermisoCuidado> Permisos { get; private set; }
     }
 }

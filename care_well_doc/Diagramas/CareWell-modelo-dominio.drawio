@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="CareWell - Dominio MVP" id="carewell-domain">
-    <mxGraphModel dx="1768" dy="1051" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1300" math="0" shadow="0">
+    <mxGraphModel dx="1768" dy="1451" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1300" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -9,6 +9,19 @@
         </mxCell>
         <mxCell id="persona" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Persona&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;nombre&lt;br&gt;apellido&lt;br&gt;documento&lt;br&gt;fechaNacimiento&lt;br&gt;email&lt;br&gt;imagen&lt;br&gt;telefono&lt;/div&gt;" vertex="1">
           <mxGeometry height="168" width="230" x="680" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-4" edge="1" parent="1" source="usuario" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="evento">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-5" connectable="0" parent="SINNnTZ66mSDKsO26zo8-4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="crea" vertex="1">
+          <mxGeometry relative="1" x="-0.1401" y="1" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-6" connectable="0" parent="SINNnTZ66mSDKsO26zo8-4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.8675" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="usuario" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Usuario&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;FK personaId (unico)&lt;br&gt;nombreUsuario&lt;br&gt;contrasenaHash&lt;br&gt;estado&lt;/div&gt;" vertex="1">
           <mxGeometry height="118" width="230" x="330" y="120" as="geometry" />
@@ -19,19 +32,47 @@
         <mxCell id="terminos" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;AceptacionTerminos&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;FK usuarioId&lt;br&gt;version&lt;br&gt;fechaAceptacion&lt;/div&gt;" vertex="1">
           <mxGeometry height="102" width="230" x="40" y="190" as="geometry" />
         </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-1" edge="1" parent="1" source="asignacion" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;edgeStyle=entityRelationEdgeStyle;" target="permiso">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-2" connectable="0" parent="SINNnTZ66mSDKsO26zo8-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="tiene permisos" vertex="1">
+          <mxGeometry relative="1" x="0.1043" y="5" as="geometry">
+            <mxPoint y="-8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-3" connectable="0" parent="SINNnTZ66mSDKsO26zo8-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="M" vertex="1">
+          <mxGeometry relative="1" x="0.6029" as="geometry">
+            <mxPoint x="21" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="asignacion" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;AsignacionCuidado&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;FK personaCuidadaId&lt;br&gt;FK personaColaboradorId&lt;br&gt;FK rolId&lt;br&gt;estado&lt;br&gt;fechaAlta&lt;/div&gt;" vertex="1">
           <mxGeometry height="134" width="230" x="1020" y="457" as="geometry" />
         </mxCell>
-        <mxCell id="rol" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Rol&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;nombre&lt;br&gt;(RESPONSABLE | CUIDADOR)&lt;/div&gt;" vertex="1">
-          <mxGeometry height="86" width="230" x="1384.87" y="480" as="geometry" />
+        <mxCell id="rol" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;RolCuidado&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;div style=&quot;text-align:left;line-height:1.3&quot;&gt;PK id&lt;br&gt;descripcion&lt;br&gt;(RESPONSABLE | CUIDADOR)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="86" width="230" x="1400" y="410" as="geometry" />
         </mxCell>
-        <mxCell id="rolpermiso" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;RolPermiso&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK,FK rolId&lt;br&gt;PK,FK permisoId&lt;/div&gt;" vertex="1">
-          <mxGeometry height="70" width="230" x="1384.87" y="579" as="geometry" />
+        <mxCell id="permiso" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;PermisoCuidado&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;div style=&quot;text-align:left;line-height:1.3&quot;&gt;PK id&lt;br&gt;descripcion&lt;/div&gt;" vertex="1">
+          <mxGeometry height="86" width="230" x="1400" y="560" as="geometry" />
         </mxCell>
-        <mxCell id="permiso" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Permiso&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;codigo&lt;br&gt;descripcion&lt;/div&gt;" vertex="1">
-          <mxGeometry height="86" width="230" x="1384.87" y="666" as="geometry" />
+        <mxCell id="SINNnTZ66mSDKsO26zo8-8" edge="1" parent="1" source="evento" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;endArrow=none;endFill=0;" target="SINNnTZ66mSDKsO26zo8-7">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="evento" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;EventoAgenda&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;FK personaId&lt;br&gt;FK creadoPorId&lt;br&gt;titulo&lt;br&gt;descripcion&lt;br&gt;tipo&lt;br&gt;fechaHoraInicio&lt;br&gt;fechaHoraFin&lt;/div&gt;" vertex="1">
+        <mxCell id="SINNnTZ66mSDKsO26zo8-9" connectable="0" parent="SINNnTZ66mSDKsO26zo8-8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="N" vertex="1">
+          <mxGeometry relative="1" x="-0.6364" y="-4" as="geometry">
+            <mxPoint x="-4" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-10" connectable="0" parent="SINNnTZ66mSDKsO26zo8-8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="0.5" y="-3" as="geometry">
+            <mxPoint y="-6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-11" connectable="0" parent="SINNnTZ66mSDKsO26zo8-8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="contiene" vertex="1">
+          <mxGeometry relative="1" x="0.0076" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="evento" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;EventoAgenda&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;div style=&quot;text-align:left;line-height:1.3&quot;&gt;PK id&lt;br&gt;FK personaId&lt;br&gt;FK creadoPorId&lt;br&gt;titulo&lt;br&gt;descripcion&lt;br&gt;FK tipoEventoAgendaId&lt;br&gt;fechaHoraInicio&lt;br&gt;fechaHoraFin&lt;/div&gt;" vertex="1">
           <mxGeometry height="166" width="230" x="810" y="96" as="geometry" />
         </mxCell>
         <mxCell id="recordatorio" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Recordatorio&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;&lt;div style=&#39;text-align:left;line-height:1.3&#39;&gt;PK id&lt;br&gt;FK eventoAgendaId&lt;br&gt;fechaHoraEnvio&lt;br&gt;enviado&lt;/div&gt;" vertex="1">
@@ -135,34 +176,6 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="e7" edge="1" parent="1" source="rol" style="edgeStyle=entityRelationEdgeStyle;fontSize=11;html=1;rounded=0;endArrow=none;startArrow=none;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" target="rolpermiso" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e7_s" connectable="0" parent="e7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=#ffffff;fontSize=11;fontStyle=1" value="1" vertex="1">
-          <mxGeometry relative="1" x="-0.8" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e7_t" connectable="0" parent="e7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=#ffffff;fontSize=11;fontStyle=1" value="N" vertex="1">
-          <mxGeometry relative="1" x="0.8" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e8" edge="1" parent="1" source="permiso" style="edgeStyle=entityRelationEdgeStyle;fontSize=11;html=1;rounded=0;endArrow=none;startArrow=none;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" target="rolpermiso" value="">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1304.87" y="666" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e8_s" connectable="0" parent="e8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=#ffffff;fontSize=11;fontStyle=1" value="1" vertex="1">
-          <mxGeometry relative="1" x="-0.8" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="e8_t" connectable="0" parent="e8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=#ffffff;fontSize=11;fontStyle=1" value="N" vertex="1">
-          <mxGeometry relative="1" x="0.8" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="e9" edge="1" parent="1" source="persona" style="edgeStyle=entityRelationEdgeStyle;fontSize=11;html=1;rounded=0;endArrow=none;startArrow=none;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="evento" value="agenda">
           <mxGeometry relative="1" x="0.0322" as="geometry">
             <mxPoint x="1" as="offset" />
@@ -177,7 +190,7 @@
         </mxCell>
         <mxCell id="e9_t" connectable="0" parent="e9" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;labelBackgroundColor=#ffffff;fontSize=11;fontStyle=1" value="N" vertex="1">
           <mxGeometry relative="1" x="0.8" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="20" y="-5" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e10" edge="1" parent="1" source="evento" style="edgeStyle=entityRelationEdgeStyle;fontSize=11;html=1;rounded=0;endArrow=none;startArrow=none;" target="recordatorio" value="dispara">
@@ -283,6 +296,9 @@
           <mxGeometry relative="1" x="0.8" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="SINNnTZ66mSDKsO26zo8-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;spacingTop=2;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;TipoEventoAgenda&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;&gt;&lt;div style=&quot;text-align:left;line-height:1.3&quot;&gt;PK id&lt;br&gt;descripcion&lt;/div&gt;" vertex="1">
+          <mxGeometry height="82" width="230" x="810" y="-52" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

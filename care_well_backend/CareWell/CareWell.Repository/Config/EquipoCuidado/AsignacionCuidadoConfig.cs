@@ -17,6 +17,13 @@ namespace CareWell.Repository.Config.EquipoCuidado
             builder.HasOne(e => e.Rol).WithMany().HasForeignKey("ID_RolCuidado").OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.Estado).WithMany().HasForeignKey("ID_EstadoAsignacionCuidado").OnDelete(DeleteBehavior.Restrict);
             builder.Property(e => e.FechaAlta).IsRequired();
+            builder.HasMany(e => e.Permisos).WithMany().UsingEntity(j =>
+            {
+                j.ToTable("t_AsignacionCuidadoPermisoCuidado");
+                j.HasOne(typeof(AsignacionCuidado)).WithMany().HasForeignKey("ID_AsignacionCuidado").OnDelete(DeleteBehavior.ClientCascade);
+                j.HasOne(typeof(PermisoCuidado)).WithMany().HasForeignKey("ID_PermisoCuidado").OnDelete(DeleteBehavior.Restrict);
+                j.HasKey("ID_AsignacionCuidado", "ID_PermisoCuidado");
+            });
         }
     }
 }

@@ -1,16 +1,12 @@
-using CareWell.Domain.General;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareWell.Repository
 {
     public class CareWellDbContext : DbContext
     {
-        public CareWellDbContext(DbContextOptions<CareWellDbContext> options)
-            : base(options)
+        public CareWellDbContext(DbContextOptions<CareWellDbContext> options) : base(options)
         {
         }
-
-        public DbSet<Persona> Personas => Set<Persona>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

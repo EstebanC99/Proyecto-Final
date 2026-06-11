@@ -10,7 +10,7 @@ namespace CareWell.Repository.Config.Auth
         {
             builder.ToTable("t_EstadoUsuario");
             builder.HasKey(e => e.ID);
-            builder.Property(e => e.ID).HasColumnName("ID_Estado").ValueGeneratedOnAdd();
+            builder.Property(e => e.ID).HasColumnName("ID_EstadoUsuario").ValueGeneratedOnAdd();
             builder.Property(e => e.Descripcion).IsRequired().HasMaxLength(100);
         }
     }

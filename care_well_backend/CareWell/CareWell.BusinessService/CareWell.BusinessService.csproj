@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CareWell.BusinessService.Abstractions\CareWell.BusinessService.Abstractions.csproj" />
+    <ProjectReference Include="..\CareWell.Commands\CareWell.Commands.csproj" />
+    <ProjectReference Include="..\CareWell.DataViews\CareWell.DataViews.csproj" />
+    <ProjectReference Include="..\CareWell.Domain\CareWell.Domain.csproj" />
+    <ProjectReference Include="..\CareWell.Queries\CareWell.Queries.csproj" />
+    <ProjectReference Include="..\CareWell.Repository\CareWell.Repository.csproj" />
+  </ItemGroup>
+
 </Project>
