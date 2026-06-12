@@ -1,5 +1,6 @@
 import '../base_entity.dart';
 import '../shared/persona.dart';
+import 'permiso.dart';
 import 'rol.dart';
 
 /// Estado de una [AsignacionCuidado].
@@ -16,7 +17,8 @@ enum EstadoAsignacion {
 
 /// Vínculo entre una persona cuidada y un colaborador (responsable o cuidador).
 ///
-/// Registra quién cuida a quién, con qué rol y en qué estado.
+/// Registra quién cuida a quién, con qué rol, qué permisos específicos tiene
+/// en esta asignación y en qué estado se encuentra.
 class AsignacionCuidado extends BaseEntity {
   /// Persona que es cuidada.
   final Persona personaCuidada;
@@ -30,6 +32,11 @@ class AsignacionCuidado extends BaseEntity {
   final EstadoAsignacion estado;
   final DateTime fechaAlta;
 
+  /// Permisos específicos otorgados en esta asignación.
+  ///
+  /// Los permisos son propios de la asignación y no del rol.
+  final List<Permiso> permisos;
+
   const AsignacionCuidado({
     required super.id,
     required this.personaCuidada,
@@ -37,6 +44,7 @@ class AsignacionCuidado extends BaseEntity {
     required this.rol,
     required this.estado,
     required this.fechaAlta,
+    this.permisos = const [],
   });
 
   @override
@@ -47,6 +55,7 @@ class AsignacionCuidado extends BaseEntity {
     Rol? rol,
     EstadoAsignacion? estado,
     DateTime? fechaAlta,
+    List<Permiso>? permisos,
   }) {
     return AsignacionCuidado(
       id: id ?? this.id,
@@ -55,6 +64,7 @@ class AsignacionCuidado extends BaseEntity {
       rol: rol ?? this.rol,
       estado: estado ?? this.estado,
       fechaAlta: fechaAlta ?? this.fechaAlta,
+      permisos: permisos ?? this.permisos,
     );
   }
 }

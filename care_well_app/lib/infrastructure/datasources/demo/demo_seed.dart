@@ -177,13 +177,11 @@ class DemoSeed {
   static final Rol rolResponsable = Rol(
     id: rolResponsableId,
     nombre: RolCuidado.responsable,
-    permisos: permisosResponsable,
   );
 
   static final Rol rolCuidador = Rol(
     id: rolCuidadorId,
     nombre: RolCuidado.cuidador,
-    permisos: permisosCuidador,
   );
 
   // ─── Asignaciones de cuidado ─────────────────────────────────────────────────
@@ -195,6 +193,7 @@ class DemoSeed {
     rol: rolResponsable,
     estado: EstadoAsignacion.activa,
     fechaAlta: DateTime(2024, 1, 10),
+    permisos: permisosResponsable,
   );
 
   static final AsignacionCuidado asignacionLaura = AsignacionCuidado(
@@ -204,6 +203,7 @@ class DemoSeed {
     rol: rolCuidador,
     estado: EstadoAsignacion.activa,
     fechaAlta: DateTime(2024, 3, 5),
+    permisos: permisosCuidador,
   );
 
   /// Asignación de María como Responsable de Alicia.
@@ -216,6 +216,7 @@ class DemoSeed {
     rol: rolResponsable,
     estado: EstadoAsignacion.activa,
     fechaAlta: DateTime(2024, 1, 8),
+    permisos: permisosResponsable,
   );
 
   // ─── Eventos de agenda ───────────────────────────────────────────────────────
@@ -377,7 +378,6 @@ class DemoSeed {
       tipo: TipoEventoSalud.citaMedica,
       fecha: DateTime(2026, 5, 20),
       descripcion: 'Control anual con médico clínico — Dr. Alejandro Torres.',
-      notas: 'Todo en orden. Indicó análisis de laboratorio en 6 meses.',
     ),
   ];
 
@@ -387,7 +387,6 @@ class DemoSeed {
     tipo: TipoEventoSalud.sintoma,
     fecha: DateTime(2026, 5, 28),
     descripcion: 'Episodio de mareos al levantarse. Duración aprox. 5 minutos.',
-    notas: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
   );
 
   static final EventoDeSalud eventoSaludControlCardiologico = EventoDeSalud(
@@ -396,7 +395,6 @@ class DemoSeed {
     tipo: TipoEventoSalud.citaMedica,
     fecha: DateTime(2026, 6, 2),
     descripcion: 'Control cardiológico — Dr. Martín Sosa · Hospital Italiano.',
-    notas: 'Resultados dentro de los parámetros normales. Repetir en 3 meses.',
   );
 
   static final List<EventoDeSalud> eventosSaludAlicia = [
@@ -408,7 +406,6 @@ class DemoSeed {
       tipo: TipoEventoSalud.vacuna,
       fecha: DateTime(2026, 4, 3),
       descripcion: 'Vacuna antigripal anual.',
-      notas: null,
     ),
   ];
 
@@ -437,6 +434,22 @@ class DemoSeed {
       fechaHora: DateTime(2026, 5, 28, 11, 0),
       contenido:
           'Presión se normalizó a los 15 minutos. Se informó al cardiólogo por WhatsApp.',
+    ),
+    // Nota migrada desde el campo notas del evento esa_001.
+    NotaEvento(
+      id: 'not_004',
+      eventoSaludId: 'esa_001',
+      autor: personaMaria,
+      fechaHora: DateTime(2026, 5, 28, 10, 5),
+      contenido: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
+    ),
+    // Nota migrada desde el campo notas del evento esa_m01 (María).
+    NotaEvento(
+      id: 'not_005',
+      eventoSaludId: 'esa_m01',
+      autor: personaMaria,
+      fechaHora: DateTime(2026, 5, 20, 12, 0),
+      contenido: 'Todo en orden. Indicó análisis de laboratorio en 6 meses.',
     ),
   ];
 

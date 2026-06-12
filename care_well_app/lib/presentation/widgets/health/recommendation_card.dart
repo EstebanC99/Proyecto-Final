@@ -41,16 +41,16 @@ class RecommendationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (recomendacion.profesional != null)
+                if (recomendacion.profesional.isNotEmpty)
                   Text(
-                    recomendacion.profesional!,
+                    recomendacion.profesional,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.healthAccent,
                     ),
                   ),
-                if (recomendacion.profesional != null)
+                if (recomendacion.profesional.isNotEmpty)
                   const SizedBox(height: 2),
                 Text(
                   recomendacion.descripcion,

@@ -60,7 +60,6 @@ class RolMapper {
     return Rol(
       id: model.id,
       nombre: _nombreMap[model.nombre] ?? RolCuidado.cuidador,
-      permisos: model.permisos.map(PermisoMapper.fromModel).toList(),
     );
   }
 
@@ -68,7 +67,6 @@ class RolMapper {
     return RolModel(
       id: entity.id,
       nombre: _nombreReverseMap[entity.nombre] ?? 'cuidador',
-      permisos: entity.permisos.map(PermisoMapper.toModel).toList(),
     );
   }
 }
@@ -103,6 +101,7 @@ class AsignacionCuidadoMapper {
       rol: rol,
       estado: _estadoMap[model.estado] ?? EstadoAsignacion.activa,
       fechaAlta: DateTime.parse(model.fechaAlta),
+      permisos: model.permisos.map(PermisoMapper.fromModel).toList(),
     );
   }
 
@@ -114,6 +113,7 @@ class AsignacionCuidadoMapper {
       rolId: entity.rol.id,
       estado: _estadoReverseMap[entity.estado] ?? 'activa',
       fechaAlta: entity.fechaAlta.toIso8601String(),
+      permisos: entity.permisos.map(PermisoMapper.toModel).toList(),
     );
   }
 }

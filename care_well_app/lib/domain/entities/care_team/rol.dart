@@ -1,5 +1,4 @@
 import '../base_entity.dart';
-import 'permiso.dart';
 
 /// Código de rol dentro del equipo de cuidado.
 ///
@@ -8,29 +7,18 @@ import 'permiso.dart';
 /// - [cuidador]: realiza tareas de cuidado; accede según permisos.
 enum RolCuidado { responsable, cuidador }
 
-/// Rol dentro del equipo de cuidado con la lista de permisos asociados.
+/// Rol dentro del equipo de cuidado.
 ///
-/// Se decide NO modelar [RolPermiso] como entidad separada: los permisos
-/// se incluyen directamente en [Rol] para simplificar el dominio del cliente.
+/// Los permisos NO se asocian al rol sino a cada [AsignacionCuidado],
+/// alineado con el modelo de dominio del backend.
 class Rol extends BaseEntity {
   /// Tipo de rol: [RolCuidado.responsable] o [RolCuidado.cuidador].
   final RolCuidado nombre;
 
-  /// Permisos otorgados a este rol.
-  final List<Permiso> permisos;
-
-  const Rol({
-    required super.id,
-    required this.nombre,
-    this.permisos = const [],
-  });
+  const Rol({required super.id, required this.nombre});
 
   @override
-  Rol copyWith({String? id, RolCuidado? nombre, List<Permiso>? permisos}) {
-    return Rol(
-      id: id ?? this.id,
-      nombre: nombre ?? this.nombre,
-      permisos: permisos ?? this.permisos,
-    );
+  Rol copyWith({String? id, RolCuidado? nombre}) {
+    return Rol(id: id ?? this.id, nombre: nombre ?? this.nombre);
   }
 }

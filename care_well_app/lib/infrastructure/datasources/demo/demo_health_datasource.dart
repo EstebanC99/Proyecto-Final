@@ -160,7 +160,6 @@ class DemoHealthDatasource implements HealthDatasource {
       tipo: evento.tipo,
       fecha: evento.fecha,
       descripcion: evento.descripcion,
-      notas: evento.notas,
     );
     _eventosSalud.add(nuevo);
     return nuevo;

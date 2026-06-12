@@ -26,17 +26,15 @@ final _personaCarlos = Persona(
   apellido: 'Pérez',
 );
 
-final _rolResponsable = Rol(
-  id: 'rol_001',
-  nombre: RolCuidado.responsable,
-  permisos: [
-    const Permiso(
-      id: 'prm_006',
-      codigo: CodigoPermiso.activarEmergencia,
-      descripcion: 'Activar emergencia',
-    ),
-  ],
-);
+final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
+
+final _permisosEmergencia = [
+  const Permiso(
+    id: 'prm_006',
+    codigo: CodigoPermiso.activarEmergencia,
+    descripcion: 'Activar emergencia',
+  ),
+];
 
 final _usuarioDemoMaria = Usuario(
   id: 'usr_001',
@@ -45,15 +43,20 @@ final _usuarioDemoMaria = Usuario(
   estado: EstadoUsuario.activo,
 );
 
-AsignacionCuidado _asignacion(String id, Persona colaborador, {Rol? rol}) =>
-    AsignacionCuidado(
-      id: id,
-      personaCuidada: _personaAlicia,
-      personaColaborador: colaborador,
-      rol: rol ?? _rolResponsable,
-      estado: EstadoAsignacion.activa,
-      fechaAlta: DateTime(2024, 1, 8),
-    );
+AsignacionCuidado _asignacion(
+  String id,
+  Persona colaborador, {
+  Rol? rol,
+  List<Permiso>? permisos,
+}) => AsignacionCuidado(
+  id: id,
+  personaCuidada: _personaAlicia,
+  personaColaborador: colaborador,
+  rol: rol ?? _rolResponsable,
+  estado: EstadoAsignacion.activa,
+  fechaAlta: DateTime(2024, 1, 8),
+  permisos: permisos ?? _permisosEmergencia,
+);
 
 // ─── Fakes ────────────────────────────────────────────────────────────────────
 

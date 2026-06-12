@@ -10,14 +10,14 @@ class RecomendacionMedica extends BaseEntity {
   final DateTime fecha;
 
   /// Nombre del profesional que emitió la recomendación.
-  final String? profesional;
+  final String profesional;
 
   const RecomendacionMedica({
     required super.id,
     required this.persona,
     required this.descripcion,
     required this.fecha,
-    this.profesional,
+    required this.profesional,
   });
 
   @override

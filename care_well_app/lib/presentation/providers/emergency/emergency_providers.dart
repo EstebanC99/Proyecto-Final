@@ -54,7 +54,7 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
       .firstOrNull;
 
   if (asignacion == null) return false;
-  return asignacion.rol.permisos.any(
+  return asignacion.permisos.any(
     (p) => p.codigo == CodigoPermiso.activarEmergencia,
   );
 });

@@ -107,17 +107,6 @@ class HealthEventDetailScreen extends ConsumerWidget {
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        if (evento.notas != null) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            evento.notas!,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ),

@@ -37,26 +37,18 @@ final _permisosCompletos = [
   ),
 ];
 
-final _rolResponsable = Rol(
-  id: 'rol_001',
-  nombre: RolCuidado.responsable,
-  permisos: _permisosCompletos,
-);
+final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
 
-final _rolCuidadorSinPermisos = Rol(
-  id: 'rol_002',
-  nombre: RolCuidado.cuidador,
-  permisos: [],
-);
-
-AsignacionCuidado _asignacionMaria({Rol? rol}) => AsignacionCuidado(
-  id: 'asi_003',
-  personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
-  rol: rol ?? _rolResponsable,
-  estado: EstadoAsignacion.activa,
-  fechaAlta: DateTime(2024, 1, 8),
-);
+AsignacionCuidado _asignacionMaria({Rol? rol, List<Permiso>? permisos}) =>
+    AsignacionCuidado(
+      id: 'asi_003',
+      personaCuidada: _personaAlicia,
+      personaColaborador: _personaMaria,
+      rol: rol ?? _rolResponsable,
+      estado: EstadoAsignacion.activa,
+      fechaAlta: DateTime(2024, 1, 8),
+      permisos: permisos ?? _permisosCompletos,
+    );
 
 final _usuarioDemoMaria = Usuario(
   id: 'usr_001',
@@ -328,7 +320,7 @@ void main() {
 
       test('retorna false cuando la asignación no tiene el permiso', () async {
         final container = _makeContainer(
-          asignaciones: [_asignacionMaria(rol: _rolCuidadorSinPermisos)],
+          asignaciones: [_asignacionMaria(permisos: [])],
         );
         addTearDown(container.dispose);
 

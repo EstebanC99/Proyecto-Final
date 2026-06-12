@@ -45,7 +45,7 @@ final puedeVerSaludProvider = FutureProvider<bool>((ref) async {
 
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
-  return asignacion.rol.permisos.any(
+  return asignacion.permisos.any(
     (p) => p.codigo == CodigoPermiso.verFichaSalud,
   );
 });
@@ -59,7 +59,7 @@ final puedeRegistrarEventosSaludProvider = FutureProvider<bool>((ref) async {
 
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
-  return asignacion.rol.permisos.any(
+  return asignacion.permisos.any(
     (p) => p.codigo == CodigoPermiso.registrarEventosSalud,
   );
 });
@@ -73,7 +73,7 @@ final puedeRegistrarHabitosProvider = FutureProvider<bool>((ref) async {
 
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
-  return asignacion.rol.permisos.any(
+  return asignacion.permisos.any(
     (p) => p.codigo == CodigoPermiso.registrarHabitos,
   );
 });
@@ -217,15 +217,9 @@ final crearEventoSaludProvider =
         required TipoEventoSalud tipo,
         required String descripcion,
         required DateTime fecha,
-        String? notas,
       })
     >((ref) {
-      return ({
-        required tipo,
-        required descripcion,
-        required fecha,
-        notas,
-      }) async {
+      return ({required tipo, required descripcion, required fecha}) async {
         final persona = await ref.read(healthPersonaContextProvider.future);
         if (persona == null) throw Exception('Sin persona de contexto');
 
@@ -236,7 +230,6 @@ final crearEventoSaludProvider =
           tipo: tipo,
           fecha: fecha,
           descripcion: descripcion,
-          notas: notas,
         );
         final creado = await repo.crearEventoSalud(evento);
         ref.invalidate(eventosSaludProvider);

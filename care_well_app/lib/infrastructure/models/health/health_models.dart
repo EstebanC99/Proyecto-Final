@@ -84,14 +84,14 @@ class RecomendacionMedicaModel {
   final String personaId;
   final String descripcion;
   final String fecha;
-  final String? profesional;
+  final String profesional;
 
   const RecomendacionMedicaModel({
     required this.id,
     required this.personaId,
     required this.descripcion,
     required this.fecha,
-    this.profesional,
+    required this.profesional,
   });
 
   factory RecomendacionMedicaModel.fromJson(Map<String, dynamic> json) {
@@ -100,7 +100,7 @@ class RecomendacionMedicaModel {
       personaId: json['personaId'] as String,
       descripcion: json['descripcion'] as String,
       fecha: json['fecha'] as String,
-      profesional: json['profesional'] as String?,
+      profesional: (json['profesional'] as String?) ?? '',
     );
   }
 
@@ -110,7 +110,7 @@ class RecomendacionMedicaModel {
       'personaId': personaId,
       'descripcion': descripcion,
       'fecha': fecha,
-      if (profesional != null) 'profesional': profesional,
+      'profesional': profesional,
     };
   }
 
@@ -131,7 +131,6 @@ class EventoDeSaludModel {
   final String tipo;
   final String fecha;
   final String descripcion;
-  final String? notas;
 
   const EventoDeSaludModel({
     required this.id,
@@ -139,7 +138,6 @@ class EventoDeSaludModel {
     required this.tipo,
     required this.fecha,
     required this.descripcion,
-    this.notas,
   });
 
   factory EventoDeSaludModel.fromJson(Map<String, dynamic> json) {
@@ -149,7 +147,6 @@ class EventoDeSaludModel {
       tipo: json['tipo'] as String,
       fecha: json['fecha'] as String,
       descripcion: json['descripcion'] as String,
-      notas: json['notas'] as String?,
     );
   }
 
@@ -160,7 +157,6 @@ class EventoDeSaludModel {
       'tipo': tipo,
       'fecha': fecha,
       'descripcion': descripcion,
-      if (notas != null) 'notas': notas,
     };
   }
 

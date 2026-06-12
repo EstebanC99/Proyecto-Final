@@ -20,17 +20,7 @@ final _personaMaria = Persona(
   apellido: 'García',
 );
 
-final _rolResponsable = Rol(
-  id: 'rol_001',
-  nombre: RolCuidado.responsable,
-  permisos: [
-    const Permiso(
-      id: 'prm_006',
-      codigo: CodigoPermiso.activarEmergencia,
-      descripcion: 'Activar emergencia',
-    ),
-  ],
-);
+final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
 
 final _asignacion = AsignacionCuidado(
   id: 'asi_001',

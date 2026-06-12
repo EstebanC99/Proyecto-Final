@@ -37,9 +37,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
 
   void _inicializarPermisos(AsignacionCuidado asignacion) {
     if (_permisos != null) return; // ya inicializado
-    final permisosActivos = asignacion.rol.permisos
-        .map((p) => p.codigo)
-        .toSet();
+    final permisosActivos = asignacion.permisos.map((p) => p.codigo).toSet();
     _permisos = {
       for (final c in CodigoPermiso.values) c: permisosActivos.contains(c),
     };

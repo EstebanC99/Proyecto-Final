@@ -143,7 +143,6 @@ void main() {
       tipo: TipoEventoSalud.sintoma,
       fecha: DateTime(2026, 5, 28),
       descripcion: 'Episodio de mareos.',
-      notas: 'Presión baja al momento.',
     );
 
     final model = EventoDeSaludModel(
@@ -152,7 +151,6 @@ void main() {
       tipo: 'sintoma',
       fecha: '2026-05-28T00:00:00.000',
       descripcion: 'Episodio de mareos.',
-      notas: 'Presión baja al momento.',
     );
 
     test('entity → model → entity produce entidad equivalente', () {
@@ -163,7 +161,6 @@ void main() {
       expect(roundTrip.id, evento.id);
       expect(roundTrip.tipo, evento.tipo);
       expect(roundTrip.descripcion, evento.descripcion);
-      expect(roundTrip.notas, evento.notas);
     });
 
     test('json → model → entity → model → json produce el mismo JSON', () {
@@ -172,22 +169,6 @@ void main() {
       final entity = EventoDeSaludMapper.fromModel(modelFromJson, persona);
       final modelBack = EventoDeSaludMapper.toModel(entity);
       expect(modelBack.toJson(), json);
-    });
-
-    test('notas nulas se preservan en round-trip', () {
-      final sinNotas = EventoDeSalud(
-        id: 'esa_002',
-        persona: persona,
-        tipo: TipoEventoSalud.vacuna,
-        fecha: DateTime(2026, 4, 3),
-        descripcion: 'Vacuna antigripal.',
-        notas: null,
-      );
-      final roundTrip = EventoDeSaludMapper.fromModel(
-        EventoDeSaludMapper.toModel(sinNotas),
-        persona,
-      );
-      expect(roundTrip.notas, isNull);
     });
   });
 

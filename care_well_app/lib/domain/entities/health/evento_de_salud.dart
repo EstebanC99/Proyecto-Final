@@ -35,6 +35,9 @@ enum TipoEventoSalud {
 }
 
 /// Evento clínico registrado para una persona.
+///
+/// Las notas adicionales se gestionan como entidades [NotaEvento] separadas,
+/// alineado con el modelo de dominio del backend.
 class EventoDeSalud extends BaseEntity {
   /// Persona a la que corresponde este evento de salud.
   final Persona persona;
@@ -43,16 +46,12 @@ class EventoDeSalud extends BaseEntity {
   final DateTime fecha;
   final String descripcion;
 
-  /// Notas adicionales del cuidador.
-  final String? notas;
-
   const EventoDeSalud({
     required super.id,
     required this.persona,
     required this.tipo,
     required this.fecha,
     required this.descripcion,
-    this.notas,
   });
 
   @override
@@ -62,7 +61,6 @@ class EventoDeSalud extends BaseEntity {
     TipoEventoSalud? tipo,
     DateTime? fecha,
     String? descripcion,
-    String? notas,
   }) {
     return EventoDeSalud(
       id: id ?? this.id,
@@ -70,7 +68,6 @@ class EventoDeSalud extends BaseEntity {
       tipo: tipo ?? this.tipo,
       fecha: fecha ?? this.fecha,
       descripcion: descripcion ?? this.descripcion,
-      notas: notas ?? this.notas,
     );
   }
 }

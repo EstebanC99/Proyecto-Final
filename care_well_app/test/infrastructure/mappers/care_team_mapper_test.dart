@@ -34,30 +34,12 @@ void main() {
   });
 
   group('RolMapper', () {
-    final permisos = [
-      Permiso(
-        id: 'prm_001',
-        codigo: CodigoPermiso.verFichaSalud,
-        descripcion: 'Ver ficha de salud',
-      ),
-      Permiso(
-        id: 'prm_002',
-        codigo: CodigoPermiso.gestionarAgenda,
-        descripcion: 'Gestionar agenda',
-      ),
-    ];
-
-    final rol = Rol(
-      id: 'rol_001',
-      nombre: RolCuidado.responsable,
-      permisos: permisos,
-    );
+    final rol = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
 
     test('entity → model → entity produce entidad equivalente', () {
       final roundTrip = RolMapper.fromModel(RolMapper.toModel(rol));
       expect(roundTrip.id, rol.id);
       expect(roundTrip.nombre, rol.nombre);
-      expect(roundTrip.permisos.length, rol.permisos.length);
     });
 
     test('json → model → entity → model → json produce el mismo JSON', () {

@@ -33,31 +33,15 @@ class RolModel {
 
   /// Nombre del rol: 'responsable' o 'cuidador'.
   final String nombre;
-  final List<PermisoModel> permisos;
 
-  const RolModel({
-    required this.id,
-    required this.nombre,
-    this.permisos = const [],
-  });
+  const RolModel({required this.id, required this.nombre});
 
   factory RolModel.fromJson(Map<String, dynamic> json) {
-    final permisosList = (json['permisos'] as List<dynamic>?) ?? [];
-    return RolModel(
-      id: json['id'] as String,
-      nombre: json['nombre'] as String,
-      permisos: permisosList
-          .map((e) => PermisoModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+    return RolModel(id: json['id'] as String, nombre: json['nombre'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nombre': nombre,
-      'permisos': permisos.map((p) => p.toJson()).toList(),
-    };
+    return {'id': id, 'nombre': nombre};
   }
 }
 
@@ -72,6 +56,9 @@ class AsignacionCuidadoModel {
   final String estado;
   final String fechaAlta;
 
+  /// Permisos específicos de esta asignación.
+  final List<PermisoModel> permisos;
+
   const AsignacionCuidadoModel({
     required this.id,
     required this.personaCuidadaId,
@@ -79,9 +66,11 @@ class AsignacionCuidadoModel {
     required this.rolId,
     required this.estado,
     required this.fechaAlta,
+    this.permisos = const [],
   });
 
   factory AsignacionCuidadoModel.fromJson(Map<String, dynamic> json) {
+    final permisosList = (json['permisos'] as List<dynamic>?) ?? [];
     return AsignacionCuidadoModel(
       id: json['id'] as String,
       personaCuidadaId: json['personaCuidadaId'] as String,
@@ -89,6 +78,9 @@ class AsignacionCuidadoModel {
       rolId: json['rolId'] as String,
       estado: json['estado'] as String,
       fechaAlta: json['fechaAlta'] as String,
+      permisos: permisosList
+          .map((e) => PermisoModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -100,6 +92,7 @@ class AsignacionCuidadoModel {
       'rolId': rolId,
       'estado': estado,
       'fechaAlta': fechaAlta,
+      'permisos': permisos.map((p) => p.toJson()).toList(),
     };
   }
 

@@ -21,14 +21,12 @@ class HealthEventFormScreen extends ConsumerStatefulWidget {
 class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
   TipoEventoSalud _tipo = TipoEventoSalud.citaMedica;
   final _descripcionCtrl = TextEditingController();
-  final _observacionesCtrl = TextEditingController();
   DateTime _fecha = DateTime.now();
   bool _loading = false;
 
   @override
   void dispose() {
     _descripcionCtrl.dispose();
-    _observacionesCtrl.dispose();
     super.dispose();
   }
 
@@ -51,9 +49,6 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
         tipo: _tipo,
         descripcion: desc,
         fecha: _fecha,
-        notas: _observacionesCtrl.text.trim().isEmpty
-            ? null
-            : _observacionesCtrl.text.trim(),
       );
       if (mounted) {
         Navigator.of(context).pop();
@@ -186,33 +181,6 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Observaciones (opcional)
-            const _SectionLabel('Observaciones'),
-            const SizedBox(height: AppSpacing.sm),
-            TextFormField(
-              controller: _observacionesCtrl,
-              enabled: !_loading,
-              minLines: 2,
-              maxLines: 5,
-              textAlignVertical: TextAlignVertical.top,
-              decoration: InputDecoration(
-                hintText: 'Opcional',
-                prefixIcon: const Padding(
-                  padding: EdgeInsets.only(top: 14),
-                  child: Icon(Icons.description_outlined),
-                ),
-                prefixIconConstraints: const BoxConstraints(minWidth: 48),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
                 ),
               ),
             ),

@@ -197,8 +197,6 @@ final crearMiembroProvider =
           );
         }).toList();
 
-        final rolConPermisos = rol.copyWith(permisos: permisosSeleccionados);
-
         final personaCuidada = await personaRepo.getById(personaCuidadaId);
 
         final asignacion = await careTeamRepo.crearAsignacion(
@@ -206,9 +204,10 @@ final crearMiembroProvider =
             id: '',
             personaCuidada: personaCuidada,
             personaColaborador: colaborador,
-            rol: rolConPermisos,
+            rol: rol,
             estado: EstadoAsignacion.activa,
             fechaAlta: DateTime.now(),
+            permisos: permisosSeleccionados,
           ),
         );
 
@@ -232,7 +231,7 @@ final actualizarPermisosProvider =
 
         final nuevosPermisos = permisosActivos.map((codigo) {
           // Reusar el permiso existente si ya estaba, o crear uno nuevo.
-          final existente = asignacion.rol.permisos
+          final existente = asignacion.permisos
               .where((p) => p.codigo == codigo)
               .firstOrNull;
           return existente ??
@@ -243,10 +242,9 @@ final actualizarPermisosProvider =
               );
         }).toList();
 
-        final rolActualizado = asignacion.rol.copyWith(
+        final asignacionActualizada = asignacion.copyWith(
           permisos: nuevosPermisos,
         );
-        final asignacionActualizada = asignacion.copyWith(rol: rolActualizado);
 
         await repo.actualizarAsignacion(asignacionActualizada);
 

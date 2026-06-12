@@ -29,26 +29,20 @@ final _permisosResponsable = [
   ),
 ];
 
-final _rolResponsable = Rol(
-  id: 'rol_001',
-  nombre: RolCuidado.responsable,
-  permisos: _permisosResponsable,
-);
+final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
 
-final _rolCuidadorSinAgenda = Rol(
-  id: 'rol_002',
-  nombre: RolCuidado.cuidador,
-  permisos: [], // sin permiso de agenda
-);
+final _rolCuidador = Rol(id: 'rol_002', nombre: RolCuidado.cuidador);
 
-AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
-  id: 'asi_003',
-  personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
-  fechaAlta: DateTime(2024, 1, 8),
-);
+AsignacionCuidado _asignacionMaria({List<Permiso>? permisos}) =>
+    AsignacionCuidado(
+      id: 'asi_003',
+      personaCuidada: _personaAlicia,
+      personaColaborador: _personaMaria,
+      rol: _rolResponsable,
+      estado: EstadoAsignacion.activa,
+      fechaAlta: DateTime(2024, 1, 8),
+      permisos: permisos ?? _permisosResponsable,
+    );
 
 final _usuarioDemoMaria = Usuario(
   id: 'usr_001',
@@ -325,9 +319,10 @@ void main() {
         id: 'asi_sin',
         personaCuidada: _personaAlicia,
         personaColaborador: _personaMaria,
-        rol: _rolCuidadorSinAgenda,
+        rol: _rolCuidador,
         estado: EstadoAsignacion.activa,
         fechaAlta: DateTime(2024, 1, 8),
+        // permisos: const [] → default, sin permiso de agenda
       );
 
       // Sobreescribir el contexto a Alicia para que esContextoPropio = false.

@@ -134,7 +134,6 @@ class EventoDeSaludMapper {
       tipo: _tipoMap[model.tipo] ?? TipoEventoSalud.otro,
       fecha: DateTime.parse(model.fecha),
       descripcion: model.descripcion,
-      notas: model.notas,
     );
   }
 
@@ -145,7 +144,6 @@ class EventoDeSaludMapper {
       tipo: _tipoReverseMap[entity.tipo] ?? 'otro',
       fecha: entity.fecha.toIso8601String(),
       descripcion: entity.descripcion,
-      notas: entity.notas,
     );
   }
 }

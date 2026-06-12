@@ -46,7 +46,7 @@ final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
 
   if (asignacion == null) return false;
 
-  return asignacion.rol.permisos.any(
+  return asignacion.permisos.any(
     (p) => p.codigo == CodigoPermiso.gestionarAgenda,
   );
 });

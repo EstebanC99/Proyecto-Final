@@ -15,17 +15,7 @@ final _personaMaria = Persona(
   email: 'maria@test.com',
 );
 
-final _rolResponsable = Rol(
-  id: 'rol_001',
-  nombre: RolCuidado.responsable,
-  permisos: [
-    const Permiso(
-      id: 'prm_001',
-      codigo: CodigoPermiso.verFichaSalud,
-      descripcion: 'Ver ficha de salud',
-    ),
-  ],
-);
+final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
 
 final _usuarioDemoMaria = Usuario(
   id: 'usr_001',
