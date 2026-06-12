@@ -17,5 +17,10 @@ namespace CareWell.BusinessService
         {
             return this.Repository.GetByID<TBaseEntity>(id);
         }
+
+        public IQueryable<TBaseEntity> Query<TBaseEntity>() where TBaseEntity : BaseEntity
+        {
+            return this.Repository.Query<TBaseEntity>();
+        }
     }
 }

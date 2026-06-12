@@ -2,6 +2,8 @@
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.General;
 using CareWell.Global.Constantes.Auth;
+using CareWell.Global.Exceptions;
+using CareWell.Global.Mensajes;
 
 namespace CareWell.Domain.Auth
 {
@@ -21,6 +23,18 @@ namespace CareWell.Domain.Auth
                                   IEntityLoaderDomainService entityLoaderDomainService,
                                   IPasswordHasherDomainService passwordHasherDomainService)
         {
+            if (persona is null)
+                throw new ValidacionDominioException(Mensajes.PersonaNoExiste);
+
+            if (string.IsNullOrEmpty(email))
+                throw new ValidacionDominioException(Mensajes.EmailRequerido);
+
+            if (string.IsNullOrEmpty(contrasena))
+                throw new ValidacionDominioException(Mensajes.ContrasenaRequerida);
+
+            if (entityLoaderDomainService.Query<Usuario>().Any(u => u.NombreUsuario == email))
+                throw new ValidacionDominioException(Mensajes.NombreUsuarioEnUso);
+
             this.Persona = persona;
             this.NombreUsuario = email;
             this.ContrasenaHash = passwordHasherDomainService.Hashear(contrasena);

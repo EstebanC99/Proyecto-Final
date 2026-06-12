@@ -15,5 +15,10 @@ namespace CareWell.Repository
         {
             return this.DbContext.Set<TBaseEntity>().Find(ID);
         }
+
+        public IQueryable<TBaseEntity> Query<TBaseEntity>() where TBaseEntity : BaseEntity
+        {
+            return this.DbContext.Set<TBaseEntity>().AsQueryable();
+        }
     }
 }
