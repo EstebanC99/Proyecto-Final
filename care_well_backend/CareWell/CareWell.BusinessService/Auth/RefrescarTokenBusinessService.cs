@@ -35,10 +35,10 @@ namespace CareWell.BusinessService.Auth
             return new LoginDataView
             {
                 AccessToken = accessTokenDataView.AccessToken,
-                RefreshToken = accessTokenDataView.RefreshToken,
                 Expiracion = DateTime.UtcNow.AddMinutes(30),
                 UsuarioID = refreshToken.Usuario.ID,
-                Email = refreshToken.Usuario.NombreUsuario
+                Email = refreshToken.Usuario.NombreUsuario,
+                RefreshToken = accessTokenDataView.RefreshToken
             };
         }
     }

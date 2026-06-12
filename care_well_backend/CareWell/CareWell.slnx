@@ -4,9 +4,11 @@
   </Folder>
   <Project Path="CareWell.API/CareWell.API.csproj" />
   <Project Path="CareWell.BusinessService.Abstractions/CareWell.BusinessService.Abstractions.csproj" />
+  <Project Path="CareWell.BusinessService.Test/CareWell.BusinessService.Test.csproj" Id="57b40783-46a6-460e-9566-32b5e3d66f68" />
   <Project Path="CareWell.BusinessService/CareWell.BusinessService.csproj" />
   <Project Path="CareWell.Commands/CareWell.Commands.csproj" />
   <Project Path="CareWell.DataViews/CareWell.DataViews.csproj" />
+  <Project Path="CareWell.Domain.Test/CareWell.Domain.Test.csproj" Id="dacfa769-3e25-41d3-aca1-c28373f8dcd3" />
   <Project Path="CareWell.Domain/CareWell.Domain.csproj" />
   <Project Path="CareWell.Global/CareWell.Global.csproj" />
   <Project Path="CareWell.Queries/CareWell.Queries.csproj" />
