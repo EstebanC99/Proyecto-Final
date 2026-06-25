@@ -10,4 +10,8 @@
     <ProjectReference Include="..\CareWell.Global\CareWell.Global.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ValueObjects\Auth\" />
+  </ItemGroup>
+
 </Project>

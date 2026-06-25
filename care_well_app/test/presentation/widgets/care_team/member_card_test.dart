@@ -3,40 +3,34 @@ import 'package:care_well_app/presentation/widgets/care_team/member_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
-final _personaCuidada = Persona(
-  id: 'per_001',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaCuidada = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _personaCarlos = Persona(
-  id: 'per_003',
+  id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
   email: 'carlos@test.com',
 );
 
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-
-final _rolCuidador = Rol(id: 'rol_002', nombre: RolCuidado.cuidador);
-
 AsignacionCuidado _asignacionResponsable() => AsignacionCuidado(
-  id: 'asi_001',
+  id: 401,
   personaCuidada: _personaCuidada,
   personaColaborador: _personaCarlos,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
 );
 
 AsignacionCuidado _asignacionCuidador() => AsignacionCuidado(
-  id: 'asi_002',
+  id: 402,
   personaCuidada: _personaCuidada,
   personaColaborador: _personaCarlos,
-  rol: _rolCuidador,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoCuidador,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 3, 5),
 );
 

@@ -8,17 +8,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../_fakes/test_fixtures.dart';
+
 /// Usuario de prueba para simular sesión autenticada.
 final _usuarioDemo = Usuario(
-  id: 'usr_test',
+  id: 101,
   persona: Persona(
-    id: 'per_test',
+    id: 1,
     nombre: 'Test',
     apellido: 'User',
     email: 'test@example.com',
   ),
-  nombreUsuario: 'demo',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 /// Construye un [ProviderContainer] con sesión autenticada.
@@ -94,7 +96,8 @@ void main() {
         addTearDown(container.dispose);
 
         final router = container.read(goRouterProvider);
-        router.go('/care-team/member/asi_001');
+        // ID numérico en la ruta — el router hace int.parse()
+        router.go('/care-team/member/401');
 
         await tester.pumpWidget(
           UncontrolledProviderScope(

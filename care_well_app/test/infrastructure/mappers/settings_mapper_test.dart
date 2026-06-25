@@ -3,27 +3,29 @@ import 'package:care_well_app/infrastructure/mappers/mappers.dart';
 import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../_fakes/test_fixtures.dart';
+
 void main() {
-  final persona = Persona(id: 'per_001', nombre: 'María', apellido: 'García');
+  final persona = Persona(id: 1, nombre: 'María', apellido: 'García');
 
   final usuario = Usuario(
-    id: 'usr_001',
+    id: 101,
     persona: persona,
-    nombreUsuario: 'maria.garcia',
-    estado: EstadoUsuario.activo,
+    contrasena: 'hash123',
+    estado: estadoUsuarioActivo,
   );
 
   group('ConfiguracionMapper', () {
     final configuracion = Configuracion(
-      id: 'cfg_001',
+      id: 601,
       usuario: usuario,
       notificacionesHabilitadas: true,
       idioma: 'es',
     );
 
     final model = ConfiguracionModel(
-      id: 'cfg_001',
-      usuarioId: 'usr_001',
+      id: 601,
+      usuarioId: 101,
       notificacionesHabilitadas: true,
       idioma: 'es',
     );
@@ -53,15 +55,15 @@ void main() {
 
   group('AceptacionTerminosMapper', () {
     final aceptacion = AceptacionTerminos(
-      id: 'acc_001',
+      id: 1401,
       usuario: usuario,
       version: '1.0',
       fechaAceptacion: DateTime(2024, 1, 8),
     );
 
     final model = AceptacionTerminosModel(
-      id: 'acc_001',
-      usuarioId: 'usr_001',
+      id: 1401,
+      usuarioId: 101,
       version: '1.0',
       fechaAceptacion: '2024-01-08T00:00:00.000',
     );

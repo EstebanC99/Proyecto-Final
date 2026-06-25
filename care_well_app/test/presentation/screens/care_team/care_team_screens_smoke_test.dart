@@ -6,86 +6,98 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
 final _personaCarlos = Persona(
-  id: 'per_003',
+  id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
   email: 'carlos@test.com',
 );
 
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-
 AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
-  id: 'asi_003',
+  id: 403,
   personaCuidada: _personaAlicia,
   personaColaborador: _personaMaria,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
 );
 
 AsignacionCuidado _asignacionCarlos() => AsignacionCuidado(
-  id: 'asi_001',
+  id: 401,
   personaCuidada: _personaAlicia,
   personaColaborador: _personaCarlos,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
 );
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 // ─── Fake repositories ────────────────────────────────────────────────────────
 
 class _FakePersonaRepository implements PersonaRepository {
   @override
-  Future<Persona> getById(String id) async => _personaAlicia;
+  Future<Persona> getById(int id) async => _personaAlicia;
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) async => [
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [
     _personaAlicia,
   ];
 
   @override
-  Future<Persona> crear(Persona persona) async =>
-      persona.copyWith(id: 'per_new');
+  Future<Persona> crear(Persona persona) async => persona.copyWith(id: 10000);
 
   @override
   Future<Persona> actualizar(Persona persona) async => persona;
 
   @override
-  Future<void> eliminar(String id) async {}
+  Future<void> eliminar(int id) async {}
+}
+
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      [_asignacionMaria()];
+
+  @override
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+    List<int> permisosCuidadoIds = const [],
+  }) async {}
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
-  ) async => colaboradorId == 'per_001' ? [_asignacionMaria()] : [];
+    int colaboradorId,
+  ) async => colaboradorId == 1 ? [_asignacionMaria()] : [];
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => [_asignacionMaria(), _asignacionCarlos()];
 
   @override
@@ -96,13 +108,13 @@ class _FakeCareTeamRepository implements CareTeamRepository {
       a;
 
   @override
-  Future<void> eliminarAsignacion(String id) async {}
+  Future<void> eliminarAsignacion(int id) async {}
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResponsable];
+  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
 
   @override
-  Future<Rol> getRolById(String rolId) async => _rolResponsable;
+  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
 }
 
 Widget _wrap(Widget child) => ProviderScope(
@@ -113,6 +125,9 @@ Widget _wrap(Widget child) => ProviderScope(
             ..state = AsyncValue.data(_usuarioDemoMaria),
     ),
     personaRepositoryProvider.overrideWithValue(_FakePersonaRepository()),
+    asignacionCuidadoRepositoryProvider.overrideWithValue(
+      _FakeAsignacionCuidadoRepository(),
+    ),
     careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
   ],
   child: MaterialApp(home: child),
@@ -149,9 +164,7 @@ void main() {
     testWidgets('CareTeamMemberScreen con memberId existente monta sin crash', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        _wrap(const CareTeamMemberScreen(memberId: 'asi_003')),
-      );
+      await tester.pumpWidget(_wrap(const CareTeamMemberScreen(memberId: 403)));
       await tester.pump();
       await tester.pump();
       expect(find.byType(CareTeamMemberScreen), findsOneWidget);
@@ -161,7 +174,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(const CareTeamMemberScreen(memberId: 'asi_inexistente')),
+        _wrap(const CareTeamMemberScreen(memberId: 99999)),
       );
       await tester.pump();
       await tester.pump();
@@ -187,16 +200,15 @@ void main() {
       expect(find.text('Permisos asignados'), findsOneWidget);
     });
 
-    testWidgets(
-      'CareTeamFormScreen muestra todos los toggles de CodigoPermiso',
-      (tester) async {
-        await tester.pumpWidget(
-          _wrap(const CareTeamFormScreen(formType: CareTeamFormType.caregiver)),
-        );
-        await tester.pump();
-        // Debe haber un Switch por cada CodigoPermiso.
-        expect(find.byType(Switch), findsNWidgets(CodigoPermiso.values.length));
-      },
-    );
+    testWidgets('CareTeamFormScreen muestra todos los toggles de CodigoPermiso', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(const CareTeamFormScreen(formType: CareTeamFormType.caregiver)),
+      );
+      await tester.pump();
+      // Debe haber un Switch por cada permiso disponible (7 permisos en PermisosCuidadoConst).
+      expect(find.byType(Switch), findsNWidgets(7));
+    });
   });
 }

@@ -3,6 +3,7 @@ using CareWell.BusinessService.Auth;
 using CareWell.DataViews.Auth;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices.Auth;
+using CareWell.Domain.General;
 using CareWell.Queries.Auth;
 using CareWell.Repository.Auth;
 using Moq;
@@ -46,6 +47,19 @@ namespace CareWell.BusinessService.Test.Auth
                 this.usuario.Setup(s => s.ID).Returns(1);
                 this.usuario.Setup(s => s.NombreUsuario).Returns("USER1");
                 this.usuario.Setup(s => s.ContrasenaHash).Returns("HASH123");
+                this.usuario.Setup(s => s.Persona).Returns(Mock.Of<Persona>(p =>
+                    p.ID == 2 &&
+                    p.Nombre == "Persona" &&
+                    p.Apellido == "Random" &&
+                    p.Documento == "41565323" &&
+                    p.FechaNacimiento == DateTime.Now &&
+                    p.Email == "persona@mail.com" &&
+                    p.Telefono == "35123175"
+                ));
+                this.usuario.Setup(s => s.Estado).Returns(Mock.Of<EstadoUsuario>(e =>
+                    e.ID == 1 &&
+                    e.Descripcion == "Estado"
+                ));
 
                 this.usuarioRepository.Setup(s => s.GetByEmail(this.query.Email)).Returns(this.usuario.Object);
 
@@ -133,30 +147,6 @@ namespace CareWell.BusinessService.Test.Auth
             }
 
             [Fact]
-            public void Setea_el_ID_de_usuario_en_la_respuesta()
-            {
-                // Arrange
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.Equal(this.usuario.Object.ID, respuesta.UsuarioID);
-            }
-
-            [Fact]
-            public void Setea_el_nombre_de_usuario_en_la_respuesta()
-            {
-                // Arrange
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.Equal(this.usuario.Object.NombreUsuario, respuesta.Email);
-            }
-
-            [Fact]
             public void Setea_el_token_de_refresco_generado_en_la_respuesta()
             {
                 // Arrange
@@ -168,6 +158,150 @@ namespace CareWell.BusinessService.Test.Auth
 
                 // Assert
                 Assert.Equal(refreshToken, respuesta.RefreshToken);
+            }
+
+            [Fact]
+            public void Setea_el_ID_de_usuario_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.ID, respuesta.Usuario.ID);
+            }
+
+            [Fact]
+            public void Setea_el_nombre_de_usuario_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.NombreUsuario, respuesta.Usuario.NombreUsuario);
+            }
+
+            [Fact]
+            public void Setea_el_ID_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.ID, respuesta.Usuario.Persona.ID);
+            }
+
+            [Fact]
+            public void Setea_el_nombre_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.Nombre, respuesta.Usuario.Persona.Nombre);
+            }
+
+            [Fact]
+            public void Setea_el_apellido_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.Apellido, respuesta.Usuario.Persona.Apellido);
+            }
+
+            [Fact]
+            public void Setea_el_documento_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.Documento, respuesta.Usuario.Persona.Documento);
+            }
+
+            [Fact]
+            public void Setea_la_fecha_de_nacimiento_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.FechaNacimiento, respuesta.Usuario.Persona.FechaNacimiento);
+            }
+
+            [Fact]
+            public void Setea_el_email_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.Email, respuesta.Usuario.Persona.Email);
+            }
+
+            [Fact]
+            public void Setea_el_telefono_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.Telefono, respuesta.Usuario.Persona.Telefono);
+            }
+
+            [Fact]
+            public void Setea_la_imagen_de_la_persona_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Persona.ImagenPath, respuesta.Usuario.Persona.ImagenPath);
+            }
+
+            [Fact]
+            public void Setea_el_ID_del_estado_de_usuario_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Estado.ID, respuesta.Usuario.Estado.ID);
+            }
+
+            [Fact]
+            public void Setea_la_descripcion_del_estado_usuario_en_la_respuesta()
+            {
+                // Arrange
+
+                // Action
+                var respuesta = this.Action();
+
+                // Assert
+                Assert.Equal(this.usuario.Object.Estado.Descripcion, respuesta.Usuario.Estado.Descripcion);
             }
 
             [Fact]

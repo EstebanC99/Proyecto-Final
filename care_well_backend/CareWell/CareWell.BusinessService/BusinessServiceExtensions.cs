@@ -1,5 +1,7 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
+using CareWell.BusinessService.Abstractions.EquipoCuidado;
 using CareWell.BusinessService.Auth;
+using CareWell.BusinessService.EquipoCuidado;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.Factories;
@@ -26,8 +28,9 @@ namespace CareWell.BusinessService
             #region Business Services
 
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
+            services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
 
-            #endregion
+            #endregion 
 
             return services;
         }

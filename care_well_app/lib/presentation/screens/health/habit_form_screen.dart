@@ -15,14 +15,29 @@ class HabitFormScreen extends ConsumerStatefulWidget {
   const HabitFormScreen({super.key, this.habitId});
 
   /// ID del hábito a editar. Null indica modo creación.
-  final String? habitId;
+  final int? habitId;
 
   @override
   ConsumerState<HabitFormScreen> createState() => _HabitFormScreenState();
 }
 
 class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
-  TipoHabito _tipo = TipoHabito.alimentacion;
+  // Lista estática de tipos de hábito disponibles (reemplaza TipoHabito.values).
+  static final _tiposHabito = [
+    TipoHabito(
+      id: TiposHabitoConst.actividadFisica,
+      descripcion: 'Actividad física',
+    ),
+    TipoHabito(id: TiposHabitoConst.alimentacion, descripcion: 'Alimentación'),
+    TipoHabito(id: TiposHabitoConst.sueno, descripcion: 'Sueño'),
+    TipoHabito(id: TiposHabitoConst.hidratacion, descripcion: 'Hidratación'),
+    TipoHabito(id: TiposHabitoConst.otro, descripcion: 'Bienestar'),
+  ];
+
+  TipoHabito _tipo = TipoHabito(
+    id: TiposHabitoConst.alimentacion,
+    descripcion: 'Alimentación',
+  );
   final _descripcionCtrl = TextEditingController();
   DateTime _fecha = DateTime.now();
   bool _loading = false;
@@ -62,16 +77,16 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   }
 
   String get _placeholder {
-    switch (_tipo) {
-      case TipoHabito.actividadFisica:
+    switch (_tipo.id) {
+      case TiposHabitoConst.actividadFisica:
         return 'Ej. Caminata de 30 minutos por el parque.';
-      case TipoHabito.alimentacion:
+      case TiposHabitoConst.alimentacion:
         return 'Ej. Desayuno con avena, frutas y yogur.';
-      case TipoHabito.sueno:
+      case TiposHabitoConst.sueno:
         return 'Ej. Durmió 7 horas con pocas interrupciones.';
-      case TipoHabito.hidratacion:
+      case TiposHabitoConst.hidratacion:
         return 'Ej. Tomó 1,5 litros de agua durante el día.';
-      case TipoHabito.otro:
+      default:
         return 'Describí el hábito registrado...';
     }
   }
@@ -156,8 +171,8 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: TipoHabito.values.map((t) {
-                  final selected = t == _tipo;
+                children: _tiposHabito.map((t) {
+                  final selected = t.id == _tipo.id;
                   final label = _labelTipo(t);
                   return Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -281,20 +296,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     );
   }
 
-  static String _labelTipo(TipoHabito tipo) {
-    switch (tipo) {
-      case TipoHabito.actividadFisica:
-        return 'Ejercicio';
-      case TipoHabito.alimentacion:
-        return 'Alimentación';
-      case TipoHabito.sueno:
-        return 'Sueño';
-      case TipoHabito.hidratacion:
-        return 'Hidratación';
-      case TipoHabito.otro:
-        return 'Bienestar';
-    }
-  }
+  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
 }
 
 class _SectionLabel extends StatelessWidget {

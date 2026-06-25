@@ -7,7 +7,7 @@ class DemoEmergencyDatasource implements EmergencyDatasource {
   final List<Emergencia> _emergencias = [];
 
   /// Mapa de personaId → Persona para resolver referencias en demo.
-  final Map<String, Persona> _personasById = {
+  final Map<int, Persona> _personasById = {
     for (final p in [
       DemoSeed.personaMaria,
       DemoSeed.personaAlicia,
@@ -17,17 +17,18 @@ class DemoEmergencyDatasource implements EmergencyDatasource {
       p.id: p,
   };
 
+  int _nextId = 10000;
+
   @override
   Future<Emergencia> activarEmergencia({
-    required String personaId,
+    required int personaId,
     String? descripcion,
   }) async {
     await Future.delayed(Duration.zero);
     final persona = _personasById[personaId];
     if (persona == null) throw Exception('Persona no encontrada: $personaId');
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final emergencia = Emergencia(
-      id: 'emg_$ts',
+      id: _nextId++,
       persona: persona,
       fechaHora: DateTime.now(),
       atendida: false,
@@ -38,13 +39,13 @@ class DemoEmergencyDatasource implements EmergencyDatasource {
   }
 
   @override
-  Future<List<Emergencia>> getEmergenciasByPersona(String personaId) async {
+  Future<List<Emergencia>> getEmergenciasByPersona(int personaId) async {
     await Future.delayed(Duration.zero);
     return _emergencias.where((e) => e.persona.id == personaId).toList();
   }
 
   @override
-  Future<Emergencia> marcarAtendida(String emergenciaId) async {
+  Future<Emergencia> marcarAtendida(int emergenciaId) async {
     await Future.delayed(Duration.zero);
     final idx = _emergencias.indexWhere((e) => e.id == emergenciaId);
     if (idx < 0) throw Exception('Emergencia no encontrada: $emergenciaId');

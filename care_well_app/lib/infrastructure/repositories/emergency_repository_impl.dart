@@ -10,7 +10,7 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
 
   @override
   Future<Emergencia> activarEmergencia({
-    required String personaId,
+    required int personaId,
     String? descripcion,
   }) => _datasource.activarEmergencia(
     personaId: personaId,
@@ -18,10 +18,10 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
   );
 
   @override
-  Future<List<Emergencia>> getEmergenciasByPersona(String personaId) =>
+  Future<List<Emergencia>> getEmergenciasByPersona(int personaId) =>
       _datasource.getEmergenciasByPersona(personaId);
 
   @override
-  Future<Emergencia> marcarAtendida(String emergenciaId) =>
+  Future<Emergencia> marcarAtendida(int emergenciaId) =>
       _datasource.marcarAtendida(emergenciaId);
 }

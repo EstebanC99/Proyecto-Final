@@ -1,5 +1,6 @@
 import '../../../domain/datasources/datasources.dart';
 import '../../../domain/entities/entities.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import 'demo_seed.dart';
 
 /// Implementación demo (en memoria) de [AuthDatasource].
@@ -19,64 +20,60 @@ class DemoAuthDatasource implements AuthDatasource {
     DemoSeed.personaRoberto,
   ];
 
+  /// Contador para IDs autogenerados en la sesión demo.
+  int _nextId = 10000;
+
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) async {
+  Future<Usuario> login(String email, String contrasena) async {
     await Future.delayed(Duration.zero);
-    // DESVÍO MVP: el contrato usa nombreUsuario pero la UI envía email.
-    // Se acepta ambos hasta que el dominio unifique el identificador.
     final usuario = _usuarios
-        .where(
-          (u) =>
-              u.nombreUsuario == nombreUsuario ||
-              u.persona.email == nombreUsuario,
-        )
+        .where((u) => u.persona.email == email)
         .firstOrNull;
-    if (usuario == null || usuario.contrasenaHash != contrasena) {
-      throw Exception('Credenciales inválidas.');
+    if (usuario == null || usuario.contrasena != contrasena) {
+      throw const CredencialesInvalidasException();
     }
-    if (usuario.estado == EstadoUsuario.eliminado) {
-      throw Exception('La cuenta fue eliminada.');
+    if (usuario.estado.id == EstadosUsuarioConst.eliminado) {
+      throw const CredencialesInvalidasException();
     }
-    if (usuario.estado == EstadoUsuario.suspendido) {
-      throw Exception('La cuenta está suspendida.');
+    if (usuario.estado.id == EstadosUsuarioConst.suspendido) {
+      throw const CredencialesInvalidasException();
     }
     return usuario;
   }
 
   @override
-  Future<Usuario> register({
+  Future<void> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) async {
     await Future.delayed(Duration.zero);
-    final existeUsuario = _usuarios.any(
-      (u) => u.nombreUsuario == nombreUsuario,
-    );
-    if (existeUsuario) throw Exception('El nombre de usuario ya está en uso.');
     final existeEmail = _usuarios.any((u) => u.persona.email == email);
-    if (existeEmail) throw Exception('El email ya está registrado.');
+    if (existeEmail) throw const CuentaExistenteException();
 
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
+    final personaId = _nextId++;
     final persona = Persona(
-      id: 'per_$ts',
+      id: personaId,
       nombre: nombre,
       apellido: apellido,
+      documento: documento,
+      fechaNacimiento: fechaNacimiento,
       email: email,
+      telefono: telefono,
     );
     _personas.add(persona);
 
     final usuario = Usuario(
-      id: 'usr_$ts',
+      id: _nextId++,
       persona: persona,
-      nombreUsuario: nombreUsuario,
-      contrasenaHash: contrasena,
-      estado: EstadoUsuario.activo,
+      contrasena: contrasena,
+      estado: DemoSeed.estadoActivo,
     );
     _usuarios.add(usuario);
-    return usuario;
   }
 
   @override
@@ -92,39 +89,39 @@ class DemoAuthDatasource implements AuthDatasource {
   }
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {
+  Future<void> eliminarCuenta(int usuarioId) async {
     await Future.delayed(Duration.zero);
     final idx = _usuarios.indexWhere((u) => u.id == usuarioId);
-    if (idx < 0) throw Exception('Usuario no encontrado.');
+    if (idx < 0) throw const RecursoNoEncontradoException();
     // Baja lógica: reemplaza con estado eliminado.
-    _usuarios[idx] = _usuarios[idx].copyWith(estado: EstadoUsuario.eliminado);
+    _usuarios[idx] = _usuarios[idx].copyWith(estado: DemoSeed.estadoEliminado);
   }
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {
     await Future.delayed(Duration.zero);
     final idx = _usuarios.indexWhere((u) => u.id == usuarioId);
-    if (idx < 0) throw Exception('Usuario no encontrado.');
-    if (_usuarios[idx].contrasenaHash != contrasenaActual) {
-      throw Exception('La contraseña actual es incorrecta.');
+    if (idx < 0) throw const RecursoNoEncontradoException();
+    if (_usuarios[idx].contrasena != contrasenaActual) {
+      throw const CredencialesInvalidasException();
     }
-    _usuarios[idx] = _usuarios[idx].copyWith(contrasenaHash: contrasenaNueva);
+    _usuarios[idx] = _usuarios[idx].copyWith(contrasena: contrasenaNueva);
   }
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
   }) async {
     await Future.delayed(Duration.zero);
     final idx = _usuarios.indexWhere((u) => u.id == usuarioId);
-    if (idx < 0) throw Exception('Usuario no encontrado.');
+    if (idx < 0) throw const RecursoNoEncontradoException();
 
     final personaActual = _usuarios[idx].persona;
     final personaActualizada = personaActual.copyWith(
@@ -133,7 +130,7 @@ class DemoAuthDatasource implements AuthDatasource {
       documento: documento ?? personaActual.documento,
     );
 
-    // Actualizar en la lista de personas si existe (por id)
+    // Actualizar en la lista de personas si existe (por id).
     final personaIdx = _personas.indexWhere((p) => p.id == personaActual.id);
     if (personaIdx >= 0) {
       _personas[personaIdx] = personaActualizada;
@@ -146,40 +143,29 @@ class DemoAuthDatasource implements AuthDatasource {
     return usuarioActualizado;
   }
 
+  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async {
     await Future.delayed(Duration.zero);
-    // Verificar que no exista ya un usuario con ese nombreUsuario.
-    final existeUsuario = _usuarios.any(
-      (u) => u.nombreUsuario == nombreUsuario,
-    );
-    if (existeUsuario) throw Exception('El nombre de usuario ya está en uso.');
 
     // Buscar persona preexistente sin credenciales.
     final persona = _personas.where((p) => p.email == email).firstOrNull;
-    if (persona == null) {
-      throw Exception('Persona no encontrada. Verificá el email ingresado.');
-    }
+    if (persona == null) throw const RecursoNoEncontradoException();
 
     // Verificar que la persona no tenga ya un Usuario asociado.
     final yaTieneCredenciales = _usuarios.any(
       (u) => u.persona.id == persona.id,
     );
-    if (yaTieneCredenciales) {
-      throw Exception('Esta persona ya tiene credenciales creadas.');
-    }
+    if (yaTieneCredenciales) throw const CuentaExistenteException();
 
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final usuario = Usuario(
-      id: 'usr_$ts',
+      id: _nextId++,
       persona: persona,
-      nombreUsuario: nombreUsuario,
-      contrasenaHash: contrasena,
-      estado: EstadoUsuario.activo,
+      contrasena: contrasena,
+      estado: DemoSeed.estadoActivo,
     );
     _usuarios.add(usuario);
     return usuario;

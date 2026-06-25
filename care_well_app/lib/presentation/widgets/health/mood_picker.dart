@@ -124,20 +124,25 @@ Color moodLevelColor(int level) {
   return found?.color ?? AppColors.textDisabled;
 }
 
-/// Convierte un [EstadoAnimoEnum] a un nivel entero (1–5).
-int moodLevel(EstadoAnimoEnum e) => switch (e) {
-  EstadoAnimoEnum.muyMal => 1,
-  EstadoAnimoEnum.mal => 2,
-  EstadoAnimoEnum.regular => 3,
-  EstadoAnimoEnum.bien => 4,
-  EstadoAnimoEnum.muyBien => 5,
-};
+/// Convierte un [EstadoAnimo] a un nivel entero (1–5).
+///
+/// El [id] de la entidad catálogo coincide con el nivel numérico.
+int moodLevel(EstadoAnimo e) => e.id;
 
-/// Convierte un [EstadoAnimoEnum] al emoji correspondiente.
-String moodEmoji(EstadoAnimoEnum e) => switch (e) {
-  EstadoAnimoEnum.muyMal => '😢',
-  EstadoAnimoEnum.mal => '😕',
-  EstadoAnimoEnum.regular => '😐',
-  EstadoAnimoEnum.bien => '🙂',
-  EstadoAnimoEnum.muyBien => '😄',
-};
+/// Convierte un [EstadoAnimo] al emoji correspondiente.
+String moodEmoji(EstadoAnimo e) {
+  switch (e.id) {
+    case EstadosAnimoConst.muyMal:
+      return '😢';
+    case EstadosAnimoConst.mal:
+      return '😕';
+    case EstadosAnimoConst.regular:
+      return '😐';
+    case EstadosAnimoConst.bien:
+      return '🙂';
+    case EstadosAnimoConst.muyBien:
+      return '😄';
+    default:
+      return '😐';
+  }
+}

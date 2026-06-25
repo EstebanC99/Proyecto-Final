@@ -11,7 +11,7 @@ class HealthEventFormScreen extends ConsumerStatefulWidget {
   const HealthEventFormScreen({super.key, this.eventId});
 
   /// Si no es null, se muestra como edición (futuro MVP).
-  final String? eventId;
+  final int? eventId;
 
   @override
   ConsumerState<HealthEventFormScreen> createState() =>
@@ -19,7 +19,42 @@ class HealthEventFormScreen extends ConsumerStatefulWidget {
 }
 
 class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
-  TipoEventoSalud _tipo = TipoEventoSalud.citaMedica;
+  // Lista estática de tipos de evento de salud (reemplaza TipoEventoSalud.values).
+  static final _tiposEvento = [
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.citaMedica,
+      descripcion: 'Cita médica',
+    ),
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.hospitalizacion,
+      descripcion: 'Hospitalización',
+    ),
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.medicacion,
+      descripcion: 'Medicación',
+    ),
+    TipoEventoSalud(id: TiposEventoSaludConst.cirugia, descripcion: 'Cirugía'),
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.tratamiento,
+      descripcion: 'Tratamiento',
+    ),
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.bienestar,
+      descripcion: 'Bienestar',
+    ),
+    TipoEventoSalud(id: TiposEventoSaludConst.sintoma, descripcion: 'Síntoma'),
+    TipoEventoSalud(
+      id: TiposEventoSaludConst.diagnostico,
+      descripcion: 'Diagnóstico',
+    ),
+    TipoEventoSalud(id: TiposEventoSaludConst.vacuna, descripcion: 'Vacuna'),
+    TipoEventoSalud(id: TiposEventoSaludConst.otro, descripcion: 'Otro'),
+  ];
+
+  TipoEventoSalud _tipo = TipoEventoSalud(
+    id: TiposEventoSaludConst.citaMedica,
+    descripcion: 'Cita médica',
+  );
   final _descripcionCtrl = TextEditingController();
   DateTime _fecha = DateTime.now();
   bool _loading = false;
@@ -99,8 +134,8 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: TipoEventoSalud.values.map((t) {
-                  final selected = t == _tipo;
+                children: _tiposEvento.map((t) {
+                  final selected = t.id == _tipo.id;
                   return Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.sm),
                     child: ChoiceChip(
@@ -222,30 +257,7 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
     );
   }
 
-  static String _labelTipo(TipoEventoSalud tipo) {
-    switch (tipo) {
-      case TipoEventoSalud.citaMedica:
-        return 'Cita médica';
-      case TipoEventoSalud.hospitalizacion:
-        return 'Hospitalización';
-      case TipoEventoSalud.medicacion:
-        return 'Medicación';
-      case TipoEventoSalud.cirugia:
-        return 'Cirugía';
-      case TipoEventoSalud.tratamiento:
-        return 'Tratamiento';
-      case TipoEventoSalud.bienestar:
-        return 'Bienestar';
-      case TipoEventoSalud.sintoma:
-        return 'Síntoma';
-      case TipoEventoSalud.diagnostico:
-        return 'Diagnóstico';
-      case TipoEventoSalud.vacuna:
-        return 'Vacuna';
-      case TipoEventoSalud.otro:
-        return 'Otro';
-    }
-  }
+  static String _labelTipo(TipoEventoSalud tipo) => tipo.descripcion;
 }
 
 class _SectionLabel extends StatelessWidget {

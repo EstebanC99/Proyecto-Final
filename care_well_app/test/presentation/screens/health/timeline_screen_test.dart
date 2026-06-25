@@ -7,16 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+import '../../../_fakes/test_fixtures.dart';
 
-EventoDeSalud _evento(String id, DateTime fecha) => EventoDeSalud(
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+
+EventoDeSalud _evento(int id, DateTime fecha) => EventoDeSalud(
   id: id,
   persona: _personaAlicia,
-  tipo: TipoEventoSalud.citaMedica,
+  tipo: tipoEventoSaludCitaMedica,
   fecha: fecha,
   descripcion: 'Descripción $id',
 );
@@ -29,8 +27,8 @@ Widget _wrap({List<EventoDeSalud>? eventos}) {
         (ref) async =>
             eventos ??
             [
-              _evento('e2', DateTime(2026, 6, 1)),
-              _evento('e1', DateTime(2026, 3, 1)),
+              _evento(1102, DateTime(2026, 6, 1)),
+              _evento(1101, DateTime(2026, 3, 1)),
             ],
       ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),

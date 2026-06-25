@@ -2,8 +2,8 @@ import 'dart:convert';
 
 /// DTO de [Configuracion] para serialización JSON.
 class ConfiguracionModel {
-  final String id;
-  final String usuarioId;
+  final int id;
+  final int usuarioId;
   final bool notificacionesHabilitadas;
   final String idioma;
 
@@ -16,8 +16,8 @@ class ConfiguracionModel {
 
   factory ConfiguracionModel.fromJson(Map<String, dynamic> json) {
     return ConfiguracionModel(
-      id: json['id'] as String,
-      usuarioId: json['usuarioId'] as String,
+      id: json['id'] as int,
+      usuarioId: json['usuarioId'] as int,
       notificacionesHabilitadas:
           (json['notificacionesHabilitadas'] as bool?) ?? true,
       idioma: (json['idioma'] as String?) ?? 'es',
@@ -41,8 +41,8 @@ class ConfiguracionModel {
 
 /// DTO de [AceptacionTerminos] para serialización JSON.
 class AceptacionTerminosModel {
-  final String id;
-  final String usuarioId;
+  final int id;
+  final int usuarioId;
   final String version;
   final String fechaAceptacion;
 
@@ -55,8 +55,8 @@ class AceptacionTerminosModel {
 
   factory AceptacionTerminosModel.fromJson(Map<String, dynamic> json) {
     return AceptacionTerminosModel(
-      id: json['id'] as String,
-      usuarioId: json['usuarioId'] as String,
+      id: json['id'] as int,
+      usuarioId: json['usuarioId'] as int,
       version: json['version'] as String,
       fechaAceptacion: json['fechaAceptacion'] as String,
     );

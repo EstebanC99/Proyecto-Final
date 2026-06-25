@@ -17,7 +17,7 @@ GO
 
 ------------------------ EstadoUsuario -----------------------------------
 SET IDENTITY_INSERT t_EstadoUsuario ON;
-INSERT INTO t_EstadoUsuario (ID_Estado, Descripcion) VALUES
+INSERT INTO t_EstadoUsuario (ID_EstadoUsuario, Descripcion) VALUES
 (1, 'Activo'),
 (2, 'Suspendido'),
 (3, 'Eliminado');
@@ -51,7 +51,7 @@ GO
 
 -------------------------- RolCuidado ------------------------------------
 SET IDENTITY_INSERT t_RolCuidado ON;
-INSERT INTO t_RolCuidado (ID_TipoRolCuidado, Descripcion) VALUES
+INSERT INTO t_RolCuidado (ID_RolCuidado, Descripcion) VALUES
 (1, 'Responsable'),
 (2, 'Cuidador');
 SET IDENTITY_INSERT t_RolCuidado OFF;

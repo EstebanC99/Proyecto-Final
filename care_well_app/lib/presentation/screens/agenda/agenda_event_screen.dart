@@ -21,7 +21,7 @@ import '../../widgets/shared/success_view.dart';
 class AgendaEventScreen extends ConsumerStatefulWidget {
   const AgendaEventScreen({super.key, this.eventId});
 
-  final String? eventId;
+  final int? eventId;
 
   @override
   ConsumerState<AgendaEventScreen> createState() => _AgendaEventScreenState();

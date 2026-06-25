@@ -20,7 +20,7 @@ import '../../widgets/widgets.dart';
 class DependentFormScreen extends ConsumerStatefulWidget {
   const DependentFormScreen({super.key, this.dependentId});
 
-  final String? dependentId;
+  final int? dependentId;
 
   @override
   ConsumerState<DependentFormScreen> createState() =>
@@ -34,11 +34,13 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
   final _apellidoController = TextEditingController();
   final _dniController = TextEditingController();
   final _emailController = TextEditingController();
+  final _telefonoController = TextEditingController();
 
   String? _nombreError;
   String? _apellidoError;
   String? _dniError;
   String? _emailError;
+  String? _telefonoError;
 
   DateTime? _fechaNacimiento;
   bool _tcAceptado = false;
@@ -55,6 +57,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
     _apellidoController.dispose();
     _dniController.dispose();
     _emailController.dispose();
+    _telefonoController.dispose();
     super.dispose();
   }
 
@@ -96,6 +99,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
       _apellidoError = apellidoErr;
       _dniError = dniErr;
       _emailError = emailErr;
+      _telefonoError = null;
     });
 
     if (fechaErr != null) {
@@ -125,6 +129,9 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
         email: _emailController.text.trim().isEmpty
             ? null
             : _emailController.text.trim(),
+        telefono: _telefonoController.text.trim().isEmpty
+            ? null
+            : _telefonoController.text.trim(),
       );
 
       if (!mounted) return;
@@ -155,12 +162,14 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
       _apellidoController.clear();
       _dniController.clear();
       _emailController.clear();
+      _telefonoController.clear();
       _fechaNacimiento = null;
       _tcAceptado = false;
       _nombreError = null;
       _apellidoError = null;
       _dniError = null;
       _emailError = null;
+      _telefonoError = null;
     });
   }
 
@@ -339,9 +348,26 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
                 prefixIcon: const Icon(Icons.email_outlined, size: 20),
                 keyboardType: TextInputType.emailAddress,
                 autocorrect: false,
-                textInputAction: TextInputAction.done,
+                textInputAction: TextInputAction.next,
                 onChanged: (_) {
                   if (_emailError != null) setState(() => _emailError = null);
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // Campo Teléfono (opcional)
+              AppTextField(
+                label: 'Teléfono (opcional)',
+                hint: '+54 9 11 1234 5678',
+                controller: _telefonoController,
+                errorText: _telefonoError,
+                prefixIcon: const Icon(Icons.phone_outlined, size: 20),
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                onChanged: (_) {
+                  if (_telefonoError != null) {
+                    setState(() => _telefonoError = null);
+                  }
                 },
               ),
               const SizedBox(height: AppSpacing.xl),

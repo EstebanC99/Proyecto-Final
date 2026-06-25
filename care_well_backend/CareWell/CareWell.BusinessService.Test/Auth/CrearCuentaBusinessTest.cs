@@ -5,7 +5,7 @@ using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.Factories;
 using CareWell.Domain.General;
-using CareWell.Domain.ValueObjects.Auth;
+using CareWell.Domain.ValueObjects.General;
 using CareWell.Repository.Auth;
 using CareWell.Repository.General;
 using Moq;
@@ -83,7 +83,7 @@ namespace CareWell.BusinessService.Test.Auth
                 this.Action();
 
                 // Assert
-                this.persona.Verify(v => v.Crear(It.IsAny<CrearCuenta>()), Times.Once);
+                this.persona.Verify(v => v.Crear(It.IsAny<CrearPersona>()), Times.Once);
             }
 
             [Fact]

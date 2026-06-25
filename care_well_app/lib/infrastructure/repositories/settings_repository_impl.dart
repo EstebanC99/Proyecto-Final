@@ -9,7 +9,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
   const SettingsRepositoryImpl(this._datasource);
 
   @override
-  Future<Configuracion> getConfiguracion(String usuarioId) =>
+  Future<Configuracion> getConfiguracion(int usuarioId) =>
       _datasource.getConfiguracion(usuarioId);
 
   @override
@@ -17,12 +17,12 @@ class SettingsRepositoryImpl implements SettingsRepository {
       _datasource.guardarConfiguracion(configuracion);
 
   @override
-  Future<List<AceptacionTerminos>> getAceptaciones(String usuarioId) =>
+  Future<List<AceptacionTerminos>> getAceptaciones(int usuarioId) =>
       _datasource.getAceptaciones(usuarioId);
 
   @override
   Future<AceptacionTerminos> aceptarTerminos({
-    required String usuarioId,
+    required int usuarioId,
     required String version,
   }) => _datasource.aceptarTerminos(usuarioId: usuarioId, version: version);
 }

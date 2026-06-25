@@ -29,20 +29,33 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
     super.dispose();
   }
 
-  EstadoAnimoEnum _levelToEnum(int level) {
+  /// Convierte un nivel entero (1–5) a la entidad catálogo [EstadoAnimo].
+  EstadoAnimo _levelToEstado(int level) {
     switch (level) {
-      case 1:
-        return EstadoAnimoEnum.muyMal;
-      case 2:
-        return EstadoAnimoEnum.mal;
-      case 3:
-        return EstadoAnimoEnum.regular;
-      case 4:
-        return EstadoAnimoEnum.bien;
-      case 5:
-        return EstadoAnimoEnum.muyBien;
+      case EstadosAnimoConst.muyMal:
+        return EstadoAnimo(
+          id: EstadosAnimoConst.muyMal,
+          descripcion: 'Muy mal',
+        );
+      case EstadosAnimoConst.mal:
+        return EstadoAnimo(id: EstadosAnimoConst.mal, descripcion: 'Mal');
+      case EstadosAnimoConst.regular:
+        return EstadoAnimo(
+          id: EstadosAnimoConst.regular,
+          descripcion: 'Regular',
+        );
+      case EstadosAnimoConst.bien:
+        return EstadoAnimo(id: EstadosAnimoConst.bien, descripcion: 'Bien');
+      case EstadosAnimoConst.muyBien:
+        return EstadoAnimo(
+          id: EstadosAnimoConst.muyBien,
+          descripcion: 'Muy bien',
+        );
       default:
-        return EstadoAnimoEnum.regular;
+        return EstadoAnimo(
+          id: EstadosAnimoConst.regular,
+          descripcion: 'Regular',
+        );
     }
   }
 
@@ -57,7 +70,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
     });
     try {
       await ref.read(registrarAnimoProvider)(
-        estado: _levelToEnum(_selectedLevel!),
+        estado: _levelToEstado(_selectedLevel!),
         observaciones: _observacionesCtrl.text.trim().isEmpty
             ? null
             : _observacionesCtrl.text.trim(),

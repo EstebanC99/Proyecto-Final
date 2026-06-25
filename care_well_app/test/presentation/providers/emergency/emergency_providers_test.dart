@@ -5,55 +5,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/fake_notification_scheduler.dart';
+import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
-final _personaMaria = Persona(
-  id: 'per_001',
-  nombre: 'María',
-  apellido: 'García',
-);
+final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
 
-final _personaCarlos = Persona(
-  id: 'per_003',
-  nombre: 'Carlos',
-  apellido: 'Pérez',
-);
-
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
+final _personaCarlos = Persona(id: 3, nombre: 'Carlos', apellido: 'Pérez');
 
 final _permisosEmergencia = [
-  const Permiso(
-    id: 'prm_006',
-    codigo: CodigoPermiso.activarEmergencia,
+  Permiso(
+    id: 306,
+    codigo: codigoActivarEmergencia,
     descripcion: 'Activar emergencia',
   ),
 ];
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 AsignacionCuidado _asignacion(
-  String id,
+  int id,
   Persona colaborador, {
-  Rol? rol,
+  RolCuidado? rol,
   List<Permiso>? permisos,
 }) => AsignacionCuidado(
   id: id,
   personaCuidada: _personaAlicia,
   personaColaborador: colaborador,
-  rol: rol ?? _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rol ?? rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
   permisos: permisos ?? _permisosEmergencia,
 );
@@ -67,14 +54,14 @@ class _FakeCareTeamRepository implements CareTeamRepository {
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => _asignaciones
       .where((a) => a.personaCuidada.id == personaCuidadaId)
       .toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async => _asignaciones
       .where((a) => a.personaColaborador.id == colaboradorId)
       .toList();
@@ -87,25 +74,26 @@ class _FakeCareTeamRepository implements CareTeamRepository {
       a;
 
   @override
-  Future<void> eliminarAsignacion(String id) async {}
+  Future<void> eliminarAsignacion(int id) async {}
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResponsable];
+  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
 
   @override
-  Future<Rol> getRolById(String rolId) async => _rolResponsable;
+  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
 }
 
 class _FakeEmergencyRepository implements EmergencyRepository {
   final List<Emergencia> _emergencias = [];
+  int _nextId = 10000;
 
   @override
   Future<Emergencia> activarEmergencia({
-    required String personaId,
+    required int personaId,
     String? descripcion,
   }) async {
     final emg = Emergencia(
-      id: 'emg_test_${_emergencias.length}',
+      id: _nextId++,
       persona: _personaAlicia,
       fechaHora: DateTime.now(),
     );
@@ -114,11 +102,11 @@ class _FakeEmergencyRepository implements EmergencyRepository {
   }
 
   @override
-  Future<List<Emergencia>> getEmergenciasByPersona(String personaId) async =>
+  Future<List<Emergencia>> getEmergenciasByPersona(int personaId) async =>
       _emergencias.where((e) => e.persona.id == personaId).toList();
 
   @override
-  Future<Emergencia> marcarAtendida(String emergenciaId) async =>
+  Future<Emergencia> marcarAtendida(int emergenciaId) async =>
       _emergencias.firstWhere((e) => e.id == emergenciaId);
 }
 
@@ -155,14 +143,14 @@ void main() {
     group('equipoEmergenciaProvider', () {
       test('retorna solo asignaciones activas', () async {
         final asignaciones = [
-          _asignacion('asi_001', _personaMaria),
-          _asignacion('asi_002', _personaCarlos),
+          _asignacion(401, _personaMaria),
+          _asignacion(402, _personaCarlos),
           AsignacionCuidado(
-            id: 'asi_inac',
+            id: 403,
             personaCuidada: _personaAlicia,
             personaColaborador: _personaCarlos,
-            rol: _rolResponsable,
-            estado: EstadoAsignacion.inactiva,
+            rol: rolCuidadoResponsable,
+            estado: estadoAsignacionInactiva,
             fechaAlta: DateTime.now(),
           ),
         ];
@@ -176,7 +164,7 @@ void main() {
         final equipo = await container.read(equipoEmergenciaProvider.future);
         expect(equipo.length, 2);
         expect(
-          equipo.every((a) => a.estado == EstadoAsignacion.activa),
+          equipo.every((a) => a.estado.id == EstadosAsignacionConst.activa),
           isTrue,
         );
       });
@@ -187,8 +175,8 @@ void main() {
         'llama showImmediateNotification una vez por miembro del equipo',
         () async {
           final miembros = [
-            _asignacion('asi_001', _personaMaria),
-            _asignacion('asi_002', _personaCarlos),
+            _asignacion(401, _personaMaria),
+            _asignacion(402, _personaCarlos),
           ];
           final scheduler = FakeNotificationScheduler();
           final container = _makeContainer(
@@ -211,7 +199,7 @@ void main() {
       test('registra la emergencia en el repositorio', () async {
         final scheduler = FakeNotificationScheduler();
         final container = _makeContainer(
-          asignaciones: [_asignacion('asi_001', _personaMaria)],
+          asignaciones: [_asignacion(401, _personaMaria)],
           scheduler: scheduler,
         );
         addTearDown(container.dispose);
@@ -219,7 +207,7 @@ void main() {
         await container.read(equipoEmergenciaProvider.future);
         final emergencia = await container.read(activarEmergenciaProvider)();
 
-        expect(emergencia.id, isNotEmpty);
+        expect(emergencia.id, greaterThan(0));
         expect(emergencia.persona.id, _personaAlicia.id);
       });
     });
@@ -228,7 +216,7 @@ void main() {
       test('retorna true con permiso activarEmergencia', () async {
         final scheduler = FakeNotificationScheduler();
         final container = _makeContainer(
-          asignaciones: [_asignacion('asi_001', _personaMaria)],
+          asignaciones: [_asignacion(401, _personaMaria)],
           scheduler: scheduler,
         );
         addTearDown(container.dispose);
@@ -242,8 +230,6 @@ void main() {
       test(
         'retorna false sin asignación para persona ajena (Alicia)',
         () async {
-          // El helper _makeContainer fija el contexto a Alicia, por lo tanto
-          // esContextoPropio = false y sin asignaciones → false.
           final scheduler = FakeNotificationScheduler();
           final container = _makeContainer(
             asignaciones: [],

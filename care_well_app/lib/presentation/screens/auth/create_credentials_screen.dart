@@ -6,6 +6,7 @@ import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -26,17 +27,14 @@ class CreateCredentialsScreen extends ConsumerStatefulWidget {
 class _CreateCredentialsScreenState
     extends ConsumerState<CreateCredentialsScreen> {
   final _emailController = TextEditingController();
-  final _usuarioController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
   final _emailFocus = FocusNode();
-  final _usuarioFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _confirmFocus = FocusNode();
 
   String? _emailError;
-  String? _usuarioError;
   String? _passwordError;
   String? _confirmError;
   String? _generalError;
@@ -49,11 +47,9 @@ class _CreateCredentialsScreenState
   @override
   void dispose() {
     _emailController.dispose();
-    _usuarioController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     _emailFocus.dispose();
-    _usuarioFocus.dispose();
     _passwordFocus.dispose();
     _confirmFocus.dispose();
     super.dispose();
@@ -61,7 +57,6 @@ class _CreateCredentialsScreenState
 
   bool _validate() {
     final emailErr = validateEmail(_emailController.text);
-    final usuarioErr = validateNombreUsuario(_usuarioController.text);
     final passErr = validatePassword(_passwordController.text);
     final confirmErr = validatePasswordMatch(
       _confirmController.text,
@@ -72,14 +67,12 @@ class _CreateCredentialsScreenState
         : 'Tenés que aceptar los Términos y Condiciones.';
     setState(() {
       _emailError = emailErr;
-      _usuarioError = usuarioErr;
       _passwordError = passErr;
       _confirmError = confirmErr;
       _tcError = tcErr;
       _generalError = null;
     });
     return emailErr == null &&
-        usuarioErr == null &&
         passErr == null &&
         confirmErr == null &&
         tcErr == null;
@@ -94,7 +87,6 @@ class _CreateCredentialsScreenState
         .read(authStateProvider.notifier)
         .crearCredenciales(
           email: _emailController.text.trim(),
-          nombreUsuario: _usuarioController.text.trim(),
           contrasena: _passwordController.text,
         );
 
@@ -112,20 +104,20 @@ class _CreateCredentialsScreenState
         context.goNamed(AppRoutes.loginName);
       },
       error: (error, _) {
-        final msg = error.toString();
         // Acá sí se puede ser específico: no es un flujo de seguridad.
-        if (msg.toLowerCase().contains('no encontrada')) {
+        if (error is RecursoNoEncontradoException) {
           setState(
             () => _emailError = 'No encontramos ningún perfil con ese email.',
           );
-        } else if (msg.toLowerCase().contains('ya tiene credenciales')) {
+        } else if (error is CuentaExistenteException) {
           setState(
             () => _emailError =
                 'Esta persona ya tiene credenciales. Podés ir al inicio de sesión.',
           );
-        } else if (msg.toLowerCase().contains('nombre de usuario')) {
+        } else if (error is SinConexionException) {
           setState(
-            () => _usuarioError = 'El nombre de usuario ya está en uso.',
+            () => _generalError =
+                'Sin conexión. Verificá tu red e intentá de nuevo.',
           );
         } else {
           setState(
@@ -202,29 +194,9 @@ class _CreateCredentialsScreenState
                 prefixIcon: const Icon(Icons.mail_outline, size: 20),
                 textInputAction: TextInputAction.next,
                 onSubmitted: (_) =>
-                    FocusScope.of(context).requestFocus(_usuarioFocus),
-                onChanged: (_) {
-                  if (_emailError != null) setState(() => _emailError = null);
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Nombre de usuario
-              AppTextField(
-                label: 'Nombre de usuario',
-                hint: 'Ej. maria.garcia',
-                controller: _usuarioController,
-                errorText: _usuarioError,
-                focusNode: _usuarioFocus,
-                autocorrect: false,
-                prefixIcon: const Icon(Icons.alternate_email, size: 20),
-                textInputAction: TextInputAction.next,
-                onSubmitted: (_) =>
                     FocusScope.of(context).requestFocus(_passwordFocus),
                 onChanged: (_) {
-                  if (_usuarioError != null) {
-                    setState(() => _usuarioError = null);
-                  }
+                  if (_emailError != null) setState(() => _emailError = null);
                 },
               ),
               const SizedBox(height: AppSpacing.lg),

@@ -1,15 +1,31 @@
 import 'dart:convert';
 
+/// DTO del catálogo [TipoEventoAgenda] para serialización JSON.
+class TipoEventoAgendaModel {
+  final int id;
+  final String descripcion;
+
+  const TipoEventoAgendaModel({required this.id, required this.descripcion});
+
+  factory TipoEventoAgendaModel.fromJson(Map<String, dynamic> json) =>
+      TipoEventoAgendaModel(
+        id: json['id'] as int,
+        descripcion: json['descripcion'] as String,
+      );
+
+  Map<String, dynamic> toJson() => {'id': id, 'descripcion': descripcion};
+}
+
 /// DTO de [EventoAgenda] para serialización JSON.
 class EventoAgendaModel {
-  final String id;
-  final String personaId;
-  final String creadoPorId;
+  final int id;
+  final int personaId;
+  final int creadoPorId;
   final String titulo;
   final String? descripcion;
 
-  /// Tipo: 'citaMedica', 'medicacion', 'rehabilitacion', 'control', 'otro'.
-  final String tipo;
+  /// Tipo como objeto catálogo.
+  final TipoEventoAgendaModel tipo;
   final String fechaHoraInicio;
   final String? fechaHoraFin;
 
@@ -26,12 +42,14 @@ class EventoAgendaModel {
 
   factory EventoAgendaModel.fromJson(Map<String, dynamic> json) {
     return EventoAgendaModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
-      creadoPorId: json['creadoPorId'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
+      creadoPorId: json['creadoPorId'] as int,
       titulo: json['titulo'] as String,
       descripcion: json['descripcion'] as String?,
-      tipo: json['tipo'] as String,
+      tipo: TipoEventoAgendaModel.fromJson(
+        json['tipo'] as Map<String, dynamic>,
+      ),
       fechaHoraInicio: json['fechaHoraInicio'] as String,
       fechaHoraFin: json['fechaHoraFin'] as String?,
     );
@@ -44,7 +62,7 @@ class EventoAgendaModel {
       'creadoPorId': creadoPorId,
       'titulo': titulo,
       if (descripcion != null) 'descripcion': descripcion,
-      'tipo': tipo,
+      'tipo': tipo.toJson(),
       'fechaHoraInicio': fechaHoraInicio,
       if (fechaHoraFin != null) 'fechaHoraFin': fechaHoraFin,
     };
@@ -58,8 +76,8 @@ class EventoAgendaModel {
 
 /// DTO de [Recordatorio] para serialización JSON.
 class RecordatorioModel {
-  final String id;
-  final String eventoAgendaId;
+  final int id;
+  final int eventoAgendaId;
   final String fechaHoraEnvio;
   final bool enviado;
 
@@ -72,8 +90,8 @@ class RecordatorioModel {
 
   factory RecordatorioModel.fromJson(Map<String, dynamic> json) {
     return RecordatorioModel(
-      id: json['id'] as String,
-      eventoAgendaId: json['eventoAgendaId'] as String,
+      id: json['id'] as int,
+      eventoAgendaId: json['eventoAgendaId'] as int,
       fechaHoraEnvio: json['fechaHoraEnvio'] as String,
       enviado: (json['enviado'] as bool?) ?? false,
     );

@@ -7,43 +7,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/fake_notification_scheduler.dart';
+import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
-final _personaMaria = Persona(
-  id: 'per_001',
-  nombre: 'María',
-  apellido: 'García',
-);
+final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 EventoAgenda _eventoFuturo() => EventoAgenda(
-  id: 'evt_fut',
+  id: 701,
   persona: _personaAlicia,
   creadoPor: _usuarioDemoMaria,
   titulo: 'Consulta cardiológica',
-  tipo: TipoEventoAgenda.citaMedica,
+  tipo: tipoEventoAgendaCitaMedica,
   fechaHoraInicio: DateTime(2099, 12, 31, 10, 0),
 );
 
 EventoAgenda _eventoVencido() => EventoAgenda(
-  id: 'evt_vec',
+  id: 704,
   persona: _personaAlicia,
   creadoPor: _usuarioDemoMaria,
   titulo: 'Control de glucemia',
-  tipo: TipoEventoAgenda.control,
+  tipo: tipoEventoAgendaControl,
   fechaHoraInicio: DateTime(2000, 1, 1, 9, 0),
 );
 

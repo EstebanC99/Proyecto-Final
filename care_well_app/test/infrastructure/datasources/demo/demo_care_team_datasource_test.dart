@@ -3,6 +3,8 @@ import 'package:care_well_app/infrastructure/datasources/demo/demo_care_team_dat
 import 'package:care_well_app/infrastructure/datasources/demo/demo_seed.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 void main() {
   group('DemoCareTeamDatasource', () {
     late DemoCareTeamDatasource datasource;
@@ -22,9 +24,7 @@ void main() {
       });
 
       test('retorna lista vacía para ID inexistente', () async {
-        final result = await datasource.getAsignacionesByPersonaCuidada(
-          'no_existe',
-        );
+        final result = await datasource.getAsignacionesByPersonaCuidada(99999);
         expect(result, isEmpty);
       });
     });
@@ -51,26 +51,23 @@ void main() {
       });
 
       test('retorna lista vacía para colaborador sin asignaciones', () async {
-        final result = await datasource.getAsignacionesByColaborador(
-          'per_inexistente',
-        );
+        final result = await datasource.getAsignacionesByColaborador(99999);
         expect(result, isEmpty);
       });
     });
 
     group('crearAsignacion', () {
-      test('agrega la asignación y genera un nuevo ID', () async {
+      test('agrega la asignación y genera un nuevo ID mayor a 0', () async {
         final nueva = AsignacionCuidado(
-          id: '',
+          id: 0,
           personaCuidada: DemoSeed.personaAlicia,
           personaColaborador: DemoSeed.personaRoberto,
-          rol: DemoSeed.rolCuidador,
-          estado: EstadoAsignacion.activa,
+          rol: DemoSeed.rolCuidadoCuidador,
+          estado: estadoAsignacionActiva,
           fechaAlta: DateTime(2026, 1, 1),
         );
         final creada = await datasource.crearAsignacion(nueva);
-        expect(creada.id, isNotEmpty);
-        expect(creada.id, startsWith('asi_'));
+        expect(creada.id, greaterThan(0));
 
         final lista = await datasource.getAsignacionesByPersonaCuidada(
           DemoSeed.personaAliciaId,
@@ -88,19 +85,19 @@ void main() {
 
         final asignacion = original.first;
         final actualizada = asignacion.copyWith(
-          estado: EstadoAsignacion.inactiva,
+          estado: estadoAsignacionInactiva,
         );
         final resultado = await datasource.actualizarAsignacion(actualizada);
-        expect(resultado.estado, EstadoAsignacion.inactiva);
+        expect(resultado.estado.id, EstadosAsignacionConst.inactiva);
       });
 
       test('lanza excepción si no existe', () async {
         final falsa = AsignacionCuidado(
-          id: 'asi_inexistente',
+          id: 99999,
           personaCuidada: DemoSeed.personaAlicia,
           personaColaborador: DemoSeed.personaCarlos,
-          rol: DemoSeed.rolResponsable,
-          estado: EstadoAsignacion.activa,
+          rol: DemoSeed.rolCuidadoResponsable,
+          estado: estadoAsignacionActiva,
           fechaAlta: DateTime.now(),
         );
         expect(() => datasource.actualizarAsignacion(falsa), throwsException);
@@ -111,11 +108,11 @@ void main() {
       test('elimina la asignación correctamente', () async {
         final nueva = await datasource.crearAsignacion(
           AsignacionCuidado(
-            id: '',
+            id: 0,
             personaCuidada: DemoSeed.personaAlicia,
             personaColaborador: DemoSeed.personaLaura,
-            rol: DemoSeed.rolCuidador,
-            estado: EstadoAsignacion.activa,
+            rol: DemoSeed.rolCuidadoCuidador,
+            estado: estadoAsignacionActiva,
             fechaAlta: DateTime.now(),
           ),
         );
@@ -128,10 +125,7 @@ void main() {
       });
 
       test('lanza excepción si el ID no existe', () async {
-        expect(
-          () => datasource.eliminarAsignacion('asi_inexistente'),
-          throwsException,
-        );
+        expect(() => datasource.eliminarAsignacion(99999), throwsException);
       });
     });
   });

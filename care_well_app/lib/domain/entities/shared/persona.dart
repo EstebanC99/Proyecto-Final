@@ -36,7 +36,7 @@ class Persona extends BaseEntity {
 
   @override
   Persona copyWith({
-    String? id,
+    int? id,
     String? nombre,
     String? apellido,
     String? documento,

@@ -22,7 +22,7 @@ class RecomendacionMedica extends BaseEntity {
 
   @override
   RecomendacionMedica copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     String? descripcion,
     DateTime? fecha,

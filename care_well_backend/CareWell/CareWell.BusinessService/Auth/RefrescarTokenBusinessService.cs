@@ -1,5 +1,7 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.DataViews.Auth;
+using CareWell.DataViews.General;
+using CareWell.Domain.Auth;
 using CareWell.Queries.Auth;
 using CareWell.Repository.Auth;
 
@@ -36,9 +38,28 @@ namespace CareWell.BusinessService.Auth
             {
                 AccessToken = accessTokenDataView.AccessToken,
                 Expiracion = DateTime.UtcNow.AddMinutes(30),
-                UsuarioID = refreshToken.Usuario.ID,
-                Email = refreshToken.Usuario.NombreUsuario,
-                RefreshToken = accessTokenDataView.RefreshToken
+                RefreshToken = accessTokenDataView.RefreshToken,
+                Usuario = new UsuarioDataView
+                {
+                    ID = refreshToken.Usuario.ID,
+                    NombreUsuario = refreshToken.Usuario.NombreUsuario,
+                    Persona = new PersonaDataView
+                    {
+                        ID = refreshToken.Usuario.Persona.ID,
+                        Nombre = refreshToken.Usuario.Persona.Nombre,
+                        Apellido = refreshToken.Usuario.Persona.Apellido,
+                        Documento = refreshToken.Usuario.Persona.Documento,
+                        FechaNacimiento = refreshToken.Usuario.Persona.FechaNacimiento,
+                        Email = refreshToken.Usuario.Persona.Email,
+                        Telefono = refreshToken.Usuario.Persona.Telefono,
+                        ImagenPath = refreshToken.Usuario.Persona.ImagenPath
+                    },
+                    Estado = new EstadoUsuarioDataView
+                    {
+                        ID = refreshToken.Usuario.Estado.ID,
+                        Descripcion = refreshToken.Usuario.Estado.Descripcion
+                    }
+                }
             };
         }
     }

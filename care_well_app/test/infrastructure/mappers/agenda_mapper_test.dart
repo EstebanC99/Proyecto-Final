@@ -4,38 +4,50 @@ import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final persona = Persona(
-    id: 'per_001',
-    nombre: 'Alicia',
-    apellido: 'Rodríguez',
-  );
+  final persona = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
   final usuario = Usuario(
-    id: 'usr_001',
-    persona: Persona(id: 'per_010', nombre: 'María', apellido: 'García'),
-    nombreUsuario: 'maria.garcia',
-    estado: EstadoUsuario.activo,
+    id: 101,
+    persona: Persona(id: 1, nombre: 'María', apellido: 'García'),
+    contrasena: 'hash123',
+    estado: EstadoUsuario(
+      id: EstadosUsuarioConst.activo,
+      descripcion: 'Activo',
+    ),
+  );
+
+  final tipoCitaMedica = TipoEventoAgenda(
+    id: TiposEventoAgendaConst.citaMedica,
+    descripcion: 'Cita médica',
+  );
+
+  final tipoMedicacion = TipoEventoAgenda(
+    id: TiposEventoAgendaConst.medicacion,
+    descripcion: 'Medicación',
   );
 
   group('EventoAgendaMapper', () {
     final evento = EventoAgenda(
-      id: 'evt_001',
+      id: 701,
       persona: persona,
       creadoPor: usuario,
       titulo: 'Consulta cardiológica',
       descripcion: 'Control anual',
-      tipo: TipoEventoAgenda.citaMedica,
+      tipo: tipoCitaMedica,
       fechaHoraInicio: DateTime(2026, 6, 10, 10, 0),
       fechaHoraFin: DateTime(2026, 6, 10, 11, 0),
     );
 
     final model = EventoAgendaModel(
-      id: 'evt_001',
-      personaId: 'per_001',
-      creadoPorId: 'usr_001',
+      id: 701,
+      personaId: 2,
+      creadoPorId: 101,
       titulo: 'Consulta cardiológica',
       descripcion: 'Control anual',
-      tipo: 'citaMedica',
+      tipo: TipoEventoAgendaModel(
+        id: TiposEventoAgendaConst.citaMedica,
+        descripcion: 'Cita médica',
+      ),
       fechaHoraInicio: '2026-06-10T10:00:00.000',
       fechaHoraFin: '2026-06-10T11:00:00.000',
     );
@@ -48,7 +60,7 @@ void main() {
       );
       expect(roundTrip.id, evento.id);
       expect(roundTrip.titulo, evento.titulo);
-      expect(roundTrip.tipo, evento.tipo);
+      expect(roundTrip.tipo.id, evento.tipo.id);
       expect(
         roundTrip.fechaHoraInicio.toIso8601String(),
         evento.fechaHoraInicio.toIso8601String(),
@@ -72,7 +84,6 @@ void main() {
     });
 
     test('fechaHoraFin nulo se preserva en round-trip', () {
-      // copyWith no puede poner null en campos opcionales; construimos directamente.
       final eventoSinFin = EventoAgenda(
         id: evento.id,
         persona: evento.persona,
@@ -94,24 +105,24 @@ void main() {
 
   group('RecordatorioMapper', () {
     final evento = EventoAgenda(
-      id: 'evt_001',
+      id: 702,
       persona: persona,
       creadoPor: usuario,
       titulo: 'Medicación',
-      tipo: TipoEventoAgenda.medicacion,
+      tipo: tipoMedicacion,
       fechaHoraInicio: DateTime(2026, 6, 7, 8, 0),
     );
 
     final recordatorio = Recordatorio(
-      id: 'rec_001',
+      id: 801,
       eventoAgenda: evento,
       fechaHoraEnvio: DateTime(2026, 6, 7, 7, 30),
       enviado: false,
     );
 
     final model = RecordatorioModel(
-      id: 'rec_001',
-      eventoAgendaId: 'evt_001',
+      id: 801,
+      eventoAgendaId: 702,
       fechaHoraEnvio: '2026-06-07T07:30:00.000',
       enviado: false,
     );

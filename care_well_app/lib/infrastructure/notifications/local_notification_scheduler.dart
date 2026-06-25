@@ -14,12 +14,11 @@ class LocalNotificationScheduler implements NotificationScheduler {
 
   final _plugin = FlutterLocalNotificationsPlugin();
 
-  /// Deriva un id entero estable a partir del String id del evento.
+  /// Retorna un id de notificación positivo a partir del id entero del evento.
   ///
-  /// Se usa la operación `& 0x7fffffff` para garantizar un valor positivo
-  /// compatible con la API de notificaciones de Android.
-  static int notificationIdFor(String eventoId) =>
-      eventoId.hashCode & 0x7fffffff;
+  /// Se usa `& 0x7fffffff` para garantizar un valor positivo en caso de
+  /// desbordamiento de signo, compatible con la API de notificaciones de Android.
+  static int notificationIdFor(int eventoId) => eventoId & 0x7fffffff;
 
   @override
   Future<void> init() async {

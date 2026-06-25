@@ -9,7 +9,7 @@ class HealthRepositoryImpl implements HealthRepository {
   const HealthRepositoryImpl(this._datasource);
 
   @override
-  Future<FichaSalud> getFichaSalud(String personaId) =>
+  Future<FichaSalud> getFichaSalud(int personaId) =>
       _datasource.getFichaSalud(personaId);
 
   @override
@@ -17,7 +17,7 @@ class HealthRepositoryImpl implements HealthRepository {
       _datasource.guardarFichaSalud(ficha);
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(String personaId) =>
+  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) =>
       _datasource.getHabitosByPersona(personaId);
 
   @override
@@ -29,12 +29,12 @@ class HealthRepositoryImpl implements HealthRepository {
       _datasource.actualizarHabito(habito);
 
   @override
-  Future<void> eliminarHabito(String habitoId) =>
+  Future<void> eliminarHabito(int habitoId) =>
       _datasource.eliminarHabito(habitoId);
 
   @override
   Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
-    String personaId,
+    int personaId,
   ) => _datasource.getRecomendacionesByPersona(personaId);
 
   @override
@@ -48,11 +48,11 @@ class HealthRepositoryImpl implements HealthRepository {
   ) => _datasource.actualizarRecomendacion(recomendacion);
 
   @override
-  Future<void> eliminarRecomendacion(String recomendacionId) =>
+  Future<void> eliminarRecomendacion(int recomendacionId) =>
       _datasource.eliminarRecomendacion(recomendacionId);
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(String personaId) =>
+  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) =>
       _datasource.getEventosSaludByPersona(personaId);
 
   @override
@@ -64,18 +64,18 @@ class HealthRepositoryImpl implements HealthRepository {
       _datasource.actualizarEventoSalud(evento);
 
   @override
-  Future<void> eliminarEventoSalud(String eventoId) =>
+  Future<void> eliminarEventoSalud(int eventoId) =>
       _datasource.eliminarEventoSalud(eventoId);
 
   @override
-  Future<List<NotaEvento>> getNotasByEvento(String eventoId) =>
+  Future<List<NotaEvento>> getNotasByEvento(int eventoId) =>
       _datasource.getNotasByEvento(eventoId);
 
   @override
   Future<NotaEvento> crearNota(NotaEvento nota) => _datasource.crearNota(nota);
 
   @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(String personaId) =>
+  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) =>
       _datasource.getEstadosAnimoByPersona(personaId);
 
   @override
@@ -87,6 +87,6 @@ class HealthRepositoryImpl implements HealthRepository {
       _datasource.actualizarEstadoAnimo(estadoAnimo);
 
   @override
-  Future<void> eliminarEstadoAnimo(String estadoAnimoId) =>
+  Future<void> eliminarEstadoAnimo(int estadoAnimoId) =>
       _datasource.eliminarEstadoAnimo(estadoAnimoId);
 }

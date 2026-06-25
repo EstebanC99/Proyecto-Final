@@ -21,6 +21,11 @@
             return this.ID == other.ID;
         }
 
-        public override int GetHashCode() => this.GetType().GetHashCode();
+        public override int GetHashCode() { 
+            if (this.ID == default)
+                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+
+            return HashCode.Combine(GetType(), this.ID);
+        }
     }
 }

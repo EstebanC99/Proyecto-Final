@@ -77,7 +77,7 @@ class HabitsScreen extends ConsumerWidget {
               habito: habitos[i],
               onTap: () => context.pushNamed(
                 AppRoutes.healthHabitDetailName,
-                pathParameters: {'id': habitos[i].id},
+                pathParameters: {'id': habitos[i].id.toString()},
               ),
             ),
           );
@@ -103,32 +103,19 @@ class _HabitoCard extends StatelessWidget {
   final HabitoDeVida habito;
   final VoidCallback onTap;
 
-  static String _labelTipo(TipoHabito tipo) {
-    switch (tipo) {
-      case TipoHabito.actividadFisica:
-        return 'Actividad física';
-      case TipoHabito.alimentacion:
-        return 'Alimentación';
-      case TipoHabito.sueno:
-        return 'Sueño';
-      case TipoHabito.hidratacion:
-        return 'Hidratación';
-      case TipoHabito.otro:
-        return 'Otro';
-    }
-  }
+  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
 
   static IconData _iconTipo(TipoHabito tipo) {
-    switch (tipo) {
-      case TipoHabito.actividadFisica:
+    switch (tipo.id) {
+      case TiposHabitoConst.actividadFisica:
         return Icons.directions_run;
-      case TipoHabito.alimentacion:
+      case TiposHabitoConst.alimentacion:
         return Icons.restaurant;
-      case TipoHabito.sueno:
+      case TiposHabitoConst.sueno:
         return Icons.bedtime_outlined;
-      case TipoHabito.hidratacion:
+      case TiposHabitoConst.hidratacion:
         return Icons.water_drop_outlined;
-      case TipoHabito.otro:
+      default:
         return Icons.self_improvement;
     }
   }

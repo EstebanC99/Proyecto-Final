@@ -1,7 +1,9 @@
 using CareWell.API.Filters;
 using CareWell.BusinessService;
 using CareWell.Repository;
+using CareWell.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,10 +21,13 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ApiResultFilter>();
+    options.Filters.Add<UserContextRequestFilter>();
 });
 
 builder.Services.AddRepositories();
 builder.Services.AddBusinessServices();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -31,7 +36,7 @@ builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("CareWellDb");
 
-builder.Services.AddDbContext<CareWellDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<CareWellDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
 #endregion
 
@@ -57,6 +62,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorizationBuilder().SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
+#endregion
+
+#region UserContext
+
+builder.Services.AddScoped<UserContext>();
+builder.Services.AddScoped<IUserContextWriter>(sp => sp.GetRequiredService<UserContext>());
+builder.Services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContext>());
+
 #endregion
 
 var app = builder.Build();
@@ -65,9 +80,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

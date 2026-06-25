@@ -9,10 +9,10 @@ class PersonaRepositoryImpl implements PersonaRepository {
   const PersonaRepositoryImpl(this._datasource);
 
   @override
-  Future<Persona> getById(String id) => _datasource.getById(id);
+  Future<Persona> getById(int id) => _datasource.getById(id);
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) =>
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) =>
       _datasource.getDependientesByUsuario(usuarioId);
 
   @override
@@ -23,5 +23,5 @@ class PersonaRepositoryImpl implements PersonaRepository {
       _datasource.actualizar(persona);
 
   @override
-  Future<void> eliminar(String id) => _datasource.eliminar(id);
+  Future<void> eliminar(int id) => _datasource.eliminar(id);
 }

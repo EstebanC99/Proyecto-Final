@@ -4,7 +4,7 @@
 /// igualdad por identidad de tipo e [id], y [hashCode] consistente.
 /// Las subclases deben implementar [copyWith] con la firma tipada correcta.
 abstract class BaseEntity {
-  final String id;
+  final int id;
 
   const BaseEntity({required this.id});
 

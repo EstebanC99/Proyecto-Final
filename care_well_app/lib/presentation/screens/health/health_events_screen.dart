@@ -85,7 +85,7 @@ class HealthEventsScreen extends ConsumerWidget {
               evento: eventos[i],
               onTap: () => context.pushNamed(
                 AppRoutes.healthEventDetailName,
-                pathParameters: {'id': eventos[i].id},
+                pathParameters: {'id': eventos[i].id.toString()},
               ),
             ),
           );

@@ -17,30 +17,23 @@ namespace CareWell.Repository.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("AsignacionCuidadoPermisoCuidado", b =>
                 {
-                    b.Property<int>("ID_AsignacionCuidado")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ID_PermisoCuidado")
-                        .HasColumnType("int");
-
                     b.Property<int>("AsignacionCuidadoID")
                         .HasColumnType("int");
 
                     b.Property<int>("PermisosID")
                         .HasColumnType("int");
 
-                    b.HasKey("ID_AsignacionCuidado", "ID_PermisoCuidado");
-
-                    b.HasIndex("AsignacionCuidadoID");
-
-                    b.HasIndex("ID_PermisoCuidado");
+                    b.HasKey("AsignacionCuidadoID", "PermisosID");
 
                     b.HasIndex("PermisosID");
 
@@ -360,7 +353,6 @@ namespace CareWell.Repository.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -377,7 +369,6 @@ namespace CareWell.Repository.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Telefono")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -629,18 +620,6 @@ namespace CareWell.Repository.Migrations
                         .WithMany()
                         .HasForeignKey("AsignacionCuidadoID")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareWell.Domain.EquipoCuidado.AsignacionCuidado", null)
-                        .WithMany()
-                        .HasForeignKey("ID_AsignacionCuidado")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("CareWell.Domain.EquipoCuidado.PermisoCuidado", null)
-                        .WithMany()
-                        .HasForeignKey("ID_PermisoCuidado")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CareWell.Domain.EquipoCuidado.PermisoCuidado", null)

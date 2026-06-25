@@ -8,17 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -44,7 +40,7 @@ List<Override> _solaUnaOpcion() => [
 ];
 
 /// Construye overrides con dos personas seleccionables.
-List<Override> _variosOpciones({String? selectedId}) => [
+List<Override> _variosOpciones({int? selectedId}) => [
   careTeamContextPersonaProvider.overrideWith(
     (ref) async =>
         selectedId == _personaAlicia.id ? _personaAlicia : _personaMaria,

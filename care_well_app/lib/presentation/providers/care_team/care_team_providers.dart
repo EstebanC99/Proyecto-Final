@@ -21,7 +21,7 @@ class PersonaContextOption {
 /// ID de la persona cuyo contexto se está visualizando.
 /// `null` = sin selección explícita → usa el default (primera persona a cargo como
 /// Responsable; si no hay ninguna, el propio usuario).
-final selectedPersonaIdProvider = StateProvider<String?>((ref) => null);
+final selectedPersonaIdProvider = StateProvider<int?>((ref) => null);
 
 /// Lista completa de personas que el usuario puede seleccionar como contexto:
 /// 1. El propio usuario (etiquetado con rol [PersonaContextRol.propio]).
@@ -59,7 +59,6 @@ final personasSeleccionablesProvider =
 ///
 /// Cuando [selectedPersonaIdProvider] es `null`, el comportamiento default es:
 /// primera persona donde el usuario es Responsable; si no hay ninguna, el propio usuario.
-/// Esto preserva el contrato previo de [careTeamContextPersonaProvider].
 final careTeamContextPersonaProvider = FutureProvider<Persona?>((ref) async {
   final opciones = await ref.watch(personasSeleccionablesProvider.future);
   if (opciones.isEmpty) return null;
@@ -86,10 +85,7 @@ final careTeamContextPersonaProvider = FutureProvider<Persona?>((ref) async {
 
 /// Asignaciones de cuidado de una persona cuidada específica.
 final careTeamAssignmentsProvider =
-    FutureProvider.family<List<AsignacionCuidado>, String>((
-      ref,
-      personaId,
-    ) async {
+    FutureProvider.family<List<AsignacionCuidado>, int>((ref, personaId) async {
       final repo = ref.watch(careTeamRepositoryProvider);
       return repo.getAsignacionesByPersonaCuidada(personaId);
     });
@@ -97,49 +93,66 @@ final careTeamAssignmentsProvider =
 /// Asignación por ID. Busca en las asignaciones de la persona de contexto.
 ///
 /// Retorna `null` si no existe.
-final assignmentByIdProvider =
-    FutureProvider.family<AsignacionCuidado?, String>((
-      ref,
-      asignacionId,
-    ) async {
-      final personaCtx = await ref.watch(careTeamContextPersonaProvider.future);
-      if (personaCtx == null) return null;
-      final asignaciones = await ref.watch(
-        careTeamAssignmentsProvider(personaCtx.id).future,
-      );
-      try {
-        return asignaciones.firstWhere((a) => a.id == asignacionId);
-      } catch (_) {
-        return null;
-      }
-    });
+final assignmentByIdProvider = FutureProvider.family<AsignacionCuidado?, int>((
+  ref,
+  asignacionId,
+) async {
+  final personaCtx = await ref.watch(careTeamContextPersonaProvider.future);
+  if (personaCtx == null) return null;
+  final asignaciones = await ref.watch(
+    careTeamAssignmentsProvider(personaCtx.id).future,
+  );
+  try {
+    return asignaciones.firstWhere((a) => a.id == asignacionId);
+  } catch (_) {
+    return null;
+  }
+});
 
 /// Catálogo completo de códigos de permiso disponibles.
+///
+/// Lista estática que reemplaza el antiguo [CodigoPermiso.values] del enum.
+final _todosCodigos = [
+  CodigoPermiso(
+    id: PermisosCuidadoConst.verFichaSalud,
+    descripcion: 'Ver ficha de salud',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.editarFichaSalud,
+    descripcion: 'Editar ficha de salud',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.gestionarAgenda,
+    descripcion: 'Gestionar agenda',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.registrarEventosSalud,
+    descripcion: 'Registrar eventos de salud',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.registrarHabitos,
+    descripcion: 'Registrar hábitos de vida',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.activarEmergencia,
+    descripcion: 'Activar emergencia',
+  ),
+  CodigoPermiso(
+    id: PermisosCuidadoConst.administrarEquipo,
+    descripcion: 'Administrar equipo de cuidado',
+  ),
+];
+
 final availablePermisosProvider = Provider<List<CodigoPermiso>>(
-  (ref) => CodigoPermiso.values,
+  (ref) => _todosCodigos,
 );
 
 // ─── Etiquetas de permisos ────────────────────────────────────────────────────
 
 /// Retorna la etiqueta legible de un [CodigoPermiso].
-String labelDePermiso(CodigoPermiso codigo) {
-  switch (codigo) {
-    case CodigoPermiso.verFichaSalud:
-      return 'Ver ficha de salud';
-    case CodigoPermiso.editarFichaSalud:
-      return 'Editar ficha de salud';
-    case CodigoPermiso.gestionarAgenda:
-      return 'Gestionar agenda';
-    case CodigoPermiso.registrarEventosSalud:
-      return 'Registrar eventos de salud';
-    case CodigoPermiso.registrarHabitos:
-      return 'Registrar hábitos de vida';
-    case CodigoPermiso.activarEmergencia:
-      return 'Activar emergencia';
-    case CodigoPermiso.administrarEquipo:
-      return 'Administrar equipo de cuidado';
-  }
-}
+///
+/// Delega en la descripción de la entidad catálogo.
+String labelDePermiso(CodigoPermiso codigo) => codigo.descripcion;
 
 // ─── Acciones mutadoras ───────────────────────────────────────────────────────
 
@@ -151,7 +164,7 @@ String labelDePermiso(CodigoPermiso codigo) {
 final crearMiembroProvider =
     Provider<
       Future<AsignacionCuidado> Function({
-        required String personaCuidadaId,
+        required int personaCuidadaId,
         required String email,
         required List<CodigoPermiso> permisos,
         required RolCuidado rolNombre,
@@ -169,13 +182,13 @@ final crearMiembroProvider =
         // DEMO: lookup simplificado — busca persona por email, si no crea placeholder.
         Persona colaborador;
         try {
-          // Intentar obtener desde una búsqueda (en demo: getById no aplica, buscar en lista)
+          // Intentar obtener desde una búsqueda (en demo: getById no aplica, buscar en lista).
           // Como no hay búsqueda por email, creamos un placeholder para demo.
           throw Exception('lookup no disponible en demo');
         } catch (_) {
           colaborador = await personaRepo.crear(
             Persona(
-              id: '',
+              id: 0,
               nombre: email.split('@').first,
               apellido: '',
               email: email,
@@ -185,13 +198,12 @@ final crearMiembroProvider =
 
         // Obtener el rol correspondiente.
         final roles = await careTeamRepo.getRoles();
-        final rol = roles.firstWhere((r) => r.nombre == rolNombre);
+        final rol = roles.firstWhere((r) => r.id == rolNombre.id);
 
         // Construir permisos con los códigos seleccionados.
         final permisosSeleccionados = permisos.map((codigo) {
-          final id = 'prm_new_${codigo.name}';
           return Permiso(
-            id: id,
+            id: 0,
             codigo: codigo,
             descripcion: labelDePermiso(codigo),
           );
@@ -201,11 +213,14 @@ final crearMiembroProvider =
 
         final asignacion = await careTeamRepo.crearAsignacion(
           AsignacionCuidado(
-            id: '',
+            id: 0,
             personaCuidada: personaCuidada,
             personaColaborador: colaborador,
             rol: rol,
-            estado: EstadoAsignacion.activa,
+            estado: EstadoAsignacion(
+              id: EstadosAsignacionConst.activa,
+              descripcion: 'Activa',
+            ),
             fechaAlta: DateTime.now(),
             permisos: permisosSeleccionados,
           ),
@@ -232,11 +247,11 @@ final actualizarPermisosProvider =
         final nuevosPermisos = permisosActivos.map((codigo) {
           // Reusar el permiso existente si ya estaba, o crear uno nuevo.
           final existente = asignacion.permisos
-              .where((p) => p.codigo == codigo)
+              .where((p) => p.codigo.id == codigo.id)
               .firstOrNull;
           return existente ??
               Permiso(
-                id: 'prm_${codigo.name}',
+                id: 0,
                 codigo: codigo,
                 descripcion: labelDePermiso(codigo),
               );
@@ -261,8 +276,8 @@ final actualizarPermisosProvider =
 final eliminarMiembroProvider =
     Provider<
       Future<void> Function({
-        required String asignacionId,
-        required String personaCuidadaId,
+        required int asignacionId,
+        required int personaCuidadaId,
       })
     >((ref) {
       return ({required asignacionId, required personaCuidadaId}) async {
@@ -298,7 +313,7 @@ final esResponsableProvider = FutureProvider<bool>((ref) async {
   return asignaciones.any(
     (a) =>
         a.personaColaborador.id == usuario.persona.id &&
-        a.rol.nombre == RolCuidado.responsable &&
-        a.estado == EstadoAsignacion.activa,
+        a.rol.id == RolesCuidadoConst.responsable &&
+        a.estado.id == EstadosAsignacionConst.activa,
   );
 });

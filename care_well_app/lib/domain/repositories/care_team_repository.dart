@@ -6,7 +6,7 @@ abstract class CareTeamRepository {
 
   /// Retorna las asignaciones activas de la persona cuidada con [personaCuidadaId].
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   );
 
   /// Crea una nueva asignación de cuidado.
@@ -16,18 +16,18 @@ abstract class CareTeamRepository {
   Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado asignacion);
 
   /// Elimina la asignación con [asignacionId].
-  Future<void> eliminarAsignacion(String asignacionId);
+  Future<void> eliminarAsignacion(int asignacionId);
 
   /// Retorna las asignaciones donde el colaborador tiene [colaboradorId].
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   );
 
-  // ─── Roles y permisos ────────────────────────────────────────────────────────
+  // ─── Roles ───────────────────────────────────────────────────────────────────
 
   /// Retorna los roles disponibles en el sistema.
-  Future<List<Rol>> getRoles();
+  Future<List<RolCuidado>> getRoles();
 
-  /// Retorna el [Rol] con el [rolId] dado.
-  Future<Rol> getRolById(String rolId);
+  /// Retorna el [RolCuidado] con el [rolId] dado.
+  Future<RolCuidado> getRolById(int rolId);
 }

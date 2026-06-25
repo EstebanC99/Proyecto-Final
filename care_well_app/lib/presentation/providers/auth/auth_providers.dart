@@ -12,30 +12,34 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
 
   final AuthRepository _authRepository;
 
-  Future<void> login(String nombreUsuario, String contrasena) async {
+  Future<void> login(String email, String contrasena) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => _authRepository.login(nombreUsuario, contrasena),
+      () => _authRepository.login(email, contrasena),
     );
   }
 
   /// Registra una nueva cuenta.
   ///
   /// En caso de éxito NO inicia sesión automáticamente: el usuario debe
-  /// dirigirse al login. Retorna el [Usuario] creado o un error.
-  Future<AsyncValue<Usuario>> register({
+  /// dirigirse al login. No modifica el estado de sesión.
+  Future<AsyncValue<void>> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) async {
     return AsyncValue.guard(
       () => _authRepository.register(
         nombre: nombre,
         apellido: apellido,
+        documento: documento,
+        fechaNacimiento: fechaNacimiento,
         email: email,
-        nombreUsuario: nombreUsuario,
+        telefono: telefono,
         contrasena: contrasena,
       ),
     );
@@ -44,15 +48,14 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
   /// Crea credenciales para una persona preexistente sin acceso.
   ///
   /// En caso de éxito NO inicia sesión: el usuario debe ir al login.
+  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
   Future<AsyncValue<Usuario>> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async {
     return AsyncValue.guard(
       () => _authRepository.crearCredenciales(
         email: email,
-        nombreUsuario: nombreUsuario,
         contrasena: contrasena,
       ),
     );

@@ -9,21 +9,25 @@ class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._datasource);
 
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) =>
-      _datasource.login(nombreUsuario, contrasena);
+  Future<Usuario> login(String email, String contrasena) =>
+      _datasource.login(email, contrasena);
 
   @override
-  Future<Usuario> register({
+  Future<void> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) => _datasource.register(
     nombre: nombre,
     apellido: apellido,
+    documento: documento,
+    fechaNacimiento: fechaNacimiento,
     email: email,
-    nombreUsuario: nombreUsuario,
+    telefono: telefono,
     contrasena: contrasena,
   );
 
@@ -35,12 +39,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() => _datasource.logout();
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) =>
+  Future<void> eliminarCuenta(int usuarioId) =>
       _datasource.eliminarCuenta(usuarioId);
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) => _datasource.cambiarContrasena(
@@ -52,17 +56,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
-  }) => _datasource.crearCredenciales(
-    email: email,
-    nombreUsuario: nombreUsuario,
-    contrasena: contrasena,
-  );
+  }) => _datasource.crearCredenciales(email: email, contrasena: contrasena);
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,

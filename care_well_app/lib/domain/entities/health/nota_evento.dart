@@ -4,7 +4,7 @@ import '../shared/persona.dart';
 /// Nota colaborativa registrada por un miembro del equipo sobre un [EventoDeSalud].
 class NotaEvento extends BaseEntity {
   /// ID del evento de salud al que pertenece esta nota.
-  final String eventoSaludId;
+  final int eventoSaludId;
 
   /// Persona que redactó la nota.
   final Persona autor;
@@ -25,8 +25,8 @@ class NotaEvento extends BaseEntity {
 
   @override
   NotaEvento copyWith({
-    String? id,
-    String? eventoSaludId,
+    int? id,
+    int? eventoSaludId,
     Persona? autor,
     DateTime? fechaHora,
     String? contenido,

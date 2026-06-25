@@ -62,7 +62,7 @@ class ContextSelector extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<PersonaContextOption> opciones,
-    String? selectedId,
+    int? selectedId,
   ) {
     showModalBottomSheet<void>(
       context: context,
@@ -169,8 +169,8 @@ class _PersonaSelectorSheet extends StatelessWidget {
   });
 
   final List<PersonaContextOption> opciones;
-  final String? selectedId;
-  final ValueChanged<String> onSelect;
+  final int? selectedId;
+  final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) {

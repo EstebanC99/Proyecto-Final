@@ -4,46 +4,41 @@ import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
 final _personaCarlos = Persona(
-  id: 'per_003',
+  id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
   email: 'carlos@test.com',
 );
 
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-final _rolCuidador = Rol(id: 'rol_002', nombre: RolCuidado.cuidador);
-
 AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
-  id: 'asi_003',
+  id: 401,
   personaCuidada: _personaAlicia,
   personaColaborador: _personaMaria,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
 );
 
 AsignacionCuidado _asignacionCarlos() => AsignacionCuidado(
-  id: 'asi_001',
+  id: 402,
   personaCuidada: _personaAlicia,
   personaColaborador: _personaCarlos,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
 );
 
@@ -56,17 +51,17 @@ class _FakePersonaRepository implements PersonaRepository {
     : _personas = List.from(personas);
 
   @override
-  Future<Persona> getById(String id) async => _personas.firstWhere(
+  Future<Persona> getById(int id) async => _personas.firstWhere(
     (p) => p.id == id,
     orElse: () => throw Exception('Persona no encontrada: $id'),
   );
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) async => [];
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [];
 
   @override
   Future<Persona> crear(Persona persona) async {
-    final nueva = persona.copyWith(id: 'per_new');
+    final nueva = persona.copyWith(id: 9999);
     _personas.add(nueva);
     return nueva;
   }
@@ -79,27 +74,53 @@ class _FakePersonaRepository implements PersonaRepository {
   }
 
   @override
-  Future<void> eliminar(String id) async {
+  Future<void> eliminar(int id) async {
     _personas.removeWhere((p) => p.id == id);
   }
 }
 
+/// Fake de [AsignacionCuidadoRepository] que simula el endpoint que devuelve
+/// las asignaciones del usuario logueado (María, id=1).
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
+  final List<AsignacionCuidado> _asignaciones;
+
+  _FakeAsignacionCuidadoRepository(List<AsignacionCuidado> asignaciones)
+    : _asignaciones = List.from(asignaciones);
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      // El usuario demo (María, id=1) es el colaborador de sus asignaciones.
+      _asignaciones.where((a) => a.personaColaborador.id == 1).toList();
+
+  @override
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+    List<int> permisosCuidadoIds = const [],
+  }) async {}
+}
+
 class _FakeCareTeamRepository implements CareTeamRepository {
   final List<AsignacionCuidado> _asignaciones;
+  int _nextId = 10000;
 
   _FakeCareTeamRepository(List<AsignacionCuidado> asignaciones)
     : _asignaciones = List.from(asignaciones);
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async => _asignaciones
       .where((a) => a.personaColaborador.id == colaboradorId)
       .toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => _asignaciones
       .where((a) => a.personaCuidada.id == personaCuidadaId)
       .toList();
@@ -107,7 +128,7 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async {
     final nueva = AsignacionCuidado(
-      id: 'asi_new_${DateTime.now().millisecondsSinceEpoch}',
+      id: _nextId++,
       personaCuidada: a.personaCuidada,
       personaColaborador: a.personaColaborador,
       rol: a.rol,
@@ -127,25 +148,30 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   }
 
   @override
-  Future<void> eliminarAsignacion(String id) async {
+  Future<void> eliminarAsignacion(int id) async {
     final idx = _asignaciones.indexWhere((a) => a.id == id);
     if (idx < 0) throw Exception('Asignación no encontrada: $id');
     _asignaciones.removeAt(idx);
   }
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResponsable, _rolCuidador];
+  Future<List<RolCuidado>> getRoles() async => [
+    rolCuidadoResponsable,
+    rolCuidadoCuidador,
+  ];
 
   @override
-  Future<Rol> getRolById(String rolId) async =>
-      [_rolResponsable, _rolCuidador].firstWhere((r) => r.id == rolId);
+  Future<RolCuidado> getRolById(int rolId) async => [
+    rolCuidadoResponsable,
+    rolCuidadoCuidador,
+  ].firstWhere((r) => r.id == rolId);
 }
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 ProviderContainer _buildContainer({
@@ -163,6 +189,9 @@ ProviderContainer _buildContainer({
               ..state = AsyncValue.data(_usuarioDemoMaria),
       ),
       personaRepositoryProvider.overrideWithValue(_FakePersonaRepository(pers)),
+      asignacionCuidadoRepositoryProvider.overrideWithValue(
+        _FakeAsignacionCuidadoRepository(asigs),
+      ),
       careTeamRepositoryProvider.overrideWithValue(
         _FakeCareTeamRepository(asigs),
       ),
@@ -230,8 +259,7 @@ void main() {
         addTearDown(container.dispose);
 
         // ID inexistente: debe volver a opciones.first (María, el propio usuario).
-        container.read(selectedPersonaIdProvider.notifier).state =
-            'per_inexistente';
+        container.read(selectedPersonaIdProvider.notifier).state = 99999;
 
         final persona = await container.read(
           careTeamContextPersonaProvider.future,
@@ -310,7 +338,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        careTeamAssignmentsProvider('per_inexistente').future,
+        careTeamAssignmentsProvider(99999).future,
       );
 
       expect(asignaciones, isEmpty);
@@ -323,11 +351,11 @@ void main() {
       addTearDown(container.dispose);
 
       final asignacion = await container.read(
-        assignmentByIdProvider('asi_001').future,
+        assignmentByIdProvider(402).future,
       );
 
       expect(asignacion, isNotNull);
-      expect(asignacion!.id, 'asi_001');
+      expect(asignacion!.id, 402);
     });
 
     test('retorna null para ID de asignación inexistente', () async {
@@ -335,7 +363,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignacion = await container.read(
-        assignmentByIdProvider('asi_inexistente').future,
+        assignmentByIdProvider(99999).future,
       );
 
       expect(asignacion, isNull);
@@ -343,24 +371,30 @@ void main() {
   });
 
   group('availablePermisosProvider', () {
-    test('retorna todos los valores de CodigoPermiso', () {
+    test('retorna 7 permisos disponibles (uno por PermisosCuidadoConst)', () {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
       final permisos = container.read(availablePermisosProvider);
 
-      expect(permisos, CodigoPermiso.values);
-      expect(permisos.length, CodigoPermiso.values.length);
+      // Los 7 permisos definidos en PermisosCuidadoConst.
+      expect(permisos.length, 7);
+      expect(
+        permisos.any((p) => p.id == PermisosCuidadoConst.verFichaSalud),
+        isTrue,
+      );
     });
   });
 
   group('labelDePermiso', () {
-    test('retorna etiqueta para verFichaSalud', () {
-      expect(labelDePermiso(CodigoPermiso.verFichaSalud), isNotEmpty);
+    test('retorna etiqueta para codigoVerFichaSalud', () {
+      expect(labelDePermiso(codigoVerFichaSalud), isNotEmpty);
     });
 
-    test('retorna etiqueta para cada CodigoPermiso', () {
-      for (final codigo in CodigoPermiso.values) {
+    test('retorna descripcion del CodigoPermiso', () {
+      final container = _buildContainer();
+      addTearDown(container.dispose);
+      for (final codigo in container.read(availablePermisosProvider)) {
         expect(labelDePermiso(codigo), isNotEmpty);
       }
     });
@@ -404,6 +438,9 @@ void main() {
           ),
           personaRepositoryProvider.overrideWithValue(
             _FakePersonaRepository([_personaMaria, _personaAlicia]),
+          ),
+          asignacionCuidadoRepositoryProvider.overrideWithValue(
+            _FakeAsignacionCuidadoRepository([]),
           ),
           careTeamRepositoryProvider.overrideWithValue(
             _FakeCareTeamRepository([]),
@@ -452,7 +489,7 @@ void main() {
       await expectLater(
         actualizarFn(
           asignacion: _asignacionCarlos(),
-          permisosActivos: [CodigoPermiso.verFichaSalud],
+          permisosActivos: [codigoVerFichaSalud],
         ),
         completes,
       );
@@ -467,10 +504,7 @@ void main() {
       final eliminarFn = container.read(eliminarMiembroProvider);
 
       await expectLater(
-        eliminarFn(
-          asignacionId: 'asi_001',
-          personaCuidadaId: _personaAlicia.id,
-        ),
+        eliminarFn(asignacionId: 402, personaCuidadaId: _personaAlicia.id),
         completes,
       );
     });
@@ -482,10 +516,7 @@ void main() {
       final eliminarFn = container.read(eliminarMiembroProvider);
 
       await expectLater(
-        eliminarFn(
-          asignacionId: 'asi_inexistente',
-          personaCuidadaId: _personaAlicia.id,
-        ),
+        eliminarFn(asignacionId: 99999, personaCuidadaId: _personaAlicia.id),
         throwsException,
       );
     });

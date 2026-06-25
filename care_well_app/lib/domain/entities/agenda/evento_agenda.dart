@@ -2,22 +2,25 @@ import '../auth/usuario.dart';
 import '../base_entity.dart';
 import '../shared/persona.dart';
 
-/// Tipo de evento registrado en la agenda.
-enum TipoEventoAgenda {
-  /// Cita médica o consulta con un profesional.
-  citaMedica,
+/// Tipo de evento registrado en la agenda (catálogo persistido).
+///
+/// - id 1: Cita médica o consulta con un profesional.
+/// - id 2: Toma de medicación.
+/// - id 3: Actividad de rehabilitación o terapia.
+/// - id 4: Control o seguimiento de salud.
+/// - id 5: Otro tipo de evento no categorizado.
+class TipoEventoAgenda extends BaseEntity {
+  final String descripcion;
 
-  /// Toma de medicación.
-  medicacion,
+  const TipoEventoAgenda({required super.id, required this.descripcion});
 
-  /// Actividad de rehabilitación o terapia.
-  rehabilitacion,
-
-  /// Control o seguimiento de salud.
-  control,
-
-  /// Otro tipo de evento no categorizado.
-  otro,
+  @override
+  TipoEventoAgenda copyWith({int? id, String? descripcion}) {
+    return TipoEventoAgenda(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
 }
 
 /// Evento agendado para una persona a cargo.
@@ -57,7 +60,7 @@ class EventoAgenda extends BaseEntity {
 
   @override
   EventoAgenda copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     Usuario? creadoPor,
     String? titulo,

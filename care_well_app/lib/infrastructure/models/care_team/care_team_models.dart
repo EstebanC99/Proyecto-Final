@@ -1,105 +1,93 @@
-import 'dart:convert';
+/// DTO de Persona tal como llega en el JSON del backend (dentro de
+/// [AsignacionCuidadoApiModel], campos `persona` y `colaborador`).
+class PersonaApiModel {
+  final int id;
+  final String nombre;
+  final String apellido;
+  final String? documento;
+  final String? fechaNacimiento;
+  final String? email;
+  final String? telefono;
+  final String? imagenPath;
 
-/// DTO de [Permiso] para serialización JSON.
-class PermisoModel {
-  final String id;
-
-  /// Código canónico: coincide con [CodigoPermiso] en el dominio.
-  final String codigo;
-  final String descripcion;
-
-  const PermisoModel({
+  const PersonaApiModel({
     required this.id,
-    required this.codigo,
-    required this.descripcion,
+    required this.nombre,
+    required this.apellido,
+    this.documento,
+    this.fechaNacimiento,
+    this.email,
+    this.telefono,
+    this.imagenPath,
   });
 
-  factory PermisoModel.fromJson(Map<String, dynamic> json) {
-    return PermisoModel(
-      id: json['id'] as String,
-      codigo: json['codigo'] as String,
-      descripcion: json['descripcion'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'codigo': codigo, 'descripcion': descripcion};
-  }
+  factory PersonaApiModel.fromJson(Map<String, dynamic> json) =>
+      PersonaApiModel(
+        id: json['id'] as int,
+        nombre: json['nombre'] as String,
+        apellido: json['apellido'] as String,
+        documento: json['documento'] as String?,
+        fechaNacimiento: json['fechaNacimiento'] as String?,
+        email: json['email'] as String?,
+        telefono: json['telefono'] as String?,
+        imagenPath: json['imagenPath'] as String?,
+      );
 }
 
-/// DTO de [Rol] para serialización JSON.
-class RolModel {
-  final String id;
+/// DTO genérico para ítems de catálogo: [rol], [estado] y cada elemento
+/// de la lista [permisos] dentro de [AsignacionCuidadoApiModel].
+class CatalogoItemModel {
+  final int id;
+  final String descripcion;
 
-  /// Nombre del rol: 'responsable' o 'cuidador'.
-  final String nombre;
+  const CatalogoItemModel({required this.id, required this.descripcion});
 
-  const RolModel({required this.id, required this.nombre});
-
-  factory RolModel.fromJson(Map<String, dynamic> json) {
-    return RolModel(id: json['id'] as String, nombre: json['nombre'] as String);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'nombre': nombre};
-  }
+  factory CatalogoItemModel.fromJson(Map<String, dynamic> json) =>
+      CatalogoItemModel(
+        id: json['id'] as int,
+        descripcion: json['descripcion'] as String,
+      );
 }
 
-/// DTO de [AsignacionCuidado] para serialización JSON.
-class AsignacionCuidadoModel {
-  final String id;
-  final String personaCuidadaId;
-  final String personaColaboradorId;
-  final String rolId;
-
-  /// Estado: 'activa', 'inactiva' o 'pendiente'.
-  final String estado;
+/// DTO principal de la respuesta del endpoint
+/// `GET /api/AdministrarEquipoCuidado/obtener-mis-asignaciones`.
+class AsignacionCuidadoApiModel {
+  final int id;
+  final PersonaApiModel persona;
+  final PersonaApiModel colaborador;
+  final CatalogoItemModel rol;
+  final CatalogoItemModel estado;
   final String fechaAlta;
+  final List<CatalogoItemModel> permisos;
 
-  /// Permisos específicos de esta asignación.
-  final List<PermisoModel> permisos;
-
-  const AsignacionCuidadoModel({
+  const AsignacionCuidadoApiModel({
     required this.id,
-    required this.personaCuidadaId,
-    required this.personaColaboradorId,
-    required this.rolId,
+    required this.persona,
+    required this.colaborador,
+    required this.rol,
     required this.estado,
     required this.fechaAlta,
     this.permisos = const [],
   });
 
-  factory AsignacionCuidadoModel.fromJson(Map<String, dynamic> json) {
+  factory AsignacionCuidadoApiModel.fromJson(Map<String, dynamic> json) {
     final permisosList = (json['permisos'] as List<dynamic>?) ?? [];
-    return AsignacionCuidadoModel(
-      id: json['id'] as String,
-      personaCuidadaId: json['personaCuidadaId'] as String,
-      personaColaboradorId: json['personaColaboradorId'] as String,
-      rolId: json['rolId'] as String,
-      estado: json['estado'] as String,
+    return AsignacionCuidadoApiModel(
+      id: json['id'] as int,
+      persona: PersonaApiModel.fromJson(
+        json['persona'] as Map<String, dynamic>,
+      ),
+      colaborador: PersonaApiModel.fromJson(
+        json['colaborador'] as Map<String, dynamic>,
+      ),
+      rol: CatalogoItemModel.fromJson(json['rol'] as Map<String, dynamic>),
+      estado: CatalogoItemModel.fromJson(
+        json['estado'] as Map<String, dynamic>,
+      ),
       fechaAlta: json['fechaAlta'] as String,
       permisos: permisosList
-          .map((e) => PermisoModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => CatalogoItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'personaCuidadaId': personaCuidadaId,
-      'personaColaboradorId': personaColaboradorId,
-      'rolId': rolId,
-      'estado': estado,
-      'fechaAlta': fechaAlta,
-      'permisos': permisos.map((p) => p.toJson()).toList(),
-    };
-  }
-
-  factory AsignacionCuidadoModel.fromRawJson(String source) =>
-      AsignacionCuidadoModel.fromJson(
-        json.decode(source) as Map<String, dynamic>,
-      );
-
-  String toRawJson() => json.encode(toJson());
 }

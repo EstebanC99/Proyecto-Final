@@ -1,45 +1,24 @@
-import 'dart:convert';
+import 'package:care_well_app/infrastructure/models/models.dart';
 
-/// DTO de [Usuario] para serialización JSON.
 class UsuarioModel {
-  final String id;
-  final String personaId;
+  final int id;
   final String nombreUsuario;
-  final String? contrasenaHash;
+  final PersonaModel personaModel;
+  final EstadoUsuarioModel estadoModel;
 
-  /// Estado de la cuenta: 'activo', 'suspendido' o 'eliminado'.
-  final String estado;
-
-  const UsuarioModel({
+  UsuarioModel({
     required this.id,
-    required this.personaId,
     required this.nombreUsuario,
-    this.contrasenaHash,
-    this.estado = 'activo',
+    required this.personaModel,
+    required this.estadoModel,
   });
 
-  factory UsuarioModel.fromJson(Map<String, dynamic> json) {
-    return UsuarioModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
-      nombreUsuario: json['nombreUsuario'] as String,
-      contrasenaHash: json['contrasenaHash'] as String?,
-      estado: (json['estado'] as String?) ?? 'activo',
-    );
-  }
+  factory UsuarioModel.fromJson(Map<String, dynamic> json) => UsuarioModel(
+    id: json["id"],
+    nombreUsuario: json["nombreUsuario"],
+    personaModel: PersonaModel.fromJson(json["persona"]),
+    estadoModel: EstadoUsuarioModel.fromJson(json["estado"]),
+  );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'personaId': personaId,
-      'nombreUsuario': nombreUsuario,
-      if (contrasenaHash != null) 'contrasenaHash': contrasenaHash,
-      'estado': estado,
-    };
-  }
-
-  factory UsuarioModel.fromRawJson(String source) =>
-      UsuarioModel.fromJson(json.decode(source) as Map<String, dynamic>);
-
-  String toRawJson() => json.encode(toJson());
+  Map<String, dynamic> toJson() => {"id": id, "nombreUsuario": nombreUsuario};
 }

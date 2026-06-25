@@ -9,17 +9,19 @@ class DemoAgendaDatasource implements AgendaDatasource {
     DemoSeed.recordatoriosAgenda,
   );
 
+  int _nextId = 10000;
+
   // ─── Eventos ─────────────────────────────────────────────────────────────────
 
   @override
-  Future<List<EventoAgenda>> getEventosByPersona(String personaId) async {
+  Future<List<EventoAgenda>> getEventosByPersona(int personaId) async {
     await Future.delayed(Duration.zero);
     return _eventos.where((e) => e.persona.id == personaId).toList();
   }
 
   @override
   Future<List<EventoAgenda>> getEventosByRango({
-    required String personaId,
+    required int personaId,
     required DateTime desde,
     required DateTime hasta,
   }) async {
@@ -37,9 +39,8 @@ class DemoAgendaDatasource implements AgendaDatasource {
   @override
   Future<EventoAgenda> crearEvento(EventoAgenda evento) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nuevo = EventoAgenda(
-      id: 'evt_$ts',
+      id: _nextId++,
       persona: evento.persona,
       creadoPor: evento.creadoPor,
       titulo: evento.titulo,
@@ -62,7 +63,7 @@ class DemoAgendaDatasource implements AgendaDatasource {
   }
 
   @override
-  Future<void> eliminarEvento(String eventoId) async {
+  Future<void> eliminarEvento(int eventoId) async {
     await Future.delayed(Duration.zero);
     final idx = _eventos.indexWhere((e) => e.id == eventoId);
     if (idx < 0) throw Exception('Evento no encontrado: $eventoId');
@@ -73,7 +74,7 @@ class DemoAgendaDatasource implements AgendaDatasource {
   // ─── Recordatorios ───────────────────────────────────────────────────────────
 
   @override
-  Future<List<Recordatorio>> getRecordatoriosByEvento(String eventoId) async {
+  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId) async {
     await Future.delayed(Duration.zero);
     return _recordatorios.where((r) => r.eventoAgenda.id == eventoId).toList();
   }
@@ -81,9 +82,8 @@ class DemoAgendaDatasource implements AgendaDatasource {
   @override
   Future<Recordatorio> crearRecordatorio(Recordatorio recordatorio) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nuevo = Recordatorio(
-      id: 'rec_$ts',
+      id: _nextId++,
       eventoAgenda: recordatorio.eventoAgenda,
       fechaHoraEnvio: recordatorio.fechaHoraEnvio,
       enviado: false,
@@ -93,7 +93,7 @@ class DemoAgendaDatasource implements AgendaDatasource {
   }
 
   @override
-  Future<Recordatorio> marcarEnviado(String recordatorioId) async {
+  Future<Recordatorio> marcarEnviado(int recordatorioId) async {
     await Future.delayed(Duration.zero);
     final idx = _recordatorios.indexWhere((r) => r.id == recordatorioId);
     if (idx < 0) {
@@ -111,7 +111,7 @@ class DemoAgendaDatasource implements AgendaDatasource {
   }
 
   @override
-  Future<void> eliminarRecordatorio(String recordatorioId) async {
+  Future<void> eliminarRecordatorio(int recordatorioId) async {
     await Future.delayed(Duration.zero);
     final idx = _recordatorios.indexWhere((r) => r.id == recordatorioId);
     if (idx < 0) {

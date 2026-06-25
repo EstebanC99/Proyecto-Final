@@ -5,11 +5,11 @@ abstract class AgendaRepository {
   // ─── Eventos ─────────────────────────────────────────────────────────────────
 
   /// Retorna todos los eventos de la persona con [personaId].
-  Future<List<EventoAgenda>> getEventosByPersona(String personaId);
+  Future<List<EventoAgenda>> getEventosByPersona(int personaId);
 
   /// Retorna los eventos de [personaId] dentro del rango de fechas indicado.
   Future<List<EventoAgenda>> getEventosByRango({
-    required String personaId,
+    required int personaId,
     required DateTime desde,
     required DateTime hasta,
   });
@@ -21,19 +21,19 @@ abstract class AgendaRepository {
   Future<EventoAgenda> actualizarEvento(EventoAgenda evento);
 
   /// Elimina el evento con [eventoId] y sus recordatorios.
-  Future<void> eliminarEvento(String eventoId);
+  Future<void> eliminarEvento(int eventoId);
 
   // ─── Recordatorios ───────────────────────────────────────────────────────────
 
   /// Retorna los recordatorios del evento con [eventoId].
-  Future<List<Recordatorio>> getRecordatoriosByEvento(String eventoId);
+  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId);
 
   /// Crea un nuevo recordatorio.
   Future<Recordatorio> crearRecordatorio(Recordatorio recordatorio);
 
   /// Marca el recordatorio con [recordatorioId] como enviado.
-  Future<Recordatorio> marcarEnviado(String recordatorioId);
+  Future<Recordatorio> marcarEnviado(int recordatorioId);
 
   /// Elimina el recordatorio con [recordatorioId].
-  Future<void> eliminarRecordatorio(String recordatorioId);
+  Future<void> eliminarRecordatorio(int recordatorioId);
 }

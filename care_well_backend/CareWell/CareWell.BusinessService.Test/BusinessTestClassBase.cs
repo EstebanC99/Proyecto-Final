@@ -11,14 +11,12 @@ namespace CareWell.BusinessService.Test
 
         protected BusinessTestClassBase()
         {
-            this.unitOfWork = new Mock<IUnitOfWork>();
-
             this.InitializeTest();
         }
 
         protected virtual void InitializeTest()
         {
-
+            this.unitOfWork = new Mock<IUnitOfWork>();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CareWell.Domain.ValueObjects.Auth;
+﻿using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 
@@ -14,39 +14,43 @@ namespace CareWell.Domain.General
 
         public virtual DateTime FechaNacimiento { get; private set; }
 
-        public virtual string Email { get; private set; }
+        public virtual string? Email { get; private set; }
 
-        public virtual string Telefono { get; private set; }
+        public virtual string? Telefono { get; private set; }
 
         public virtual string? ImagenPath { get; private set; }
 
-        public virtual void Crear(CrearCuenta crearCuenta)
+        public virtual void Crear(CrearPersona crearPersona)
         {
-            if (string.IsNullOrEmpty(crearCuenta.Nombre))
+            if (string.IsNullOrEmpty(crearPersona.Nombre))
                 throw new ValidacionDominioException(Mensajes.NombreRequerido);
 
-            if (string.IsNullOrEmpty(crearCuenta.Apellido))
+            if (string.IsNullOrEmpty(crearPersona.Apellido))
                 throw new ValidacionDominioException(Mensajes.ApellidoRequerido);
 
-            if (string.IsNullOrEmpty(crearCuenta.Documento))
+            if (string.IsNullOrEmpty(crearPersona.Documento))
                 throw new ValidacionDominioException(Mensajes.DocumentoRequerido);
 
-            if (crearCuenta.FechaNacimiento == default)
+            if (crearPersona.FechaNacimiento == default)
                 throw new ValidacionDominioException(Mensajes.FechaNacimientoRequerida);
 
-            if (string.IsNullOrEmpty(crearCuenta.Email))
-                throw new ValidacionDominioException(Mensajes.EmailRequerido);
-
-            if (string.IsNullOrEmpty(crearCuenta.Telefono))
-                throw new ValidacionDominioException(Mensajes.TelefonoRequerido);
-
-            this.Nombre = crearCuenta.Nombre;
-            this.Apellido = crearCuenta.Apellido;
-            this.Documento = crearCuenta.Documento;
-            this.FechaNacimiento = crearCuenta.FechaNacimiento;
-            this.Email = crearCuenta.Email;
-            this.Telefono = crearCuenta.Telefono;
+            this.Nombre = crearPersona.Nombre;
+            this.Apellido = crearPersona.Apellido;
+            this.Documento = crearPersona.Documento;
+            this.FechaNacimiento = crearPersona.FechaNacimiento;
+            this.Email = crearPersona.Email;
+            this.Telefono = crearPersona.Telefono;
         }
 
+        public virtual void CrearDesdeCuenta(CrearPersona crearPersona)
+        {
+            if (string.IsNullOrEmpty(crearPersona.Email))
+                throw new ValidacionDominioException(Mensajes.EmailRequerido);
+
+            if (string.IsNullOrEmpty(crearPersona.Telefono))
+                throw new ValidacionDominioException(Mensajes.TelefonoRequerido);
+
+            this.Crear(crearPersona);
+        }
     }
 }

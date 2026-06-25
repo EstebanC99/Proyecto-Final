@@ -7,81 +7,58 @@ import '../../../domain/entities/entities.dart';
 
 /// Retorna el ícono correspondiente al tipo de evento de salud.
 IconData _iconForTipo(TipoEventoSalud tipo) {
-  switch (tipo) {
-    case TipoEventoSalud.citaMedica:
+  switch (tipo.id) {
+    case TiposEventoSaludConst.citaMedica:
       return Icons.medical_services_outlined;
-    case TipoEventoSalud.hospitalizacion:
+    case TiposEventoSaludConst.hospitalizacion:
       return Icons.local_hospital_outlined;
-    case TipoEventoSalud.medicacion:
+    case TiposEventoSaludConst.medicacion:
       return Icons.medication_outlined;
-    case TipoEventoSalud.cirugia:
+    case TiposEventoSaludConst.cirugia:
       return Icons.biotech_outlined;
-    case TipoEventoSalud.tratamiento:
+    case TiposEventoSaludConst.tratamiento:
       return Icons.healing_outlined;
-    case TipoEventoSalud.bienestar:
+    case TiposEventoSaludConst.bienestar:
       return Icons.favorite_outline;
-    case TipoEventoSalud.sintoma:
+    case TiposEventoSaludConst.sintoma:
       return Icons.sick_outlined;
-    case TipoEventoSalud.diagnostico:
+    case TiposEventoSaludConst.diagnostico:
       return Icons.search_outlined;
-    case TipoEventoSalud.vacuna:
+    case TiposEventoSaludConst.vacuna:
       return Icons.vaccines_outlined;
-    case TipoEventoSalud.otro:
+    default:
       return Icons.event_note_outlined;
   }
 }
 
 /// Retorna el color de acento correspondiente al tipo de evento de salud.
 Color _colorForTipo(TipoEventoSalud tipo) {
-  switch (tipo) {
-    case TipoEventoSalud.citaMedica:
+  switch (tipo.id) {
+    case TiposEventoSaludConst.citaMedica:
       return AppColors.healthAccent;
-    case TipoEventoSalud.hospitalizacion:
+    case TiposEventoSaludConst.hospitalizacion:
       return AppColors.error;
-    case TipoEventoSalud.medicacion:
+    case TiposEventoSaludConst.medicacion:
       return const Color(0xFF2563EB);
-    case TipoEventoSalud.cirugia:
+    case TiposEventoSaludConst.cirugia:
       return AppColors.error;
-    case TipoEventoSalud.tratamiento:
+    case TiposEventoSaludConst.tratamiento:
       return AppColors.moodAccent;
-    case TipoEventoSalud.bienestar:
+    case TiposEventoSaludConst.bienestar:
       return AppColors.success;
-    case TipoEventoSalud.sintoma:
+    case TiposEventoSaludConst.sintoma:
       return AppColors.habitsAccent;
-    case TipoEventoSalud.diagnostico:
+    case TiposEventoSaludConst.diagnostico:
       return const Color(0xFF0284C7);
-    case TipoEventoSalud.vacuna:
+    case TiposEventoSaludConst.vacuna:
       return const Color(0xFF059669);
-    case TipoEventoSalud.otro:
+    default:
       return AppColors.textSecondary;
   }
 }
 
 /// Etiqueta legible del tipo de evento.
-String _labelForTipo(TipoEventoSalud tipo) {
-  switch (tipo) {
-    case TipoEventoSalud.citaMedica:
-      return 'Cita médica';
-    case TipoEventoSalud.hospitalizacion:
-      return 'Hospitalización';
-    case TipoEventoSalud.medicacion:
-      return 'Medicación';
-    case TipoEventoSalud.cirugia:
-      return 'Cirugía';
-    case TipoEventoSalud.tratamiento:
-      return 'Tratamiento';
-    case TipoEventoSalud.bienestar:
-      return 'Bienestar';
-    case TipoEventoSalud.sintoma:
-      return 'Síntoma';
-    case TipoEventoSalud.diagnostico:
-      return 'Diagnóstico';
-    case TipoEventoSalud.vacuna:
-      return 'Vacuna';
-    case TipoEventoSalud.otro:
-      return 'Otro';
-  }
-}
+String _labelForTipo(TipoEventoSalud tipo) => tipo.descripcion;
 
 /// Funciones públicas para uso en otros widgets del módulo salud.
 IconData healthEventIcon(TipoEventoSalud tipo) => _iconForTipo(tipo);

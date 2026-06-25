@@ -154,33 +154,23 @@ class _MoodRecordItem extends StatelessWidget {
 
   final EstadoDeAnimo estado;
 
-  static int _enumToLevel(EstadoAnimoEnum e) {
-    switch (e) {
-      case EstadoAnimoEnum.muyMal:
-        return 1;
-      case EstadoAnimoEnum.mal:
-        return 2;
-      case EstadoAnimoEnum.regular:
-        return 3;
-      case EstadoAnimoEnum.bien:
-        return 4;
-      case EstadoAnimoEnum.muyBien:
-        return 5;
-    }
-  }
+  /// El [id] de [EstadoAnimo] coincide con el nivel numérico (1–5).
+  static int _enumToLevel(EstadoAnimo e) => e.id;
 
-  static String _emojiForEnum(EstadoAnimoEnum e) {
-    switch (e) {
-      case EstadoAnimoEnum.muyMal:
+  static String _emojiForEnum(EstadoAnimo e) {
+    switch (e.id) {
+      case EstadosAnimoConst.muyMal:
         return '😞';
-      case EstadoAnimoEnum.mal:
+      case EstadosAnimoConst.mal:
         return '😕';
-      case EstadoAnimoEnum.regular:
+      case EstadosAnimoConst.regular:
         return '😐';
-      case EstadoAnimoEnum.bien:
+      case EstadosAnimoConst.bien:
         return '🙂';
-      case EstadoAnimoEnum.muyBien:
+      case EstadosAnimoConst.muyBien:
         return '😄';
+      default:
+        return '😐';
     }
   }
 

@@ -1,25 +1,20 @@
 import '../../domain/entities/entities.dart';
 import '../models/models.dart';
 
+/// Convierte entre [TipoEventoAgendaModel] y [TipoEventoAgenda].
+class TipoEventoAgendaMapper {
+  TipoEventoAgendaMapper._();
+
+  static TipoEventoAgenda fromModel(TipoEventoAgendaModel model) =>
+      TipoEventoAgenda(id: model.id, descripcion: model.descripcion);
+
+  static TipoEventoAgendaModel toModel(TipoEventoAgenda entity) =>
+      TipoEventoAgendaModel(id: entity.id, descripcion: entity.descripcion);
+}
+
 /// Convierte entre [EventoAgendaModel] y [EventoAgenda].
 class EventoAgendaMapper {
   EventoAgendaMapper._();
-
-  static const _tipoMap = {
-    'citaMedica': TipoEventoAgenda.citaMedica,
-    'medicacion': TipoEventoAgenda.medicacion,
-    'rehabilitacion': TipoEventoAgenda.rehabilitacion,
-    'control': TipoEventoAgenda.control,
-    'otro': TipoEventoAgenda.otro,
-  };
-
-  static const _tipoReverseMap = {
-    TipoEventoAgenda.citaMedica: 'citaMedica',
-    TipoEventoAgenda.medicacion: 'medicacion',
-    TipoEventoAgenda.rehabilitacion: 'rehabilitacion',
-    TipoEventoAgenda.control: 'control',
-    TipoEventoAgenda.otro: 'otro',
-  };
 
   /// Requiere la [persona] y el [creadoPor] ya construidos.
   static EventoAgenda fromModel(
@@ -33,7 +28,7 @@ class EventoAgendaMapper {
       creadoPor: creadoPor,
       titulo: model.titulo,
       descripcion: model.descripcion,
-      tipo: _tipoMap[model.tipo] ?? TipoEventoAgenda.otro,
+      tipo: TipoEventoAgendaMapper.fromModel(model.tipo),
       fechaHoraInicio: DateTime.parse(model.fechaHoraInicio),
       fechaHoraFin: model.fechaHoraFin != null
           ? DateTime.tryParse(model.fechaHoraFin!)
@@ -48,7 +43,7 @@ class EventoAgendaMapper {
       creadoPorId: entity.creadoPor.id,
       titulo: entity.titulo,
       descripcion: entity.descripcion,
-      tipo: _tipoReverseMap[entity.tipo] ?? 'otro',
+      tipo: TipoEventoAgendaMapper.toModel(entity.tipo),
       fechaHoraInicio: entity.fechaHoraInicio.toIso8601String(),
       fechaHoraFin: entity.fechaHoraFin?.toIso8601String(),
     );

@@ -4,57 +4,69 @@ import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('EstadoUsuarioMapper', () {
+    test('fromModel activo produce entidad con id correcto', () {
+      final model = EstadoUsuarioModel(
+        id: EstadosUsuarioConst.activo,
+        descripcion: 'Activo',
+      );
+      final entity = EstadoUsuarioMapper.fromModel(model);
+      expect(entity.id, EstadosUsuarioConst.activo);
+      expect(entity.descripcion, 'Activo');
+    });
+
+    test('fromModel suspendido produce entidad con id correcto', () {
+      final model = EstadoUsuarioModel(
+        id: EstadosUsuarioConst.suspendido,
+        descripcion: 'Suspendido',
+      );
+      final entity = EstadoUsuarioMapper.fromModel(model);
+      expect(entity.id, EstadosUsuarioConst.suspendido);
+    });
+
+    test('json → model → entity produce la entidad esperada', () {
+      final json = {'id': EstadosUsuarioConst.activo, 'descripcion': 'Activo'};
+      final model = EstadoUsuarioModel.fromJson(json);
+      final entity = EstadoUsuarioMapper.fromModel(model);
+      expect(entity.id, EstadosUsuarioConst.activo);
+      expect(entity.descripcion, 'Activo');
+    });
+  });
+
   group('UsuarioMapper', () {
-    final persona = Persona(
-      id: 'per_001',
+    final personaModel = PersonaModel(
+      id: 1,
       nombre: 'María',
       apellido: 'García',
       email: 'maria@example.com',
+      telefono: '',
+      documento: '',
+      fechaNacimiento: DateTime(1990, 1, 1),
+      imagenPath: null,
     );
 
-    final usuario = Usuario(
-      id: 'usr_001',
-      persona: persona,
-      nombreUsuario: 'maria.garcia',
-      contrasenaHash: 'hash123',
-      estado: EstadoUsuario.activo,
+    final estadoModel = EstadoUsuarioModel(
+      id: EstadosUsuarioConst.activo,
+      descripcion: 'Activo',
     );
 
-    final model = UsuarioModel(
-      id: 'usr_001',
-      personaId: 'per_001',
-      nombreUsuario: 'maria.garcia',
-      contrasenaHash: 'hash123',
-      estado: 'activo',
+    final usuarioModel = UsuarioModel(
+      id: 101,
+      nombreUsuario: 'maria@example.com',
+      personaModel: personaModel,
+      estadoModel: estadoModel,
     );
 
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = UsuarioMapper.fromModel(
-        UsuarioMapper.toModel(usuario),
-        persona,
-      );
-      expect(roundTrip.id, usuario.id);
-      expect(roundTrip.nombreUsuario, usuario.nombreUsuario);
-      expect(roundTrip.contrasenaHash, usuario.contrasenaHash);
-      expect(roundTrip.estado, usuario.estado);
-      expect(roundTrip.persona.id, persona.id);
+    test('fromModel produce entidad con id y estado correcto', () {
+      final entity = UsuarioMapper.fromModel(usuarioModel);
+      expect(entity.id, 101);
+      expect(entity.estado.id, EstadosUsuarioConst.activo);
     });
 
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = UsuarioModel.fromJson(json);
-      final entity = UsuarioMapper.fromModel(modelFromJson, persona);
-      final modelBack = UsuarioMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
-    });
-
-    test('estado suspendido se serializa y deserializa correctamente', () {
-      final suspendido = usuario.copyWith(estado: EstadoUsuario.suspendido);
-      final roundTrip = UsuarioMapper.fromModel(
-        UsuarioMapper.toModel(suspendido),
-        persona,
-      );
-      expect(roundTrip.estado, EstadoUsuario.suspendido);
+    test('fromModel asigna persona correctamente', () {
+      final entity = UsuarioMapper.fromModel(usuarioModel);
+      expect(entity.persona.id, 1);
+      expect(entity.persona.nombre, 'María');
     });
   });
 }

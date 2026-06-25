@@ -15,7 +15,7 @@ import '../../widgets/widgets.dart';
 class CareTeamMemberScreen extends ConsumerStatefulWidget {
   const CareTeamMemberScreen({super.key, required this.memberId});
 
-  final String memberId;
+  final int memberId;
 
   @override
   ConsumerState<CareTeamMemberScreen> createState() =>
@@ -23,36 +23,42 @@ class CareTeamMemberScreen extends ConsumerStatefulWidget {
 }
 
 class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
-  Map<CodigoPermiso, bool>? _permisos;
-  Map<CodigoPermiso, bool>? _permisosIniciales;
+  /// Mapa de permisos por id: true = activo, false = inactivo.
+  Map<int, bool>? _permisos;
+  Map<int, bool>? _permisosIniciales;
   bool _guardando = false;
 
   bool get _hayCambios {
     if (_permisos == null || _permisosIniciales == null) return false;
-    for (final codigo in CodigoPermiso.values) {
-      if (_permisos![codigo] != _permisosIniciales![codigo]) return true;
+    for (final id in _permisos!.keys) {
+      if (_permisos![id] != _permisosIniciales![id]) return true;
     }
     return false;
   }
 
-  void _inicializarPermisos(AsignacionCuidado asignacion) {
+  void _inicializarPermisos(
+    AsignacionCuidado asignacion,
+    List<CodigoPermiso> todosLosCodigos,
+  ) {
     if (_permisos != null) return; // ya inicializado
-    final permisosActivos = asignacion.permisos.map((p) => p.codigo).toSet();
+    final idsActivos = asignacion.permisos.map((p) => p.codigo.id).toSet();
     _permisos = {
-      for (final c in CodigoPermiso.values) c: permisosActivos.contains(c),
+      for (final c in todosLosCodigos) c.id: idsActivos.contains(c.id),
     };
     _permisosIniciales = Map.from(_permisos!);
   }
 
-  Future<void> _guardarCambios(AsignacionCuidado asignacion) async {
+  Future<void> _guardarCambios(
+    AsignacionCuidado asignacion,
+    List<CodigoPermiso> todosLosCodigos,
+  ) async {
     if (_permisos == null) return;
     setState(() => _guardando = true);
 
     try {
       final actualizar = ref.read(actualizarPermisosProvider);
-      final permisosActivos = _permisos!.entries
-          .where((e) => e.value)
-          .map((e) => e.key)
+      final permisosActivos = todosLosCodigos
+          .where((c) => _permisos![c.id] == true)
           .toList();
       await actualizar(
         asignacion: asignacion,
@@ -187,15 +193,19 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
               );
             }
 
+            final todosLosCodigos = ref.watch(availablePermisosProvider);
+
             // Inicializar permisos en el primer render.
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (_permisos == null) {
-                setState(() => _inicializarPermisos(asignacion));
+                setState(
+                  () => _inicializarPermisos(asignacion, todosLosCodigos),
+                );
               }
             });
 
             if (_permisos == null) {
-              _inicializarPermisos(asignacion);
+              _inicializarPermisos(asignacion, todosLosCodigos);
             }
 
             final personaCuidada = asignacion.personaCuidada;
@@ -252,7 +262,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                         Container(
                           color: AppColors.surface,
                           child: Column(
-                            children: CodigoPermiso.values.asMap().entries.map((
+                            children: todosLosCodigos.asMap().entries.map((
                               entry,
                             ) {
                               final i = entry.key;
@@ -261,11 +271,12 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                                 children: [
                                   PermissionToggleRow(
                                     label: labelDePermiso(codigo),
-                                    value: _permisos?[codigo] ?? false,
-                                    onChanged: (v) =>
-                                        setState(() => _permisos![codigo] = v),
+                                    value: _permisos?[codigo.id] ?? false,
+                                    onChanged: (v) => setState(
+                                      () => _permisos![codigo.id] = v,
+                                    ),
                                   ),
-                                  if (i < CodigoPermiso.values.length - 1)
+                                  if (i < todosLosCodigos.length - 1)
                                     const Divider(
                                       height: 1,
                                       thickness: 1,
@@ -292,7 +303,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                       label: 'Guardar cambios',
                       isLoading: _guardando,
                       onPressed: _hayCambios
-                          ? () => _guardarCambios(asignacion)
+                          ? () => _guardarCambios(asignacion, todosLosCodigos)
                           : null,
                     ),
                   ),

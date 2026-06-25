@@ -7,16 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+import '../../../_fakes/test_fixtures.dart';
+
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _evento = EventoDeSalud(
-  id: 'esa_001',
+  id: 1101,
   persona: _personaAlicia,
-  tipo: TipoEventoSalud.citaMedica,
+  tipo: tipoEventoSaludCitaMedica,
   fecha: DateTime(2026, 6, 2),
   descripcion: 'Control cardiológico',
 );

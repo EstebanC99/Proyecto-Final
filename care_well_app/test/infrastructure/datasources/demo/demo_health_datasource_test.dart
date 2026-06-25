@@ -12,32 +12,25 @@ void main() {
     // ─── getEventosSaludByPersona ──────────────────────────────────────────────
 
     group('getEventosSaludByPersona', () {
-      test('retorna eventos de Alicia con tipos del enum ampliado', () async {
+      test('retorna eventos de Alicia', () async {
         final eventos = await datasource.getEventosSaludByPersona(
           DemoSeed.personaAliciaId,
         );
         expect(eventos, isNotEmpty);
+      });
+
+      test('incluye evento de tipo citaMedica en el seed', () async {
+        final eventos = await datasource.getEventosSaludByPersona(
+          DemoSeed.personaAliciaId,
+        );
         expect(
-          eventos.every((e) => TipoEventoSalud.values.contains(e.tipo)),
+          eventos.any((e) => e.tipo.id == TiposEventoSaludConst.citaMedica),
           isTrue,
         );
       });
 
-      test(
-        'incluye evento de tipo citaMedica (nuevo valor del enum)',
-        () async {
-          final eventos = await datasource.getEventosSaludByPersona(
-            DemoSeed.personaAliciaId,
-          );
-          expect(
-            eventos.any((e) => e.tipo == TipoEventoSalud.citaMedica),
-            isTrue,
-          );
-        },
-      );
-
       test('retorna vacío para ID inexistente', () async {
-        final eventos = await datasource.getEventosSaludByPersona('no_existe');
+        final eventos = await datasource.getEventosSaludByPersona(99999);
         expect(eventos, isEmpty);
       });
     });
@@ -45,14 +38,16 @@ void main() {
     // ─── getNotasByEvento ──────────────────────────────────────────────────────
 
     group('getNotasByEvento', () {
-      test('retorna notas del evento esa_003 del seed', () async {
-        final notas = await datasource.getNotasByEvento('esa_003');
+      // El seed tiene notas para eventoSaludControlCardiologico (id: 1103)
+      test('retorna notas del evento 1103 del seed', () async {
+        final notas = await datasource.getNotasByEvento(1103);
         expect(notas, isNotEmpty);
-        expect(notas.every((n) => n.eventoSaludId == 'esa_003'), isTrue);
+        expect(notas.every((n) => n.eventoSaludId == 1103), isTrue);
       });
 
+      // El evento de vacuna antigripal (id: 1104) no tiene notas en el seed
       test('retorna vacío para evento sin notas', () async {
-        final notas = await datasource.getNotasByEvento('esa_002');
+        final notas = await datasource.getNotasByEvento(1104);
         expect(notas, isEmpty);
       });
     });
@@ -60,30 +55,30 @@ void main() {
     // ─── crearNota ─────────────────────────────────────────────────────────────
 
     group('crearNota', () {
-      test('crea nota y la retorna con id generado', () async {
+      test('crea nota y la retorna con id generado mayor a 0', () async {
         final nota = NotaEvento(
-          id: '',
-          eventoSaludId: 'esa_001',
+          id: 0,
+          eventoSaludId: 1101,
           autor: DemoSeed.personaMaria,
           fechaHora: DateTime.now(),
           contenido: 'Nueva nota de prueba.',
         );
         final creada = await datasource.crearNota(nota);
-        expect(creada.id, isNotEmpty);
+        expect(creada.id, greaterThan(0));
         expect(creada.contenido, 'Nueva nota de prueba.');
-        expect(creada.eventoSaludId, 'esa_001');
+        expect(creada.eventoSaludId, 1101);
       });
 
       test('nota creada aparece en getNotasByEvento', () async {
         final nota = NotaEvento(
-          id: '',
-          eventoSaludId: 'esa_002',
+          id: 0,
+          eventoSaludId: 1104,
           autor: DemoSeed.personaMaria,
           fechaHora: DateTime.now(),
           contenido: 'Contenido de test.',
         );
         await datasource.crearNota(nota);
-        final notas = await datasource.getNotasByEvento('esa_002');
+        final notas = await datasource.getNotasByEvento(1104);
         expect(notas.any((n) => n.contenido == 'Contenido de test.'), isTrue);
       });
     });

@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 final _persona = Persona(
-  id: 'per_test',
+  id: 2,
   nombre: 'Alicia',
   apellido: 'Rodríguez',
   fechaNacimiento: DateTime(1943, 7, 22),
@@ -88,7 +88,7 @@ void main() {
       tester,
     ) async {
       final personaSinFecha = Persona(
-        id: 'per_sf',
+        id: 99,
         nombre: 'Juan',
         apellido: 'Pérez',
       );

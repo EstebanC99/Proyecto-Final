@@ -156,29 +156,26 @@ void main() {
     });
   });
 
-  group('validateNombreUsuario', () {
-    test('nombre de usuario válido retorna null', () {
-      expect(validateNombreUsuario('maria.garcia'), isNull);
+  group('validateFechaNacimiento', () {
+    test('fecha pasada retorna null', () {
+      expect(validateFechaNacimiento(DateTime(1990, 5, 20)), isNull);
     });
 
-    test('nombre de usuario con espacio retorna error', () {
-      expect(validateNombreUsuario('maria garcia'), isNotNull);
+    test('fecha de hoy retorna null', () {
+      final hoy = DateTime.now();
+      expect(
+        validateFechaNacimiento(DateTime(hoy.year, hoy.month, hoy.day)),
+        isNull,
+      );
     });
 
-    test('nombre de usuario de 2 caracteres retorna error', () {
-      expect(validateNombreUsuario('mg'), isNotNull);
-    });
-
-    test('nombre de usuario vacío retorna error', () {
-      expect(validateNombreUsuario(''), isNotNull);
+    test('fecha futura retorna error', () {
+      final manana = DateTime.now().add(const Duration(days: 1));
+      expect(validateFechaNacimiento(manana), isNotNull);
     });
 
     test('null retorna error', () {
-      expect(validateNombreUsuario(null), isNotNull);
-    });
-
-    test('nombre de usuario de 3 caracteres retorna null', () {
-      expect(validateNombreUsuario('abc'), isNull);
+      expect(validateFechaNacimiento(null), isNotNull);
     });
   });
 }

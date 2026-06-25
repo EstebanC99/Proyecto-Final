@@ -5,18 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _habito = HabitoDeVida(
-  id: 'hab_001',
+  id: 901,
   persona: _personaAlicia,
-  tipo: TipoHabito.actividadFisica,
+  tipo: tipoHabitoActividadFisica,
   descripcion: 'Caminata diaria de 30 minutos.',
 );
 
@@ -28,7 +26,7 @@ const _sinHabito = Object();
 Widget _wrap({
   Object? habito = _sinHabito,
   bool puedeRegistrar = true,
-  String habitId = 'hab_001',
+  int habitId = 901,
 }) {
   final habitoResuelto = habito == _sinHabito
       ? _habito
@@ -80,7 +78,7 @@ void main() {
     );
 
     testWidgets('muestra mensaje cuando el hábito no existe', (tester) async {
-      await tester.pumpWidget(_wrap(habito: null, habitId: 'hab_inexistente'));
+      await tester.pumpWidget(_wrap(habito: null, habitId: 99999));
       await tester.pump();
       expect(find.text('Hábito no encontrado.'), findsOneWidget);
     });

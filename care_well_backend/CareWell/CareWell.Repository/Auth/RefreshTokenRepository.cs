@@ -1,5 +1,4 @@
 ﻿using CareWell.Domain.Auth;
-using Microsoft.EntityFrameworkCore;
 
 namespace CareWell.Repository.Auth
 {
@@ -11,7 +10,7 @@ namespace CareWell.Repository.Auth
 
         public RefreshToken GetByToken(string token)
         {
-            return this.DbSet.Include(t => t.Usuario).FirstOrDefault(t => t.Token == token);
+            return this.DbSet.FirstOrDefault(t => t.Token == token);
         }
     }
 }

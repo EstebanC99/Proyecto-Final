@@ -13,9 +13,9 @@ Widget _wrap(Widget child) => ProviderScope(child: MaterialApp(home: child));
 Widget _wrapHome() {
   return ProviderScope(
     overrides: [
-      // Sobreescribe dependentsListProvider con lista vacía resuelta para evitar
+      // Sobreescribe dependentsAsResponsableProvider con lista vacía resuelta para evitar
       // el NavTileSkeleton, que tiene un AnimationController de shimmer infinito.
-      dependentsListProvider.overrideWith((ref) async => <Persona>[]),
+      dependentsAsResponsableProvider.overrideWith((ref) async => <Persona>[]),
     ],
     child: const MaterialApp(home: HomeScreen()),
   );

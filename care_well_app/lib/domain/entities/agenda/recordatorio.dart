@@ -22,7 +22,7 @@ class Recordatorio extends BaseEntity {
 
   @override
   Recordatorio copyWith({
-    String? id,
+    int? id,
     EventoAgenda? eventoAgenda,
     DateTime? fechaHoraEnvio,
     bool? enviado,

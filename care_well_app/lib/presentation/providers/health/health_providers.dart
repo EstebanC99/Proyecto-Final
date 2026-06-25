@@ -31,7 +31,7 @@ Future<AsignacionCuidado?> _asignacionActivaDelUsuario(Ref ref) async {
       .where(
         (a) =>
             a.personaCuidada.id == persona.id &&
-            a.estado == EstadoAsignacion.activa,
+            a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;
 }
@@ -46,7 +46,7 @@ final puedeVerSaludProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo == CodigoPermiso.verFichaSalud,
+    (p) => p.codigo.id == PermisosCuidadoConst.verFichaSalud,
   );
 });
 
@@ -60,7 +60,7 @@ final puedeRegistrarEventosSaludProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo == CodigoPermiso.registrarEventosSalud,
+    (p) => p.codigo.id == PermisosCuidadoConst.registrarEventosSalud,
   );
 });
 
@@ -74,7 +74,7 @@ final puedeRegistrarHabitosProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo == CodigoPermiso.registrarHabitos,
+    (p) => p.codigo.id == PermisosCuidadoConst.registrarHabitos,
   );
 });
 
@@ -115,7 +115,7 @@ final eventosSaludProvider = FutureProvider<List<EventoDeSalud>>((ref) async {
 /// Evento de salud individual por ID. Busca en la lista ya cargada.
 ///
 /// Retorna `null` si no existe.
-final eventoSaludByIdProvider = FutureProvider.family<EventoDeSalud?, String>((
+final eventoSaludByIdProvider = FutureProvider.family<EventoDeSalud?, int>((
   ref,
   id,
 ) async {
@@ -126,7 +126,7 @@ final eventoSaludByIdProvider = FutureProvider.family<EventoDeSalud?, String>((
 // ─── Notas de eventos de salud ───────────────────────────────────────────────
 
 /// Notas del evento con [eventoId], ordenadas cronológicamente ascendente.
-final notasByEventoProvider = FutureProvider.family<List<NotaEvento>, String>((
+final notasByEventoProvider = FutureProvider.family<List<NotaEvento>, int>((
   ref,
   eventoId,
 ) async {
@@ -153,7 +153,7 @@ final estadosAnimoProvider = FutureProvider<List<EstadoDeAnimo>>((ref) async {
 /// Hábito de vida individual por ID. Busca en la lista ya cargada.
 ///
 /// Retorna `null` si no existe.
-final habitoByIdProvider = FutureProvider.family<HabitoDeVida?, String>((
+final habitoByIdProvider = FutureProvider.family<HabitoDeVida?, int>((
   ref,
   id,
 ) async {
@@ -177,7 +177,7 @@ final actualizarHabitoProvider =
 
 /// Elimina un hábito de vida e invalida la lista.
 final eliminarHabitoProvider =
-    Provider<Future<void> Function({required String habitoId})>((ref) {
+    Provider<Future<void> Function({required int habitoId})>((ref) {
       return ({required habitoId}) async {
         final repo = ref.read(healthRepositoryProvider);
         await repo.eliminarHabito(habitoId);
@@ -199,7 +199,7 @@ final crearHabitoProvider =
 
         final repo = ref.read(healthRepositoryProvider);
         final habito = HabitoDeVida(
-          id: '',
+          id: 0,
           persona: persona,
           tipo: tipo,
           descripcion: descripcion,
@@ -225,7 +225,7 @@ final crearEventoSaludProvider =
 
         final repo = ref.read(healthRepositoryProvider);
         final evento = EventoDeSalud(
-          id: '',
+          id: 0,
           persona: persona,
           tipo: tipo,
           fecha: fecha,
@@ -241,7 +241,7 @@ final crearEventoSaludProvider =
 final crearNotaEventoProvider =
     Provider<
       Future<NotaEvento> Function({
-        required String eventoSaludId,
+        required int eventoSaludId,
         required String contenido,
       })
     >((ref) {
@@ -251,7 +251,7 @@ final crearNotaEventoProvider =
 
         final repo = ref.read(healthRepositoryProvider);
         final nota = NotaEvento(
-          id: '',
+          id: 0,
           eventoSaludId: eventoSaludId,
           autor: usuario.persona,
           fechaHora: DateTime.now(),
@@ -265,7 +265,7 @@ final crearNotaEventoProvider =
 
 /// Elimina un evento de salud e invalida la lista.
 final eliminarEventoSaludProvider =
-    Provider<Future<void> Function({required String eventoId})>((ref) {
+    Provider<Future<void> Function({required int eventoId})>((ref) {
       return ({required eventoId}) async {
         final repo = ref.read(healthRepositoryProvider);
         await repo.eliminarEventoSalud(eventoId);
@@ -286,7 +286,7 @@ final ultimoEstadoAnimoProvider = FutureProvider<EstadoDeAnimo?>((ref) async {
 final registrarAnimoProvider =
     Provider<
       Future<EstadoDeAnimo> Function({
-        required EstadoAnimoEnum estado,
+        required EstadoAnimo estado,
         String? observaciones,
       })
     >((ref) {
@@ -296,7 +296,7 @@ final registrarAnimoProvider =
 
         final repo = ref.read(healthRepositoryProvider);
         final animo = EstadoDeAnimo(
-          id: '',
+          id: 0,
           persona: persona,
           fecha: DateTime.now(),
           estado: estado,

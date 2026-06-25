@@ -1,6 +1,7 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
+import 'package:care_well_app/presentation/screens/auth/account_created_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/create_credentials_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/login_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/recover_password_screen.dart';
@@ -12,30 +13,33 @@ import 'package:flutter_test/flutter_test.dart';
 /// Fake de repositorio que implementa todos los métodos requeridos.
 class _FakeAuthRepository implements AuthRepository {
   static final _usuario = Usuario(
-    id: 'usr_test',
+    id: 101,
     persona: Persona(
-      id: 'per_test',
+      id: 1,
       nombre: 'Test',
       apellido: 'User',
       email: 'test@example.com',
     ),
-    nombreUsuario: 'demo',
-    contrasenaHash: '1234',
-    estado: EstadoUsuario.activo,
+    contrasena: '1234',
+    estado: EstadoUsuario(
+      id: EstadosUsuarioConst.activo,
+      descripcion: 'Activo',
+    ),
   );
 
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) async =>
-      _usuario;
+  Future<Usuario> login(String email, String contrasena) async => _usuario;
 
   @override
-  Future<Usuario> register({
+  Future<void> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
-  }) async => _usuario;
+  }) async {}
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
@@ -44,11 +48,11 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {}
+  Future<void> eliminarCuenta(int usuarioId) async {}
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {}
@@ -56,13 +60,12 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async => _usuario;
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
@@ -119,6 +122,8 @@ void main() {
         await tester.pump();
         expect(find.text('Nombre'), findsOneWidget);
         expect(find.text('Apellido'), findsOneWidget);
+        expect(find.text('DNI'), findsOneWidget);
+        expect(find.text('Fecha de nacimiento'), findsOneWidget);
         expect(find.text('Email'), findsOneWidget);
       },
     );
@@ -159,8 +164,16 @@ void main() {
       await tester.pumpWidget(_wrap(const CreateCredentialsScreen()));
       await tester.pump();
       expect(find.text('Email'), findsOneWidget);
-      expect(find.text('Nombre de usuario'), findsOneWidget);
       expect(find.text('Nueva contraseña'), findsOneWidget);
+      expect(find.text('Confirmar contraseña'), findsOneWidget);
+    });
+
+    testWidgets('CreateCredentialsScreen NO muestra campo Nombre de usuario', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(const CreateCredentialsScreen()));
+      await tester.pump();
+      expect(find.text('Nombre de usuario'), findsNothing);
     });
 
     testWidgets('CreateCredentialsScreen muestra botón crear credenciales', (
@@ -169,6 +182,32 @@ void main() {
       await tester.pumpWidget(_wrap(const CreateCredentialsScreen()));
       await tester.pump();
       expect(find.text('Crear credenciales'), findsOneWidget);
+    });
+
+    testWidgets('AccountCreatedScreen monta sin errores', (tester) async {
+      await tester.pumpWidget(_wrap(const AccountCreatedScreen()));
+      await tester.pump();
+      // ZoomIn de animate_do tiene timer de animacion; drenamos para evitar timers pendientes.
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byType(AccountCreatedScreen), findsOneWidget);
+    });
+
+    testWidgets('AccountCreatedScreen muestra texto "Cuenta creada"', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(const AccountCreatedScreen()));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('Cuenta creada'), findsOneWidget);
+    });
+
+    testWidgets('AccountCreatedScreen muestra botón "Ir al login"', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(const AccountCreatedScreen()));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('Ir al login'), findsOneWidget);
     });
   });
 }

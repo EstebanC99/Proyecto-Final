@@ -12,15 +12,16 @@ class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository(this._usuario);
 
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) async =>
-      _usuario;
+  Future<Usuario> login(String email, String contrasena) async => _usuario;
 
   @override
   Future<Usuario> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) async => _usuario;
 
@@ -31,11 +32,11 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {}
+  Future<void> eliminarCuenta(int usuarioId) async {}
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {}
@@ -43,13 +44,12 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async => _usuario;
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
@@ -58,18 +58,17 @@ class _FakeAuthRepository implements AuthRepository {
 
 // Usuario demo para los tests.
 final _testUsuario = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: Persona(
-    id: 'per_001',
+    id: 1,
     nombre: 'María',
     apellido: 'García',
     email: 'maria.garcia@example.com',
     telefono: '+54 9 11 1234-5678',
     documento: '28456789',
   ),
-  nombreUsuario: 'maria.garcia',
-  contrasenaHash: '12345678',
-  estado: EstadoUsuario.activo,
+  contrasena: '12345678',
+  estado: EstadoUsuario(id: EstadosUsuarioConst.activo, descripcion: 'Activo'),
 );
 
 Widget _wrap(Widget child, {bool loggedIn = true}) {
@@ -82,7 +81,7 @@ Widget _wrap(Widget child, {bool loggedIn = true}) {
         authStateProvider.overrideWith(
           (ref) =>
               AuthNotifier(ref.watch(authRepositoryProvider))
-                ..login('maria.garcia', '12345678'),
+                ..login(_testUsuario.persona.email!, _testUsuario.contrasena),
         ),
     ],
     child: MaterialApp(home: child),

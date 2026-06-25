@@ -6,13 +6,13 @@ abstract class EmergencyDatasource {
   ///
   /// Retorna la [Emergencia] creada con su id generado.
   Future<Emergencia> activarEmergencia({
-    required String personaId,
+    required int personaId,
     String? descripcion,
   });
 
   /// Retorna el historial de emergencias de la persona con [personaId].
-  Future<List<Emergencia>> getEmergenciasByPersona(String personaId);
+  Future<List<Emergencia>> getEmergenciasByPersona(int personaId);
 
   /// Marca la emergencia con [emergenciaId] como atendida.
-  Future<Emergencia> marcarAtendida(String emergenciaId);
+  Future<Emergencia> marcarAtendida(int emergenciaId);
 }

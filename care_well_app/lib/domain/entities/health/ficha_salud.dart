@@ -24,7 +24,7 @@ class FichaSalud extends BaseEntity {
 
   @override
   FichaSalud copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     String? antecedentes,
     String? estudios,

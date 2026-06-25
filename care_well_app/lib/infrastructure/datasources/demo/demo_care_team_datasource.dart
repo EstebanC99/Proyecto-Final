@@ -4,7 +4,10 @@ import 'demo_seed.dart';
 
 /// Implementación demo (en memoria) de [CareTeamDatasource].
 class DemoCareTeamDatasource implements CareTeamDatasource {
-  final List<Rol> _roles = [DemoSeed.rolResponsable, DemoSeed.rolCuidador];
+  final List<RolCuidado> _roles = [
+    DemoSeed.rolCuidadoResponsable,
+    DemoSeed.rolCuidadoCuidador,
+  ];
 
   final List<AsignacionCuidado> _asignaciones = [
     DemoSeed.asignacionCarlos,
@@ -12,9 +15,11 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
     DemoSeed.asignacionMaria,
   ];
 
+  int _nextId = 10000;
+
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async {
     await Future.delayed(Duration.zero);
     return _asignaciones
@@ -24,7 +29,7 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async {
     await Future.delayed(Duration.zero);
     return _asignaciones
@@ -37,9 +42,8 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
     AsignacionCuidado asignacion,
   ) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nueva = AsignacionCuidado(
-      id: 'asi_$ts',
+      id: _nextId++,
       personaCuidada: asignacion.personaCuidada,
       personaColaborador: asignacion.personaColaborador,
       rol: asignacion.rol,
@@ -62,7 +66,7 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
   }
 
   @override
-  Future<void> eliminarAsignacion(String asignacionId) async {
+  Future<void> eliminarAsignacion(int asignacionId) async {
     await Future.delayed(Duration.zero);
     final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
     if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
@@ -70,13 +74,13 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
   }
 
   @override
-  Future<List<Rol>> getRoles() async {
+  Future<List<RolCuidado>> getRoles() async {
     await Future.delayed(Duration.zero);
     return List.unmodifiable(_roles);
   }
 
   @override
-  Future<Rol> getRolById(String rolId) async {
+  Future<RolCuidado> getRolById(int rolId) async {
     await Future.delayed(Duration.zero);
     final rol = _roles.where((r) => r.id == rolId).firstOrNull;
     if (rol == null) throw Exception('Rol no encontrado: $rolId');

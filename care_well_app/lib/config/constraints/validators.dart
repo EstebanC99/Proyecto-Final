@@ -73,17 +73,12 @@ String? validateDocumento(String? value) {
   return null;
 }
 
-/// Valida que [value] sea un nombre de usuario válido:
-/// requerido, mínimo 3 caracteres, sin espacios.
-String? validateNombreUsuario(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Ingresá un nombre de usuario.';
-  }
-  if (value.contains(' ')) {
-    return 'El nombre de usuario no puede contener espacios.';
-  }
-  if (value.length < 3) {
-    return 'El nombre de usuario debe tener al menos 3 caracteres.';
+/// Valida que [value] sea una fecha de nacimiento válida:
+/// requerida y no futura.
+String? validateFechaNacimiento(DateTime? value) {
+  if (value == null) return 'Seleccioná tu fecha de nacimiento.';
+  if (value.isAfter(DateTime.now())) {
+    return 'La fecha de nacimiento no puede ser en el futuro.';
   }
   return null;
 }

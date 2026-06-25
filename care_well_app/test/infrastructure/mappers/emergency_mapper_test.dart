@@ -5,14 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EmergenciaMapper', () {
-    final persona = Persona(
-      id: 'per_001',
-      nombre: 'Alicia',
-      apellido: 'Rodríguez',
-    );
+    final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
 
     final emergencia = Emergencia(
-      id: 'eme_001',
+      id: 1,
       persona: persona,
       fechaHora: DateTime(2026, 6, 5, 14, 30),
       atendida: false,
@@ -20,8 +16,8 @@ void main() {
     );
 
     final model = EmergenciaModel(
-      id: 'eme_001',
-      personaId: 'per_001',
+      id: 1,
+      personaId: 1,
       fechaHora: '2026-06-05T14:30:00.000',
       atendida: false,
       descripcion: 'Caída en el baño.',
@@ -51,7 +47,7 @@ void main() {
 
     test('descripcion nula se preserva en round-trip', () {
       final sinDescripcion = Emergencia(
-        id: 'eme_002',
+        id: 2,
         persona: persona,
         fechaHora: DateTime(2026, 6, 1, 9, 0),
         atendida: true,

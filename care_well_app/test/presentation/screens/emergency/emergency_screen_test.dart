@@ -7,27 +7,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/fake_notification_scheduler.dart';
+import '../../../_fakes/test_fixtures.dart';
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
-final _personaMaria = Persona(
-  id: 'per_001',
-  nombre: 'María',
-  apellido: 'García',
-);
-
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
+final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
 
 final _asignacion = AsignacionCuidado(
-  id: 'asi_001',
+  id: 401,
   personaCuidada: _personaAlicia,
   personaColaborador: _personaMaria,
-  rol: _rolResponsable,
-  estado: EstadoAsignacion.activa,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
 );
 

@@ -3,7 +3,9 @@
     public abstract class Mensajes
     {
         public const string ApellidoRequerido = "El apellido es requerido.";
+        public const string ColaboradorRequerido = "El usuario elegido no existe como colaborador.";
         public const string ContrasenaRequerida = "La contraseña es requerida.";
+        public const string DebeSeleccionarUnoMasPermisos = "Debe seleccionar uno o más permisos.";
         public const string DocumentoRequerido = "El documento es requerido.";
         public const string EmailRequerido = "El email es requerido.";
         public const string FechaNacimientoRequerida = "La fecha de nacimiento es requerida.";

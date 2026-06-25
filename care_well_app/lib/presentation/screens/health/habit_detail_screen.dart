@@ -16,34 +16,21 @@ import '../../widgets/widgets.dart';
 class HabitDetailScreen extends ConsumerWidget {
   const HabitDetailScreen({super.key, required this.habitId});
 
-  final String habitId;
+  final int habitId;
 
-  static String _labelTipo(TipoHabito tipo) {
-    switch (tipo) {
-      case TipoHabito.actividadFisica:
-        return 'Actividad física';
-      case TipoHabito.alimentacion:
-        return 'Alimentación';
-      case TipoHabito.sueno:
-        return 'Sueño';
-      case TipoHabito.hidratacion:
-        return 'Hidratación';
-      case TipoHabito.otro:
-        return 'Otro';
-    }
-  }
+  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
 
   static IconData _iconTipo(TipoHabito tipo) {
-    switch (tipo) {
-      case TipoHabito.actividadFisica:
+    switch (tipo.id) {
+      case TiposHabitoConst.actividadFisica:
         return Icons.directions_run;
-      case TipoHabito.alimentacion:
+      case TiposHabitoConst.alimentacion:
         return Icons.restaurant;
-      case TipoHabito.sueno:
+      case TiposHabitoConst.sueno:
         return Icons.bedtime_outlined;
-      case TipoHabito.hidratacion:
+      case TiposHabitoConst.hidratacion:
         return Icons.water_drop_outlined;
-      case TipoHabito.otro:
+      default:
         return Icons.self_improvement;
     }
   }
@@ -74,7 +61,7 @@ class HabitDetailScreen extends ConsumerWidget {
               tooltip: 'Editar',
               onPressed: () => context.pushNamed(
                 AppRoutes.healthHabitEditName,
-                pathParameters: {'id': habitId},
+                pathParameters: {'id': habitId.toString()},
               ),
             ),
             IconButton(

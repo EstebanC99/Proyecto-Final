@@ -1,37 +1,30 @@
 import '../base_entity.dart';
 import '../shared/persona.dart';
 
-/// Tipo de evento de salud.
-enum TipoEventoSalud {
-  /// Cita o consulta médica.
-  citaMedica,
+/// Tipo de evento de salud (catálogo persistido).
+///
+/// - id 1: Cita o consulta médica.
+/// - id 2: Hospitalización o internación.
+/// - id 3: Medicación administrada o ajuste de dosis.
+/// - id 4: Cirugía o procedimiento quirúrgico.
+/// - id 5: Tratamiento en curso (fisioterapia, rehabilitación, etc.).
+/// - id 6: Evento de bienestar general.
+/// - id 7: Síntoma percibido por el dependiente o el cuidador.
+/// - id 8: Diagnóstico médico.
+/// - id 9: Aplicación de vacuna.
+/// - id 10: Otro evento de salud no categorizado.
+class TipoEventoSalud extends BaseEntity {
+  final String descripcion;
 
-  /// Hospitalización o internación.
-  hospitalizacion,
+  const TipoEventoSalud({required super.id, required this.descripcion});
 
-  /// Medicación administrada o ajuste de dosis.
-  medicacion,
-
-  /// Cirugía o procedimiento quirúrgico.
-  cirugia,
-
-  /// Tratamiento en curso (fisioterapia, rehabilitación, etc.).
-  tratamiento,
-
-  /// Evento de bienestar general.
-  bienestar,
-
-  /// Síntoma percibido por el dependiente o el cuidador.
-  sintoma,
-
-  /// Diagnóstico médico.
-  diagnostico,
-
-  /// Aplicación de vacuna.
-  vacuna,
-
-  /// Otro evento de salud no categorizado.
-  otro,
+  @override
+  TipoEventoSalud copyWith({int? id, String? descripcion}) {
+    return TipoEventoSalud(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
 }
 
 /// Evento clínico registrado para una persona.
@@ -56,7 +49,7 @@ class EventoDeSalud extends BaseEntity {
 
   @override
   EventoDeSalud copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     TipoEventoSalud? tipo,
     DateTime? fecha,

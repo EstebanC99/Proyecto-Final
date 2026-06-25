@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 final _personaAlicia = Persona(
-  id: 'per_002',
+  id: 2,
   nombre: 'Alicia',
   apellido: 'Rodríguez',
   documento: '5234100',
@@ -17,59 +19,82 @@ final _personaAlicia = Persona(
 );
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 class _FakePersonaRepository implements PersonaRepository {
   @override
-  Future<Persona> getById(String id) async => _personaAlicia;
+  Future<Persona> getById(int id) async => _personaAlicia;
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) async => [
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [
     _personaAlicia,
   ];
 
   @override
-  Future<Persona> crear(Persona persona) async =>
-      persona.copyWith(id: 'per_new');
+  Future<Persona> crear(Persona persona) async => persona.copyWith(id: 9999);
 
   @override
   Future<Persona> actualizar(Persona persona) async => persona;
 
   @override
-  Future<void> eliminar(String id) async {}
+  Future<void> eliminar(int id) async {}
+}
+
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      [
+        AsignacionCuidado(
+          id: 401,
+          personaCuidada: _personaAlicia,
+          personaColaborador: _personaMaria,
+          rol: rolCuidadoResponsable,
+          estado: estadoAsignacionActiva,
+          fechaAlta: DateTime(2024, 1, 8),
+        ),
+      ];
+
+  @override
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+    List<int> permisosCuidadoIds = const [],
+  }) async {}
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
-  final _rolResp = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async => [
     AsignacionCuidado(
-      id: 'asi_003',
+      id: 401,
       personaCuidada: _personaAlicia,
       personaColaborador: _personaMaria,
-      rol: _rolResp,
-      estado: EstadoAsignacion.activa,
+      rol: rolCuidadoResponsable,
+      estado: estadoAsignacionActiva,
       fechaAlta: DateTime(2024, 1, 8),
     ),
   ];
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => [];
 
   @override
@@ -80,13 +105,13 @@ class _FakeCareTeamRepository implements CareTeamRepository {
       a;
 
   @override
-  Future<void> eliminarAsignacion(String id) async {}
+  Future<void> eliminarAsignacion(int id) async {}
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResp];
+  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
 
   @override
-  Future<Rol> getRolById(String rolId) async => _rolResp;
+  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
 }
 
 Widget _wrap(Widget child) => ProviderScope(
@@ -97,6 +122,9 @@ Widget _wrap(Widget child) => ProviderScope(
             ..state = AsyncValue.data(_usuarioDemoMaria),
     ),
     personaRepositoryProvider.overrideWithValue(_FakePersonaRepository()),
+    asignacionCuidadoRepositoryProvider.overrideWithValue(
+      _FakeAsignacionCuidadoRepository(),
+    ),
     careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
   ],
   child: MaterialApp(home: child),
@@ -118,7 +146,7 @@ void main() {
 
     testWidgets('DependentDetailScreen monta sin errores', (tester) async {
       await tester.pumpWidget(
-        _wrap(const DependentDetailScreen(dependentId: 'per_002')),
+        _wrap(const DependentDetailScreen(dependentId: 2)),
       );
       await tester.pump();
       expect(find.byType(DependentDetailScreen), findsOneWidget);

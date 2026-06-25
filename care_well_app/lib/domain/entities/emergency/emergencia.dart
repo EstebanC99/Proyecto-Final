@@ -27,7 +27,7 @@ class Emergencia extends BaseEntity {
 
   @override
   Emergencia copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     DateTime? fechaHora,
     bool? atendida,

@@ -20,7 +20,7 @@ class AceptacionTerminos extends BaseEntity {
 
   @override
   AceptacionTerminos copyWith({
-    String? id,
+    int? id,
     Usuario? usuario,
     String? version,
     DateTime? fechaAceptacion,

@@ -87,7 +87,7 @@ class _Body extends StatelessWidget {
                         rolLabel: 'Responsable',
                         onTap: () => context.pushNamed(
                           AppRoutes.dependentDetailName,
-                          pathParameters: {'id': p.id},
+                          pathParameters: {'id': p.id.toString()},
                         ),
                       ),
                     )
@@ -129,7 +129,7 @@ class _Body extends StatelessWidget {
                         rolLabel: 'Cuidador',
                         onTap: () => context.pushNamed(
                           AppRoutes.dependentDetailName,
-                          pathParameters: {'id': p.id},
+                          pathParameters: {'id': p.id.toString()},
                         ),
                       ),
                     )

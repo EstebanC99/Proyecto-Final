@@ -13,12 +13,14 @@ class DemoPersonaDatasource implements PersonaDatasource {
   ];
 
   /// Mapa usuarioId → lista de ids de sus dependientes.
-  final Map<String, List<String>> _dependientes = {
+  final Map<int, List<int>> _dependientes = {
     DemoSeed.usuarioMariaId: [DemoSeed.personaAliciaId],
   };
 
+  int _nextId = 10000;
+
   @override
-  Future<Persona> getById(String id) async {
+  Future<Persona> getById(int id) async {
     await Future.delayed(Duration.zero);
     final persona = _personas.where((p) => p.id == id).firstOrNull;
     if (persona == null) throw Exception('Persona no encontrada: $id');
@@ -26,7 +28,7 @@ class DemoPersonaDatasource implements PersonaDatasource {
   }
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) async {
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async {
     await Future.delayed(Duration.zero);
     final ids = _dependientes[usuarioId] ?? [];
     return _personas.where((p) => ids.contains(p.id)).toList();
@@ -35,8 +37,7 @@ class DemoPersonaDatasource implements PersonaDatasource {
   @override
   Future<Persona> crear(Persona persona) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
-    final nueva = persona.copyWith(id: 'per_$ts');
+    final nueva = persona.copyWith(id: _nextId++);
     _personas.add(nueva);
     return nueva;
   }
@@ -51,7 +52,7 @@ class DemoPersonaDatasource implements PersonaDatasource {
   }
 
   @override
-  Future<void> eliminar(String id) async {
+  Future<void> eliminar(int id) async {
     await Future.delayed(Duration.zero);
     final idx = _personas.indexWhere((p) => p.id == id);
     if (idx < 0) throw Exception('Persona no encontrada: $id');

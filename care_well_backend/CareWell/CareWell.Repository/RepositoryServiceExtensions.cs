@@ -1,4 +1,5 @@
 ﻿using CareWell.Repository.Auth;
+using CareWell.Repository.EquipoCuidado;
 using CareWell.Repository.General;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +22,7 @@ namespace CareWell.Repository
 
             services.AddScoped<IPersonaRepository, PersonaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IAsignacionCuidadoRepository, AsignacionCuidadoRepository>();
 
             #endregion
 

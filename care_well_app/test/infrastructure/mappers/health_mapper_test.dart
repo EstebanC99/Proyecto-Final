@@ -4,23 +4,19 @@ import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final persona = Persona(
-    id: 'per_001',
-    nombre: 'Alicia',
-    apellido: 'Rodríguez',
-  );
+  final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
 
   group('FichaSaludMapper', () {
     final ficha = FichaSalud(
-      id: 'fis_001',
+      id: 501,
       persona: persona,
       antecedentes: 'Hipertensión arterial.',
       estudios: 'ECG normal.',
     );
 
     final model = FichaSaludModel(
-      id: 'fis_001',
-      personaId: 'per_001',
+      id: 501,
+      personaId: 1,
       antecedentes: 'Hipertensión arterial.',
       estudios: 'ECG normal.',
     );
@@ -45,7 +41,7 @@ void main() {
 
     test('campos opcionales nulos se preservan en round-trip', () {
       final sinCampos = FichaSalud(
-        id: 'fis_002',
+        id: 502,
         persona: persona,
         antecedentes: null,
         estudios: null,
@@ -60,17 +56,25 @@ void main() {
   });
 
   group('HabitoDeVidaMapper', () {
+    final tipoActividadFisica = TipoHabito(
+      id: TiposHabitoConst.actividadFisica,
+      descripcion: 'Actividad física',
+    );
+
     final habito = HabitoDeVida(
-      id: 'hab_001',
+      id: 901,
       persona: persona,
-      tipo: TipoHabito.actividadFisica,
+      tipo: tipoActividadFisica,
       descripcion: 'Caminata diaria.',
     );
 
     final model = HabitoDeVidaModel(
-      id: 'hab_001',
-      personaId: 'per_001',
-      tipo: 'actividadFisica',
+      id: 901,
+      personaId: 1,
+      tipo: TipoHabitoModel(
+        id: TiposHabitoConst.actividadFisica,
+        descripcion: 'Actividad física',
+      ),
       descripcion: 'Caminata diaria.',
     );
 
@@ -80,7 +84,7 @@ void main() {
         persona,
       );
       expect(roundTrip.id, habito.id);
-      expect(roundTrip.tipo, habito.tipo);
+      expect(roundTrip.tipo.id, habito.tipo.id);
       expect(roundTrip.descripcion, habito.descripcion);
     });
 
@@ -95,7 +99,7 @@ void main() {
 
   group('RecomendacionMedicaMapper', () {
     final recomendacion = RecomendacionMedica(
-      id: 'rec_001',
+      id: 1001,
       persona: persona,
       descripcion: 'Controlar presión arterial.',
       fecha: DateTime(2026, 5, 15),
@@ -103,8 +107,8 @@ void main() {
     );
 
     final model = RecomendacionMedicaModel(
-      id: 'rec_001',
-      personaId: 'per_001',
+      id: 1001,
+      personaId: 1,
       descripcion: 'Controlar presión arterial.',
       fecha: '2026-05-15T00:00:00.000',
       profesional: 'Dr. Hernández',
@@ -137,18 +141,26 @@ void main() {
   });
 
   group('EventoDeSaludMapper', () {
+    final tipoSintoma = TipoEventoSalud(
+      id: TiposEventoSaludConst.sintoma,
+      descripcion: 'Síntoma',
+    );
+
     final evento = EventoDeSalud(
-      id: 'esa_001',
+      id: 1101,
       persona: persona,
-      tipo: TipoEventoSalud.sintoma,
+      tipo: tipoSintoma,
       fecha: DateTime(2026, 5, 28),
       descripcion: 'Episodio de mareos.',
     );
 
     final model = EventoDeSaludModel(
-      id: 'esa_001',
-      personaId: 'per_001',
-      tipo: 'sintoma',
+      id: 1101,
+      personaId: 1,
+      tipo: TipoEventoSaludModel(
+        id: TiposEventoSaludConst.sintoma,
+        descripcion: 'Síntoma',
+      ),
       fecha: '2026-05-28T00:00:00.000',
       descripcion: 'Episodio de mareos.',
     );
@@ -159,7 +171,7 @@ void main() {
         persona,
       );
       expect(roundTrip.id, evento.id);
-      expect(roundTrip.tipo, evento.tipo);
+      expect(roundTrip.tipo.id, evento.tipo.id);
       expect(roundTrip.descripcion, evento.descripcion);
     });
 
@@ -173,29 +185,44 @@ void main() {
   });
 
   group('EstadoDeAnimoMapper', () {
+    final tipoSintoma = TipoEventoSalud(
+      id: TiposEventoSaludConst.sintoma,
+      descripcion: 'Síntoma',
+    );
+
+    final estadoMal = EstadoAnimo(
+      id: EstadosAnimoConst.mal,
+      descripcion: 'Mal',
+    );
+
+    final estadoBien = EstadoAnimo(
+      id: EstadosAnimoConst.bien,
+      descripcion: 'Bien',
+    );
+
     final evento = EventoDeSalud(
-      id: 'esa_001',
+      id: 1101,
       persona: persona,
-      tipo: TipoEventoSalud.sintoma,
+      tipo: tipoSintoma,
       fecha: DateTime(2026, 5, 28),
       descripcion: 'Mareos.',
     );
 
     final estadoConEvento = EstadoDeAnimo(
-      id: 'ani_001',
+      id: 1201,
       persona: persona,
       eventoDeSalud: evento,
       fecha: DateTime(2026, 5, 28),
-      estado: EstadoAnimoEnum.mal,
+      estado: estadoMal,
       observaciones: 'Preocupada.',
     );
 
     final model = EstadoDeAnimoModel(
-      id: 'ani_001',
-      personaId: 'per_001',
-      eventoDeSaludId: 'esa_001',
+      id: 1201,
+      personaId: 1,
+      eventoDeSaludId: 1101,
       fecha: '2026-05-28T00:00:00.000',
-      estado: 'mal',
+      estado: EstadoAnimoModel(id: EstadosAnimoConst.mal, descripcion: 'Mal'),
       observaciones: 'Preocupada.',
     );
 
@@ -206,7 +233,7 @@ void main() {
         eventoDeSalud: evento,
       );
       expect(roundTrip.id, estadoConEvento.id);
-      expect(roundTrip.estado, estadoConEvento.estado);
+      expect(roundTrip.estado.id, estadoConEvento.estado.id);
       expect(roundTrip.observaciones, estadoConEvento.observaciones);
       expect(roundTrip.eventoDeSalud?.id, evento.id);
     });
@@ -225,10 +252,10 @@ void main() {
 
     test('eventoDeSalud nulo se preserva en round-trip', () {
       final sinEvento = EstadoDeAnimo(
-        id: 'ani_002',
+        id: 1202,
         persona: persona,
         fecha: DateTime(2026, 6, 4),
-        estado: EstadoAnimoEnum.bien,
+        estado: estadoBien,
       );
       final roundTrip = EstadoDeAnimoMapper.fromModel(
         EstadoDeAnimoMapper.toModel(sinEvento),

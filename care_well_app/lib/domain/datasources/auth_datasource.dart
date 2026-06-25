@@ -2,20 +2,22 @@ import '../entities/entities.dart';
 
 /// Interfaz de datasource para autenticación y gestión de cuenta.
 abstract class AuthDatasource {
-  /// Inicia sesión con [nombreUsuario] y [contrasena].
+  /// Inicia sesión con [email] y [contrasena].
   ///
   /// Retorna el [Usuario] autenticado.
   /// Lanza excepción si las credenciales son inválidas.
-  Future<Usuario> login(String nombreUsuario, String contrasena);
+  Future<Usuario> login(String email, String contrasena);
 
   /// Registra un nuevo usuario y la persona asociada.
   ///
-  /// Retorna el [Usuario] creado.
-  Future<Usuario> register({
+  /// No inicia sesión: tras el alta el usuario debe loguearse manualmente.
+  Future<void> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   });
 
@@ -26,11 +28,11 @@ abstract class AuthDatasource {
   Future<void> logout();
 
   /// Elimina la cuenta del usuario autenticado.
-  Future<void> eliminarCuenta(String usuarioId);
+  Future<void> eliminarCuenta(int usuarioId);
 
   /// Cambia la contraseña del usuario autenticado.
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   });
@@ -39,9 +41,9 @@ abstract class AuthDatasource {
   /// pero aún no tiene [Usuario] asociado (fue cargada por un responsable/cuidador).
   ///
   /// Lanza excepción si la persona no existe o si ya tiene credenciales.
+  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   });
 
@@ -49,7 +51,7 @@ abstract class AuthDatasource {
   ///
   /// Solo se actualizan los campos que sean no-null. Retorna el [Usuario] actualizado.
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,

@@ -13,4 +13,5 @@
   <Project Path="CareWell.Global/CareWell.Global.csproj" />
   <Project Path="CareWell.Queries/CareWell.Queries.csproj" />
   <Project Path="CareWell.Repository/CareWell.Repository.csproj" />
+  <Project Path="CareWell.Security/CareWell.Security.csproj" Id="427c8a13-3d12-4ea7-8e3d-a1ea2b548cd0" />
 </Solution>

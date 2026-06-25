@@ -4,57 +4,55 @@ import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
 final _permisosCompletos = [
-  const Permiso(
-    id: 'prm_001',
-    codigo: CodigoPermiso.verFichaSalud,
+  Permiso(
+    id: 301,
+    codigo: codigoVerFichaSalud,
     descripcion: 'Ver ficha de salud',
   ),
-  const Permiso(
-    id: 'prm_004',
-    codigo: CodigoPermiso.registrarEventosSalud,
+  Permiso(
+    id: 304,
+    codigo: codigoRegistrarEventosSalud,
     descripcion: 'Registrar eventos de salud',
   ),
-  const Permiso(
-    id: 'prm_005',
-    codigo: CodigoPermiso.registrarHabitos,
+  Permiso(
+    id: 305,
+    codigo: codigoRegistrarHabitos,
     descripcion: 'Registrar hábitos',
   ),
 ];
 
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-
-AsignacionCuidado _asignacionMaria({Rol? rol, List<Permiso>? permisos}) =>
-    AsignacionCuidado(
-      id: 'asi_003',
-      personaCuidada: _personaAlicia,
-      personaColaborador: _personaMaria,
-      rol: rol ?? _rolResponsable,
-      estado: EstadoAsignacion.activa,
-      fechaAlta: DateTime(2024, 1, 8),
-      permisos: permisos ?? _permisosCompletos,
-    );
+AsignacionCuidado _asignacionMaria({
+  RolCuidado? rol,
+  List<Permiso>? permisos,
+}) => AsignacionCuidado(
+  id: 401,
+  personaCuidada: _personaAlicia,
+  personaColaborador: _personaMaria,
+  rol: rol ?? rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
+  fechaAlta: DateTime(2024, 1, 8),
+  permisos: permisos ?? _permisosCompletos,
+);
 
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 // ─── Fake repositories ────────────────────────────────────────────────────────
@@ -66,14 +64,14 @@ class _FakeCareTeamRepository implements CareTeamRepository {
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async => _asignaciones
       .where((a) => a.personaColaborador.id == colaboradorId)
       .toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => _asignaciones
       .where((a) => a.personaCuidada.id == personaCuidadaId)
       .toList();
@@ -86,13 +84,13 @@ class _FakeCareTeamRepository implements CareTeamRepository {
       a;
 
   @override
-  Future<void> eliminarAsignacion(String id) async {}
+  Future<void> eliminarAsignacion(int id) async {}
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResponsable];
+  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
 
   @override
-  Future<Rol> getRolById(String rolId) async => _rolResponsable;
+  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
 }
 
 class _FakeHealthRepository implements HealthRepository {
@@ -112,9 +110,8 @@ class _FakeHealthRepository implements HealthRepository {
        _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(
-    String personaId,
-  ) async => _eventos.where((e) => e.persona.id == personaId).toList();
+  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) async =>
+      _eventos.where((e) => e.persona.id == personaId).toList();
 
   @override
   Future<EventoDeSalud> crearEventoSalud(EventoDeSalud e) async {
@@ -126,13 +123,13 @@ class _FakeHealthRepository implements HealthRepository {
   Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud e) async => e;
 
   @override
-  Future<void> eliminarEventoSalud(String id) async {
+  Future<void> eliminarEventoSalud(int id) async {
     _eventos.removeWhere((e) => e.id == id);
     _notas.removeWhere((n) => n.eventoSaludId == id);
   }
 
   @override
-  Future<FichaSalud> getFichaSalud(String personaId) async =>
+  Future<FichaSalud> getFichaSalud(int personaId) async =>
       throw UnimplementedError();
 
   @override
@@ -140,7 +137,7 @@ class _FakeHealthRepository implements HealthRepository {
       throw UnimplementedError();
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(String personaId) async =>
+  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async =>
       _habitos.where((h) => h.persona.id == personaId).toList();
 
   @override
@@ -157,13 +154,13 @@ class _FakeHealthRepository implements HealthRepository {
   }
 
   @override
-  Future<void> eliminarHabito(String habitoId) async {
+  Future<void> eliminarHabito(int habitoId) async {
     _habitos.removeWhere((h) => h.id == habitoId);
   }
 
   @override
   Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
-    String personaId,
+    int personaId,
   ) async => [];
 
   @override
@@ -176,19 +173,18 @@ class _FakeHealthRepository implements HealthRepository {
   ) async => r;
 
   @override
-  Future<void> eliminarRecomendacion(String id) async {}
+  Future<void> eliminarRecomendacion(int id) async {}
 
   @override
-  Future<List<NotaEvento>> getNotasByEvento(String eventoId) async =>
+  Future<List<NotaEvento>> getNotasByEvento(int eventoId) async =>
       _notas.where((n) => n.eventoSaludId == eventoId).toList();
 
   @override
   Future<NotaEvento> crearNota(NotaEvento nota) async => nota;
 
   @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(
-    String personaId,
-  ) async => _estadosAnimo.where((e) => e.persona.id == personaId).toList();
+  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) async =>
+      _estadosAnimo.where((e) => e.persona.id == personaId).toList();
 
   @override
   Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo e) async => e;
@@ -197,16 +193,12 @@ class _FakeHealthRepository implements HealthRepository {
   Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo e) async => e;
 
   @override
-  Future<void> eliminarEstadoAnimo(String id) async {}
+  Future<void> eliminarEstadoAnimo(int id) async {}
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /// Construye un container con contexto de persona AJENA (Alicia).
-///
-/// Sobreescribe tanto [healthPersonaContextProvider] como
-/// [careTeamContextPersonaProvider] a Alicia, asegurando que
-/// [esContextoPropioProvider] retorne `false` y los permisos RBAC sean evaluados.
 ProviderContainer _makeContainer({
   required List<AsignacionCuidado> asignaciones,
   List<EventoDeSalud>? eventos,
@@ -242,9 +234,6 @@ ProviderContainer _makeContainer({
 }
 
 /// Construye un container con contexto de persona PROPIA (María).
-///
-/// [esContextoPropioProvider] retorna `true`, por lo que los permisos deben
-/// concederse sin necesidad de asignación.
 ProviderContainer _makeContainerContextPropio({
   List<EventoDeSalud>? eventos,
   List<HabitoDeVida>? habitos,
@@ -260,11 +249,7 @@ ProviderContainer _makeContainerContextPropio({
       // Contexto = María (propio usuario).
       careTeamContextPersonaProvider.overrideWith((ref) async => _personaMaria),
       healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
-      careTeamRepositoryProvider.overrideWithValue(
-        _FakeCareTeamRepository(
-          [],
-        ), // sin asignaciones — no deben ser necesarias
-      ),
+      careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository([])),
       healthRepositoryProvider.overrideWithValue(
         _FakeHealthRepository(
           eventos: eventos,
@@ -284,16 +269,16 @@ void main() {
       test('retorna eventos ordenados descendente por fecha', () async {
         final eventos = [
           EventoDeSalud(
-            id: 'e1',
+            id: 1101,
             persona: _personaAlicia,
-            tipo: TipoEventoSalud.citaMedica,
+            tipo: tipoEventoSaludCitaMedica,
             fecha: DateTime(2026, 4, 1),
             descripcion: 'Evento antiguo',
           ),
           EventoDeSalud(
-            id: 'e2',
+            id: 1102,
             persona: _personaAlicia,
-            tipo: TipoEventoSalud.vacuna,
+            tipo: tipoEventoSaludVacuna,
             fecha: DateTime(2026, 6, 1),
             descripcion: 'Evento reciente',
           ),
@@ -405,18 +390,17 @@ void main() {
         'retorna el estado más reciente (primero de la lista descendente)',
         () async {
           final estadoAntiguo = EstadoDeAnimo(
-            id: 'ani_001',
+            id: 1201,
             persona: _personaAlicia,
             fecha: DateTime(2026, 5, 1),
-            estado: EstadoAnimoEnum.regular,
+            estado: estadoAnimoRegular,
           );
           final estadoReciente = EstadoDeAnimo(
-            id: 'ani_002',
+            id: 1202,
             persona: _personaAlicia,
             fecha: DateTime(2026, 6, 1),
-            estado: EstadoAnimoEnum.muyBien,
+            estado: estadoAnimoMuyBien,
           );
-          // El provider ordena descendente, así el primero es el más reciente.
           final container = _makeContainer(
             asignaciones: [_asignacionMaria()],
             estadosAnimo: [estadoAntiguo, estadoReciente],
@@ -425,7 +409,7 @@ void main() {
 
           final ultimo = await container.read(ultimoEstadoAnimoProvider.future);
           expect(ultimo, isNotNull);
-          expect(ultimo!.estado, EstadoAnimoEnum.muyBien);
+          expect(ultimo!.estado.id, EstadosAnimoConst.muyBien);
         },
       );
 
@@ -446,9 +430,9 @@ void main() {
     group('eliminarHabitoProvider', () {
       test('quita el hábito de la lista tras eliminar', () async {
         final habito = HabitoDeVida(
-          id: 'hab_001',
+          id: 901,
           persona: _personaAlicia,
-          tipo: TipoHabito.alimentacion,
+          tipo: tipoHabitoAlimentacion,
           descripcion: 'Desayuno saludable',
         );
         final container = _makeContainer(
@@ -462,7 +446,7 @@ void main() {
         expect(antes, hasLength(1));
 
         // Ejecutar eliminación.
-        await container.read(eliminarHabitoProvider)(habitoId: 'hab_001');
+        await container.read(eliminarHabitoProvider)(habitoId: 901);
 
         // El provider fue invalidado; al releer debe estar vacío.
         final despues = await container.read(habitosProvider.future);
@@ -475,15 +459,15 @@ void main() {
     group('eliminarEventoSaludProvider', () {
       test('quita el evento de la lista tras eliminar', () async {
         final evento = EventoDeSalud(
-          id: 'esa_001',
+          id: 1101,
           persona: _personaAlicia,
-          tipo: TipoEventoSalud.citaMedica,
+          tipo: tipoEventoSaludCitaMedica,
           fecha: DateTime(2026, 5, 10),
           descripcion: 'Cita médica',
         );
         final nota = NotaEvento(
-          id: 'not_001',
-          eventoSaludId: 'esa_001',
+          id: 1301,
+          eventoSaludId: 1101,
           autor: _personaMaria,
           fechaHora: DateTime(2026, 5, 10, 10),
           contenido: 'Nota de prueba',
@@ -500,7 +484,7 @@ void main() {
         expect(antes, hasLength(1));
 
         // Ejecutar eliminación.
-        await container.read(eliminarEventoSaludProvider)(eventoId: 'esa_001');
+        await container.read(eliminarEventoSaludProvider)(eventoId: 1101);
 
         // El provider fue invalidado; al releer debe estar vacío.
         final despues = await container.read(eventosSaludProvider.future);

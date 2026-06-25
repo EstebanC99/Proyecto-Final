@@ -9,12 +9,12 @@ class AgendaRepositoryImpl implements AgendaRepository {
   const AgendaRepositoryImpl(this._datasource);
 
   @override
-  Future<List<EventoAgenda>> getEventosByPersona(String personaId) =>
+  Future<List<EventoAgenda>> getEventosByPersona(int personaId) =>
       _datasource.getEventosByPersona(personaId);
 
   @override
   Future<List<EventoAgenda>> getEventosByRango({
-    required String personaId,
+    required int personaId,
     required DateTime desde,
     required DateTime hasta,
   }) => _datasource.getEventosByRango(
@@ -32,11 +32,11 @@ class AgendaRepositoryImpl implements AgendaRepository {
       _datasource.actualizarEvento(evento);
 
   @override
-  Future<void> eliminarEvento(String eventoId) =>
+  Future<void> eliminarEvento(int eventoId) =>
       _datasource.eliminarEvento(eventoId);
 
   @override
-  Future<List<Recordatorio>> getRecordatoriosByEvento(String eventoId) =>
+  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId) =>
       _datasource.getRecordatoriosByEvento(eventoId);
 
   @override
@@ -44,10 +44,10 @@ class AgendaRepositoryImpl implements AgendaRepository {
       _datasource.crearRecordatorio(recordatorio);
 
   @override
-  Future<Recordatorio> marcarEnviado(String recordatorioId) =>
+  Future<Recordatorio> marcarEnviado(int recordatorioId) =>
       _datasource.marcarEnviado(recordatorioId);
 
   @override
-  Future<void> eliminarRecordatorio(String recordatorioId) =>
+  Future<void> eliminarRecordatorio(int recordatorioId) =>
       _datasource.eliminarRecordatorio(recordatorioId);
 }

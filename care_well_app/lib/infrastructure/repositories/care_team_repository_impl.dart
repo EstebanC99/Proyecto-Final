@@ -10,7 +10,7 @@ class CareTeamRepositoryImpl implements CareTeamRepository {
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) => _datasource.getAsignacionesByPersonaCuidada(personaCuidadaId);
 
   @override
@@ -23,17 +23,17 @@ class CareTeamRepositoryImpl implements CareTeamRepository {
   ) => _datasource.actualizarAsignacion(asignacion);
 
   @override
-  Future<void> eliminarAsignacion(String asignacionId) =>
+  Future<void> eliminarAsignacion(int asignacionId) =>
       _datasource.eliminarAsignacion(asignacionId);
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) => _datasource.getAsignacionesByColaborador(colaboradorId);
 
   @override
-  Future<List<Rol>> getRoles() => _datasource.getRoles();
+  Future<List<RolCuidado>> getRoles() => _datasource.getRoles();
 
   @override
-  Future<Rol> getRolById(String rolId) => _datasource.getRolById(rolId);
+  Future<RolCuidado> getRolById(int rolId) => _datasource.getRolById(rolId);
 }

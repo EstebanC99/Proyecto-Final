@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 // Implementacion manual de AuthRepository para tests, sin dependencias externas.
 class _FakeAuthRepository implements AuthRepository {
   static final _persona = Persona(
-    id: 'per_test',
+    id: 1,
     nombre: 'Test',
     apellido: 'User',
     email: 'test@example.com',
@@ -15,31 +15,35 @@ class _FakeAuthRepository implements AuthRepository {
   );
 
   static final _usuario = Usuario(
-    id: 'usr_test',
+    id: 101,
     persona: _persona,
-    nombreUsuario: 'demo',
-    contrasenaHash: '1234',
-    estado: EstadoUsuario.activo,
+    contrasena: '1234',
+    estado: EstadoUsuario(
+      id: EstadosUsuarioConst.activo,
+      descripcion: 'Activo',
+    ),
   );
 
   String _contrasenaActual = '1234';
 
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) async {
-    if (nombreUsuario == 'demo' && contrasena == _contrasenaActual) {
+  Future<Usuario> login(String email, String contrasena) async {
+    if (email == 'test@example.com' && contrasena == _contrasenaActual) {
       return _usuario;
     }
     throw Exception('Credenciales inválidas.');
   }
 
   @override
-  Future<Usuario> register({
+  Future<void> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
-  }) async => _usuario;
+  }) async {}
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
@@ -48,11 +52,11 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {}
+  Future<void> eliminarCuenta(int usuarioId) async {}
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {
@@ -65,13 +69,12 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async => _usuario;
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
@@ -105,12 +108,14 @@ void main() {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
-        await container.read(authStateProvider.notifier).login('demo', '1234');
+        await container
+            .read(authStateProvider.notifier)
+            .login('test@example.com', '1234');
 
         final state = container.read(authStateProvider);
         expect(state.hasValue, isTrue);
         expect(state.valueOrNull, isNotNull);
-        expect(state.valueOrNull?.nombreUsuario, 'demo');
+        expect(state.valueOrNull?.persona.email, 'test@example.com');
       },
     );
 
@@ -118,14 +123,16 @@ void main() {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      await container.read(authStateProvider.notifier).login('demo', '1234');
+      await container
+          .read(authStateProvider.notifier)
+          .login('test@example.com', '1234');
       await container.read(authStateProvider.notifier).logout();
 
       final state = container.read(authStateProvider);
       expect(state, const AsyncValue<Usuario?>.data(null));
     });
 
-    test('register retorna AsyncValue con el usuario creado', () async {
+    test('register completa sin error', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
@@ -134,13 +141,14 @@ void main() {
           .register(
             nombre: 'Test',
             apellido: 'User',
+            documento: '30123456',
+            fechaNacimiento: DateTime(1990, 5, 20),
             email: 'test@example.com',
-            nombreUsuario: 'testuser',
             contrasena: 'Password1',
           );
 
       expect(result.hasValue, isTrue);
-      expect(result.valueOrNull?.nombreUsuario, 'demo');
+      expect(result.hasError, isFalse);
     });
 
     test('register no modifica el estado de sesión', () async {
@@ -152,8 +160,9 @@ void main() {
           .register(
             nombre: 'Test',
             apellido: 'User',
+            documento: '30123456',
+            fechaNacimiento: DateTime(1990, 5, 20),
             email: 'test@example.com',
-            nombreUsuario: 'testuser',
             contrasena: 'Password1',
           );
 
@@ -171,12 +180,11 @@ void main() {
             .read(authStateProvider.notifier)
             .crearCredenciales(
               email: 'test@example.com',
-              nombreUsuario: 'testuser',
               contrasena: 'Password1',
             );
 
         expect(result.hasValue, isTrue);
-        expect(result.valueOrNull?.nombreUsuario, 'demo');
+        expect(result.valueOrNull?.id, 101);
       },
     );
 
@@ -188,7 +196,6 @@ void main() {
           .read(authStateProvider.notifier)
           .crearCredenciales(
             email: 'test@example.com',
-            nombreUsuario: 'testuser',
             contrasena: 'Password1',
           );
 
@@ -211,7 +218,9 @@ void main() {
         addTearDown(container.dispose);
 
         // Iniciar sesión primero.
-        await container.read(authStateProvider.notifier).login('demo', '1234');
+        await container
+            .read(authStateProvider.notifier)
+            .login('test@example.com', '1234');
 
         await container
             .read(authStateProvider.notifier)
@@ -242,7 +251,9 @@ void main() {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
-        await container.read(authStateProvider.notifier).login('demo', '1234');
+        await container
+            .read(authStateProvider.notifier)
+            .login('test@example.com', '1234');
 
         await expectLater(
           container
@@ -257,7 +268,7 @@ void main() {
         // La sesión sigue activa.
         final state = container.read(authStateProvider);
         expect(state.valueOrNull, isNotNull);
-        expect(state.valueOrNull?.nombreUsuario, 'demo');
+        expect(state.valueOrNull?.id, 101);
       },
     );
 
@@ -267,7 +278,9 @@ void main() {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
-        await container.read(authStateProvider.notifier).login('demo', '1234');
+        await container
+            .read(authStateProvider.notifier)
+            .login('test@example.com', '1234');
 
         await expectLater(
           container
@@ -287,7 +300,9 @@ void main() {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
-        await container.read(authStateProvider.notifier).login('demo', '1234');
+        await container
+            .read(authStateProvider.notifier)
+            .login('test@example.com', '1234');
 
         expect(container.read(authStateProvider).valueOrNull, isNotNull);
 

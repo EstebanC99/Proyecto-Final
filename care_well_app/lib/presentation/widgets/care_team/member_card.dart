@@ -32,7 +32,7 @@ class MemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final esResponsable = asignacion.rol.nombre == RolCuidado.responsable;
+    final esResponsable = asignacion.rol.id == RolesCuidadoConst.responsable;
     final avatarBg = esResponsable
         ? AppColors.primaryContainer
         : AppColors.secondaryContainer;

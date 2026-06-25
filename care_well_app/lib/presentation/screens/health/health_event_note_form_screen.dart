@@ -10,7 +10,7 @@ import '../../widgets/widgets.dart';
 class HealthEventNoteFormScreen extends ConsumerStatefulWidget {
   const HealthEventNoteFormScreen({super.key, required this.eventoId});
 
-  final String eventoId;
+  final int eventoId;
 
   @override
   ConsumerState<HealthEventNoteFormScreen> createState() =>

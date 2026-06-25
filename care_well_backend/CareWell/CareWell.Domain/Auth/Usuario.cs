@@ -18,7 +18,7 @@ namespace CareWell.Domain.Auth
         public virtual EstadoUsuario Estado { get; private set; }
 
         public virtual void Crear(Persona persona,
-                                  string email,
+                                  string nombreUsuario,
                                   string contrasena,
                                   IEntityLoaderDomainService entityLoaderDomainService,
                                   IPasswordHasherDomainService passwordHasherDomainService)
@@ -26,17 +26,17 @@ namespace CareWell.Domain.Auth
             if (persona is null)
                 throw new ValidacionDominioException(Mensajes.PersonaNoExiste);
 
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(nombreUsuario))
                 throw new ValidacionDominioException(Mensajes.EmailRequerido);
 
             if (string.IsNullOrEmpty(contrasena))
                 throw new ValidacionDominioException(Mensajes.ContrasenaRequerida);
 
-            if (entityLoaderDomainService.Query<Usuario>().Any(u => u.NombreUsuario == email))
+            if (entityLoaderDomainService.Query<Usuario>().Any(u => u.NombreUsuario == nombreUsuario))
                 throw new ValidacionDominioException(Mensajes.NombreUsuarioEnUso);
 
             this.Persona = persona;
-            this.NombreUsuario = email;
+            this.NombreUsuario = nombreUsuario;
             this.ContrasenaHash = passwordHasherDomainService.Hashear(contrasena);
             this.Estado = entityLoaderDomainService.GetByID<EstadoUsuario>(EstadosUsuario.Activo);
         }

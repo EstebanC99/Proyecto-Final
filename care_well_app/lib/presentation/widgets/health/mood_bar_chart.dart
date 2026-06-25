@@ -99,18 +99,6 @@ class MoodBarChart extends StatelessWidget {
     );
   }
 
-  int _enumToLevel(EstadoAnimoEnum estado) {
-    switch (estado) {
-      case EstadoAnimoEnum.muyMal:
-        return 1;
-      case EstadoAnimoEnum.mal:
-        return 2;
-      case EstadoAnimoEnum.regular:
-        return 3;
-      case EstadoAnimoEnum.bien:
-        return 4;
-      case EstadoAnimoEnum.muyBien:
-        return 5;
-    }
-  }
+  /// El [id] de [EstadoAnimo] coincide con el nivel numérico (1–5).
+  int _enumToLevel(EstadoAnimo estado) => estado.id;
 }

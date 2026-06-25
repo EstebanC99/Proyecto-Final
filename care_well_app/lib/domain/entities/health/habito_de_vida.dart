@@ -1,22 +1,25 @@
 import '../base_entity.dart';
 import '../shared/persona.dart';
 
-/// Tipo de hábito de vida.
-enum TipoHabito {
-  /// Actividad física.
-  actividadFisica,
+/// Tipo de hábito de vida (catálogo persistido).
+///
+/// - id 1: Actividad física.
+/// - id 2: Alimentación y dieta.
+/// - id 3: Hábitos de sueño.
+/// - id 4: Hidratación diaria.
+/// - id 5: Otro hábito no categorizado.
+class TipoHabito extends BaseEntity {
+  final String descripcion;
 
-  /// Alimentación y dieta.
-  alimentacion,
+  const TipoHabito({required super.id, required this.descripcion});
 
-  /// Hábitos de sueño.
-  sueno,
-
-  /// Hidratación diaria.
-  hidratacion,
-
-  /// Otro hábito no categorizado.
-  otro,
+  @override
+  TipoHabito copyWith({int? id, String? descripcion}) {
+    return TipoHabito(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
 }
 
 /// Hábito de vida registrado para una persona.
@@ -36,7 +39,7 @@ class HabitoDeVida extends BaseEntity {
 
   @override
   HabitoDeVida copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     TipoHabito? tipo,
     String? descripcion,

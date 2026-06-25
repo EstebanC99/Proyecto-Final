@@ -5,7 +5,7 @@ abstract class HealthRepository {
   // ─── Ficha de salud ──────────────────────────────────────────────────────────
 
   /// Retorna la ficha de salud de la persona con [personaId].
-  Future<FichaSalud> getFichaSalud(String personaId);
+  Future<FichaSalud> getFichaSalud(int personaId);
 
   /// Crea o actualiza la ficha de salud.
   Future<FichaSalud> guardarFichaSalud(FichaSalud ficha);
@@ -13,7 +13,7 @@ abstract class HealthRepository {
   // ─── Hábitos de vida ─────────────────────────────────────────────────────────
 
   /// Retorna los hábitos registrados para la persona con [personaId].
-  Future<List<HabitoDeVida>> getHabitosByPersona(String personaId);
+  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId);
 
   /// Crea un hábito de vida.
   Future<HabitoDeVida> crearHabito(HabitoDeVida habito);
@@ -22,14 +22,12 @@ abstract class HealthRepository {
   Future<HabitoDeVida> actualizarHabito(HabitoDeVida habito);
 
   /// Elimina el hábito con [habitoId].
-  Future<void> eliminarHabito(String habitoId);
+  Future<void> eliminarHabito(int habitoId);
 
   // ─── Recomendaciones médicas ─────────────────────────────────────────────────
 
   /// Retorna las recomendaciones médicas de la persona con [personaId].
-  Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
-    String personaId,
-  );
+  Future<List<RecomendacionMedica>> getRecomendacionesByPersona(int personaId);
 
   /// Crea una recomendación médica.
   Future<RecomendacionMedica> crearRecomendacion(
@@ -42,12 +40,12 @@ abstract class HealthRepository {
   );
 
   /// Elimina la recomendación con [recomendacionId].
-  Future<void> eliminarRecomendacion(String recomendacionId);
+  Future<void> eliminarRecomendacion(int recomendacionId);
 
   // ─── Eventos de salud ────────────────────────────────────────────────────────
 
   /// Retorna los eventos de salud de la persona con [personaId].
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(String personaId);
+  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId);
 
   /// Crea un evento de salud.
   Future<EventoDeSalud> crearEventoSalud(EventoDeSalud evento);
@@ -56,12 +54,12 @@ abstract class HealthRepository {
   Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud evento);
 
   /// Elimina el evento de salud con [eventoId].
-  Future<void> eliminarEventoSalud(String eventoId);
+  Future<void> eliminarEventoSalud(int eventoId);
 
   // ─── Notas de eventos de salud ───────────────────────────────────────────────
 
   /// Retorna las notas del evento con [eventoId].
-  Future<List<NotaEvento>> getNotasByEvento(String eventoId);
+  Future<List<NotaEvento>> getNotasByEvento(int eventoId);
 
   /// Crea una nota de evento de salud.
   Future<NotaEvento> crearNota(NotaEvento nota);
@@ -69,7 +67,7 @@ abstract class HealthRepository {
   // ─── Estados de ánimo ────────────────────────────────────────────────────────
 
   /// Retorna los estados de ánimo de la persona con [personaId].
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(String personaId);
+  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId);
 
   /// Crea un estado de ánimo.
   Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo estadoAnimo);
@@ -78,5 +76,5 @@ abstract class HealthRepository {
   Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo estadoAnimo);
 
   /// Elimina el estado de ánimo con [estadoAnimoId].
-  Future<void> eliminarEstadoAnimo(String estadoAnimoId);
+  Future<void> eliminarEstadoAnimo(int estadoAnimoId);
 }

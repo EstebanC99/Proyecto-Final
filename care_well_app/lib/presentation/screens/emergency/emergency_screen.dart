@@ -137,7 +137,7 @@ class EmergencyScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 Text(
-                                  m.rol.nombre == RolCuidado.responsable
+                                  m.rol.id == RolesCuidadoConst.responsable
                                       ? '(Responsable)'
                                       : '(Cuidador/a)',
                                   style: const TextStyle(

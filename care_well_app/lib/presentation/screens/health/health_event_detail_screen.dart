@@ -13,7 +13,7 @@ import '../../widgets/widgets.dart';
 class HealthEventDetailScreen extends ConsumerWidget {
   const HealthEventDetailScreen({super.key, required this.eventId});
 
-  final String eventId;
+  final int eventId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,7 +205,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
           ? FloatingActionButton(
               onPressed: () => context.pushNamed(
                 AppRoutes.healthEventNoteNewName,
-                pathParameters: {'id': eventId},
+                pathParameters: {'id': eventId.toString()},
               ),
               tooltip: 'Agregar nota',
               backgroundColor: AppColors.healthAccent,

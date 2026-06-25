@@ -1,9 +1,57 @@
 import 'dart:convert';
 
+/// DTO del catálogo [TipoHabito] para serialización JSON.
+class TipoHabitoModel {
+  final int id;
+  final String descripcion;
+
+  const TipoHabitoModel({required this.id, required this.descripcion});
+
+  factory TipoHabitoModel.fromJson(Map<String, dynamic> json) =>
+      TipoHabitoModel(
+        id: json['id'] as int,
+        descripcion: json['descripcion'] as String,
+      );
+
+  Map<String, dynamic> toJson() => {'id': id, 'descripcion': descripcion};
+}
+
+/// DTO del catálogo [TipoEventoSalud] para serialización JSON.
+class TipoEventoSaludModel {
+  final int id;
+  final String descripcion;
+
+  const TipoEventoSaludModel({required this.id, required this.descripcion});
+
+  factory TipoEventoSaludModel.fromJson(Map<String, dynamic> json) =>
+      TipoEventoSaludModel(
+        id: json['id'] as int,
+        descripcion: json['descripcion'] as String,
+      );
+
+  Map<String, dynamic> toJson() => {'id': id, 'descripcion': descripcion};
+}
+
+/// DTO del catálogo [EstadoAnimo] para serialización JSON.
+class EstadoAnimoModel {
+  final int id;
+  final String descripcion;
+
+  const EstadoAnimoModel({required this.id, required this.descripcion});
+
+  factory EstadoAnimoModel.fromJson(Map<String, dynamic> json) =>
+      EstadoAnimoModel(
+        id: json['id'] as int,
+        descripcion: json['descripcion'] as String,
+      );
+
+  Map<String, dynamic> toJson() => {'id': id, 'descripcion': descripcion};
+}
+
 /// DTO de [FichaSalud] para serialización JSON.
 class FichaSaludModel {
-  final String id;
-  final String personaId;
+  final int id;
+  final int personaId;
   final String? antecedentes;
   final String? estudios;
 
@@ -16,8 +64,8 @@ class FichaSaludModel {
 
   factory FichaSaludModel.fromJson(Map<String, dynamic> json) {
     return FichaSaludModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
       antecedentes: json['antecedentes'] as String?,
       estudios: json['estudios'] as String?,
     );
@@ -40,11 +88,11 @@ class FichaSaludModel {
 
 /// DTO de [HabitoDeVida] para serialización JSON.
 class HabitoDeVidaModel {
-  final String id;
-  final String personaId;
+  final int id;
+  final int personaId;
 
-  /// Tipo: 'actividadFisica', 'alimentacion', 'sueno', 'hidratacion', 'otro'.
-  final String tipo;
+  /// Tipo como objeto catálogo.
+  final TipoHabitoModel tipo;
   final String descripcion;
 
   const HabitoDeVidaModel({
@@ -56,9 +104,9 @@ class HabitoDeVidaModel {
 
   factory HabitoDeVidaModel.fromJson(Map<String, dynamic> json) {
     return HabitoDeVidaModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
-      tipo: json['tipo'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
+      tipo: TipoHabitoModel.fromJson(json['tipo'] as Map<String, dynamic>),
       descripcion: json['descripcion'] as String,
     );
   }
@@ -67,7 +115,7 @@ class HabitoDeVidaModel {
     return {
       'id': id,
       'personaId': personaId,
-      'tipo': tipo,
+      'tipo': tipo.toJson(),
       'descripcion': descripcion,
     };
   }
@@ -80,8 +128,8 @@ class HabitoDeVidaModel {
 
 /// DTO de [RecomendacionMedica] para serialización JSON.
 class RecomendacionMedicaModel {
-  final String id;
-  final String personaId;
+  final int id;
+  final int personaId;
   final String descripcion;
   final String fecha;
   final String profesional;
@@ -96,8 +144,8 @@ class RecomendacionMedicaModel {
 
   factory RecomendacionMedicaModel.fromJson(Map<String, dynamic> json) {
     return RecomendacionMedicaModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
       descripcion: json['descripcion'] as String,
       fecha: json['fecha'] as String,
       profesional: (json['profesional'] as String?) ?? '',
@@ -124,11 +172,11 @@ class RecomendacionMedicaModel {
 
 /// DTO de [EventoDeSalud] para serialización JSON.
 class EventoDeSaludModel {
-  final String id;
-  final String personaId;
+  final int id;
+  final int personaId;
 
-  /// Tipo: 'sintoma', 'diagnostico', 'hospitalizacion', 'procedimiento', 'vacuna', 'otro'.
-  final String tipo;
+  /// Tipo como objeto catálogo.
+  final TipoEventoSaludModel tipo;
   final String fecha;
   final String descripcion;
 
@@ -142,9 +190,9 @@ class EventoDeSaludModel {
 
   factory EventoDeSaludModel.fromJson(Map<String, dynamic> json) {
     return EventoDeSaludModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
-      tipo: json['tipo'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
+      tipo: TipoEventoSaludModel.fromJson(json['tipo'] as Map<String, dynamic>),
       fecha: json['fecha'] as String,
       descripcion: json['descripcion'] as String,
     );
@@ -154,7 +202,7 @@ class EventoDeSaludModel {
     return {
       'id': id,
       'personaId': personaId,
-      'tipo': tipo,
+      'tipo': tipo.toJson(),
       'fecha': fecha,
       'descripcion': descripcion,
     };
@@ -168,13 +216,13 @@ class EventoDeSaludModel {
 
 /// DTO de [EstadoDeAnimo] para serialización JSON.
 class EstadoDeAnimoModel {
-  final String id;
-  final String personaId;
-  final String? eventoDeSaludId;
+  final int id;
+  final int personaId;
+  final int? eventoDeSaludId;
   final String fecha;
 
-  /// Estado: 'muyBien', 'bien', 'regular', 'mal', 'muyMal'.
-  final String estado;
+  /// Estado como objeto catálogo.
+  final EstadoAnimoModel estado;
   final String? observaciones;
 
   const EstadoDeAnimoModel({
@@ -188,11 +236,11 @@ class EstadoDeAnimoModel {
 
   factory EstadoDeAnimoModel.fromJson(Map<String, dynamic> json) {
     return EstadoDeAnimoModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
-      eventoDeSaludId: json['eventoDeSaludId'] as String?,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
+      eventoDeSaludId: json['eventoDeSaludId'] as int?,
       fecha: json['fecha'] as String,
-      estado: json['estado'] as String,
+      estado: EstadoAnimoModel.fromJson(json['estado'] as Map<String, dynamic>),
       observaciones: json['observaciones'] as String?,
     );
   }
@@ -203,13 +251,55 @@ class EstadoDeAnimoModel {
       'personaId': personaId,
       if (eventoDeSaludId != null) 'eventoDeSaludId': eventoDeSaludId,
       'fecha': fecha,
-      'estado': estado,
+      'estado': estado.toJson(),
       if (observaciones != null) 'observaciones': observaciones,
     };
   }
 
   factory EstadoDeAnimoModel.fromRawJson(String source) =>
       EstadoDeAnimoModel.fromJson(json.decode(source) as Map<String, dynamic>);
+
+  String toRawJson() => json.encode(toJson());
+}
+
+/// DTO de [NotaEvento] para serialización JSON.
+class NotaEventoModel {
+  final int id;
+  final int eventoSaludId;
+  final int autorId;
+  final String fechaHora;
+  final String contenido;
+
+  const NotaEventoModel({
+    required this.id,
+    required this.eventoSaludId,
+    required this.autorId,
+    required this.fechaHora,
+    required this.contenido,
+  });
+
+  factory NotaEventoModel.fromJson(Map<String, dynamic> json) {
+    return NotaEventoModel(
+      id: json['id'] as int,
+      eventoSaludId: json['eventoSaludId'] as int,
+      autorId: json['autorId'] as int,
+      fechaHora: json['fechaHora'] as String,
+      contenido: json['contenido'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'eventoSaludId': eventoSaludId,
+      'autorId': autorId,
+      'fechaHora': fechaHora,
+      'contenido': contenido,
+    };
+  }
+
+  factory NotaEventoModel.fromRawJson(String source) =>
+      NotaEventoModel.fromJson(json.decode(source) as Map<String, dynamic>);
 
   String toRawJson() => json.encode(toJson());
 }

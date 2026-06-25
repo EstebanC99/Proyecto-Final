@@ -57,6 +57,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: AppRoutes.createCredentialsName,
         builder: (_, _) => const CreateCredentialsScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.accountCreated,
+        name: AppRoutes.accountCreatedName,
+        builder: (_, _) => const AccountCreatedScreen(),
+      ),
 
       // ── Shell (sesión autenticada) ─────────────────────────────────────────
       ShellRoute(
@@ -116,14 +121,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 name: AppRoutes.dependentDetailName,
                 builder: (_, state) => DependentDetailScreen(
-                  dependentId: state.pathParameters['id']!,
+                  dependentId: int.parse(state.pathParameters['id']!),
                 ),
                 routes: [
                   GoRoute(
                     path: 'edit',
                     name: AppRoutes.dependentEditName,
                     builder: (_, state) => DependentFormScreen(
-                      dependentId: state.pathParameters['id'],
+                      dependentId: int.tryParse(
+                        state.pathParameters['id'] ?? '',
+                      ),
                     ),
                   ),
                 ],
@@ -155,7 +162,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: 'member/:memberId',
                 name: AppRoutes.careTeamMemberName,
                 builder: (_, state) => CareTeamMemberScreen(
-                  memberId: state.pathParameters['memberId']!,
+                  memberId: int.parse(state.pathParameters['memberId']!),
                 ),
               ),
             ],
@@ -175,8 +182,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 name: AppRoutes.agendaEventName,
-                builder: (_, state) =>
-                    AgendaEventScreen(eventId: state.pathParameters['id']),
+                builder: (_, state) => AgendaEventScreen(
+                  eventId: int.tryParse(state.pathParameters['id'] ?? ''),
+                ),
               ),
             ],
           ),
@@ -200,14 +208,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: ':id',
                     name: AppRoutes.healthHabitDetailName,
-                    builder: (_, s) =>
-                        HabitDetailScreen(habitId: s.pathParameters['id']!),
+                    builder: (_, s) => HabitDetailScreen(
+                      habitId: int.parse(s.pathParameters['id']!),
+                    ),
                     routes: [
                       GoRoute(
                         path: 'edit',
                         name: AppRoutes.healthHabitEditName,
-                        builder: (_, s) =>
-                            HabitFormScreen(habitId: s.pathParameters['id']),
+                        builder: (_, s) => HabitFormScreen(
+                          habitId: int.tryParse(s.pathParameters['id'] ?? ''),
+                        ),
                       ),
                     ],
                   ),
@@ -232,14 +242,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     path: ':id',
                     name: AppRoutes.healthEventDetailName,
                     builder: (_, state) => HealthEventDetailScreen(
-                      eventId: state.pathParameters['id']!,
+                      eventId: int.parse(state.pathParameters['id']!),
                     ),
                     routes: [
                       GoRoute(
                         path: 'note',
                         name: AppRoutes.healthEventNoteNewName,
                         builder: (_, state) => HealthEventNoteFormScreen(
-                          eventoId: state.pathParameters['id']!,
+                          eventoId: int.parse(state.pathParameters['id']!),
                         ),
                       ),
                     ],

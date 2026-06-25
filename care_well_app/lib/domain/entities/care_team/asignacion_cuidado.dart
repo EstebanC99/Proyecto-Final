@@ -1,18 +1,25 @@
 import '../base_entity.dart';
 import '../shared/persona.dart';
 import 'permiso.dart';
-import 'rol.dart';
+import 'rol_cuidado.dart';
 
-/// Estado de una [AsignacionCuidado].
-enum EstadoAsignacion {
-  /// La asignación está activa y vigente.
-  activa,
+/// Estado de una [AsignacionCuidado] (catálogo persistido).
+///
+/// - id 1: Activa — la asignación está vigente.
+/// - id 2: Inactiva — la asignación fue dada de baja.
+/// - id 3: Pendiente — invitación enviada, pendiente de aceptación.
+class EstadoAsignacion extends BaseEntity {
+  final String descripcion;
 
-  /// La asignación fue dada de baja.
-  inactiva,
+  const EstadoAsignacion({required super.id, required this.descripcion});
 
-  /// Invitación enviada, pendiente de aceptación del colaborador.
-  pendiente,
+  @override
+  EstadoAsignacion copyWith({int? id, String? descripcion}) {
+    return EstadoAsignacion(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
 }
 
 /// Vínculo entre una persona cuidada y un colaborador (responsable o cuidador).
@@ -26,8 +33,8 @@ class AsignacionCuidado extends BaseEntity {
   /// Persona que colabora en el cuidado.
   final Persona personaColaborador;
 
-  /// Rol asignado al colaborador.
-  final Rol rol;
+  /// Rol del colaborador en este equipo de cuidado.
+  final RolCuidado rol;
 
   final EstadoAsignacion estado;
   final DateTime fechaAlta;
@@ -49,10 +56,10 @@ class AsignacionCuidado extends BaseEntity {
 
   @override
   AsignacionCuidado copyWith({
-    String? id,
+    int? id,
     Persona? personaCuidada,
     Persona? personaColaborador,
-    Rol? rol,
+    RolCuidado? rol,
     EstadoAsignacion? estado,
     DateTime? fechaAlta,
     List<Permiso>? permisos,

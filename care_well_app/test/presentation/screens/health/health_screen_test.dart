@@ -6,17 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final _personaMaria = Persona(
-  id: 'per_001',
-  nombre: 'María',
-  apellido: 'García',
-);
+final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 Widget _wrap({Persona? persona}) {
   final personaEfectiva = persona ?? _personaAlicia;

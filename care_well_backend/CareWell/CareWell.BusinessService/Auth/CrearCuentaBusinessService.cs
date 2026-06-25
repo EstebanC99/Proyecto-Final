@@ -5,7 +5,7 @@ using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.Factories;
 using CareWell.Domain.General;
-using CareWell.Domain.ValueObjects.Auth;
+using CareWell.Domain.ValueObjects.General;
 using CareWell.Repository;
 using CareWell.Repository.Auth;
 using CareWell.Repository.General;
@@ -37,22 +37,22 @@ namespace CareWell.BusinessService.Auth
 
         public void Crear(CrearCuentaCommand command)
         {
-            var crearCuenta = new CrearCuenta(command.Nombre,
-                                              command.Apellido,
-                                              command.Documento,
-                                              command.FechaNacimiento,
-                                              command.Email,
-                                              command.Telefono);
+            var crearPersona = new CrearPersona(command.Nombre,
+                                                command.Apellido,
+                                                command.Documento,
+                                                command.FechaNacimiento,
+                                                command.Email,
+                                                command.Telefono);
 
             var persona = this.Factory.Crear<Persona>();
 
-            persona.Crear(crearCuenta);
+            persona.Crear(crearPersona);
 
             this.PersonaRepository.Add(persona);
 
             var usuario = this.Factory.Crear<Usuario>();
 
-            usuario.Crear(persona, 
+            usuario.Crear(persona,
                           command.Email,
                           command.Contrasena,
                           this.EntityLoaderDomainService,

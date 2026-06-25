@@ -26,31 +26,31 @@ class EventCard extends StatelessWidget {
       '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
   String _labelTipo(TipoEventoAgenda tipo) {
-    switch (tipo) {
-      case TipoEventoAgenda.citaMedica:
+    switch (tipo.id) {
+      case TiposEventoAgendaConst.citaMedica:
         return 'Cita médica';
-      case TipoEventoAgenda.medicacion:
+      case TiposEventoAgendaConst.medicacion:
         return 'Medicación';
-      case TipoEventoAgenda.rehabilitacion:
+      case TiposEventoAgendaConst.rehabilitacion:
         return 'Rehabilitación';
-      case TipoEventoAgenda.control:
+      case TiposEventoAgendaConst.control:
         return 'Control';
-      case TipoEventoAgenda.otro:
+      default:
         return 'Otro';
     }
   }
 
   IconData _iconTipo(TipoEventoAgenda tipo) {
-    switch (tipo) {
-      case TipoEventoAgenda.citaMedica:
+    switch (tipo.id) {
+      case TiposEventoAgendaConst.citaMedica:
         return Icons.local_hospital_outlined;
-      case TipoEventoAgenda.medicacion:
+      case TiposEventoAgendaConst.medicacion:
         return Icons.medication_outlined;
-      case TipoEventoAgenda.rehabilitacion:
+      case TiposEventoAgendaConst.rehabilitacion:
         return Icons.accessibility_new_outlined;
-      case TipoEventoAgenda.control:
+      case TiposEventoAgendaConst.control:
         return Icons.monitor_heart_outlined;
-      case TipoEventoAgenda.otro:
+      default:
         return Icons.event_outlined;
     }
   }

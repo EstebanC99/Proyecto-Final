@@ -14,15 +14,16 @@ class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository(this._usuario);
 
   @override
-  Future<Usuario> login(String nombreUsuario, String contrasena) async =>
-      _usuario!;
+  Future<Usuario> login(String email, String contrasena) async => _usuario!;
 
   @override
   Future<Usuario> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) async => _usuario!;
 
@@ -33,11 +34,11 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {}
+  Future<void> eliminarCuenta(int usuarioId) async {}
 
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {}
@@ -45,13 +46,12 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async => _usuario!;
 
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
@@ -61,20 +61,19 @@ class _FakeAuthRepository implements AuthRepository {
 // ─── Datos de prueba ─────────────────────────────────────────────────────────
 
 final _testUsuario = Usuario(
-  id: 'usr_test',
+  id: 101,
   persona: Persona(
-    id: 'per_test',
+    id: 1,
     nombre: 'María',
     apellido: 'García',
     email: 'maria@example.com',
   ),
-  nombreUsuario: 'maria.garcia',
-  contrasenaHash: '1234',
-  estado: EstadoUsuario.activo,
+  contrasena: '1234',
+  estado: EstadoUsuario(id: EstadosUsuarioConst.activo, descripcion: 'Activo'),
 );
 
 final _testDependiente = Persona(
-  id: 'per_dep',
+  id: 2,
   nombre: 'Alicia',
   apellido: 'Rodríguez',
 );
@@ -93,11 +92,11 @@ Widget _wrap({required List<Persona> dependientes}) {
       authStateProvider.overrideWith(
         (ref) =>
             AuthNotifier(ref.watch(authRepositoryProvider))
-              ..login(_testUsuario.nombreUsuario, _testUsuario.contrasenaHash!),
+              ..login(_testUsuario.persona.email!, _testUsuario.contrasena),
       ),
-      // Sobrescribe dependentsListProvider directamente para evitar el loading
+      // Sobrescribe dependentsAsResponsableProvider directamente para evitar el loading
       // state, lo que evita que se monte NavTileSkeleton y sus timers infinitos.
-      dependentsListProvider.overrideWith((ref) async => dependientes),
+      dependentsAsResponsableProvider.overrideWith((ref) async => dependientes),
       // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
       ultimoEstadoAnimoProvider.overrideWith((ref) async => null),
     ],

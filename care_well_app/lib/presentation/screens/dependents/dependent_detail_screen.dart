@@ -16,7 +16,7 @@ import '../../widgets/widgets.dart';
 class DependentDetailScreen extends ConsumerWidget {
   const DependentDetailScreen({super.key, required this.dependentId});
 
-  final String dependentId;
+  final int dependentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

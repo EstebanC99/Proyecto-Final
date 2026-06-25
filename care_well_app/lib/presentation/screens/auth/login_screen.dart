@@ -6,14 +6,14 @@ import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 /// Pantalla de inicio de sesión (US-02).
 ///
-/// El email se envía como identificador (desvío MVP: el datasource acepta
-/// tanto nombreUsuario como email). En éxito NO navega: el redirect del router
-/// se dispara automáticamente al cambiar [authStateProvider].
+/// El email es el identificador único de acceso. En éxito NO navega: el redirect
+/// del router se dispara automáticamente al cambiar [authStateProvider].
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -55,8 +55,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     if (!_validate()) return;
 
-    // DESVÍO MVP: se envía el email como identificador; el datasource
-    // lo resuelve tanto por nombreUsuario como por email.
     await ref
         .read(authStateProvider.notifier)
         .login(_emailController.text.trim(), _passwordController.text);
@@ -64,8 +62,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.read(authStateProvider);
     if (authState.hasError && mounted) {
       setState(() {
-        // Mensaje genérico: no revela si es el email o la contraseña.
-        _loginError = 'Credenciales incorrectas. Verificá e intentá de nuevo.';
+        final error = authState.error;
+        if (error is SinConexionException) {
+          _loginError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
+        } else {
+          // Mensaje genérico para CredencialesInvalidasException y cualquier
+          // otro error: no revela si es el email o la contraseña.
+          _loginError =
+              'Credenciales incorrectas. Verificá e intentá de nuevo.';
+        }
       });
     }
     // En éxito: el redirect del router maneja la navegación automáticamente.

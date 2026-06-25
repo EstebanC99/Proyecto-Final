@@ -5,7 +5,7 @@ import 'demo_seed.dart';
 /// Implementación demo (en memoria) de [HealthDatasource].
 class DemoHealthDatasource implements HealthDatasource {
   /// Fichas de salud indexadas por persona.id.
-  final Map<String, FichaSalud> _fichas = {
+  final Map<int, FichaSalud> _fichas = {
     DemoSeed.personaAliciaId: DemoSeed.fichaSaludAlicia,
   };
 
@@ -25,10 +25,12 @@ class DemoHealthDatasource implements HealthDatasource {
   );
   final List<NotaEvento> _notas = List.of(DemoSeed.notasEvento);
 
+  int _nextId = 10000;
+
   // ─── Ficha de salud ──────────────────────────────────────────────────────────
 
   @override
-  Future<FichaSalud> getFichaSalud(String personaId) async {
+  Future<FichaSalud> getFichaSalud(int personaId) async {
     await Future.delayed(Duration.zero);
     final ficha = _fichas[personaId];
     if (ficha == null) {
@@ -40,11 +42,10 @@ class DemoHealthDatasource implements HealthDatasource {
   @override
   Future<FichaSalud> guardarFichaSalud(FichaSalud ficha) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final guardada = _fichas.containsKey(ficha.persona.id)
         ? ficha
         : FichaSalud(
-            id: 'fis_$ts',
+            id: _nextId++,
             persona: ficha.persona,
             antecedentes: ficha.antecedentes,
             estudios: ficha.estudios,
@@ -56,7 +57,7 @@ class DemoHealthDatasource implements HealthDatasource {
   // ─── Hábitos de vida ─────────────────────────────────────────────────────────
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(String personaId) async {
+  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async {
     await Future.delayed(Duration.zero);
     return _habitos.where((h) => h.persona.id == personaId).toList();
   }
@@ -64,9 +65,8 @@ class DemoHealthDatasource implements HealthDatasource {
   @override
   Future<HabitoDeVida> crearHabito(HabitoDeVida habito) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nuevo = HabitoDeVida(
-      id: 'hab_$ts',
+      id: _nextId++,
       persona: habito.persona,
       tipo: habito.tipo,
       descripcion: habito.descripcion,
@@ -85,7 +85,7 @@ class DemoHealthDatasource implements HealthDatasource {
   }
 
   @override
-  Future<void> eliminarHabito(String habitoId) async {
+  Future<void> eliminarHabito(int habitoId) async {
     await Future.delayed(Duration.zero);
     final idx = _habitos.indexWhere((h) => h.id == habitoId);
     if (idx < 0) throw Exception('Hábito no encontrado: $habitoId');
@@ -96,7 +96,7 @@ class DemoHealthDatasource implements HealthDatasource {
 
   @override
   Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
-    String personaId,
+    int personaId,
   ) async {
     await Future.delayed(Duration.zero);
     return _recomendaciones.where((r) => r.persona.id == personaId).toList();
@@ -107,9 +107,8 @@ class DemoHealthDatasource implements HealthDatasource {
     RecomendacionMedica recomendacion,
   ) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nueva = RecomendacionMedica(
-      id: 'rec_$ts',
+      id: _nextId++,
       persona: recomendacion.persona,
       descripcion: recomendacion.descripcion,
       fecha: recomendacion.fecha,
@@ -133,7 +132,7 @@ class DemoHealthDatasource implements HealthDatasource {
   }
 
   @override
-  Future<void> eliminarRecomendacion(String recomendacionId) async {
+  Future<void> eliminarRecomendacion(int recomendacionId) async {
     await Future.delayed(Duration.zero);
     final idx = _recomendaciones.indexWhere((r) => r.id == recomendacionId);
     if (idx < 0) {
@@ -145,7 +144,7 @@ class DemoHealthDatasource implements HealthDatasource {
   // ─── Eventos de salud ────────────────────────────────────────────────────────
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(String personaId) async {
+  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) async {
     await Future.delayed(Duration.zero);
     return _eventosSalud.where((e) => e.persona.id == personaId).toList();
   }
@@ -153,9 +152,8 @@ class DemoHealthDatasource implements HealthDatasource {
   @override
   Future<EventoDeSalud> crearEventoSalud(EventoDeSalud evento) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nuevo = EventoDeSalud(
-      id: 'esa_$ts',
+      id: _nextId++,
       persona: evento.persona,
       tipo: evento.tipo,
       fecha: evento.fecha,
@@ -175,7 +173,7 @@ class DemoHealthDatasource implements HealthDatasource {
   }
 
   @override
-  Future<void> eliminarEventoSalud(String eventoId) async {
+  Future<void> eliminarEventoSalud(int eventoId) async {
     await Future.delayed(Duration.zero);
     final idx = _eventosSalud.indexWhere((e) => e.id == eventoId);
     if (idx < 0) throw Exception('Evento de salud no encontrado: $eventoId');
@@ -187,7 +185,7 @@ class DemoHealthDatasource implements HealthDatasource {
   // ─── Notas de eventos de salud ───────────────────────────────────────────────
 
   @override
-  Future<List<NotaEvento>> getNotasByEvento(String eventoId) async {
+  Future<List<NotaEvento>> getNotasByEvento(int eventoId) async {
     await Future.delayed(Duration.zero);
     return _notas.where((n) => n.eventoSaludId == eventoId).toList();
   }
@@ -195,9 +193,8 @@ class DemoHealthDatasource implements HealthDatasource {
   @override
   Future<NotaEvento> crearNota(NotaEvento nota) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nueva = NotaEvento(
-      id: 'not_$ts',
+      id: _nextId++,
       eventoSaludId: nota.eventoSaludId,
       autor: nota.autor,
       fechaHora: nota.fechaHora,
@@ -210,7 +207,7 @@ class DemoHealthDatasource implements HealthDatasource {
   // ─── Estados de ánimo ────────────────────────────────────────────────────────
 
   @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(String personaId) async {
+  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) async {
     await Future.delayed(Duration.zero);
     return _estadosAnimo.where((e) => e.persona.id == personaId).toList();
   }
@@ -218,9 +215,8 @@ class DemoHealthDatasource implements HealthDatasource {
   @override
   Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo estadoAnimo) async {
     await Future.delayed(Duration.zero);
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final nuevo = EstadoDeAnimo(
-      id: 'ani_$ts',
+      id: _nextId++,
       persona: estadoAnimo.persona,
       eventoDeSalud: estadoAnimo.eventoDeSalud,
       fecha: estadoAnimo.fecha,
@@ -243,7 +239,7 @@ class DemoHealthDatasource implements HealthDatasource {
   }
 
   @override
-  Future<void> eliminarEstadoAnimo(String estadoAnimoId) async {
+  Future<void> eliminarEstadoAnimo(int estadoAnimoId) async {
     await Future.delayed(Duration.zero);
     final idx = _estadosAnimo.indexWhere((e) => e.id == estadoAnimoId);
     if (idx < 0) {

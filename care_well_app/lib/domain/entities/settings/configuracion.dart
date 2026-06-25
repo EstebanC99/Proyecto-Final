@@ -21,7 +21,7 @@ class Configuracion extends BaseEntity {
 
   @override
   Configuracion copyWith({
-    String? id,
+    int? id,
     Usuario? usuario,
     bool? notificacionesHabilitadas,
     String? idioma,

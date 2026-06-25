@@ -2,8 +2,8 @@ import 'dart:convert';
 
 /// DTO de [Emergencia] para serialización JSON.
 class EmergenciaModel {
-  final String id;
-  final String personaId;
+  final int id;
+  final int personaId;
   final String fechaHora;
   final bool atendida;
   final String? descripcion;
@@ -18,8 +18,8 @@ class EmergenciaModel {
 
   factory EmergenciaModel.fromJson(Map<String, dynamic> json) {
     return EmergenciaModel(
-      id: json['id'] as String,
-      personaId: json['personaId'] as String,
+      id: json['id'] as int,
+      personaId: json['personaId'] as int,
       fechaHora: json['fechaHora'] as String,
       atendida: (json['atendida'] as bool?) ?? false,
       descripcion: json['descripcion'] as String?,

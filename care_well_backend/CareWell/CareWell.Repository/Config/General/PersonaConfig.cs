@@ -17,8 +17,8 @@ namespace CareWell.Repository.Config.General
             builder.Property(p => p.Apellido).IsRequired().HasMaxLength(100);
             builder.Property(p => p.Documento).IsRequired().HasMaxLength(20);
             builder.Property(p => p.FechaNacimiento).IsRequired();
-            builder.Property(p => p.Email).IsRequired().HasMaxLength(256);
-            builder.Property(p => p.Telefono).IsRequired().HasMaxLength(30);
+            builder.Property(p => p.Email).HasMaxLength(256);
+            builder.Property(p => p.Telefono).HasMaxLength(30);
             builder.Property(p => p.ImagenPath).HasMaxLength(500);
         }
     }

@@ -1,28 +1,26 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 void main() {
   // ─── Fixture ────────────────────────────────────────────────────────────────
 
-  final personaAlicia = Persona(
-    id: 'per_002',
-    nombre: 'Alicia',
-    apellido: 'Rodríguez',
-  );
+  final personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
   final usuarioMaria = Usuario(
-    id: 'usr_001',
-    persona: Persona(id: 'per_001', nombre: 'María', apellido: 'García'),
-    nombreUsuario: 'maria.garcia',
-    estado: EstadoUsuario.activo,
+    id: 101,
+    persona: Persona(id: 1, nombre: 'María', apellido: 'García'),
+    contrasena: 'hash123',
+    estado: estadoUsuarioActivo,
   );
 
   EventoAgenda buildEvento(DateTime fechaHoraInicio) => EventoAgenda(
-    id: 'evt_test',
+    id: 701,
     persona: personaAlicia,
     creadoPor: usuarioMaria,
     titulo: 'Evento de prueba',
-    tipo: TipoEventoAgenda.otro,
+    tipo: tipoEventoAgendaOtro,
     fechaHoraInicio: fechaHoraInicio,
   );
 

@@ -7,17 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../_fakes/test_fixtures.dart';
+
 /// Usuario de prueba para simular sesión autenticada.
 final _usuarioDemo = Usuario(
-  id: 'usr_test',
+  id: 101,
   persona: Persona(
-    id: 'per_test',
+    id: 1,
     nombre: 'Test',
     apellido: 'User',
     email: 'test@example.com',
   ),
-  nombreUsuario: 'demo',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 void main() {

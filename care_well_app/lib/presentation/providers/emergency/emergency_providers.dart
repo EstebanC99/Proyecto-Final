@@ -19,7 +19,7 @@ final equipoEmergenciaProvider = FutureProvider<List<AsignacionCuidado>>((
       .watch(careTeamRepositoryProvider)
       .getAsignacionesByPersonaCuidada(persona.id);
   return asignaciones
-      .where((a) => a.estado == EstadoAsignacion.activa)
+      .where((a) => a.estado.id == EstadosAsignacionConst.activa)
       .toList();
 });
 
@@ -49,13 +49,13 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
       .where(
         (a) =>
             a.personaCuidada.id == persona.id &&
-            a.estado == EstadoAsignacion.activa,
+            a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;
 
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo == CodigoPermiso.activarEmergencia,
+    (p) => p.codigo.id == PermisosCuidadoConst.activarEmergencia,
   );
 });
 
@@ -96,7 +96,7 @@ final activarEmergenciaProvider = Provider<Future<Emergencia> Function()>((
         titulo: 'Emergencia — ${persona.nombre} ${persona.apellido}',
         cuerpo:
             '${usuario.persona.nombre} está solicitando asistencia inmediata.',
-        payload: emergencia.id,
+        payload: emergencia.id.toString(),
       );
     }
 

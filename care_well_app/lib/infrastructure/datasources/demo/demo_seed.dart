@@ -6,40 +6,76 @@ import '../../../domain/entities/entities.dart';
 /// Esta clase centraliza los valores de IDs y objetos reutilizables para
 /// facilitar la lectura del código, pero NO garantiza consistencia
 /// referencial entre módulos: cada datasource es independiente.
+///
+/// Esquema de rangos de IDs:
+/// Personas: 1–99 | Usuarios: 101–199 | Permisos: 301–399
+/// Asignaciones: 401–499 | Fichas salud: 501–599 | Configuraciones: 601–699
+/// Eventos agenda: 701–799 | Recordatorios: 801–899 | Hábitos: 901–999
+/// Recomendaciones: 1001–1099 | Eventos salud: 1101–1199
+/// Estados ánimo: 1201–1299 | Notas evento: 1301–1399 | Aceptaciones: 1401–1499
 class DemoSeed {
   DemoSeed._();
 
   // ─── IDs fijos (representan instancias persistentes en la demo) ──────────────
 
-  static const String usuarioMariaId = 'usr_001';
-  static const String personaMariaId = 'per_001';
+  static const int usuarioMariaId = 101;
+  static const int personaMariaId = 1;
 
   /// Persona a cargo de María: Alicia Rodríguez, 82 años.
-  static const String personaAliciaId = 'per_002';
+  static const int personaAliciaId = 2;
 
   /// Carlos Pérez — colaborador Responsable.
-  static const String personaCarlosId = 'per_003';
+  static const int personaCarlosId = 3;
 
   /// Laura Méndez — colaboradora Cuidadora.
-  static const String personaLauraId = 'per_004';
+  static const int personaLauraId = 4;
 
   /// Roberto Sánchez — persona sin credenciales (caso de prueba US-04).
   /// Email de prueba para US-04: roberto.sanchez@example.com
-  static const String personaRobertoId = 'per_005';
+  static const int personaRobertoId = 5;
 
-  static const String rolResponsableId = 'rol_001';
-  static const String rolCuidadorId = 'rol_002';
-
-  static const String asignacionCarlosId = 'asi_001';
-  static const String asignacionLauraId = 'asi_002';
+  static const int asignacionCarlosId = 401;
+  static const int asignacionLauraId = 402;
 
   /// María como Responsable de Alicia — asignación del usuario demo principal.
   /// Email de prueba para US-20 (agregar cuidador): usar cualquier email no registrado.
-  static const String asignacionMariaId = 'asi_003';
+  static const int asignacionMariaId = 403;
 
-  static const String fichaSaludAliciaId = 'fis_001';
+  static const int fichaSaludAliciaId = 501;
 
-  static const String configuracionMariaId = 'cfg_001';
+  static const int configuracionMariaId = 601;
+
+  // ─── Catálogos de uso frecuente ──────────────────────────────────────────────
+
+  static final EstadoUsuario estadoActivo = EstadoUsuario(
+    id: EstadosUsuarioConst.activo,
+    descripcion: 'Activo',
+  );
+
+  static final EstadoUsuario estadoSuspendido = EstadoUsuario(
+    id: EstadosUsuarioConst.suspendido,
+    descripcion: 'Suspendido',
+  );
+
+  static final EstadoUsuario estadoEliminado = EstadoUsuario(
+    id: EstadosUsuarioConst.eliminado,
+    descripcion: 'Eliminado',
+  );
+
+  static final RolCuidado rolCuidadoResponsable = RolCuidado(
+    id: RolesCuidadoConst.responsable,
+    descripcion: 'Responsable',
+  );
+
+  static final RolCuidado rolCuidadoCuidador = RolCuidado(
+    id: RolesCuidadoConst.cuidador,
+    descripcion: 'Cuidador',
+  );
+
+  static final EstadoAsignacion estadoAsignacionActiva = EstadoAsignacion(
+    id: EstadosAsignacionConst.activa,
+    descripcion: 'Activa',
+  );
 
   // ─── Personas ────────────────────────────────────────────────────────────────
 
@@ -96,10 +132,9 @@ class DemoSeed {
   static final Usuario usuarioMaria = Usuario(
     id: usuarioMariaId,
     persona: personaMaria,
-    nombreUsuario: 'maria.garcia',
     // En demo la "contraseña" es texto plano para facilitar el login de prueba.
-    contrasenaHash: '12345678',
-    estado: EstadoUsuario.activo,
+    contrasena: '12345678',
+    estado: estadoActivo,
   );
 
   // ─── Configuración ───────────────────────────────────────────────────────────
@@ -114,75 +149,98 @@ class DemoSeed {
   // ─── Roles y permisos ────────────────────────────────────────────────────────
 
   static final List<Permiso> permisosResponsable = [
-    const Permiso(
-      id: 'prm_001',
-      codigo: CodigoPermiso.verFichaSalud,
+    Permiso(
+      id: 301,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.verFichaSalud,
+        descripcion: 'Ver ficha de salud',
+      ),
       descripcion: 'Ver ficha de salud',
     ),
-    const Permiso(
-      id: 'prm_002',
-      codigo: CodigoPermiso.editarFichaSalud,
+    Permiso(
+      id: 302,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.editarFichaSalud,
+        descripcion: 'Editar ficha de salud',
+      ),
       descripcion: 'Editar ficha de salud',
     ),
-    const Permiso(
-      id: 'prm_003',
-      codigo: CodigoPermiso.gestionarAgenda,
+    Permiso(
+      id: 303,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.gestionarAgenda,
+        descripcion: 'Gestionar agenda',
+      ),
       descripcion: 'Gestionar agenda',
     ),
-    const Permiso(
-      id: 'prm_004',
-      codigo: CodigoPermiso.registrarEventosSalud,
+    Permiso(
+      id: 304,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.registrarEventosSalud,
+        descripcion: 'Registrar eventos de salud',
+      ),
       descripcion: 'Registrar eventos de salud',
     ),
-    const Permiso(
-      id: 'prm_005',
-      codigo: CodigoPermiso.registrarHabitos,
+    Permiso(
+      id: 305,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.registrarHabitos,
+        descripcion: 'Registrar hábitos de vida',
+      ),
       descripcion: 'Registrar hábitos de vida',
     ),
-    const Permiso(
-      id: 'prm_006',
-      codigo: CodigoPermiso.activarEmergencia,
+    Permiso(
+      id: 306,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.activarEmergencia,
+        descripcion: 'Activar emergencia',
+      ),
       descripcion: 'Activar emergencia',
     ),
-    const Permiso(
-      id: 'prm_007',
-      codigo: CodigoPermiso.administrarEquipo,
+    Permiso(
+      id: 307,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.administrarEquipo,
+        descripcion: 'Administrar equipo de cuidado',
+      ),
       descripcion: 'Administrar equipo de cuidado',
     ),
   ];
 
   static final List<Permiso> permisosCuidador = [
-    const Permiso(
-      id: 'prm_008',
-      codigo: CodigoPermiso.verFichaSalud,
+    Permiso(
+      id: 308,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.verFichaSalud,
+        descripcion: 'Ver ficha de salud',
+      ),
       descripcion: 'Ver ficha de salud',
     ),
-    const Permiso(
-      id: 'prm_009',
-      codigo: CodigoPermiso.gestionarAgenda,
+    Permiso(
+      id: 309,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.gestionarAgenda,
+        descripcion: 'Gestionar agenda',
+      ),
       descripcion: 'Gestionar agenda',
     ),
-    const Permiso(
-      id: 'prm_010',
-      codigo: CodigoPermiso.registrarEventosSalud,
+    Permiso(
+      id: 310,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.registrarEventosSalud,
+        descripcion: 'Registrar eventos de salud',
+      ),
       descripcion: 'Registrar eventos de salud',
     ),
-    const Permiso(
-      id: 'prm_011',
-      codigo: CodigoPermiso.activarEmergencia,
+    Permiso(
+      id: 311,
+      codigo: CodigoPermiso(
+        id: PermisosCuidadoConst.activarEmergencia,
+        descripcion: 'Activar emergencia',
+      ),
       descripcion: 'Activar emergencia',
     ),
   ];
-
-  static final Rol rolResponsable = Rol(
-    id: rolResponsableId,
-    nombre: RolCuidado.responsable,
-  );
-
-  static final Rol rolCuidador = Rol(
-    id: rolCuidadorId,
-    nombre: RolCuidado.cuidador,
-  );
 
   // ─── Asignaciones de cuidado ─────────────────────────────────────────────────
 
@@ -190,8 +248,8 @@ class DemoSeed {
     id: asignacionCarlosId,
     personaCuidada: personaAlicia,
     personaColaborador: personaCarlos,
-    rol: rolResponsable,
-    estado: EstadoAsignacion.activa,
+    rol: rolCuidadoResponsable,
+    estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 1, 10),
     permisos: permisosResponsable,
   );
@@ -200,8 +258,8 @@ class DemoSeed {
     id: asignacionLauraId,
     personaCuidada: personaAlicia,
     personaColaborador: personaLaura,
-    rol: rolCuidador,
-    estado: EstadoAsignacion.activa,
+    rol: rolCuidadoCuidador,
+    estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 3, 5),
     permisos: permisosCuidador,
   );
@@ -213,8 +271,8 @@ class DemoSeed {
     id: asignacionMariaId,
     personaCuidada: personaAlicia,
     personaColaborador: personaMaria,
-    rol: rolResponsable,
-    estado: EstadoAsignacion.activa,
+    rol: rolCuidadoResponsable,
+    estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 1, 8),
     permisos: permisosResponsable,
   );
@@ -224,54 +282,69 @@ class DemoSeed {
   static final List<EventoAgenda> eventosAgenda = [
     // Evento futuro (mañana) con recordatorio activo — caso principal US-23/US-27.
     EventoAgenda(
-      id: 'evt_001',
+      id: 701,
       persona: personaAlicia,
       creadoPor: usuarioMaria,
       titulo: 'Consulta cardiológica',
       descripcion: 'Control de presión arterial y electrocardiograma.',
-      tipo: TipoEventoAgenda.citaMedica,
+      tipo: TipoEventoAgenda(
+        id: TiposEventoAgendaConst.citaMedica,
+        descripcion: 'Cita médica',
+      ),
       fechaHoraInicio: DateTime(2026, 6, 10, 10, 0),
       fechaHoraFin: DateTime(2026, 6, 10, 11, 0),
     ),
     // Evento futuro (próximo) con recordatorio activo — toma de medicación.
     EventoAgenda(
-      id: 'evt_002',
+      id: 702,
       persona: personaAlicia,
       creadoPor: usuarioMaria,
       titulo: 'Toma de medicación matutina',
       descripcion: 'Atenolol 25 mg + Enalapril 10 mg.',
-      tipo: TipoEventoAgenda.medicacion,
+      tipo: TipoEventoAgenda(
+        id: TiposEventoAgendaConst.medicacion,
+        descripcion: 'Medicación',
+      ),
       fechaHoraInicio: DateTime(2026, 6, 7, 8, 0),
     ),
     // Evento futuro — fisioterapia.
     EventoAgenda(
-      id: 'evt_003',
+      id: 703,
       persona: personaAlicia,
       creadoPor: usuarioMaria,
       titulo: 'Fisioterapia semanal',
       descripcion: 'Sesión de rehabilitación motriz.',
-      tipo: TipoEventoAgenda.rehabilitacion,
+      tipo: TipoEventoAgenda(
+        id: TiposEventoAgendaConst.rehabilitacion,
+        descripcion: 'Rehabilitación',
+      ),
       fechaHoraInicio: DateTime(2026, 6, 12, 14, 30),
       fechaHoraFin: DateTime(2026, 6, 12, 15, 30),
     ),
     // Evento vencido (hace 2 días) — para demostrar estado readonly (US-25).
     EventoAgenda(
-      id: 'evt_004',
+      id: 704,
       persona: personaAlicia,
       creadoPor: usuarioMaria,
       titulo: 'Control de glucemia',
       descripcion: 'Medición de glucemia en ayunas.',
-      tipo: TipoEventoAgenda.control,
+      tipo: TipoEventoAgenda(
+        id: TiposEventoAgendaConst.control,
+        descripcion: 'Control',
+      ),
       fechaHoraInicio: DateTime(2026, 6, 4, 9, 0),
     ),
     // Evento vencido (ayer) — segundo caso de evento pasado.
     EventoAgenda(
-      id: 'evt_005',
+      id: 705,
       persona: personaAlicia,
       creadoPor: usuarioMaria,
       titulo: 'Medicación vespertina',
       descripcion: 'Metformina 500 mg con la cena.',
-      tipo: TipoEventoAgenda.medicacion,
+      tipo: TipoEventoAgenda(
+        id: TiposEventoAgendaConst.medicacion,
+        descripcion: 'Medicación',
+      ),
       fechaHoraInicio: DateTime(2026, 6, 5, 20, 0),
     ),
   ];
@@ -281,13 +354,13 @@ class DemoSeed {
   /// Recordatorios iniciales para los eventos futuros de demostración.
   static final List<Recordatorio> recordatoriosAgenda = [
     Recordatorio(
-      id: 'rec_001',
-      eventoAgenda: eventosAgenda[0], // evt_001 — Consulta cardiológica
+      id: 801,
+      eventoAgenda: eventosAgenda[0], // 701 — Consulta cardiológica
       fechaHoraEnvio: DateTime(2026, 6, 10, 10, 0),
     ),
     Recordatorio(
-      id: 'rec_002',
-      eventoAgenda: eventosAgenda[1], // evt_002 — Toma de medicación matutina
+      id: 802,
+      eventoAgenda: eventosAgenda[1], // 702 — Toma de medicación matutina
       fechaHoraEnvio: DateTime(2026, 6, 7, 8, 0),
     ),
   ];
@@ -311,38 +384,53 @@ class DemoSeed {
   /// Hábitos propios de María (usuario demo, contexto "Yo").
   static final List<HabitoDeVida> habitosMaria = [
     HabitoDeVida(
-      id: 'hab_m01',
+      id: 901,
       persona: personaMaria,
-      tipo: TipoHabito.actividadFisica,
+      tipo: TipoHabito(
+        id: TiposHabitoConst.actividadFisica,
+        descripcion: 'Actividad física',
+      ),
       descripcion:
           'Caminata de 30 minutos antes del trabajo, cinco días a la semana.',
     ),
     HabitoDeVida(
-      id: 'hab_m02',
+      id: 902,
       persona: personaMaria,
-      tipo: TipoHabito.hidratacion,
+      tipo: TipoHabito(
+        id: TiposHabitoConst.hidratacion,
+        descripcion: 'Hidratación',
+      ),
       descripcion: 'Dos litros de agua por día. Recuerda beber entre comidas.',
     ),
   ];
 
   static final List<HabitoDeVida> habitosAlicia = [
     HabitoDeVida(
-      id: 'hab_001',
+      id: 903,
       persona: personaAlicia,
-      tipo: TipoHabito.actividadFisica,
+      tipo: TipoHabito(
+        id: TiposHabitoConst.actividadFisica,
+        descripcion: 'Actividad física',
+      ),
       descripcion:
           'Caminata de 20 minutos por el parque, tres veces por semana.',
     ),
     HabitoDeVida(
-      id: 'hab_002',
+      id: 904,
       persona: personaAlicia,
-      tipo: TipoHabito.alimentacion,
+      tipo: TipoHabito(
+        id: TiposHabitoConst.alimentacion,
+        descripcion: 'Alimentación',
+      ),
       descripcion: 'Dieta baja en sodio y azúcares simples. Sin sal de mesa.',
     ),
     HabitoDeVida(
-      id: 'hab_003',
+      id: 905,
       persona: personaAlicia,
-      tipo: TipoHabito.hidratacion,
+      tipo: TipoHabito(
+        id: TiposHabitoConst.hidratacion,
+        descripcion: 'Hidratación',
+      ),
       descripcion: 'Ingesta de al menos 1,5 litros de agua por día.',
     ),
   ];
@@ -351,7 +439,7 @@ class DemoSeed {
 
   static final List<RecomendacionMedica> recomendacionesAlicia = [
     RecomendacionMedica(
-      id: 'rec_001',
+      id: 1001,
       persona: personaAlicia,
       descripcion:
           'Controlar la presión arterial dos veces al día. Registrar valores.',
@@ -359,7 +447,7 @@ class DemoSeed {
       profesional: 'Dr. Hernández (Cardiología)',
     ),
     RecomendacionMedica(
-      id: 'rec_002',
+      id: 1002,
       persona: personaAlicia,
       descripcion:
           'Evitar esfuerzos físicos prolongados. Descanso obligatorio a las 16 hs.',
@@ -373,26 +461,35 @@ class DemoSeed {
   /// Eventos de salud propios de María (usuario demo, contexto "Yo").
   static final List<EventoDeSalud> eventosSaludMaria = [
     EventoDeSalud(
-      id: 'esa_m01',
+      id: 1101,
       persona: personaMaria,
-      tipo: TipoEventoSalud.citaMedica,
+      tipo: TipoEventoSalud(
+        id: TiposEventoSaludConst.citaMedica,
+        descripcion: 'Cita médica',
+      ),
       fecha: DateTime(2026, 5, 20),
       descripcion: 'Control anual con médico clínico — Dr. Alejandro Torres.',
     ),
   ];
 
   static final EventoDeSalud eventoSaludMareos = EventoDeSalud(
-    id: 'esa_001',
+    id: 1102,
     persona: personaAlicia,
-    tipo: TipoEventoSalud.sintoma,
+    tipo: TipoEventoSalud(
+      id: TiposEventoSaludConst.sintoma,
+      descripcion: 'Síntoma',
+    ),
     fecha: DateTime(2026, 5, 28),
     descripcion: 'Episodio de mareos al levantarse. Duración aprox. 5 minutos.',
   );
 
   static final EventoDeSalud eventoSaludControlCardiologico = EventoDeSalud(
-    id: 'esa_003',
+    id: 1103,
     persona: personaAlicia,
-    tipo: TipoEventoSalud.citaMedica,
+    tipo: TipoEventoSalud(
+      id: TiposEventoSaludConst.citaMedica,
+      descripcion: 'Cita médica',
+    ),
     fecha: DateTime(2026, 6, 2),
     descripcion: 'Control cardiológico — Dr. Martín Sosa · Hospital Italiano.',
   );
@@ -401,9 +498,12 @@ class DemoSeed {
     eventoSaludControlCardiologico,
     eventoSaludMareos,
     EventoDeSalud(
-      id: 'esa_002',
+      id: 1104,
       persona: personaAlicia,
-      tipo: TipoEventoSalud.vacuna,
+      tipo: TipoEventoSalud(
+        id: TiposEventoSaludConst.vacuna,
+        descripcion: 'Vacuna',
+      ),
       fecha: DateTime(2026, 4, 3),
       descripcion: 'Vacuna antigripal anual.',
     ),
@@ -413,40 +513,40 @@ class DemoSeed {
 
   static final List<NotaEvento> notasEvento = [
     NotaEvento(
-      id: 'not_001',
-      eventoSaludId: 'esa_003',
+      id: 1301,
+      eventoSaludId: 1103,
       autor: personaMaria,
       fechaHora: DateTime(2026, 6, 2, 14, 32),
       contenido:
           'El médico indicó repetir análisis en 3 meses. Solicitar turno a fin de mes.',
     ),
     NotaEvento(
-      id: 'not_002',
-      eventoSaludId: 'esa_003',
+      id: 1302,
+      eventoSaludId: 1103,
       autor: personaLaura,
       fechaHora: DateTime(2026, 6, 3, 9, 15),
       contenido: 'Acordado con Alicia hacer los análisis en Fleni.',
     ),
     NotaEvento(
-      id: 'not_003',
-      eventoSaludId: 'esa_001',
+      id: 1303,
+      eventoSaludId: 1102,
       autor: personaMaria,
       fechaHora: DateTime(2026, 5, 28, 11, 0),
       contenido:
           'Presión se normalizó a los 15 minutos. Se informó al cardiólogo por WhatsApp.',
     ),
-    // Nota migrada desde el campo notas del evento esa_001.
+    // Nota migrada desde el campo notas del evento 1102.
     NotaEvento(
-      id: 'not_004',
-      eventoSaludId: 'esa_001',
+      id: 1304,
+      eventoSaludId: 1102,
       autor: personaMaria,
       fechaHora: DateTime(2026, 5, 28, 10, 5),
       contenido: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
     ),
-    // Nota migrada desde el campo notas del evento esa_m01 (María).
+    // Nota migrada desde el campo notas del evento 1101 (María).
     NotaEvento(
-      id: 'not_005',
-      eventoSaludId: 'esa_m01',
+      id: 1305,
+      eventoSaludId: 1101,
       autor: personaMaria,
       fechaHora: DateTime(2026, 5, 20, 12, 0),
       contenido: 'Todo en orden. Indicó análisis de laboratorio en 6 meses.',
@@ -457,18 +557,18 @@ class DemoSeed {
 
   static final List<EstadoDeAnimo> estadosAnimoAlicia = [
     EstadoDeAnimo(
-      id: 'ani_001',
+      id: 1201,
       persona: personaAlicia,
       fecha: DateTime(2026, 6, 4),
-      estado: EstadoAnimoEnum.bien,
+      estado: EstadoAnimo(id: EstadosAnimoConst.bien, descripcion: 'Bien'),
       observaciones: 'Estuvo animada en el desayuno.',
     ),
     EstadoDeAnimo(
-      id: 'ani_002',
+      id: 1202,
       persona: personaAlicia,
       eventoDeSalud: eventoSaludMareos,
       fecha: DateTime(2026, 5, 28),
-      estado: EstadoAnimoEnum.mal,
+      estado: EstadoAnimo(id: EstadosAnimoConst.mal, descripcion: 'Mal'),
       observaciones: 'Preocupada tras el episodio de mareos.',
     ),
   ];
@@ -477,7 +577,7 @@ class DemoSeed {
 
   static final List<AceptacionTerminos> aceptacionesMaria = [
     AceptacionTerminos(
-      id: 'acc_001',
+      id: 1401,
       usuario: usuarioMaria,
       version: '1.0',
       fechaAceptacion: DateTime(2024, 1, 8),

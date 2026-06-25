@@ -1,29 +1,21 @@
 import '../base_entity.dart';
 
-/// Código de permiso que puede otorgarse a un colaborador.
+/// Código canónico de permiso (catálogo persistido).
 ///
-/// Cada [Permiso] habilita una acción concreta dentro de la app.
-enum CodigoPermiso {
-  /// Ver la ficha de salud de la persona a cargo.
-  verFichaSalud,
+/// Cada instancia representa una acción concreta que puede habilitarse
+/// sobre una [AsignacionCuidado].
+class CodigoPermiso extends BaseEntity {
+  final String descripcion;
 
-  /// Editar la ficha de salud de la persona a cargo.
-  editarFichaSalud,
+  const CodigoPermiso({required super.id, required this.descripcion});
 
-  /// Ver y gestionar la agenda de la persona a cargo.
-  gestionarAgenda,
-
-  /// Registrar eventos de salud.
-  registrarEventosSalud,
-
-  /// Registrar hábitos de vida.
-  registrarHabitos,
-
-  /// Activar una emergencia.
-  activarEmergencia,
-
-  /// Administrar el equipo de cuidado (solo responsable).
-  administrarEquipo,
+  @override
+  CodigoPermiso copyWith({int? id, String? descripcion}) {
+    return CodigoPermiso(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
 }
 
 /// Permiso individual que puede asociarse a un [Rol].
@@ -41,7 +33,7 @@ class Permiso extends BaseEntity {
   });
 
   @override
-  Permiso copyWith({String? id, CodigoPermiso? codigo, String? descripcion}) {
+  Permiso copyWith({int? id, CodigoPermiso? codigo, String? descripcion}) {
     return Permiso(
       id: id ?? this.id,
       codigo: codigo ?? this.codigo,

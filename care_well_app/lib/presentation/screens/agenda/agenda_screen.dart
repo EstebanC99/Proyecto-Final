@@ -135,7 +135,7 @@ class AgendaScreen extends ConsumerWidget {
                             evento: e,
                             onTap: () => context.pushNamed(
                               AppRoutes.agendaEventName,
-                              pathParameters: {'id': e.id},
+                              pathParameters: {'id': e.id.toString()},
                             ),
                           ),
                         ),

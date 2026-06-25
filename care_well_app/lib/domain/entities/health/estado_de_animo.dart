@@ -2,8 +2,26 @@ import '../base_entity.dart';
 import '../shared/persona.dart';
 import 'evento_de_salud.dart';
 
-/// Estado de ánimo registrado para una persona.
-enum EstadoAnimoEnum { muyBien, bien, regular, mal, muyMal }
+/// Estado de ánimo (catálogo persistido).
+///
+/// - id 1: Muy bien.
+/// - id 2: Bien.
+/// - id 3: Regular.
+/// - id 4: Mal.
+/// - id 5: Muy mal.
+class EstadoAnimo extends BaseEntity {
+  final String descripcion;
+
+  const EstadoAnimo({required super.id, required this.descripcion});
+
+  @override
+  EstadoAnimo copyWith({int? id, String? descripcion}) {
+    return EstadoAnimo(
+      id: id ?? this.id,
+      descripcion: descripcion ?? this.descripcion,
+    );
+  }
+}
 
 /// Estado de ánimo registrado para una persona en un momento dado.
 class EstadoDeAnimo extends BaseEntity {
@@ -14,7 +32,7 @@ class EstadoDeAnimo extends BaseEntity {
   final EventoDeSalud? eventoDeSalud;
 
   final DateTime fecha;
-  final EstadoAnimoEnum estado;
+  final EstadoAnimo estado;
 
   /// Observaciones o contexto adicional.
   final String? observaciones;
@@ -30,11 +48,11 @@ class EstadoDeAnimo extends BaseEntity {
 
   @override
   EstadoDeAnimo copyWith({
-    String? id,
+    int? id,
     Persona? persona,
     EventoDeSalud? eventoDeSalud,
     DateTime? fecha,
-    EstadoAnimoEnum? estado,
+    EstadoAnimo? estado,
     String? observaciones,
   }) {
     return EstadoDeAnimo(

@@ -36,26 +36,29 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
   bool _exitoso = false;
   String _emailAgregado = '';
 
-  late Map<CodigoPermiso, bool> _permisos;
+  /// Mapa de permisos por id: true = activo, false = inactivo.
+  late Map<int, bool> _permisos;
 
   bool get _esResponsable => widget.formType == CareTeamFormType.responsible;
 
   @override
   void initState() {
     super.initState();
-    _permisos = _permisosDefault();
+    // _permisos se inicializa en build() cuando ya se tienen los códigos del provider.
+    // Aquí solo inicializamos vacío; se llenará la primera vez en build.
+    _permisos = {};
   }
 
-  Map<CodigoPermiso, bool> _permisosDefault() {
+  Map<int, bool> _permisosDefault(List<CodigoPermiso> codigos) {
     if (_esResponsable) {
-      return {for (final c in CodigoPermiso.values) c: true};
+      return {for (final c in codigos) c.id: true};
     } else {
       // Cuidador: solo verFichaSalud y gestionarAgenda ON por defecto.
       return {
-        for (final c in CodigoPermiso.values)
-          c:
-              c == CodigoPermiso.verFichaSalud ||
-              c == CodigoPermiso.gestionarAgenda,
+        for (final c in codigos)
+          c.id:
+              c.id == PermisosCuidadoConst.verFichaSalud ||
+              c.id == PermisosCuidadoConst.gestionarAgenda,
       };
     }
   }
@@ -80,18 +83,24 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
       }
 
       final crearMiembro = ref.read(crearMiembroProvider);
-      final permisosActivos = _permisos.entries
-          .where((e) => e.value)
-          .map((e) => e.key)
+      final todosLosCodigos = ref.read(availablePermisosProvider);
+      final permisosActivos = todosLosCodigos
+          .where((c) => _permisos[c.id] == true)
           .toList();
+
+      // Construimos un RolCuidado con el id correcto; el provider lo busca por id.
+      final rolNombre = RolCuidado(
+        id: _esResponsable
+            ? RolesCuidadoConst.responsable
+            : RolesCuidadoConst.cuidador,
+        descripcion: _esResponsable ? 'Responsable' : 'Cuidador',
+      );
 
       await crearMiembro(
         personaCuidadaId: personaCtx.id,
         email: _emailController.text.trim(),
         permisos: permisosActivos,
-        rolNombre: _esResponsable
-            ? RolCuidado.responsable
-            : RolCuidado.cuidador,
+        rolNombre: rolNombre,
       );
 
       if (!mounted) return;
@@ -151,6 +160,12 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     final headerBody = _esResponsable
         ? 'El responsable podrá gestionar datos y coordinar el cuidado de'
         : 'El cuidador tendrá acceso según los permisos que definas para';
+
+    final todosLosCodigos = ref.watch(availablePermisosProvider);
+    // Inicializar permisos la primera vez que los códigos están disponibles.
+    if (_permisos.isEmpty && todosLosCodigos.isNotEmpty) {
+      _permisos = _permisosDefault(todosLosCodigos);
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -259,18 +274,18 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
                     color: AppColors.surfaceVariant,
                   ),
                   // Filas de permisos
-                  ...CodigoPermiso.values.asMap().entries.map((entry) {
+                  ...todosLosCodigos.asMap().entries.map((entry) {
                     final i = entry.key;
                     final codigo = entry.value;
                     return Column(
                       children: [
                         PermissionToggleRow(
                           label: labelDePermiso(codigo),
-                          value: _permisos[codigo] ?? false,
+                          value: _permisos[codigo.id] ?? false,
                           onChanged: (v) =>
-                              setState(() => _permisos[codigo] = v),
+                              setState(() => _permisos[codigo.id] = v),
                         ),
-                        if (i < CodigoPermiso.values.length - 1)
+                        if (i < todosLosCodigos.length - 1)
                           const Divider(
                             height: 1,
                             thickness: 1,

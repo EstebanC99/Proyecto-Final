@@ -11,13 +11,15 @@ class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository(this._usuario);
 
   @override
-  Future<Usuario> login(String n, String c) async => _usuario;
+  Future<Usuario> login(String email, String contrasena) async => _usuario;
   @override
   Future<Usuario> register({
     required String nombre,
     required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
     required String email,
-    required String nombreUsuario,
+    String? telefono,
     required String contrasena,
   }) async => _usuario;
   @override
@@ -25,22 +27,21 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async {}
   @override
-  Future<void> eliminarCuenta(String usuarioId) async {}
+  Future<void> eliminarCuenta(int usuarioId) async {}
   @override
   Future<void> cambiarContrasena({
-    required String usuarioId,
+    required int usuarioId,
     required String contrasenaActual,
     required String contrasenaNueva,
   }) async {}
   @override
   Future<Usuario> crearCredenciales({
     required String email,
-    required String nombreUsuario,
     required String contrasena,
   }) async => _usuario;
   @override
   Future<Usuario> actualizarPerfil({
-    required String usuarioId,
+    required int usuarioId,
     String? email,
     String? telefono,
     String? documento,
@@ -48,16 +49,15 @@ class _FakeAuthRepository implements AuthRepository {
 }
 
 final _testUsuario = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: Persona(
-    id: 'per_001',
+    id: 1,
     nombre: 'María',
     apellido: 'García',
     email: 'maria@example.com',
   ),
-  nombreUsuario: 'maria',
-  contrasenaHash: '1234',
-  estado: EstadoUsuario.activo,
+  contrasena: '1234',
+  estado: EstadoUsuario(id: EstadosUsuarioConst.activo, descripcion: 'Activo'),
 );
 
 Widget _wrapWithUser(Widget child) {

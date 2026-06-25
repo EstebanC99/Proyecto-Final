@@ -4,7 +4,7 @@ import 'demo_seed.dart';
 
 /// Implementación demo (en memoria) de [SettingsDatasource].
 class DemoSettingsDatasource implements SettingsDatasource {
-  final Map<String, Configuracion> _configuraciones = {
+  final Map<int, Configuracion> _configuraciones = {
     DemoSeed.usuarioMariaId: DemoSeed.configuracionMaria,
   };
 
@@ -13,22 +13,21 @@ class DemoSettingsDatasource implements SettingsDatasource {
   );
 
   /// Mapa de usuarioId → Usuario para resolver referencias en demo.
-  final Map<String, Usuario> _usuariosById = {
+  final Map<int, Usuario> _usuariosById = {
     DemoSeed.usuarioMariaId: DemoSeed.usuarioMaria,
   };
 
+  int _nextId = 10000;
+
   @override
-  Future<Configuracion> getConfiguracion(String usuarioId) async {
+  Future<Configuracion> getConfiguracion(int usuarioId) async {
     await Future.delayed(Duration.zero);
     if (_configuraciones.containsKey(usuarioId)) {
       return _configuraciones[usuarioId]!;
     }
     final usuario = _usuariosById[usuarioId];
     if (usuario == null) throw Exception('Usuario no encontrado: $usuarioId');
-    return Configuracion(
-      id: 'cfg_${DateTime.now().millisecondsSinceEpoch}',
-      usuario: usuario,
-    );
+    return Configuracion(id: _nextId++, usuario: usuario);
   }
 
   @override
@@ -41,22 +40,21 @@ class DemoSettingsDatasource implements SettingsDatasource {
   }
 
   @override
-  Future<List<AceptacionTerminos>> getAceptaciones(String usuarioId) async {
+  Future<List<AceptacionTerminos>> getAceptaciones(int usuarioId) async {
     await Future.delayed(Duration.zero);
     return _aceptaciones.where((a) => a.usuario.id == usuarioId).toList();
   }
 
   @override
   Future<AceptacionTerminos> aceptarTerminos({
-    required String usuarioId,
+    required int usuarioId,
     required String version,
   }) async {
     await Future.delayed(Duration.zero);
     final usuario = _usuariosById[usuarioId];
     if (usuario == null) throw Exception('Usuario no encontrado: $usuarioId');
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
     final aceptacion = AceptacionTerminos(
-      id: 'acc_$ts',
+      id: _nextId++,
       usuario: usuario,
       version: version,
       fechaAceptacion: DateTime.now(),

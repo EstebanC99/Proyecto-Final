@@ -120,7 +120,7 @@ class CareTeamScreen extends ConsumerWidget {
           }
           return _TeamBody(
             personaCtx: personaCtx,
-            usuarioId: usuario?.persona.id ?? '',
+            usuarioId: usuario?.persona.id ?? 0,
           );
         },
       ),
@@ -145,7 +145,7 @@ class _TeamBody extends ConsumerWidget {
   const _TeamBody({required this.personaCtx, required this.usuarioId});
 
   final Persona personaCtx;
-  final String usuarioId;
+  final int usuarioId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -161,10 +161,10 @@ class _TeamBody extends ConsumerWidget {
       ),
       data: (asignaciones) {
         final responsables = asignaciones
-            .where((a) => a.rol.nombre == RolCuidado.responsable)
+            .where((a) => a.rol.id == RolesCuidadoConst.responsable)
             .toList();
         final cuidadores = asignaciones
-            .where((a) => a.rol.nombre == RolCuidado.cuidador)
+            .where((a) => a.rol.id == RolesCuidadoConst.cuidador)
             .toList();
 
         return SingleChildScrollView(
@@ -196,7 +196,7 @@ class _TeamBody extends ConsumerWidget {
                       isCurrentUser: a.personaColaborador.id == usuarioId,
                       onTap: () => context.pushNamed(
                         AppRoutes.careTeamMemberName,
-                        pathParameters: {'memberId': a.id},
+                        pathParameters: {'memberId': a.id.toString()},
                       ),
                     ),
                   ),
@@ -218,7 +218,7 @@ class _TeamBody extends ConsumerWidget {
                       isCurrentUser: a.personaColaborador.id == usuarioId,
                       onTap: () => context.pushNamed(
                         AppRoutes.careTeamMemberName,
-                        pathParameters: {'memberId': a.id},
+                        pathParameters: {'memberId': a.id.toString()},
                       ),
                     ),
                   ),

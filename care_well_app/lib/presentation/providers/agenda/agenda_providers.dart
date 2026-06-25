@@ -40,14 +40,14 @@ final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
       .where(
         (a) =>
             a.personaCuidada.id == persona.id &&
-            a.estado == EstadoAsignacion.activa,
+            a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;
 
   if (asignacion == null) return false;
 
   return asignacion.permisos.any(
-    (p) => p.codigo == CodigoPermiso.gestionarAgenda,
+    (p) => p.codigo.id == PermisosCuidadoConst.gestionarAgenda,
   );
 });
 
@@ -67,7 +67,7 @@ final agendaEventosProvider = FutureProvider<List<EventoAgenda>>((ref) async {
 /// Evento individual por ID. Busca en la lista ya cargada.
 ///
 /// Retorna `null` si el evento no existe.
-final agendaEventoByIdProvider = FutureProvider.family<EventoAgenda?, String>((
+final agendaEventoByIdProvider = FutureProvider.family<EventoAgenda?, int>((
   ref,
   eventId,
 ) async {
@@ -77,7 +77,7 @@ final agendaEventoByIdProvider = FutureProvider.family<EventoAgenda?, String>((
 
 /// Recordatorios de un evento por su ID.
 final recordatoriosByEventoProvider =
-    FutureProvider.family<List<Recordatorio>, String>((ref, eventoId) async {
+    FutureProvider.family<List<Recordatorio>, int>((ref, eventoId) async {
       final repo = ref.watch(agendaRepositoryProvider);
       return repo.getRecordatoriosByEvento(eventoId);
     });
@@ -106,12 +106,16 @@ final crearEventoAgendaProvider =
         final repo = ref.read(agendaRepositoryProvider);
         final scheduler = ref.read(notificationSchedulerProvider);
 
+        // id: 0 → la datasource asigna el ID auto-generado.
         final eventoBase = EventoAgenda(
-          id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+          id: 0,
           persona: personaCuidada,
           creadoPor: creadoPor,
           titulo: descripcion,
-          tipo: TipoEventoAgenda.otro,
+          tipo: TipoEventoAgenda(
+            id: TiposEventoAgendaConst.otro,
+            descripcion: 'Otro',
+          ),
           fechaHoraInicio: fechaHora,
         );
 
@@ -119,7 +123,7 @@ final crearEventoAgendaProvider =
 
         if (conRecordatorio) {
           final recordatorio = Recordatorio(
-            id: 'rec_${DateTime.now().millisecondsSinceEpoch}',
+            id: 0,
             eventoAgenda: eventoCreado,
             fechaHoraEnvio: fechaHora,
           );
@@ -135,7 +139,7 @@ final crearEventoAgendaProvider =
             fechaHora: fechaHora,
             titulo: 'Recordatorio de salud — ${personaCuidada.nombre}',
             cuerpo: '${eventoCreado.titulo} · $horaFormateada',
-            payload: eventoCreado.id,
+            payload: eventoCreado.id.toString(),
           );
         }
 
@@ -189,7 +193,7 @@ final actualizarEventoAgendaProvider =
 
         if (conRecordatorio) {
           final recordatorio = Recordatorio(
-            id: 'rec_${DateTime.now().millisecondsSinceEpoch}',
+            id: 0,
             eventoAgenda: eventoActualizado,
             fechaHoraEnvio: fechaHora,
           );
@@ -204,7 +208,7 @@ final actualizarEventoAgendaProvider =
             titulo:
                 'Recordatorio de salud — ${eventoActualizado.persona.nombre}',
             cuerpo: '${eventoActualizado.titulo} · $horaFormateada',
-            payload: eventoActualizado.id,
+            payload: eventoActualizado.id.toString(),
           );
         }
 

@@ -13,6 +13,7 @@
     <ProjectReference Include="..\CareWell.Domain\CareWell.Domain.csproj" />
     <ProjectReference Include="..\CareWell.Queries\CareWell.Queries.csproj" />
     <ProjectReference Include="..\CareWell.Repository\CareWell.Repository.csproj" />
+    <ProjectReference Include="..\CareWell.Security\CareWell.Security.csproj" />
   </ItemGroup>
 
 </Project>

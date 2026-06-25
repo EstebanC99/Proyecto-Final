@@ -6,30 +6,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/test_fixtures.dart';
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 final _personaMaria = Persona(
-  id: 'per_001',
+  id: 1,
   nombre: 'María',
   apellido: 'García',
   email: 'maria@test.com',
 );
 
-final _rolResponsable = Rol(id: 'rol_001', nombre: RolCuidado.responsable);
-
 final _usuarioDemoMaria = Usuario(
-  id: 'usr_001',
+  id: 101,
   persona: _personaMaria,
-  nombreUsuario: 'maria.garcia',
-  estado: EstadoUsuario.activo,
+  contrasena: 'hash123',
+  estado: estadoUsuarioActivo,
 );
 
 class _FakePersonaRepository implements PersonaRepository {
   @override
-  Future<Persona> getById(String id) async => _personaMaria;
+  Future<Persona> getById(int id) async => _personaMaria;
 
   @override
-  Future<List<Persona>> getDependientesByUsuario(String usuarioId) async => [];
+  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [];
 
   @override
   Future<Persona> crear(Persona persona) async => persona;
@@ -38,18 +38,35 @@ class _FakePersonaRepository implements PersonaRepository {
   Future<Persona> actualizar(Persona persona) async => persona;
 
   @override
-  Future<void> eliminar(String id) async {}
+  Future<void> eliminar(int id) async {}
+}
+
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      [];
+
+  @override
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+    List<int> permisosCuidadoIds = const [],
+  }) async {}
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    String colaboradorId,
+    int colaboradorId,
   ) async => [];
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    String personaCuidadaId,
+    int personaCuidadaId,
   ) async => [];
 
   @override
@@ -60,13 +77,13 @@ class _FakeCareTeamRepository implements CareTeamRepository {
       a;
 
   @override
-  Future<void> eliminarAsignacion(String id) async {}
+  Future<void> eliminarAsignacion(int id) async {}
 
   @override
-  Future<List<Rol>> getRoles() async => [_rolResponsable];
+  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
 
   @override
-  Future<Rol> getRolById(String rolId) async => _rolResponsable;
+  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -79,6 +96,9 @@ Widget _wrap(Widget child) => ProviderScope(
             ..state = AsyncValue.data(_usuarioDemoMaria),
     ),
     personaRepositoryProvider.overrideWithValue(_FakePersonaRepository()),
+    asignacionCuidadoRepositoryProvider.overrideWithValue(
+      _FakeAsignacionCuidadoRepository(),
+    ),
     careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
     // Forzar esResponsableProvider a true para que el FAB y el botón sean visibles.
     esResponsableProvider.overrideWith((ref) async => true),

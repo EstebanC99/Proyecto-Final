@@ -5,11 +5,11 @@ abstract class AgendaDatasource {
   // ─── Eventos ─────────────────────────────────────────────────────────────────
 
   /// Retorna todos los [EventoAgenda] de la persona con [personaId].
-  Future<List<EventoAgenda>> getEventosByPersona(String personaId);
+  Future<List<EventoAgenda>> getEventosByPersona(int personaId);
 
   /// Retorna los [EventoAgenda] de [personaId] dentro del rango de fechas.
   Future<List<EventoAgenda>> getEventosByRango({
-    required String personaId,
+    required int personaId,
     required DateTime desde,
     required DateTime hasta,
   });
@@ -21,19 +21,19 @@ abstract class AgendaDatasource {
   Future<EventoAgenda> actualizarEvento(EventoAgenda evento);
 
   /// Elimina el [EventoAgenda] con [eventoId] y sus recordatorios asociados.
-  Future<void> eliminarEvento(String eventoId);
+  Future<void> eliminarEvento(int eventoId);
 
   // ─── Recordatorios ───────────────────────────────────────────────────────────
 
   /// Retorna los [Recordatorio] del evento con [eventoId].
-  Future<List<Recordatorio>> getRecordatoriosByEvento(String eventoId);
+  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId);
 
   /// Crea un [Recordatorio] y retorna la entidad con id generado.
   Future<Recordatorio> crearRecordatorio(Recordatorio recordatorio);
 
   /// Marca un [Recordatorio] como enviado.
-  Future<Recordatorio> marcarEnviado(String recordatorioId);
+  Future<Recordatorio> marcarEnviado(int recordatorioId);
 
   /// Elimina el [Recordatorio] con [recordatorioId].
-  Future<void> eliminarRecordatorio(String recordatorioId);
+  Future<void> eliminarRecordatorio(int recordatorioId);
 }

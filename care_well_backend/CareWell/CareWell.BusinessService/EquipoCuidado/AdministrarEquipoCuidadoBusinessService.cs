@@ -1,0 +1,77 @@
+﻿using CareWell.BusinessService.Abstractions.EquipoCuidado;
+using CareWell.Commands.EquipoCuidado;
+using CareWell.DataViews.EquipoCuidado;
+using CareWell.Domain.Auth;
+using CareWell.Domain.DomainServices;
+using CareWell.Domain.EquipoCuidado;
+using CareWell.Domain.Factories;
+using CareWell.Domain.General;
+using CareWell.Domain.ValueObjects.EquipoCuidado;
+using CareWell.Repository;
+using CareWell.Repository.EquipoCuidado;
+using CareWell.Repository.General;
+using CareWell.Security;
+
+namespace CareWell.BusinessService.EquipoCuidado
+{
+    public class AdministrarEquipoCuidadoBusinessService : BusinessService, IAdministrarEquipoCuidadoBusinessService
+    {
+        private IBaseFactory Factory { get; set; }
+        private IUserContext UserContext { get; set; }
+        private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
+        private IPersonaRepository PersonaRepository { get; set; }
+        private IAsignacionCuidadoRepository AsignacionCuidadoRepository { get; set; }
+
+        public AdministrarEquipoCuidadoBusinessService(IUnitOfWork unitOfWork,
+                                                       IBaseFactory baseFactory,
+                                                       IUserContext userContext,
+                                                       IEntityLoaderDomainService entityLoaderDomainService,
+                                                       IPersonaRepository personaRepository,
+                                                       IAsignacionCuidadoRepository asignacionCuidadoRepository)
+            : base(unitOfWork)
+        {
+            this.Factory = baseFactory;
+            this.UserContext = userContext;
+            this.EntityLoaderDomainService = entityLoaderDomainService;
+            this.PersonaRepository = personaRepository;
+            this.AsignacionCuidadoRepository = asignacionCuidadoRepository;
+        }
+
+        public List<AsignacionCuidadoDataView> ObtenerAsignacionesUsuarioLogueado()
+        {
+            var usuarioID = this.UserContext.UsuarioID;
+
+            return this.AsignacionCuidadoRepository.ObtenerAsignacionesPorUsuario(usuarioID);
+        }
+
+        public void CrearPersonaCargo(CrearPersonaCargoCommand command)
+        {
+            var usuarioLogueado = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
+
+            var personaCargo = this.Factory.Crear<Persona>();
+            personaCargo.Crear(new Domain.ValueObjects.General.CrearPersona(
+                command.Nombre,
+                command.Apellido,
+                command.Documento,
+                command.FechaNacimiento,
+                command.Email,
+                command.Telefono
+            ));
+            this.PersonaRepository.Add(personaCargo);
+
+            var crearAsignacionResponsable = new CrearAsignacionResponsable(
+                personaCargo,
+                usuarioLogueado
+            );
+
+            var asignacionCuidado = this.Factory.Crear<AsignacionCuidado>();
+            asignacionCuidado.AsignarResponsable(crearAsignacionResponsable,
+                                                 this.EntityLoaderDomainService);
+            this.AsignacionCuidadoRepository.Add(asignacionCuidado);
+
+            asignacionCuidado.AsignarPermisosResponsable(this.EntityLoaderDomainService);
+
+            this.UnitOfWork.SaveChanges();
+        }
+    }
+}

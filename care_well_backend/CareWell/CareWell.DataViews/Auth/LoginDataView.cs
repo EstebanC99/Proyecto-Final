@@ -6,10 +6,8 @@
 
         public DateTime Expiracion { get; set; }
 
-        public int UsuarioID { get; set; }
-
-        public string Email { get; set; }
-
         public string RefreshToken { get; set; }
+
+        public UsuarioDataView Usuario { get; set; }
     }
 }

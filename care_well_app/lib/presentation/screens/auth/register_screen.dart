@@ -6,12 +6,13 @@ import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 /// Pantalla de registro en 2 pasos (US-01).
 ///
-/// Paso 1: datos personales (nombre, apellido, email, teléfono).
+/// Paso 1: datos personales (nombre, apellido, documento, fecha de nacimiento, email, teléfono).
 /// Paso 2: credenciales (contraseña, confirmación, T&C).
 ///
 /// En éxito: navega al login con mensaje de confirmación.
@@ -26,18 +27,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // ── Controladores Paso 1 ────────────────────────────────────────────────────
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
+  final _documentoController = TextEditingController();
   final _emailController = TextEditingController();
   final _telefonoController = TextEditingController();
 
   // ── Focus nodes Paso 1 ──────────────────────────────────────────────────────
   final _nombreFocus = FocusNode();
   final _apellidoFocus = FocusNode();
+  final _documentoFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _telefonoFocus = FocusNode();
+
+  // ── Fecha de nacimiento (Paso 1) ─────────────────────────────────────────────
+  DateTime? _fechaNacimiento;
+  String? _fechaNacimientoError;
 
   // ── Errores Paso 1 ──────────────────────────────────────────────────────────
   String? _nombreError;
   String? _apellidoError;
+  String? _documentoError;
   String? _emailError;
   String? _telefonoError;
 
@@ -65,10 +73,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void dispose() {
     _nombreController.dispose();
     _apellidoController.dispose();
+    _documentoController.dispose();
     _emailController.dispose();
     _telefonoController.dispose();
     _nombreFocus.dispose();
     _apellidoFocus.dispose();
+    _documentoFocus.dispose();
     _emailFocus.dispose();
     _telefonoFocus.dispose();
     _passwordController.dispose();
@@ -81,14 +91,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool get _hasDatosPaso1 =>
       _nombreController.text.isNotEmpty ||
       _apellidoController.text.isNotEmpty ||
+      _documentoController.text.isNotEmpty ||
       _emailController.text.isNotEmpty ||
-      _telefonoController.text.isNotEmpty;
+      _telefonoController.text.isNotEmpty ||
+      _fechaNacimiento != null;
 
   // ── Validaciones ─────────────────────────────────────────────────────────────
 
   bool _validatePaso1() {
     final nombreErr = validateNombre(_nombreController.text);
     final apellidoErr = validateApellido(_apellidoController.text);
+    final documentoErr = validateDocumento(_documentoController.text);
+    final fechaErr = validateFechaNacimiento(_fechaNacimiento);
     final emailErr = validateEmail(_emailController.text);
     // Teléfono: requerido en UI para registro.
     String? telefonoErr = validateTelefono(_telefonoController.text);
@@ -98,11 +112,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() {
       _nombreError = nombreErr;
       _apellidoError = apellidoErr;
+      _documentoError = documentoErr;
+      _fechaNacimientoError = fechaErr;
       _emailError = emailErr;
       _telefonoError = telefonoErr;
     });
     return nombreErr == null &&
         apellidoErr == null &&
+        documentoErr == null &&
+        fechaErr == null &&
         emailErr == null &&
         telefonoErr == null;
   }
@@ -123,6 +141,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _generalError = null;
     });
     return passErr == null && confirmErr == null && tcErr == null;
+  }
+
+  // ── Selector de fecha ─────────────────────────────────────────────────────────
+
+  Future<void> _pickFechaNacimiento() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate:
+          _fechaNacimiento ?? DateTime(now.year - 18, now.month, now.day),
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: 'Seleccioná tu fecha de nacimiento',
+      cancelText: 'Cancelar',
+      confirmText: 'Confirmar',
+    );
+    if (picked != null) {
+      setState(() {
+        _fechaNacimiento = picked;
+        _fechaNacimientoError = null;
+      });
+    }
   }
 
   // ── Navegación de pasos ───────────────────────────────────────────────────────
@@ -173,8 +213,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .register(
           nombre: _nombreController.text.trim(),
           apellido: _apellidoController.text.trim(),
+          documento: _documentoController.text.trim(),
+          fechaNacimiento: _fechaNacimiento!,
           email: _emailController.text.trim(),
-          nombreUsuario: _emailController.text.trim(),
+          telefono: _telefonoController.text.trim().isEmpty
+              ? null
+              : _telefonoController.text.trim(),
           contrasena: _passwordController.text,
         );
 
@@ -183,23 +227,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     result.when(
       data: (_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Cuenta creada! Ya podés iniciar sesión.'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        context.goNamed(AppRoutes.loginName);
+        context.goNamed(AppRoutes.accountCreatedName);
       },
       error: (error, _) {
-        final msg = error.toString();
         // Si es error de email duplicado, volver a paso 1 y mostrar en campo.
-        if (msg.toLowerCase().contains('email') &&
-            msg.toLowerCase().contains('registrado')) {
+        if (error is CuentaExistenteException) {
           setState(() {
             _currentStep = 1;
             _emailError =
                 'Este email ya está registrado. Intentá iniciar sesión.';
+          });
+        } else if (error is SinConexionException) {
+          setState(() {
+            _generalError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
           });
         } else {
           setState(() {
@@ -248,6 +288,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // ── Paso 1 ───────────────────────────────────────────────────────────────────
 
   Widget _buildPaso1() {
+    final theme = Theme.of(context);
+
+    // Formatea la fecha seleccionada como DD/MM/AAAA.
+    String fechaFormateada = 'Seleccioná tu fecha de nacimiento';
+    if (_fechaNacimiento != null) {
+      final d = _fechaNacimiento!;
+      fechaFormateada =
+          '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -256,16 +306,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         const SizedBox(height: AppSpacing.xl),
         Text(
           'Creá tu cuenta',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: AppColors.textPrimary),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: AppColors.textPrimary,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Empecemos con tus datos personales.',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         const SizedBox(height: AppSpacing.xl),
 
@@ -297,10 +347,100 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           textCapitalization: TextCapitalization.words,
           prefixIcon: const Icon(Icons.person_outline, size: 20),
           textInputAction: TextInputAction.next,
-          onSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
+          onSubmitted: (_) =>
+              FocusScope.of(context).requestFocus(_documentoFocus),
           onChanged: (_) {
             if (_apellidoError != null) setState(() => _apellidoError = null);
           },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
+        // Documento (DNI)
+        AppTextField(
+          label: 'DNI',
+          hint: 'Ej. 30123456',
+          controller: _documentoController,
+          errorText: _documentoError,
+          focusNode: _documentoFocus,
+          keyboardType: TextInputType.number,
+          prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+          textInputAction: TextInputAction.next,
+          onSubmitted: (_) {
+            _documentoFocus.unfocus();
+            _pickFechaNacimiento();
+          },
+          onChanged: (_) {
+            if (_documentoError != null) setState(() => _documentoError = null);
+          },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
+        // Fecha de nacimiento (date picker)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Fecha de nacimiento',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: _fechaNacimientoError != null
+                    ? AppColors.error
+                    : AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            InkWell(
+              onTap: _pickFechaNacimiento,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _fechaNacimientoError != null
+                        ? AppColors.error
+                        : AppColors.outline,
+                    width: _fechaNacimientoError != null ? 1.5 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: _fechaNacimiento != null
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      fechaFormateada,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: _fechaNacimiento != null
+                            ? AppColors.textPrimary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_fechaNacimientoError != null) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(left: AppSpacing.sm),
+                child: Text(
+                  _fechaNacimientoError!,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
         const SizedBox(height: AppSpacing.lg),
 

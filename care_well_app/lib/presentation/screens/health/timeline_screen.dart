@@ -106,7 +106,7 @@ class TimelineScreen extends ConsumerWidget {
                 isLast: i == eventos.length - 1,
                 onTap: () => context.pushNamed(
                   AppRoutes.healthEventDetailName,
-                  pathParameters: {'id': eventos[i].id},
+                  pathParameters: {'id': eventos[i].id.toString()},
                 ),
               ),
             ),

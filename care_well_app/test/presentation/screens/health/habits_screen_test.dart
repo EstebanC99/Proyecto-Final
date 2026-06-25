@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final _personaAlicia = Persona(
-  id: 'per_002',
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-);
+import '../../../_fakes/test_fixtures.dart';
+
+final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
 
 final _habito = HabitoDeVida(
-  id: 'hab_001',
+  id: 901,
   persona: _personaAlicia,
-  tipo: TipoHabito.actividadFisica,
+  tipo: tipoHabitoActividadFisica,
   descripcion: 'Caminata diaria',
 );
 
