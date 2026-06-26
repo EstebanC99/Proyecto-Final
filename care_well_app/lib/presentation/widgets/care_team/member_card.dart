@@ -44,7 +44,7 @@ class MemberCard extends StatelessWidget {
         ? AppColors.onPrimaryContainer
         : const Color(0xFF7A2E1A);
 
-    final colaborador = asignacion.personaColaborador;
+    final colaborador = asignacion.colaborador;
 
     return Material(
       color: AppColors.surface,

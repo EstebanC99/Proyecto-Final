@@ -1,9 +1,7 @@
-import '../../domain/datasources/datasources.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [AsignacionCuidadoRepository] que delega al
-/// [AsignacionCuidadoDatasource] inyectado.
 class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
   final AsignacionCuidadoDatasource _datasource;
 
@@ -17,7 +15,6 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
-    List<int> permisosCuidadoIds = const [],
   }) => _datasource.crearPersonaCargo(
     nombre: nombre,
     apellido: apellido,
@@ -25,8 +22,11 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
     fechaNacimiento: fechaNacimiento,
     email: email,
     telefono: telefono,
-    permisosCuidadoIds: permisosCuidadoIds,
   );
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      _datasource.modificarPersonaCargo(asignacionId, persona);
 
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() =>

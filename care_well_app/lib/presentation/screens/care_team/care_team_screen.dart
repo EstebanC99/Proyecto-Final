@@ -193,7 +193,7 @@ class _TeamBody extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: MemberCard(
                       asignacion: a,
-                      isCurrentUser: a.personaColaborador.id == usuarioId,
+                      isCurrentUser: a.colaborador.id == usuarioId,
                       onTap: () => context.pushNamed(
                         AppRoutes.careTeamMemberName,
                         pathParameters: {'memberId': a.id.toString()},
@@ -215,7 +215,7 @@ class _TeamBody extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: MemberCard(
                       asignacion: a,
-                      isCurrentUser: a.personaColaborador.id == usuarioId,
+                      isCurrentUser: a.colaborador.id == usuarioId,
                       onTap: () => context.pushNamed(
                         AppRoutes.careTeamMemberName,
                         pathParameters: {'memberId': a.id.toString()},

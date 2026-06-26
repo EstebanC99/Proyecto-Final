@@ -22,6 +22,8 @@ final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
@@ -30,6 +32,16 @@ final _usuarioDemoMaria = Usuario(
   persona: _personaMaria,
   contrasena: 'hash123',
   estado: estadoUsuarioActivo,
+);
+
+// Asignación con id=401 (el id que se pasa a DependentDetailScreen)
+final _asignacionActiva = AsignacionCuidado(
+  id: 401,
+  personaCuidada: _personaAlicia,
+  colaborador: _personaMaria,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
+  fechaAlta: DateTime(2024, 1, 8),
 );
 
 class _FakePersonaRepository implements PersonaRepository {
@@ -54,16 +66,7 @@ class _FakePersonaRepository implements PersonaRepository {
 class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
-      [
-        AsignacionCuidado(
-          id: 401,
-          personaCuidada: _personaAlicia,
-          personaColaborador: _personaMaria,
-          rol: rolCuidadoResponsable,
-          estado: estadoAsignacionActiva,
-          fechaAlta: DateTime(2024, 1, 8),
-        ),
-      ];
+      [_asignacionActiva];
 
   @override
   Future<void> crearPersonaCargo({
@@ -75,22 +78,17 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     String? telefono,
     List<int> permisosCuidadoIds = const [],
   }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => [
-    AsignacionCuidado(
-      id: 401,
-      personaCuidada: _personaAlicia,
-      personaColaborador: _personaMaria,
-      rol: rolCuidadoResponsable,
-      estado: estadoAsignacionActiva,
-      fechaAlta: DateTime(2024, 1, 8),
-    ),
-  ];
+  ) async => [_asignacionActiva];
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
@@ -146,7 +144,8 @@ void main() {
 
     testWidgets('DependentDetailScreen monta sin errores', (tester) async {
       await tester.pumpWidget(
-        _wrap(const DependentDetailScreen(dependentId: 2)),
+        // asignacionId: 401 — coincide con el id de la asignación en el fake
+        _wrap(const DependentDetailScreen(asignacionId: 401)),
       );
       await tester.pump();
       expect(find.byType(DependentDetailScreen), findsOneWidget);

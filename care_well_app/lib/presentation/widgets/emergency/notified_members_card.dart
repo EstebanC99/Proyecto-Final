@@ -15,7 +15,7 @@ class NotifiedMembersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final persona = asignacion.personaColaborador;
+    final persona = asignacion.colaborador;
     final rolLabel = asignacion.rol.id == RolesCuidadoConst.responsable
         ? 'Responsable'
         : 'Cuidador/a';

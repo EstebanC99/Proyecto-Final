@@ -11,7 +11,9 @@ class ApiConfig {
   static const refreshPath = '/api/Authorization/refresh-token';
   static const cuentaPath = '/api/Cuenta/crear';
   static const crearPersonaCargoPath =
-      '/api/AdministrarEquipoCuidado/crear-persona-cargo';
+      '/api/AdministrarPersonasCargo/crear-persona-cargo';
+  static const modificarPersonaCargoPath =
+      '/api/AdministrarPersonasCargo/modificar-persona-cargo';
   static const obtenerMisAsignacionesPath =
-      '/api/AdministrarEquipoCuidado/obtener-mis-asignaciones';
+      '/api/AdministrarPersonasCargo/obtener-mis-asignaciones';
 }

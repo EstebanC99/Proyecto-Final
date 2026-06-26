@@ -4,58 +4,64 @@ import '../../../domain/entities/entities.dart';
 import '../di_providers.dart';
 import '../auth/auth_providers.dart';
 
-/// Personas donde el usuario autenticado actúa como Responsable (asignación activa).
-final dependentsAsResponsableProvider = FutureProvider<List<Persona>>((
+// ─── Provider base ────────────────────────────────────────────────────────────
+
+/// Todas las asignaciones del usuario logueado (activas, pendientes e inactivas).
+final misAsignacionesProvider = FutureProvider<List<AsignacionCuidado>>((
   ref,
 ) async {
   final usuario = ref.watch(authStateProvider).valueOrNull;
   if (usuario == null) return [];
   final repo = ref.watch(asignacionCuidadoRepositoryProvider);
-  final asignaciones = await repo.obtenerAsignacionesUsuarioLogueado();
-  return asignaciones
-      .where(
-        (a) =>
-            a.rol.id == RolesCuidadoConst.responsable &&
-            a.estado.id == EstadosAsignacionConst.activa,
-      )
-      .map((a) => a.personaCuidada)
-      .toList();
+  return repo.obtenerAsignacionesUsuarioLogueado();
 });
 
-/// Personas donde el usuario autenticado actúa como Cuidador (asignación activa).
-final dependentsAsCuidadorProvider = FutureProvider<List<Persona>>((ref) async {
-  final usuario = ref.watch(authStateProvider).valueOrNull;
-  if (usuario == null) return [];
-  final repo = ref.watch(asignacionCuidadoRepositoryProvider);
-  final asignaciones = await repo.obtenerAsignacionesUsuarioLogueado();
-  return asignaciones
+// ─── Providers derivados ──────────────────────────────────────────────────────
+
+/// Asignaciones donde el usuario actúa como Responsable (activas o pendientes).
+final dependentsAsResponsableProvider = FutureProvider<List<AsignacionCuidado>>(
+  (ref) async {
+    final todas = await ref.watch(misAsignacionesProvider.future);
+    return todas
+        .where(
+          (a) =>
+              a.rol.id == RolesCuidadoConst.responsable &&
+              a.estado.id != EstadosAsignacionConst.inactiva,
+        )
+        .toList();
+  },
+);
+
+/// Asignaciones donde el usuario actúa como Cuidador (activas o pendientes).
+final dependentsAsCuidadorProvider = FutureProvider<List<AsignacionCuidado>>((
+  ref,
+) async {
+  final todas = await ref.watch(misAsignacionesProvider.future);
+  return todas
       .where(
         (a) =>
             a.rol.id == RolesCuidadoConst.cuidador &&
-            a.estado.id == EstadosAsignacionConst.activa,
+            a.estado.id != EstadosAsignacionConst.inactiva,
       )
-      .map((a) => a.personaCuidada)
       .toList();
 });
 
-/// Persona por ID.
-final dependentByIdProvider = FutureProvider.family<Persona, int>((
+/// Asignación por ID, buscada en memoria (sin llamada al backend).
+final asignacionByIdProvider = FutureProvider.family<AsignacionCuidado, int>((
   ref,
-  personaId,
+  asignacionId,
 ) async {
-  final repo = ref.watch(personaRepositoryProvider);
-  return repo.getById(personaId);
+  final todas = await ref.watch(misAsignacionesProvider.future);
+  return todas.firstWhere(
+    (a) => a.id == asignacionId,
+    orElse: () =>
+        throw StateError('Asignación no encontrada en memoria: $asignacionId'),
+  );
 });
 
 // ─── Acciones mutadoras ───────────────────────────────────────────────────────
 
 /// Crea una nueva persona a cargo y la vincula al usuario como Responsable.
-///
-/// Delega a [AsignacionCuidadoRepository.crearPersonaCargo], que en modo API
-/// realiza la operación de forma atómica y en modo demo registra la
-/// [Persona] y la [AsignacionCuidado] en memoria.
-///
-/// Invalida los providers de lista tras el éxito.
 final crearDependenteProvider =
     Provider<
       Future<void> Function({
@@ -82,8 +88,6 @@ final crearDependenteProvider =
 
         final asignacionRepo = ref.read(asignacionCuidadoRepositoryProvider);
 
-        // Una sola llamada: el backend crea Persona + AsignacionCuidado
-        // de forma atómica (rol Responsable, estado Activa).
         await asignacionRepo.crearPersonaCargo(
           nombre: nombre,
           apellido: apellido,
@@ -91,22 +95,28 @@ final crearDependenteProvider =
           fechaNacimiento: fechaNacimiento,
           email: email,
           telefono: telefono,
-          // MVP: sin permisos adicionales.
-          permisosCuidadoIds: const [],
         );
 
-        // Invalidar listas para que se recarguen.
-        ref.invalidate(dependentsAsResponsableProvider);
+        // Invalidar lista base para que se recargue.
+        ref.invalidate(misAsignacionesProvider);
       };
     });
 
 /// Actualiza los datos de una persona a cargo existente.
+///
+/// Recibe el [asignacionId] para que el backend pueda validar los permisos
+/// del usuario logueado antes de aplicar los cambios.
 final actualizarDependenteProvider =
-    Provider<Future<Persona> Function(Persona persona)>((ref) {
-      return (persona) async {
-        final repo = ref.read(personaRepositoryProvider);
-        final actualizada = await repo.actualizar(persona);
-        ref.invalidate(dependentByIdProvider(persona.id));
+    Provider<Future<Persona> Function(int asignacionId, Persona persona)>((
+      ref,
+    ) {
+      return (asignacionId, persona) async {
+        final repo = ref.read(asignacionCuidadoRepositoryProvider);
+        final actualizada = await repo.modificarPersonaCargo(
+          asignacionId,
+          persona,
+        );
+        ref.invalidate(misAsignacionesProvider);
         return actualizada;
       };
     });
@@ -117,6 +127,6 @@ final eliminarDependenteProvider =
       return (personaId) async {
         final repo = ref.read(personaRepositoryProvider);
         await repo.eliminar(personaId);
-        ref.invalidate(dependentsAsResponsableProvider);
+        ref.invalidate(misAsignacionesProvider);
       };
     });

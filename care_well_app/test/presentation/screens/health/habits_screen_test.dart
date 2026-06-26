@@ -7,7 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/test_fixtures.dart';
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _habito = HabitoDeVida(
   id: 901,

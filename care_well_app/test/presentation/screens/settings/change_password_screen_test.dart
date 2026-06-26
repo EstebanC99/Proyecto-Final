@@ -17,6 +17,8 @@ class _FakeAuthRepository implements AuthRepository {
       id: 1,
       nombre: 'María',
       apellido: 'García',
+      documento: '28000001',
+      fechaNacimiento: DateTime(1990, 1, 1),
       email: 'maria@example.com',
     ),
     contrasena: '1234',

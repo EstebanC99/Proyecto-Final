@@ -129,7 +129,7 @@ class EmergencyScreen extends ConsumerWidget {
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: Text(
-                                    '${m.personaColaborador.nombre} ${m.personaColaborador.apellido}',
+                                    '${m.colaborador.nombre} ${m.colaborador.apellido}',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: AppColors.textPrimary,

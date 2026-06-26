@@ -8,40 +8,45 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
 final _permisosCompletos = [
-  Permiso(
-    id: 301,
-    codigo: codigoVerFichaSalud,
+  PermisoCuidado(
+    id: PermisosCuidadoConst.verFichaSalud,
     descripcion: 'Ver ficha de salud',
   ),
-  Permiso(
-    id: 304,
-    codigo: codigoRegistrarEventosSalud,
+  PermisoCuidado(
+    id: PermisosCuidadoConst.registrarEventosSalud,
     descripcion: 'Registrar eventos de salud',
   ),
-  Permiso(
-    id: 305,
-    codigo: codigoRegistrarHabitos,
+  PermisoCuidado(
+    id: PermisosCuidadoConst.registrarHabitos,
     descripcion: 'Registrar hábitos',
   ),
 ];
 
 AsignacionCuidado _asignacionMaria({
   RolCuidado? rol,
-  List<Permiso>? permisos,
+  List<PermisoCuidado>? permisos,
 }) => AsignacionCuidado(
   id: 401,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
+  colaborador: _personaMaria,
   rol: rol ?? rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
@@ -65,9 +70,8 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => _asignaciones
-      .where((a) => a.personaColaborador.id == colaboradorId)
-      .toList();
+  ) async =>
+      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(

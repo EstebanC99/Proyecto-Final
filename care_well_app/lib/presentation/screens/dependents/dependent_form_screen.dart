@@ -10,13 +10,6 @@ import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// US-12 · Alta de persona a cargo.
-///
-/// Formulario con Nombre, Apellido, DNI, Fecha de nacimiento, Email (opcional)
-/// y checkbox T&C. El botón "Registrar persona" permanece deshabilitado hasta
-/// que T&C esté marcado.
-///
-/// Si [dependentId] viene en la ruta, es edición (US-14 route /edit).
 class DependentFormScreen extends ConsumerStatefulWidget {
   const DependentFormScreen({super.key, this.dependentId});
 

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -50,8 +51,8 @@ class DependentsScreen extends ConsumerWidget {
 class _Body extends StatelessWidget {
   const _Body({required this.responsableAsync, required this.cuidadorAsync});
 
-  final AsyncValue<List<dynamic>> responsableAsync;
-  final AsyncValue<List<dynamic>> cuidadorAsync;
+  final AsyncValue<List<AsignacionCuidado>> responsableAsync;
+  final AsyncValue<List<AsignacionCuidado>> cuidadorAsync;
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +71,8 @@ class _Body extends StatelessWidget {
                     'No se pudo cargar la lista. ${e.toString().replaceFirst('Exception: ', '')}',
               ),
             ),
-            data: (personas) {
-              if (personas.isEmpty) {
+            data: (asignaciones) {
+              if (asignaciones.isEmpty) {
                 return _EmptySection(
                   icon: Icons.person_outline,
                   mensaje: 'Aún no agregaste personas a cargo.',
@@ -80,14 +81,13 @@ class _Body extends StatelessWidget {
                 );
               }
               return Column(
-                children: personas
+                children: asignaciones
                     .map(
-                      (p) => PersonCard(
-                        persona: p,
-                        rolLabel: 'Responsable',
+                      (a) => PersonCard(
+                        asignacion: a,
                         onTap: () => context.pushNamed(
                           AppRoutes.dependentDetailName,
-                          pathParameters: {'id': p.id.toString()},
+                          pathParameters: {'id': a.id.toString()},
                         ),
                       ),
                     )
@@ -105,8 +105,8 @@ class _Body extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: InlineErrorBanner(message: 'No se pudo cargar la lista.'),
             ),
-            data: (personas) {
-              if (personas.isEmpty) {
+            data: (asignaciones) {
+              if (asignaciones.isEmpty) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.xl,
@@ -122,14 +122,13 @@ class _Body extends StatelessWidget {
                 );
               }
               return Column(
-                children: personas
+                children: asignaciones
                     .map(
-                      (p) => PersonCard(
-                        persona: p,
-                        rolLabel: 'Cuidador',
+                      (a) => PersonCard(
+                        asignacion: a,
                         onTap: () => context.pushNamed(
                           AppRoutes.dependentDetailName,
-                          pathParameters: {'id': p.id.toString()},
+                          pathParameters: {'id': a.id.toString()},
                         ),
                       ),
                     )

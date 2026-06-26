@@ -4,7 +4,7 @@ import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
+  final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez', documento: "123123", fechaNacimiento: DateTime.now());
 
   group('FichaSaludMapper', () {
     final ficha = FichaSalud(

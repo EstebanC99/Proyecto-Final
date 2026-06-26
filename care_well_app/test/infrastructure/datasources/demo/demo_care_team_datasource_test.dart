@@ -36,9 +36,7 @@ void main() {
         );
         expect(result, isNotEmpty);
         expect(
-          result.every(
-            (a) => a.personaColaborador.id == DemoSeed.personaMariaId,
-          ),
+          result.every((a) => a.colaborador.id == DemoSeed.personaMariaId),
           isTrue,
         );
       });
@@ -61,7 +59,7 @@ void main() {
         final nueva = AsignacionCuidado(
           id: 0,
           personaCuidada: DemoSeed.personaAlicia,
-          personaColaborador: DemoSeed.personaRoberto,
+          colaborador: DemoSeed.personaRoberto,
           rol: DemoSeed.rolCuidadoCuidador,
           estado: estadoAsignacionActiva,
           fechaAlta: DateTime(2026, 1, 1),
@@ -95,7 +93,7 @@ void main() {
         final falsa = AsignacionCuidado(
           id: 99999,
           personaCuidada: DemoSeed.personaAlicia,
-          personaColaborador: DemoSeed.personaCarlos,
+          colaborador: DemoSeed.personaCarlos,
           rol: DemoSeed.rolCuidadoResponsable,
           estado: estadoAsignacionActiva,
           fechaAlta: DateTime.now(),
@@ -110,7 +108,7 @@ void main() {
           AsignacionCuidado(
             id: 0,
             personaCuidada: DemoSeed.personaAlicia,
-            personaColaborador: DemoSeed.personaLaura,
+            colaborador: DemoSeed.personaLaura,
             rol: DemoSeed.rolCuidadoCuidador,
             estado: estadoAsignacionActiva,
             fechaAlta: DateTime.now(),

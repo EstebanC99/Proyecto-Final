@@ -75,7 +75,7 @@ namespace CareWell.BusinessService.Test.Auth
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Crear_de_la_Persona()
+            public void Llama_una_vez_al_metodo_CrearModificar_de_la_Persona()
             {
                 // Arrange
 
@@ -83,7 +83,7 @@ namespace CareWell.BusinessService.Test.Auth
                 this.Action();
 
                 // Assert
-                this.persona.Verify(v => v.Crear(It.IsAny<CrearPersona>()), Times.Once);
+                this.persona.Verify(v => v.CrearModificar(It.IsAny<CrearModificarPersona>()), Times.Once);
             }
 
             [Fact]

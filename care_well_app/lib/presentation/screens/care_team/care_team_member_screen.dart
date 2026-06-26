@@ -38,26 +38,26 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
 
   void _inicializarPermisos(
     AsignacionCuidado asignacion,
-    List<CodigoPermiso> todosLosCodigos,
+    List<PermisoCuidado> todosLosPermisos,
   ) {
     if (_permisos != null) return; // ya inicializado
-    final idsActivos = asignacion.permisos.map((p) => p.codigo.id).toSet();
+    final idsActivos = asignacion.permisos.map((p) => p.id).toSet();
     _permisos = {
-      for (final c in todosLosCodigos) c.id: idsActivos.contains(c.id),
+      for (final c in todosLosPermisos) c.id: idsActivos.contains(c.id),
     };
     _permisosIniciales = Map.from(_permisos!);
   }
 
   Future<void> _guardarCambios(
     AsignacionCuidado asignacion,
-    List<CodigoPermiso> todosLosCodigos,
+    List<PermisoCuidado> todosLosPermisos,
   ) async {
     if (_permisos == null) return;
     setState(() => _guardando = true);
 
     try {
       final actualizar = ref.read(actualizarPermisosProvider);
-      final permisosActivos = todosLosCodigos
+      final permisosActivos = todosLosPermisos
           .where((c) => _permisos![c.id] == true)
           .toList();
       await actualizar(
@@ -90,7 +90,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
   }
 
   Future<void> _confirmarBaja(AsignacionCuidado asignacion) async {
-    final nombre = asignacion.personaColaborador.nombreCompleto;
+    final nombre = asignacion.colaborador.nombreCompleto;
     final confirmo = await ConfirmDialog.show(
       context,
       title: '¿Quitar a $nombre del equipo?',
@@ -156,8 +156,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
           title: asignacionAsync.when(
             loading: () => const Text('Miembro del equipo'),
             error: (e, st) => const Text('Miembro del equipo'),
-            data: (a) =>
-                Text(a?.personaColaborador.nombre ?? 'Miembro del equipo'),
+            data: (a) => Text(a?.colaborador.nombre ?? 'Miembro del equipo'),
           ),
           actions: [
             asignacionAsync.when(
@@ -266,14 +265,14 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                               entry,
                             ) {
                               final i = entry.key;
-                              final codigo = entry.value;
+                              final permiso = entry.value;
                               return Column(
                                 children: [
                                   PermissionToggleRow(
-                                    label: labelDePermiso(codigo),
-                                    value: _permisos?[codigo.id] ?? false,
+                                    label: permiso.descripcion,
+                                    value: _permisos?[permiso.id] ?? false,
                                     onChanged: (v) => setState(
-                                      () => _permisos![codigo.id] = v,
+                                      () => _permisos![permiso.id] = v,
                                     ),
                                   ),
                                   if (i < todosLosCodigos.length - 1)

@@ -15,7 +15,9 @@ Widget _wrapHome() {
     overrides: [
       // Sobreescribe dependentsAsResponsableProvider con lista vacía resuelta para evitar
       // el NavTileSkeleton, que tiene un AnimationController de shimmer infinito.
-      dependentsAsResponsableProvider.overrideWith((ref) async => <Persona>[]),
+      dependentsAsResponsableProvider.overrideWith(
+        (ref) async => <AsignacionCuidado>[],
+      ),
     ],
     child: const MaterialApp(home: HomeScreen()),
   );

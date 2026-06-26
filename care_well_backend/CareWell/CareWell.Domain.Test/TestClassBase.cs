@@ -1,8 +1,8 @@
 ﻿namespace CareWell.Domain.Test
 {
-    public abstract class TestClassBase<TBaseEntity> where TBaseEntity : BaseEntity
+    public abstract class TestClassBase<TClass> where TClass : class
     {
-        protected TBaseEntity Target { get; set; }
+        protected TClass Target { get; set; }
 
         protected TestClassBase()
         {

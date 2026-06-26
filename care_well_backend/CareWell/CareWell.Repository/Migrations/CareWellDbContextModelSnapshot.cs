@@ -251,6 +251,9 @@ namespace CareWell.Repository.Migrations
                     b.Property<DateTime>("FechaAlta")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ID_EstadoAsignacionCuidado")
                         .HasColumnType("int");
 

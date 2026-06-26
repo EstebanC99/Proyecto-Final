@@ -66,6 +66,8 @@ final _testUsuario = Usuario(
     id: 1,
     nombre: 'María',
     apellido: 'García',
+    documento: '28000001',
+    fechaNacimiento: DateTime(1990, 1, 1),
     email: 'maria@example.com',
   ),
   contrasena: '1234',
@@ -76,13 +78,31 @@ final _testDependiente = Persona(
   id: 2,
   nombre: 'Alicia',
   apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
+
+/// Construye una AsignacionCuidado de prueba a partir de una Persona.
+AsignacionCuidado _asignacionDesde(Persona persona) => AsignacionCuidado(
+  id: 401,
+  personaCuidada: persona,
+  colaborador: _testUsuario.persona,
+  rol: RolCuidado(
+    id: RolesCuidadoConst.responsable,
+    descripcion: 'Responsable',
+  ),
+  estado: EstadoAsignacionCuidado(
+    id: EstadosAsignacionConst.activa,
+    descripcion: 'Activa',
+  ),
+  fechaAlta: DateTime(2024, 1, 8),
 );
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
 
 /// Construye el widget con los providers sobrescritos directamente
 /// para evitar el estado de carga y los timers del skeleton en tests.
-Widget _wrap({required List<Persona> dependientes}) {
+Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(
@@ -96,7 +116,7 @@ Widget _wrap({required List<Persona> dependientes}) {
       ),
       // Sobrescribe dependentsAsResponsableProvider directamente para evitar el loading
       // state, lo que evita que se monte NavTileSkeleton y sus timers infinitos.
-      dependentsAsResponsableProvider.overrideWith((ref) async => dependientes),
+      dependentsAsResponsableProvider.overrideWith((ref) async => asignaciones),
       // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
       ultimoEstadoAnimoProvider.overrideWith((ref) async => null),
     ],
@@ -118,7 +138,9 @@ Future<void> _settleAnimations(WidgetTester tester) async {
 void main() {
   group('HomeScreen', () {
     testWidgets('monta sin errores (smoke)', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: [_testDependiente]));
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
       await _settleAnimations(tester);
       expect(find.byType(HomeScreen), findsOneWidget);
     });
@@ -126,7 +148,9 @@ void main() {
     testWidgets('Caso 1 — lista no vacía muestra NavTile de personas a cargo', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap(dependientes: [_testDependiente]));
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
       await _settleAnimations(tester);
 
       expect(find.text('Personas a cargo'), findsOneWidget);
@@ -134,7 +158,7 @@ void main() {
     });
 
     testWidgets('Caso 2 — lista vacía muestra EmptyStateTile', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: []));
+      await tester.pumpWidget(_wrap(asignaciones: []));
       await _settleAnimations(tester);
 
       expect(find.byType(EmptyStateTile), findsOneWidget);
@@ -143,7 +167,7 @@ void main() {
     });
 
     testWidgets('Caso 3 — HomeHeader se renderiza', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: []));
+      await tester.pumpWidget(_wrap(asignaciones: []));
       await _settleAnimations(tester);
 
       expect(find.byType(HomeHeader), findsOneWidget);
@@ -152,7 +176,7 @@ void main() {
     testWidgets('Caso 3b — nombre del usuario aparece en el header', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap(dependientes: []));
+      await tester.pumpWidget(_wrap(asignaciones: []));
       await _settleAnimations(tester);
 
       // El header debe mostrar el nombre del usuario autenticado
@@ -162,25 +186,29 @@ void main() {
     testWidgets('EmergencyTile siempre visible con lista vacía', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap(dependientes: []));
+      await tester.pumpWidget(_wrap(asignaciones: []));
       await _settleAnimations(tester);
       expect(find.byType(EmergencyTile), findsOneWidget);
     });
 
     testWidgets('EmergencyTile siempre visible con datos', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: [_testDependiente]));
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
       await _settleAnimations(tester);
       expect(find.byType(EmergencyTile), findsOneWidget);
     });
 
     testWidgets('QuickAccessRow se muestra', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: []));
+      await tester.pumpWidget(_wrap(asignaciones: []));
       await _settleAnimations(tester);
       expect(find.byType(QuickAccessRow), findsOneWidget);
     });
 
     testWidgets('tiles fijos del grid siempre se muestran', (tester) async {
-      await tester.pumpWidget(_wrap(dependientes: [_testDependiente]));
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
       await _settleAnimations(tester);
 
       expect(find.text('Calendario'), findsOneWidget);

@@ -9,16 +9,33 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
-final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
+final _personaMaria = Persona(
+  id: 1,
+  nombre: 'María',
+  apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
+);
 
-final _personaCarlos = Persona(id: 3, nombre: 'Carlos', apellido: 'Pérez');
+final _personaCarlos = Persona(
+  id: 3,
+  nombre: 'Carlos',
+  apellido: 'Pérez',
+  documento: '30000003',
+  fechaNacimiento: DateTime(1985, 3, 15),
+);
 
 final _permisosEmergencia = [
-  Permiso(
-    id: 306,
-    codigo: codigoActivarEmergencia,
+  PermisoCuidado(
+    id: PermisosCuidadoConst.activarEmergencia,
     descripcion: 'Activar emergencia',
   ),
 ];
@@ -34,11 +51,11 @@ AsignacionCuidado _asignacion(
   int id,
   Persona colaborador, {
   RolCuidado? rol,
-  List<Permiso>? permisos,
+  List<PermisoCuidado>? permisos,
 }) => AsignacionCuidado(
   id: id,
   personaCuidada: _personaAlicia,
-  personaColaborador: colaborador,
+  colaborador: colaborador,
   rol: rol ?? rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
@@ -62,9 +79,8 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => _asignaciones
-      .where((a) => a.personaColaborador.id == colaboradorId)
-      .toList();
+  ) async =>
+      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
 
   @override
   Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async => a;
@@ -148,7 +164,7 @@ void main() {
           AsignacionCuidado(
             id: 403,
             personaCuidada: _personaAlicia,
-            personaColaborador: _personaCarlos,
+            colaborador: _personaCarlos,
             rol: rolCuidadoResponsable,
             estado: estadoAsignacionInactiva,
             fechaAlta: DateTime.now(),

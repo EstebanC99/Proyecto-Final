@@ -20,17 +20,29 @@ final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
-/// Asignación en la que María es responsable de Alicia.
+/// Asignación en la que María es responsable de Alicia (activa).
 AsignacionCuidado _asignacionMariaResponsable() => AsignacionCuidado(
   id: 401,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
+  colaborador: _personaMaria,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
+);
+
+/// Asignación en la que María es responsable de Alicia (pendiente).
+AsignacionCuidado _asignacionMariaPendiente() => AsignacionCuidado(
+  id: 402,
+  personaCuidada: _personaAlicia,
+  colaborador: _personaMaria,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionPendiente,
+  fechaAlta: DateTime(2024, 6, 1),
 );
 
 /// Fake de [PersonaRepository] para tests de dependents.
@@ -84,7 +96,7 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
       // Devuelve asignaciones donde María (id=1) es colaborador.
-      _asignaciones.where((a) => a.personaColaborador.id == 1).toList();
+      _asignaciones.where((a) => a.colaborador.id == 1).toList();
 
   @override
   Future<void> crearPersonaCargo({
@@ -108,12 +120,31 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
           email: email,
           telefono: telefono,
         ),
-        personaColaborador: _personaMaria,
+        colaborador: _personaMaria,
         rol: rolCuidadoResponsable,
         estado: estadoAsignacionActiva,
         fechaAlta: DateTime.now(),
       ),
     );
+  }
+
+  @override
+  Future<Persona> modificarPersonaCargo(
+    int asignacionId,
+    Persona persona,
+  ) async {
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    final actual = _asignaciones[idx];
+    _asignaciones[idx] = AsignacionCuidado(
+      id: actual.id,
+      personaCuidada: persona,
+      colaborador: actual.colaborador,
+      rol: actual.rol,
+      estado: actual.estado,
+      fechaAlta: actual.fechaAlta,
+    );
+    return persona;
   }
 }
 
@@ -128,9 +159,8 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => _asignaciones
-      .where((a) => a.personaColaborador.id == colaboradorId)
-      .toList();
+  ) async =>
+      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
@@ -144,7 +174,7 @@ class _FakeCareTeamRepository implements CareTeamRepository {
     final nueva = AsignacionCuidado(
       id: _nextId++,
       personaCuidada: a.personaCuidada,
-      personaColaborador: a.personaColaborador,
+      colaborador: a.colaborador,
       rol: a.rol,
       estado: a.estado,
       fechaAlta: a.fechaAlta,
@@ -214,39 +244,39 @@ ProviderContainer _buildContainer({
 
 void main() {
   group('dependentsAsResponsableProvider', () {
-    test('retorna personas donde el usuario es Responsable activo', () async {
-      final container = _buildContainer();
-      addTearDown(container.dispose);
-
-      final personas = await container.read(
-        dependentsAsResponsableProvider.future,
-      );
-
-      expect(personas, isNotEmpty);
-      expect(personas.first.id, _personaAlicia.id);
-    });
-
     test(
-      'retorna lista vacía si el usuario no tiene asignaciones activas',
+      'retorna asignaciones donde el usuario es Responsable activo',
       () async {
-        final container = _buildContainer(asignaciones: []);
+        final container = _buildContainer();
         addTearDown(container.dispose);
 
-        final personas = await container.read(
+        final asignaciones = await container.read(
           dependentsAsResponsableProvider.future,
         );
 
-        expect(personas, isEmpty);
+        expect(asignaciones, isNotEmpty);
+        expect(asignaciones.first.personaCuidada.id, _personaAlicia.id);
       },
     );
+
+    test('retorna lista vacía si el usuario no tiene asignaciones', () async {
+      final container = _buildContainer(asignaciones: []);
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        dependentsAsResponsableProvider.future,
+      );
+
+      expect(asignaciones, isEmpty);
+    });
 
     test(
       'retorna lista vacía si las asignaciones son de rol Cuidador',
       () async {
         final asignacionCuidador = AsignacionCuidado(
-          id: 402,
+          id: 403,
           personaCuidada: _personaAlicia,
-          personaColaborador: _personaMaria,
+          colaborador: _personaMaria,
           rol: rolCuidadoCuidador,
           estado: estadoAsignacionActiva,
           fechaAlta: DateTime(2024, 1, 1),
@@ -254,21 +284,35 @@ void main() {
         final container = _buildContainer(asignaciones: [asignacionCuidador]);
         addTearDown(container.dispose);
 
-        final personas = await container.read(
+        final asignaciones = await container.read(
           dependentsAsResponsableProvider.future,
         );
 
-        expect(personas, isEmpty);
+        expect(asignaciones, isEmpty);
       },
     );
+
+    test('incluye asignaciones pendientes (no las excluye)', () async {
+      final container = _buildContainer(
+        asignaciones: [_asignacionMariaPendiente()],
+      );
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        dependentsAsResponsableProvider.future,
+      );
+
+      expect(asignaciones, isNotEmpty);
+      expect(asignaciones.first.estado.id, estadoAsignacionPendiente.id);
+    });
   });
 
   group('dependentsAsCuidadorProvider', () {
-    test('retorna personas donde el usuario es Cuidador activo', () async {
+    test('retorna asignaciones donde el usuario es Cuidador activo', () async {
       final asignacionCuidador = AsignacionCuidado(
-        id: 403,
+        id: 404,
         personaCuidada: _personaAlicia,
-        personaColaborador: _personaMaria,
+        colaborador: _personaMaria,
         rol: rolCuidadoCuidador,
         estado: estadoAsignacionActiva,
         fechaAlta: DateTime(2024, 1, 1),
@@ -276,46 +320,46 @@ void main() {
       final container = _buildContainer(asignaciones: [asignacionCuidador]);
       addTearDown(container.dispose);
 
-      final personas = await container.read(
+      final asignaciones = await container.read(
         dependentsAsCuidadorProvider.future,
       );
 
-      expect(personas, isNotEmpty);
-      expect(personas.first.id, _personaAlicia.id);
+      expect(asignaciones, isNotEmpty);
+      expect(asignaciones.first.personaCuidada.id, _personaAlicia.id);
     });
 
     test('retorna lista vacía si no hay asignaciones de cuidador', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final personas = await container.read(
+      final asignaciones = await container.read(
         dependentsAsCuidadorProvider.future,
       );
 
-      expect(personas, isEmpty);
+      expect(asignaciones, isEmpty);
     });
   });
 
-  group('dependentByIdProvider', () {
-    test('retorna la persona con el id correcto', () async {
+  group('asignacionByIdProvider', () {
+    test('retorna la asignación con el id correcto', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final persona = await container.read(
-        dependentByIdProvider(_personaAlicia.id).future,
+      final asignacion = await container.read(
+        asignacionByIdProvider(401).future,
       );
 
-      expect(persona.id, _personaAlicia.id);
-      expect(persona.nombre, 'Alicia');
+      expect(asignacion.id, 401);
+      expect(asignacion.personaCuidada.nombre, 'Alicia');
     });
 
-    test('lanza excepción si el id no existe', () async {
+    test('lanza StateError si el id no existe en memoria', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
       await expectLater(
-        container.read(dependentByIdProvider(99999).future),
-        throwsException,
+        container.read(asignacionByIdProvider(99999).future),
+        throwsA(isA<StateError>()),
       );
     });
   });
@@ -327,7 +371,6 @@ void main() {
 
       final crearFn = container.read(crearDependenteProvider);
 
-      // El provider devuelve void; verificamos que completa sin error.
       await expectLater(
         crearFn(
           nombre: 'Pedro',
@@ -340,12 +383,12 @@ void main() {
       );
     });
 
-    test('invalida dependentsAsResponsableProvider tras creación', () async {
+    test('invalida misAsignacionesProvider tras creación', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
       // Primero leer para establecer el estado.
-      await container.read(dependentsAsResponsableProvider.future);
+      await container.read(misAsignacionesProvider.future);
 
       final crearFn = container.read(crearDependenteProvider);
       await crearFn(
@@ -356,8 +399,7 @@ void main() {
       );
 
       // Después de crear, el estado del provider debe haberse reiniciado.
-      final state = container.read(dependentsAsResponsableProvider);
-      // Puede estar en loading o data; lo importante es que no crashea.
+      final state = container.read(misAsignacionesProvider);
       expect(state, isNotNull);
     });
   });
@@ -369,7 +411,9 @@ void main() {
 
       final actualizarFn = container.read(actualizarDependenteProvider);
 
+      // asignacionId=401 corresponde a _asignacionMariaResponsable().
       final actualizada = await actualizarFn(
+        401,
         _personaAlicia.copyWith(nombre: 'Alicia Modificada'),
       );
 

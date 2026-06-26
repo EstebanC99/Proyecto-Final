@@ -1,6 +1,6 @@
 ﻿namespace CareWell.Domain.ValueObjects.General
 {
-    public record CrearPersona(
+    public record CrearModificarPersona(
         string Nombre,
         string Apellido,
         string Documento,

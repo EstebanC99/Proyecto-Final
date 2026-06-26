@@ -88,7 +88,7 @@ class ProfileScreen extends ConsumerWidget {
                 ProfileDataRow(
                   icon: Icons.badge_outlined,
                   label: 'DNI',
-                  value: persona.documento ?? '',
+                  value: persona.documento,
                 ),
                 ProfileDataRow(
                   icon: Icons.person_outlined,

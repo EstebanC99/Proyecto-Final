@@ -22,28 +22,25 @@ int? calcularEdad(DateTime? fechaNacimiento) {
   return edad < 0 ? null : edad;
 }
 
-/// Tarjeta de persona para la lista de personas a cargo (US-13).
+/// Tarjeta de asignación de cuidado para la lista de personas a cargo (US-13).
 ///
-/// Muestra avatar con inicial, nombre completo, edad calculada y badge de rol.
+/// Muestra avatar con inicial, nombre completo, edad calculada, badge de rol
+/// y —cuando la asignación está pendiente— un chip "Pendiente".
 class PersonCard extends StatelessWidget {
-  const PersonCard({
-    super.key,
-    required this.persona,
-    required this.rolLabel,
-    required this.onTap,
-  });
+  const PersonCard({super.key, required this.asignacion, required this.onTap});
 
-  /// Persona a mostrar.
-  final Persona persona;
-
-  /// Etiqueta de rol. Ej: "Responsable", "Cuidador".
-  final String rolLabel;
+  /// Asignación de cuidado a mostrar.
+  final AsignacionCuidado asignacion;
 
   /// Callback al tocar la tarjeta.
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final persona = asignacion.personaCuidada;
+    final rolLabel = asignacion.rol.descripcion;
+    final esPendiente =
+        asignacion.estado.id == EstadosAsignacionConst.pendiente;
     final edad = calcularEdad(persona.fechaNacimiento);
 
     return Padding(
@@ -101,6 +98,10 @@ class PersonCard extends StatelessWidget {
                             const SizedBox(width: AppSpacing.sm),
                           ],
                           RoleBadge(rol: rolLabel),
+                          if (esPendiente) ...[
+                            const SizedBox(width: AppSpacing.sm),
+                            const _PendingChip(),
+                          ],
                         ],
                       ),
                     ],
@@ -115,6 +116,31 @@ class PersonCard extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Chip de estado pendiente para asignaciones en espera de aceptación.
+class _PendingChip extends StatelessWidget {
+  const _PendingChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3CD),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: const Color(0xFFF5A623), width: 1),
+      ),
+      child: const Text(
+        'Pendiente',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF7A5200),
         ),
       ),
     );

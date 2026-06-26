@@ -11,10 +11,18 @@ final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

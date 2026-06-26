@@ -5,6 +5,7 @@ using CareWell.BusinessService.EquipoCuidado;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.Factories;
+using CareWell.Domain.Validadores;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CareWell.BusinessService
@@ -28,9 +29,15 @@ namespace CareWell.BusinessService
             #region Business Services
 
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
-            services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
+            services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
 
-            #endregion 
+            #endregion
+
+            #region Domain
+
+            services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
+
+            #endregion
 
             return services;
         }

@@ -6,6 +6,7 @@ using CareWell.Domain.DomainServices;
 using CareWell.Domain.EquipoCuidado;
 using CareWell.Domain.Factories;
 using CareWell.Domain.General;
+using CareWell.Domain.Validadores;
 using CareWell.Domain.ValueObjects.EquipoCuidado;
 using CareWell.Repository;
 using CareWell.Repository.EquipoCuidado;
@@ -14,20 +15,22 @@ using CareWell.Security;
 
 namespace CareWell.BusinessService.EquipoCuidado
 {
-    public class AdministrarEquipoCuidadoBusinessService : BusinessService, IAdministrarEquipoCuidadoBusinessService
+    public class AdministrarPersonasCargoBusinessService : BusinessService, IAdministrarPersonasCargoBusinessService
     {
         private IBaseFactory Factory { get; set; }
         private IUserContext UserContext { get; set; }
         private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
         private IPersonaRepository PersonaRepository { get; set; }
         private IAsignacionCuidadoRepository AsignacionCuidadoRepository { get; set; }
+        private IValidadorPermisoAccion ValidadorPermisoAccion { get; set; }
 
-        public AdministrarEquipoCuidadoBusinessService(IUnitOfWork unitOfWork,
+        public AdministrarPersonasCargoBusinessService(IUnitOfWork unitOfWork,
                                                        IBaseFactory baseFactory,
                                                        IUserContext userContext,
                                                        IEntityLoaderDomainService entityLoaderDomainService,
                                                        IPersonaRepository personaRepository,
-                                                       IAsignacionCuidadoRepository asignacionCuidadoRepository)
+                                                       IAsignacionCuidadoRepository asignacionCuidadoRepository,
+                                                       IValidadorPermisoAccion validadorPermisoAccion)
             : base(unitOfWork)
         {
             this.Factory = baseFactory;
@@ -35,6 +38,7 @@ namespace CareWell.BusinessService.EquipoCuidado
             this.EntityLoaderDomainService = entityLoaderDomainService;
             this.PersonaRepository = personaRepository;
             this.AsignacionCuidadoRepository = asignacionCuidadoRepository;
+            this.ValidadorPermisoAccion = validadorPermisoAccion;
         }
 
         public List<AsignacionCuidadoDataView> ObtenerAsignacionesUsuarioLogueado()
@@ -49,7 +53,7 @@ namespace CareWell.BusinessService.EquipoCuidado
             var usuarioLogueado = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
 
             var personaCargo = this.Factory.Crear<Persona>();
-            personaCargo.Crear(new Domain.ValueObjects.General.CrearPersona(
+            personaCargo.CrearModificar(new Domain.ValueObjects.General.CrearModificarPersona(
                 command.Nombre,
                 command.Apellido,
                 command.Documento,
@@ -65,11 +69,48 @@ namespace CareWell.BusinessService.EquipoCuidado
             );
 
             var asignacionCuidado = this.Factory.Crear<AsignacionCuidado>();
+
             asignacionCuidado.AsignarResponsable(crearAsignacionResponsable,
                                                  this.EntityLoaderDomainService);
+
             this.AsignacionCuidadoRepository.Add(asignacionCuidado);
 
-            asignacionCuidado.AsignarPermisosResponsable(this.EntityLoaderDomainService);
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void ModificarPersonaCargo(ModificarPersonaCargoCommand command)
+        {
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(command.AsignacionCuidadoID);
+
+            var modificarAsignacionResponsable = new ModificarInformacionPersona(
+                command.Nombre,
+                command.Apellido,
+                command.Documento,
+                command.FechaNacimiento,
+                command.Email,
+                command.Telefono,
+                this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID));
+
+            asignacionCuidado.ModificarInformacionPersona(modificarAsignacionResponsable,
+                                                          this.ValidadorPermisoAccion);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void EliminarAsignacion(int asignacionCuidadoID)
+        {
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
+
+            asignacionCuidado.Eliminar(this.EntityLoaderDomainService);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void ReactivarAsignacion(int asignacionCuidadoID)
+        {
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
+
+            asignacionCuidado.Reactivar(this.EntityLoaderDomainService);
 
             this.UnitOfWork.SaveChanges();
         }

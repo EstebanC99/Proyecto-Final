@@ -37,56 +37,19 @@ final rolCuidadoCuidador = RolCuidado(
 
 // ─── Catálogos de estado de asignación ───────────────────────────────────────
 
-final estadoAsignacionActiva = EstadoAsignacion(
+final estadoAsignacionActiva = EstadoAsignacionCuidado(
   id: EstadosAsignacionConst.activa,
   descripcion: 'Activa',
 );
 
-final estadoAsignacionInactiva = EstadoAsignacion(
+final estadoAsignacionInactiva = EstadoAsignacionCuidado(
   id: EstadosAsignacionConst.inactiva,
   descripcion: 'Inactiva',
 );
 
-final estadoAsignacionPendiente = EstadoAsignacion(
+final estadoAsignacionPendiente = EstadoAsignacionCuidado(
   id: EstadosAsignacionConst.pendiente,
   descripcion: 'Pendiente',
-);
-
-// ─── Catálogos de permisos ────────────────────────────────────────────────────
-
-final codigoVerFichaSalud = CodigoPermiso(
-  id: PermisosCuidadoConst.verFichaSalud,
-  descripcion: 'Ver ficha de salud',
-);
-
-final codigoEditarFichaSalud = CodigoPermiso(
-  id: PermisosCuidadoConst.editarFichaSalud,
-  descripcion: 'Editar ficha de salud',
-);
-
-final codigoGestionarAgenda = CodigoPermiso(
-  id: PermisosCuidadoConst.gestionarAgenda,
-  descripcion: 'Gestionar agenda',
-);
-
-final codigoRegistrarEventosSalud = CodigoPermiso(
-  id: PermisosCuidadoConst.registrarEventosSalud,
-  descripcion: 'Registrar eventos de salud',
-);
-
-final codigoRegistrarHabitos = CodigoPermiso(
-  id: PermisosCuidadoConst.registrarHabitos,
-  descripcion: 'Registrar hábitos',
-);
-
-final codigoActivarEmergencia = CodigoPermiso(
-  id: PermisosCuidadoConst.activarEmergencia,
-  descripcion: 'Activar emergencia',
-);
-
-final codigoAdministrarEquipo = CodigoPermiso(
-  id: PermisosCuidadoConst.administrarEquipo,
-  descripcion: 'Administrar equipo',
 );
 
 // ─── Tipos de evento de agenda ────────────────────────────────────────────────

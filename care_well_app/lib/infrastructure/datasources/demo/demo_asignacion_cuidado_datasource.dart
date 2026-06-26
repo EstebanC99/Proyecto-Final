@@ -4,8 +4,9 @@ import 'demo_seed.dart';
 
 /// Implementación demo (en memoria) de [AsignacionCuidadoDatasource].
 ///
-/// Simula el endpoint `POST /api/AdministrarEquipoCuidado/crear-persona-cargo`
-/// y el endpoint `GET /api/AdministrarEquipoCuidado/obtener-mis-asignaciones`
+/// Simula el endpoint `POST /api/AdministrarPersonasCargo/crear-persona-cargo`,
+/// el endpoint `POST /api/AdministrarPersonasCargo/modificar-persona-cargo`
+/// y el endpoint `GET /api/AdministrarPersonasCargo/obtener-mis-asignaciones`
 /// sin necesidad de servidor.
 class DemoAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   /// Lista mutable de asignaciones en la sesión demo.
@@ -46,7 +47,7 @@ class DemoAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
     final nuevaAsignacion = AsignacionCuidado(
       id: _nextAsignacionId++,
       personaCuidada: nuevaPersona,
-      personaColaborador: DemoSeed.personaMaria,
+      colaborador: DemoSeed.personaMaria,
       rol: DemoSeed.rolCuidadoResponsable,
       estado: DemoSeed.estadoAsignacionActiva,
       fechaAlta: DateTime.now(),
@@ -54,6 +55,37 @@ class DemoAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
     );
 
     _asignaciones.add(nuevaAsignacion);
+  }
+
+  // ── modificarPersonaCargo ─────────────────────────────────────────────────
+
+  /// Actualiza la [Persona] cuidada dentro de la asignación con [asignacionId].
+  ///
+  /// Lanza [Exception] si la asignación no existe en memoria.
+  @override
+  Future<Persona> modificarPersonaCargo(
+    int asignacionId,
+    Persona persona,
+  ) async {
+    await Future.delayed(Duration.zero);
+
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) {
+      throw Exception('Asignación no encontrada en demo: $asignacionId');
+    }
+
+    final asignacionActual = _asignaciones[idx];
+    _asignaciones[idx] = AsignacionCuidado(
+      id: asignacionActual.id,
+      personaCuidada: persona,
+      colaborador: asignacionActual.colaborador,
+      rol: asignacionActual.rol,
+      estado: asignacionActual.estado,
+      fechaAlta: asignacionActual.fechaAlta,
+      permisos: asignacionActual.permisos,
+    );
+
+    return persona;
   }
 
   // ── obtenerAsignacionesUsuarioLogueado ────────────────────────────────────

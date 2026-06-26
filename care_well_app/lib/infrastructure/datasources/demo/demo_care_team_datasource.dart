@@ -33,7 +33,7 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
   ) async {
     await Future.delayed(Duration.zero);
     return _asignaciones
-        .where((a) => a.personaColaborador.id == colaboradorId)
+        .where((a) => a.colaborador.id == colaboradorId)
         .toList();
   }
 
@@ -45,7 +45,7 @@ class DemoCareTeamDatasource implements CareTeamDatasource {
     final nueva = AsignacionCuidado(
       id: _nextId++,
       personaCuidada: asignacion.personaCuidada,
-      personaColaborador: asignacion.personaColaborador,
+      colaborador: asignacion.colaborador,
       rol: asignacion.rol,
       estado: asignacion.estado,
       fechaAlta: asignacion.fechaAlta,

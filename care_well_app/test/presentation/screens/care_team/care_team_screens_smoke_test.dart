@@ -10,12 +10,20 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
@@ -23,13 +31,15 @@ final _personaCarlos = Persona(
   id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
+  documento: '30000003',
+  fechaNacimiento: DateTime(1985, 3, 15),
   email: 'carlos@test.com',
 );
 
 AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
   id: 403,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
+  colaborador: _personaMaria,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
@@ -38,7 +48,7 @@ AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
 AsignacionCuidado _asignacionCarlos() => AsignacionCuidado(
   id: 401,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaCarlos,
+  colaborador: _personaCarlos,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
@@ -87,6 +97,10 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     String? telefono,
     List<int> permisosCuidadoIds = const [],
   }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {

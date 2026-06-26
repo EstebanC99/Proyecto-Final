@@ -1,22 +1,11 @@
 import 'package:care_well_app/domain/datasources/datasources.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/infrastructure/http/http_configs.dart';
-import 'package:care_well_app/infrastructure/mappers/usuario_mapper.dart';
+import 'package:care_well_app/infrastructure/mappers/auth/usuario_mapper.dart';
 import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:care_well_app/infrastructure/storage/token_storage.dart';
 import 'package:dio/dio.dart';
 
-/// Implementación de [AuthDatasource] contra la API REST de CareWell.
-///
-/// Los bodies de request se envían en camelCase. ASP.NET Core deserializa
-/// de forma case-insensitive, por lo que mapea correctamente a los Commands
-/// en PascalCase sin ningún cambio en el backend.
-/// Las respuestas (DataViews) ya vienen en camelCase por defecto en ASP.NET Core.
-///
-/// Rutas:
-///   POST /api/Authorization/login
-///   POST /api/Authorization/refresh-token
-///   POST /api/Cuenta/crear
 class ApiAuthDatasource implements AuthDatasource {
   final Dio _dio;
   final TokenStorage _tokenStorage;
@@ -28,8 +17,6 @@ class ApiAuthDatasource implements AuthDatasource {
 
     return loginResponse;
   }
-
-  // ── login ────────────────────────────────────────────────────────────────────
 
   @override
   Future<Usuario> login(String email, String contrasena) async {
@@ -51,8 +38,6 @@ class ApiAuthDatasource implements AuthDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
-
-  // ── register ─────────────────────────────────────────────────────────────────
 
   @override
   Future<void> register({
@@ -81,8 +66,6 @@ class ApiAuthDatasource implements AuthDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
-
-  // ── logout ───────────────────────────────────────────────────────────────────
 
   @override
   Future<void> logout() async {

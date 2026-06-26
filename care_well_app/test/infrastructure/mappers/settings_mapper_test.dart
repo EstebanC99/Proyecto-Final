@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../_fakes/test_fixtures.dart';
 
 void main() {
-  final persona = Persona(id: 1, nombre: 'María', apellido: 'García');
+  final persona = Persona(id: 1, nombre: 'María', apellido: 'García', documento: "123123", fechaNacimiento: DateTime.now());
 
   final usuario = Usuario(
     id: 101,

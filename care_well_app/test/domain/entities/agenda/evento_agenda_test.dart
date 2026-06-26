@@ -6,11 +6,11 @@ import '../../../_fakes/test_fixtures.dart';
 void main() {
   // ─── Fixture ────────────────────────────────────────────────────────────────
 
-  final personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+  final personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez', documento: "123123", fechaNacimiento: DateTime.now());
 
   final usuarioMaria = Usuario(
     id: 101,
-    persona: Persona(id: 1, nombre: 'María', apellido: 'García'),
+    persona: Persona(id: 1, nombre: 'María', apellido: 'García', documento: "123123", fechaNacimiento: DateTime.now()),
     contrasena: 'hash123',
     estado: estadoUsuarioActivo,
   );

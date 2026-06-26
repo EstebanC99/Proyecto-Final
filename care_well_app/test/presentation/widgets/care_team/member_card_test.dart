@@ -7,19 +7,27 @@ import '../../../_fakes/test_fixtures.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
-final _personaCuidada = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaCuidada = Persona(
+  id: 1,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _personaCarlos = Persona(
   id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
+  documento: '30000003',
+  fechaNacimiento: DateTime(1985, 3, 15),
   email: 'carlos@test.com',
 );
 
 AsignacionCuidado _asignacionResponsable() => AsignacionCuidado(
   id: 401,
   personaCuidada: _personaCuidada,
-  personaColaborador: _personaCarlos,
+  colaborador: _personaCarlos,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
@@ -28,7 +36,7 @@ AsignacionCuidado _asignacionResponsable() => AsignacionCuidado(
 AsignacionCuidado _asignacionCuidador() => AsignacionCuidado(
   id: 402,
   personaCuidada: _personaCuidada,
-  personaColaborador: _personaCarlos,
+  colaborador: _personaCarlos,
   rol: rolCuidadoCuidador,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 3, 5),

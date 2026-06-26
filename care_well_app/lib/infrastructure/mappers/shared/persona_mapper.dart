@@ -1,5 +1,5 @@
-import '../../domain/entities/entities.dart';
-import '../models/models.dart';
+import 'package:care_well_app/domain/entities/shared/persona.dart';
+import 'package:care_well_app/infrastructure/models/shared/persona_model.dart';
 
 class PersonaMapper {
   static Persona fromModel(PersonaModel model) {

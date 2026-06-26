@@ -150,7 +150,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   ProfileDataRow(
                     icon: Icons.badge_outlined,
                     label: 'DNI',
-                    value: persona.documento ?? '',
+                    value: persona.documento,
                     editable: true,
                     keyboardType: TextInputType.number,
                     onSave: _guardarDocumento,

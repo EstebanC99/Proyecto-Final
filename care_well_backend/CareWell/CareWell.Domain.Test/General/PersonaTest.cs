@@ -14,15 +14,15 @@ namespace CareWell.Domain.Test.General
             this.Target = new Persona();
         }
 
-        public class ElMetodo_Crear : PersonaTest
+        public class ElMetodo_CrearModificar : PersonaTest
         {
-            private CrearPersona crearPersona;
+            private CrearModificarPersona crearPersona;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                      "Prueba",
                                                      "1234",
                                                      DateTime.Today,
@@ -32,14 +32,14 @@ namespace CareWell.Domain.Test.General
 
             private void Action()
             {
-                this.Target.Crear(this.crearPersona);
+                this.Target.CrearModificar(this.crearPersona);
             }
 
             [Fact]
             public void Si_Nombre_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona(null,
+                this.crearPersona = new CrearModificarPersona(null,
                                                    "Prueba",
                                                    "1234",
                                                    DateTime.Today,
@@ -55,7 +55,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Apellido_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    null,
                                                    "1234",
                                                    DateTime.Today,
@@ -71,7 +71,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Documento_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    "Prueba",
                                                    null,
                                                    DateTime.Today,
@@ -87,7 +87,7 @@ namespace CareWell.Domain.Test.General
             public void Si_FechaNacimiento_no_fue_especificada_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    "Prueba",
                                                    "1234",
                                                    default,
@@ -174,13 +174,13 @@ namespace CareWell.Domain.Test.General
 
         public class ElMetodo_CrearDesdeCuenta : PersonaTest
         {
-            private CrearPersona crearPersona;
+            private CrearModificarPersona crearPersona;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    "Prueba",
                                                    "1234",
                                                    DateTime.Today,
@@ -197,7 +197,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Email_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    "Prueba",
                                                    "1234",
                                                    DateTime.Today,
@@ -213,7 +213,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Telefono_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearPersona("Usuario",
+                this.crearPersona = new CrearModificarPersona("Usuario",
                                                    "Prueba",
                                                    "1234",
                                                    DateTime.Today,

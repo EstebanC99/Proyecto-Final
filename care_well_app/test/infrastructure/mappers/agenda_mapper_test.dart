@@ -4,11 +4,11 @@ import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final persona = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+  final persona = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez', documento: "123123", fechaNacimiento: DateTime.now());
 
   final usuario = Usuario(
     id: 101,
-    persona: Persona(id: 1, nombre: 'María', apellido: 'García'),
+    persona: Persona(id: 1, nombre: 'María', apellido: 'García', documento: "123123", fechaNacimiento: DateTime.now()),
     contrasena: 'hash123',
     estado: EstadoUsuario(
       id: EstadosUsuarioConst.activo,

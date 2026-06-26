@@ -72,10 +72,11 @@ class DemoSeed {
     descripcion: 'Cuidador',
   );
 
-  static final EstadoAsignacion estadoAsignacionActiva = EstadoAsignacion(
-    id: EstadosAsignacionConst.activa,
-    descripcion: 'Activa',
-  );
+  static final EstadoAsignacionCuidado estadoAsignacionActiva =
+      EstadoAsignacionCuidado(
+        id: EstadosAsignacionConst.activa,
+        descripcion: 'Activa',
+      );
 
   // ─── Personas ────────────────────────────────────────────────────────────────
 
@@ -148,96 +149,52 @@ class DemoSeed {
 
   // ─── Roles y permisos ────────────────────────────────────────────────────────
 
-  static final List<Permiso> permisosResponsable = [
-    Permiso(
-      id: 301,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.verFichaSalud,
-        descripcion: 'Ver ficha de salud',
-      ),
+  static final List<PermisoCuidado> permisosResponsable = [
+    PermisoCuidado(
+      id: PermisosCuidadoConst.verFichaSalud,
       descripcion: 'Ver ficha de salud',
     ),
-    Permiso(
-      id: 302,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.editarFichaSalud,
-        descripcion: 'Editar ficha de salud',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.editarFichaSalud,
       descripcion: 'Editar ficha de salud',
     ),
-    Permiso(
-      id: 303,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.gestionarAgenda,
-        descripcion: 'Gestionar agenda',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.gestionarAgenda,
       descripcion: 'Gestionar agenda',
     ),
-    Permiso(
-      id: 304,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.registrarEventosSalud,
-        descripcion: 'Registrar eventos de salud',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.registrarEventosSalud,
       descripcion: 'Registrar eventos de salud',
     ),
-    Permiso(
-      id: 305,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.registrarHabitos,
-        descripcion: 'Registrar hábitos de vida',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.registrarHabitos,
       descripcion: 'Registrar hábitos de vida',
     ),
-    Permiso(
-      id: 306,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.activarEmergencia,
-        descripcion: 'Activar emergencia',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.activarEmergencia,
       descripcion: 'Activar emergencia',
     ),
-    Permiso(
-      id: 307,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.administrarEquipo,
-        descripcion: 'Administrar equipo de cuidado',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.administrarEquipo,
       descripcion: 'Administrar equipo de cuidado',
     ),
   ];
 
-  static final List<Permiso> permisosCuidador = [
-    Permiso(
-      id: 308,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.verFichaSalud,
-        descripcion: 'Ver ficha de salud',
-      ),
+  static final List<PermisoCuidado> permisosCuidador = [
+    PermisoCuidado(
+      id: PermisosCuidadoConst.verFichaSalud,
       descripcion: 'Ver ficha de salud',
     ),
-    Permiso(
-      id: 309,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.gestionarAgenda,
-        descripcion: 'Gestionar agenda',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.gestionarAgenda,
       descripcion: 'Gestionar agenda',
     ),
-    Permiso(
-      id: 310,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.registrarEventosSalud,
-        descripcion: 'Registrar eventos de salud',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.registrarEventosSalud,
       descripcion: 'Registrar eventos de salud',
     ),
-    Permiso(
-      id: 311,
-      codigo: CodigoPermiso(
-        id: PermisosCuidadoConst.activarEmergencia,
-        descripcion: 'Activar emergencia',
-      ),
+    PermisoCuidado(
+      id: PermisosCuidadoConst.activarEmergencia,
       descripcion: 'Activar emergencia',
     ),
   ];
@@ -247,7 +204,7 @@ class DemoSeed {
   static final AsignacionCuidado asignacionCarlos = AsignacionCuidado(
     id: asignacionCarlosId,
     personaCuidada: personaAlicia,
-    personaColaborador: personaCarlos,
+    colaborador: personaCarlos,
     rol: rolCuidadoResponsable,
     estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 1, 10),
@@ -257,7 +214,7 @@ class DemoSeed {
   static final AsignacionCuidado asignacionLaura = AsignacionCuidado(
     id: asignacionLauraId,
     personaCuidada: personaAlicia,
-    personaColaborador: personaLaura,
+    colaborador: personaLaura,
     rol: rolCuidadoCuidador,
     estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 3, 5),
@@ -270,7 +227,7 @@ class DemoSeed {
   static final AsignacionCuidado asignacionMaria = AsignacionCuidado(
     id: asignacionMariaId,
     personaCuidada: personaAlicia,
-    personaColaborador: personaMaria,
+    colaborador: personaMaria,
     rol: rolCuidadoResponsable,
     estado: estadoAsignacionActiva,
     fechaAlta: DateTime(2024, 1, 8),

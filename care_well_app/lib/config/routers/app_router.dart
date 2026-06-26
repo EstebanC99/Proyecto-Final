@@ -121,7 +121,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 name: AppRoutes.dependentDetailName,
                 builder: (_, state) => DependentDetailScreen(
-                  dependentId: int.parse(state.pathParameters['id']!),
+                  asignacionId: int.parse(state.pathParameters['id']!),
                 ),
                 routes: [
                   GoRoute(

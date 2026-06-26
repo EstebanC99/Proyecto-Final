@@ -20,29 +20,29 @@ namespace CareWell.Domain.General
 
         public virtual string? ImagenPath { get; private set; }
 
-        public virtual void Crear(CrearPersona crearPersona)
+        public virtual void CrearModificar(CrearModificarPersona crearModificarPersona)
         {
-            if (string.IsNullOrEmpty(crearPersona.Nombre))
+            if (string.IsNullOrEmpty(crearModificarPersona.Nombre))
                 throw new ValidacionDominioException(Mensajes.NombreRequerido);
 
-            if (string.IsNullOrEmpty(crearPersona.Apellido))
+            if (string.IsNullOrEmpty(crearModificarPersona.Apellido))
                 throw new ValidacionDominioException(Mensajes.ApellidoRequerido);
 
-            if (string.IsNullOrEmpty(crearPersona.Documento))
+            if (string.IsNullOrEmpty(crearModificarPersona.Documento))
                 throw new ValidacionDominioException(Mensajes.DocumentoRequerido);
 
-            if (crearPersona.FechaNacimiento == default)
+            if (crearModificarPersona.FechaNacimiento == default)
                 throw new ValidacionDominioException(Mensajes.FechaNacimientoRequerida);
 
-            this.Nombre = crearPersona.Nombre;
-            this.Apellido = crearPersona.Apellido;
-            this.Documento = crearPersona.Documento;
-            this.FechaNacimiento = crearPersona.FechaNacimiento;
-            this.Email = crearPersona.Email;
-            this.Telefono = crearPersona.Telefono;
+            this.Nombre = crearModificarPersona.Nombre;
+            this.Apellido = crearModificarPersona.Apellido;
+            this.Documento = crearModificarPersona.Documento;
+            this.FechaNacimiento = crearModificarPersona.FechaNacimiento;
+            this.Email = crearModificarPersona.Email;
+            this.Telefono = crearModificarPersona.Telefono;
         }
 
-        public virtual void CrearDesdeCuenta(CrearPersona crearPersona)
+        public virtual void CrearDesdeCuenta(CrearModificarPersona crearPersona)
         {
             if (string.IsNullOrEmpty(crearPersona.Email))
                 throw new ValidacionDominioException(Mensajes.EmailRequerido);
@@ -50,7 +50,7 @@ namespace CareWell.Domain.General
             if (string.IsNullOrEmpty(crearPersona.Telefono))
                 throw new ValidacionDominioException(Mensajes.TelefonoRequerido);
 
-            this.Crear(crearPersona);
+            this.CrearModificar(crearPersona);
         }
     }
 }

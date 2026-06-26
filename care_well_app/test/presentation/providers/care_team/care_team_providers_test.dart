@@ -8,12 +8,20 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
@@ -21,13 +29,15 @@ final _personaCarlos = Persona(
   id: 3,
   nombre: 'Carlos',
   apellido: 'Pérez',
+  documento: '30000003',
+  fechaNacimiento: DateTime(1985, 3, 15),
   email: 'carlos@test.com',
 );
 
 AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
   id: 401,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
+  colaborador: _personaMaria,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),
@@ -36,7 +46,7 @@ AsignacionCuidado _asignacionMaria() => AsignacionCuidado(
 AsignacionCuidado _asignacionCarlos() => AsignacionCuidado(
   id: 402,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaCarlos,
+  colaborador: _personaCarlos,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 10),
@@ -90,7 +100,7 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
       // El usuario demo (María, id=1) es el colaborador de sus asignaciones.
-      _asignaciones.where((a) => a.personaColaborador.id == 1).toList();
+      _asignaciones.where((a) => a.colaborador.id == 1).toList();
 
   @override
   Future<void> crearPersonaCargo({
@@ -102,6 +112,10 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     String? telefono,
     List<int> permisosCuidadoIds = const [],
   }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
@@ -114,9 +128,8 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => _asignaciones
-      .where((a) => a.personaColaborador.id == colaboradorId)
-      .toList();
+  ) async =>
+      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
@@ -130,7 +143,7 @@ class _FakeCareTeamRepository implements CareTeamRepository {
     final nueva = AsignacionCuidado(
       id: _nextId++,
       personaCuidada: a.personaCuidada,
-      personaColaborador: a.personaColaborador,
+      colaborador: a.colaborador,
       rol: a.rol,
       estado: a.estado,
       fechaAlta: a.fechaAlta,
@@ -386,20 +399,6 @@ void main() {
     });
   });
 
-  group('labelDePermiso', () {
-    test('retorna etiqueta para codigoVerFichaSalud', () {
-      expect(labelDePermiso(codigoVerFichaSalud), isNotEmpty);
-    });
-
-    test('retorna descripcion del CodigoPermiso', () {
-      final container = _buildContainer();
-      addTearDown(container.dispose);
-      for (final codigo in container.read(availablePermisosProvider)) {
-        expect(labelDePermiso(codigo), isNotEmpty);
-      }
-    });
-  });
-
   group('esContextoPropioProvider', () {
     test(
       'retorna true cuando selectedPersonaId coincide con el id del usuario',
@@ -489,7 +488,12 @@ void main() {
       await expectLater(
         actualizarFn(
           asignacion: _asignacionCarlos(),
-          permisosActivos: [codigoVerFichaSalud],
+          permisosActivos: [
+            PermisoCuidado(
+              id: PermisosCuidadoConst.verFichaSalud,
+              descripcion: 'Ver ficha de salud',
+            ),
+          ],
         ),
         completes,
       );

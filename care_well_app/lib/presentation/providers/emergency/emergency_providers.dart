@@ -55,7 +55,7 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
 
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo.id == PermisosCuidadoConst.activarEmergencia,
+    (p) => p.id == PermisosCuidadoConst.activarEmergencia,
   );
 });
 

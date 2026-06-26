@@ -49,13 +49,13 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     _permisos = {};
   }
 
-  Map<int, bool> _permisosDefault(List<CodigoPermiso> codigos) {
+  Map<int, bool> _permisosDefault(List<PermisoCuidado> permisos) {
     if (_esResponsable) {
-      return {for (final c in codigos) c.id: true};
+      return {for (final c in permisos) c.id: true};
     } else {
       // Cuidador: solo verFichaSalud y gestionarAgenda ON por defecto.
       return {
-        for (final c in codigos)
+        for (final c in permisos)
           c.id:
               c.id == PermisosCuidadoConst.verFichaSalud ||
               c.id == PermisosCuidadoConst.gestionarAgenda,
@@ -276,14 +276,14 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
                   // Filas de permisos
                   ...todosLosCodigos.asMap().entries.map((entry) {
                     final i = entry.key;
-                    final codigo = entry.value;
+                    final permiso = entry.value;
                     return Column(
                       children: [
                         PermissionToggleRow(
-                          label: labelDePermiso(codigo),
-                          value: _permisos[codigo.id] ?? false,
+                          label: permiso.descripcion,
+                          value: _permisos[permiso.id] ?? false,
                           onChanged: (v) =>
-                              setState(() => _permisos[codigo.id] = v),
+                              setState(() => _permisos[permiso.id] = v),
                         ),
                         if (i < todosLosCodigos.length - 1)
                           const Divider(

@@ -16,7 +16,8 @@ final _usuarioDemo = Usuario(
     id: 1,
     nombre: 'Test',
     apellido: 'User',
-    email: 'test@example.com',
+    documento: '1231241',
+    fechaNacimiento: DateTime.now()
   ),
   contrasena: 'hash123',
   estado: estadoUsuarioActivo,

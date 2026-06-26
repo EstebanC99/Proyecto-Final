@@ -1,15 +1,24 @@
+import 'package:care_well_app/domain/datasources/asignacion_cuidado_datasource.dart';
+import 'package:care_well_app/domain/entities/care_team/asignacion_cuidado.dart';
+import 'package:care_well_app/domain/entities/shared/persona.dart';
+import 'package:care_well_app/infrastructure/http/api_config.dart';
+import 'package:care_well_app/infrastructure/http/api_exception_mapper.dart';
+import 'package:care_well_app/infrastructure/mappers/care_team/asignacion_cuidado_mapper.dart';
+import 'package:care_well_app/infrastructure/models/care_team/asignacion_cuidado_model.dart';
 import 'package:dio/dio.dart';
-
-import '../../../domain/datasources/datasources.dart';
-import '../../../domain/entities/entities.dart';
-import '../../http/http_configs.dart';
-import '../../mappers/mappers.dart';
-import '../../models/models.dart';
 
 class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   final Dio _dio;
 
   ApiAsignacionCuidadoDatasource(this._dio);
+
+  List<AsignacionCuidadoModel> _jsonToAsignacionesCuidadoModel(
+    List<dynamic> json,
+  ) {
+    return json
+        .map((e) => AsignacionCuidadoModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 
   @override
   Future<void> crearPersonaCargo({
@@ -19,7 +28,6 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
-    List<int> permisosCuidadoIds = const [],
   }) async {
     try {
       await _dio.post(
@@ -31,9 +39,32 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
           'fechaNacimiento': fechaNacimiento.toIso8601String(),
           'email': email ?? '',
           'telefono': telefono ?? '',
-          'permisosCuidadoIds': permisosCuidadoIds,
         },
       );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
+  Future<Persona> modificarPersonaCargo(
+    int asignacionId,
+    Persona persona,
+  ) async {
+    try {
+      await _dio.post(
+        ApiConfig.modificarPersonaCargoPath,
+        data: {
+          'asignacionCuidadoId': asignacionId,
+          'nombre': persona.nombre,
+          'apellido': persona.apellido,
+          'documento': persona.documento,
+          'fechaNacimiento': persona.fechaNacimiento.toIso8601String(),
+          'email': persona.email ?? '',
+          'telefono': persona.telefono ?? '',
+        },
+      );
+      return persona;
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
     }
@@ -43,13 +74,13 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async {
     try {
       final response = await _dio.get(ApiConfig.obtenerMisAsignacionesPath);
-      final list = response.data as List<dynamic>;
-      return list
-          .map(
-            (e) => AsignacionCuidadoApiMapper.fromModel(
-              AsignacionCuidadoApiModel.fromJson(e as Map<String, dynamic>),
-            ),
-          )
+
+      final asignacionesModel = _jsonToAsignacionesCuidadoModel(
+        response.data as List<dynamic>,
+      );
+
+      return asignacionesModel
+          .map((e) => AsignacionCuidadoMapper.fromModel(e))
           .toList();
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);

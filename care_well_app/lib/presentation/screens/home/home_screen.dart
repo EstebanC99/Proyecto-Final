@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -150,7 +151,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildDependentsTile(
     BuildContext context,
     WidgetRef ref,
-    AsyncValue<List<dynamic>> dependentsAsync,
+    AsyncValue<List<AsignacionCuidado>> dependentsAsync,
   ) {
     return dependentsAsync.when(
       loading: () => const NavTileSkeleton(),

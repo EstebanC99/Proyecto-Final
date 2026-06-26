@@ -1,8 +1,11 @@
 export 'agenda/agenda_models.dart';
+export 'auth/estado_usuario_model.dart';
 export 'auth/login_response.dart';
 export 'auth/usuario_model.dart';
-export 'auth/estado_usuario_model.dart';
-export 'care_team/care_team_models.dart';
+export 'care_team/asignacion_cuidado_model.dart';
+export 'care_team/estado_asignacion_cuidado_model.dart';
+export 'care_team/permiso_cuidado_model.dart';
+export 'care_team/rol_cuidado_model.dart';
 export 'emergency/emergencia_model.dart';
 export 'health/health_models.dart';
 export 'settings/configuracion_model.dart';

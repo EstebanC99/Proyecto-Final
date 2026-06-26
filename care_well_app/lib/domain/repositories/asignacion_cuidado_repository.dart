@@ -1,10 +1,6 @@
 import '../entities/entities.dart';
 
-/// Contrato de repositorio para las operaciones de [AsignacionCuidado]
-/// que involucran al usuario logueado como colaborador.
 abstract class AsignacionCuidadoRepository {
-  /// Crea una persona a cargo y la vincula al usuario logueado como Responsable
-  /// en una sola operación atómica.
   Future<void> crearPersonaCargo({
     required String nombre,
     required String apellido,
@@ -12,10 +8,13 @@ abstract class AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
-    List<int> permisosCuidadoIds = const [],
   });
 
-  /// Retorna todas las [AsignacionCuidado] donde el usuario logueado
-  /// figura como colaborador (responsable o cuidador).
+  /// Modifica los datos de la persona cuidada identificada por [asignacionId].
+  ///
+  /// El backend valida los permisos del usuario logueado sobre la asignación
+  /// antes de aplicar los cambios. Retorna la [Persona] actualizada.
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona);
+
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado();
 }

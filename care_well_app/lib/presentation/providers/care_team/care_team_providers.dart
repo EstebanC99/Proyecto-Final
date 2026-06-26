@@ -43,14 +43,16 @@ final personasSeleccionablesProvider =
           rol: PersonaContextRol.propio,
         ),
         ...comoResponsable.map(
-          (p) => PersonaContextOption(
-            persona: p,
+          (a) => PersonaContextOption(
+            persona: a.personaCuidada,
             rol: PersonaContextRol.responsable,
           ),
         ),
         ...comoCuidador.map(
-          (p) =>
-              PersonaContextOption(persona: p, rol: PersonaContextRol.cuidador),
+          (a) => PersonaContextOption(
+            persona: a.personaCuidada,
+            rol: PersonaContextRol.cuidador,
+          ),
         ),
       ];
     });
@@ -113,47 +115,39 @@ final assignmentByIdProvider = FutureProvider.family<AsignacionCuidado?, int>((
 ///
 /// Lista estática que reemplaza el antiguo [CodigoPermiso.values] del enum.
 final _todosCodigos = [
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.verFichaSalud,
     descripcion: 'Ver ficha de salud',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.editarFichaSalud,
     descripcion: 'Editar ficha de salud',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.gestionarAgenda,
     descripcion: 'Gestionar agenda',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.registrarEventosSalud,
     descripcion: 'Registrar eventos de salud',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.registrarHabitos,
     descripcion: 'Registrar hábitos de vida',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.activarEmergencia,
     descripcion: 'Activar emergencia',
   ),
-  CodigoPermiso(
+  PermisoCuidado(
     id: PermisosCuidadoConst.administrarEquipo,
     descripcion: 'Administrar equipo de cuidado',
   ),
 ];
 
-final availablePermisosProvider = Provider<List<CodigoPermiso>>(
+final availablePermisosProvider = Provider<List<PermisoCuidado>>(
   (ref) => _todosCodigos,
 );
-
-// ─── Etiquetas de permisos ────────────────────────────────────────────────────
-
-/// Retorna la etiqueta legible de un [CodigoPermiso].
-///
-/// Delega en la descripción de la entidad catálogo.
-String labelDePermiso(CodigoPermiso codigo) => codigo.descripcion;
-
 // ─── Acciones mutadoras ───────────────────────────────────────────────────────
 
 /// Agrega un nuevo miembro al equipo de cuidado de la persona de contexto.
@@ -166,7 +160,7 @@ final crearMiembroProvider =
       Future<AsignacionCuidado> Function({
         required int personaCuidadaId,
         required String email,
-        required List<CodigoPermiso> permisos,
+        required List<PermisoCuidado> permisos,
         required RolCuidado rolNombre,
       })
     >((ref) {
@@ -191,7 +185,8 @@ final crearMiembroProvider =
               id: 0,
               nombre: email.split('@').first,
               apellido: '',
-              email: email,
+              documento: '',
+              fechaNacimiento: DateTime.now(),
             ),
           );
         }
@@ -201,11 +196,10 @@ final crearMiembroProvider =
         final rol = roles.firstWhere((r) => r.id == rolNombre.id);
 
         // Construir permisos con los códigos seleccionados.
-        final permisosSeleccionados = permisos.map((codigo) {
-          return Permiso(
-            id: 0,
-            codigo: codigo,
-            descripcion: labelDePermiso(codigo),
+        final permisosSeleccionados = permisos.map((permiso) {
+          return PermisoCuidado(
+            id: permiso.id,
+            descripcion: permiso.descripcion,
           );
         }).toList();
 
@@ -215,9 +209,9 @@ final crearMiembroProvider =
           AsignacionCuidado(
             id: 0,
             personaCuidada: personaCuidada,
-            personaColaborador: colaborador,
+            colaborador: colaborador,
             rol: rol,
-            estado: EstadoAsignacion(
+            estado: EstadoAsignacionCuidado(
               id: EstadosAsignacionConst.activa,
               descripcion: 'Activa',
             ),
@@ -238,23 +232,19 @@ final actualizarPermisosProvider =
     Provider<
       Future<void> Function({
         required AsignacionCuidado asignacion,
-        required List<CodigoPermiso> permisosActivos,
+        required List<PermisoCuidado> permisosActivos,
       })
     >((ref) {
       return ({required asignacion, required permisosActivos}) async {
         final repo = ref.read(careTeamRepositoryProvider);
 
-        final nuevosPermisos = permisosActivos.map((codigo) {
+        final nuevosPermisos = permisosActivos.map((permiso) {
           // Reusar el permiso existente si ya estaba, o crear uno nuevo.
           final existente = asignacion.permisos
-              .where((p) => p.codigo.id == codigo.id)
+              .where((p) => p.id == permiso.id)
               .firstOrNull;
           return existente ??
-              Permiso(
-                id: 0,
-                codigo: codigo,
-                descripcion: labelDePermiso(codigo),
-              );
+              PermisoCuidado(id: permiso.id, descripcion: permiso.descripcion);
         }).toList();
 
         final asignacionActualizada = asignacion.copyWith(
@@ -312,7 +302,7 @@ final esResponsableProvider = FutureProvider<bool>((ref) async {
   );
   return asignaciones.any(
     (a) =>
-        a.personaColaborador.id == usuario.persona.id &&
+        a.colaborador.id == usuario.persona.id &&
         a.rol.id == RolesCuidadoConst.responsable &&
         a.estado.id == EstadosAsignacionConst.activa,
   );

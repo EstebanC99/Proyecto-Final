@@ -14,6 +14,8 @@ final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
@@ -56,6 +58,10 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     String? telefono,
     List<int> permisosCuidadoIds = const [],
   }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {

@@ -9,28 +9,35 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
 final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
   apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
   email: 'maria@test.com',
 );
 
 final _permisosResponsable = [
-  Permiso(
-    id: 301,
-    codigo: codigoGestionarAgenda,
+  PermisoCuidado(
+    id: PermisosCuidadoConst.gestionarAgenda,
     descripcion: 'Gestionar agenda',
   ),
 ];
 
-AsignacionCuidado _asignacionMaria({List<Permiso>? permisos}) =>
+AsignacionCuidado _asignacionMaria({List<PermisoCuidado>? permisos}) =>
     AsignacionCuidado(
       id: 401,
       personaCuidada: _personaAlicia,
-      personaColaborador: _personaMaria,
+      colaborador: _personaMaria,
       rol: rolCuidadoResponsable,
       estado: estadoAsignacionActiva,
       fechaAlta: DateTime(2024, 1, 8),
@@ -54,9 +61,8 @@ class _FakeCareTeamRepository implements CareTeamRepository {
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
     int colaboradorId,
-  ) async => _asignaciones
-      .where((a) => a.personaColaborador.id == colaboradorId)
-      .toList();
+  ) async =>
+      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
 
   @override
   Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
@@ -218,7 +224,7 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
 
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
-      _asignaciones.where((a) => a.personaColaborador.id == 1).toList();
+      _asignaciones.where((a) => a.colaborador.id == 1).toList();
 
   @override
   Future<void> crearPersonaCargo({
@@ -230,6 +236,10 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     String? telefono,
     List<int> permisosCuidadoIds = const [],
   }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -335,7 +345,7 @@ void main() {
       final asignacionSinPermiso = AsignacionCuidado(
         id: 402,
         personaCuidada: _personaAlicia,
-        personaColaborador: _personaMaria,
+        colaborador: _personaMaria,
         rol: rolCuidadoCuidador,
         estado: estadoAsignacionActiva,
         fechaAlta: DateTime(2024, 1, 8),

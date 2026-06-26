@@ -9,14 +9,26 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../_fakes/fake_notification_scheduler.dart';
 import '../../../_fakes/test_fixtures.dart';
 
-final _personaAlicia = Persona(id: 2, nombre: 'Alicia', apellido: 'Rodríguez');
+final _personaAlicia = Persona(
+  id: 2,
+  nombre: 'Alicia',
+  apellido: 'Rodríguez',
+  documento: '5234100',
+  fechaNacimiento: DateTime(1943, 7, 22),
+);
 
-final _personaMaria = Persona(id: 1, nombre: 'María', apellido: 'García');
+final _personaMaria = Persona(
+  id: 1,
+  nombre: 'María',
+  apellido: 'García',
+  documento: '28000001',
+  fechaNacimiento: DateTime(1990, 1, 1),
+);
 
 final _asignacion = AsignacionCuidado(
   id: 401,
   personaCuidada: _personaAlicia,
-  personaColaborador: _personaMaria,
+  colaborador: _personaMaria,
   rol: rolCuidadoResponsable,
   estado: estadoAsignacionActiva,
   fechaAlta: DateTime(2024, 1, 8),

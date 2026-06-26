@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EmergenciaMapper', () {
-    final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez');
+    final persona = Persona(id: 1, nombre: 'Alicia', apellido: 'Rodríguez', documento: "123123", fechaNacimiento: DateTime.now());
 
     final emergencia = Emergencia(
       id: 1,

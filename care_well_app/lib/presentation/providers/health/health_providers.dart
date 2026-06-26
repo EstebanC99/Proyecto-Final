@@ -46,7 +46,7 @@ final puedeVerSaludProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo.id == PermisosCuidadoConst.verFichaSalud,
+    (p) => p.id == PermisosCuidadoConst.verFichaSalud,
   );
 });
 
@@ -60,7 +60,7 @@ final puedeRegistrarEventosSaludProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo.id == PermisosCuidadoConst.registrarEventosSalud,
+    (p) => p.id == PermisosCuidadoConst.registrarEventosSalud,
   );
 });
 
@@ -74,7 +74,7 @@ final puedeRegistrarHabitosProvider = FutureProvider<bool>((ref) async {
   final asignacion = await _asignacionActivaDelUsuario(ref);
   if (asignacion == null) return false;
   return asignacion.permisos.any(
-    (p) => p.codigo.id == PermisosCuidadoConst.registrarHabitos,
+    (p) => p.id == PermisosCuidadoConst.registrarHabitos,
   );
 });
 
