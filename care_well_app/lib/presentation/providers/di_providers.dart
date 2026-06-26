@@ -55,7 +55,6 @@ final personaDatasourceProvider = Provider<PersonaDatasource>((ref) {
 
 final asignacionCuidadoDatasourceProvider =
     Provider<AsignacionCuidadoDatasource>((ref) {
-      if (_useDemo) return DemoAsignacionCuidadoDatasource();
       return ApiAsignacionCuidadoDatasource(ref.watch(dioClientProvider));
     });
 

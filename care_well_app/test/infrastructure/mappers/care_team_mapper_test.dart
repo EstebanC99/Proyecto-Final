@@ -32,8 +32,9 @@ void main() {
   // mapper (model→entity) del parsing JSON, cuya responsabilidad corresponde
   // al test del modelo. La construcción directa evita el bug de inferencia de
   // tipo en AsignacionCuidadoModel.fromJson (ver nota al arquitecto).
-  AsignacionCuidadoModel _buildAsignacionModel({
+  AsignacionCuidadoModel buildAsignacionModel({
     List<PermisoCuidadoModel> permisos = const [],
+    String? fechaEliminacion,
   }) => AsignacionCuidadoModel(
     id: 1,
     persona: PersonaModel.fromJson(personaJson),
@@ -44,6 +45,7 @@ void main() {
       'descripcion': 'Activa',
     }),
     fechaAlta: '2025-01-10T00:00:00',
+    fechaEliminacion: fechaEliminacion,
     permisos: permisos,
   );
 
@@ -69,7 +71,7 @@ void main() {
 
   group('AsignacionCuidadoMapper', () {
     test('model → entity mapea todos los campos', () {
-      final model = _buildAsignacionModel();
+      final model = buildAsignacionModel();
       final entity = AsignacionCuidadoMapper.fromModel(model);
 
       expect(entity.id, 1);
@@ -84,8 +86,22 @@ void main() {
       expect(entity.fechaAlta, DateTime(2025, 1, 10));
     });
 
+    test('fechaEliminacion ausente mapea a null', () {
+      final model = buildAsignacionModel();
+      final entity = AsignacionCuidadoMapper.fromModel(model);
+      expect(entity.fechaEliminacion, isNull);
+    });
+
+    test('fechaEliminacion presente se parsea a DateTime', () {
+      final model = buildAsignacionModel(
+        fechaEliminacion: '2025-02-20T00:00:00',
+      );
+      final entity = AsignacionCuidadoMapper.fromModel(model);
+      expect(entity.fechaEliminacion, DateTime(2025, 2, 20));
+    });
+
     test('permisos se mapean correctamente', () {
-      final model = _buildAsignacionModel(
+      final model = buildAsignacionModel(
         permisos: [PermisoCuidadoModel(id: 2, descripcion: 'Ver agenda')],
       );
       final entity = AsignacionCuidadoMapper.fromModel(model);
@@ -97,19 +113,19 @@ void main() {
     });
 
     test('permisos vacíos produce lista vacía', () {
-      final model = _buildAsignacionModel();
+      final model = buildAsignacionModel();
       final entity = AsignacionCuidadoMapper.fromModel(model);
       expect(entity.permisos, isEmpty);
     });
 
     test('entity es de tipo AsignacionCuidado', () {
-      final model = _buildAsignacionModel();
+      final model = buildAsignacionModel();
       final entity = AsignacionCuidadoMapper.fromModel(model);
       expect(entity, isA<AsignacionCuidado>());
     });
 
     test('personaCuidada y colaborador son entidades Persona', () {
-      final model = _buildAsignacionModel();
+      final model = buildAsignacionModel();
       final entity = AsignacionCuidadoMapper.fromModel(model);
       expect(entity.personaCuidada, isA<Persona>());
       expect(entity.colaborador, isA<Persona>());

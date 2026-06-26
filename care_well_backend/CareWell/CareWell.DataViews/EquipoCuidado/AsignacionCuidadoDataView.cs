@@ -15,5 +15,7 @@ namespace CareWell.DataViews.EquipoCuidado
         public DateTime FechaAlta { get; set; }
 
         public List<BaseEntityDataView> Permisos { get; set; }
+
+        public DateTime? FechaEliminacion { get; set; }
     }
 }

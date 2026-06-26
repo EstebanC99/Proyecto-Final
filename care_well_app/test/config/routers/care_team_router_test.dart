@@ -2,6 +2,7 @@ import 'package:care_well_app/config/routers/app_router.dart';
 import 'package:care_well_app/config/routers/app_routes.dart';
 import 'package:care_well_app/config/theme/theme.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/screens/screens.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +19,41 @@ final _usuarioDemo = Usuario(
     nombre: 'Test',
     apellido: 'User',
     documento: '123123',
-    fechaNacimiento: DateTime.now()
+    fechaNacimiento: DateTime.now(),
   ),
   contrasena: 'hash123',
   estado: estadoUsuarioActivo,
 );
+
+/// Fake de [AsignacionCuidadoRepository] que resuelve al instante.
+///
+/// Evita que [HomeScreen] (montada por el shell del router) dispare la llamada
+/// real a la API y deje `pumpAndSettle` colgado.
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      [];
+
+  @override
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+  }) async {}
+
+  @override
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) async {}
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) async {}
+}
 
 /// Construye un [ProviderContainer] con sesión autenticada.
 ProviderContainer _containerAutenticado() {
@@ -32,6 +63,9 @@ ProviderContainer _containerAutenticado() {
         (ref) =>
             AuthNotifier(ref.watch(authRepositoryProvider))
               ..state = AsyncValue.data(_usuarioDemo),
+      ),
+      asignacionCuidadoRepositoryProvider.overrideWithValue(
+        _FakeAsignacionCuidadoRepository(),
       ),
     ],
   );

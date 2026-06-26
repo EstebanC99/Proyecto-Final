@@ -1,6 +1,4 @@
-// Barrel raíz de todas las entidades de dominio.
-// Importar este archivo otorga acceso a todas las entidades de la app.
-export '../global/global.dart';
+export '../global/global_const.dart';
 export 'agenda/evento_agenda.dart';
 export 'agenda/recordatorio.dart';
 export 'auth/estado_usuario.dart';

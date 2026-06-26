@@ -29,6 +29,7 @@ class ConfirmDialog extends StatefulWidget {
     required this.confirmLabel,
     required this.onConfirm,
     this.icon,
+    this.accentColor = AppColors.error,
   });
 
   /// Título del diálogo.
@@ -46,6 +47,13 @@ class ConfirmDialog extends StatefulWidget {
   /// Ícono opcional. Por defecto [Icons.person_remove_outlined].
   final IconData? icon;
 
+  /// Color de acento del ícono y del botón de confirmación.
+  ///
+  /// Por defecto [AppColors.error] (variante destructiva). Para acciones no
+  /// destructivas (p. ej. reactivar) pasar un color positivo como
+  /// [AppColors.primary] o [AppColors.success].
+  final Color accentColor;
+
   /// Muestra el diálogo y retorna `true` si el usuario confirmó la acción.
   static Future<bool> show(
     BuildContext context, {
@@ -54,6 +62,7 @@ class ConfirmDialog extends StatefulWidget {
     required String confirmLabel,
     required Future<void> Function() onConfirm,
     IconData? icon,
+    Color accentColor = AppColors.error,
   }) async {
     final result = await showDialog<bool>(
       context: context,
@@ -64,6 +73,7 @@ class ConfirmDialog extends StatefulWidget {
         confirmLabel: confirmLabel,
         onConfirm: onConfirm,
         icon: icon,
+        accentColor: accentColor,
       ),
     );
     return result ?? false;
@@ -100,7 +110,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
           Icon(
             widget.icon ?? Icons.person_remove_outlined,
             size: 48,
-            color: AppColors.error,
+            color: widget.accentColor,
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
@@ -130,7 +140,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             child: FilledButton(
               onPressed: _loading ? null : _handleConfirm,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.error,
+                backgroundColor: widget.accentColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),

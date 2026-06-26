@@ -116,6 +116,14 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   @override
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
       throw UnimplementedError();
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {

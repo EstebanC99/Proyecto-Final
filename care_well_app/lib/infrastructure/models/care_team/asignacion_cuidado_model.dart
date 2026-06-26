@@ -7,6 +7,7 @@ class AsignacionCuidadoModel {
   final RolCuidadoModel rol;
   final EstadoAsignacionCuidadoModel estado;
   final String fechaAlta;
+  final String? fechaEliminacion;
   final List<PermisoCuidadoModel> permisos;
 
   const AsignacionCuidadoModel({
@@ -16,6 +17,7 @@ class AsignacionCuidadoModel {
     required this.rol,
     required this.estado,
     required this.fechaAlta,
+    this.fechaEliminacion,
     this.permisos = const [],
   });
 
@@ -29,6 +31,7 @@ class AsignacionCuidadoModel {
       rol: RolCuidadoModel.fromJson(json['rol']),
       estado: EstadoAsignacionCuidadoModel.fromJson(json['estado']),
       fechaAlta: json['fechaAlta'],
+      fechaEliminacion: json['fechaEliminacion'] as String?,
       permisos: permisosList
           .map((e) => PermisoCuidadoModel.fromJson(e))
           .toList(),

@@ -11,6 +11,9 @@ class AsignacionCuidadoMapper {
       rol: RolCuidadoMapper.fromModel(model.rol),
       estado: EstadoAsignacionCuidadoMapper.fromModel(model.estado),
       fechaAlta: DateTime.parse(model.fechaAlta),
+      fechaEliminacion: model.fechaEliminacion == null
+          ? null
+          : DateTime.parse(model.fechaEliminacion!),
       permisos: model.permisos
           .map((p) => PermisoCuidadoMapper.fromModel(p))
           .toList(),

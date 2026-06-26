@@ -10,11 +10,11 @@ abstract class AsignacionCuidadoDatasource {
     String? telefono,
   });
 
-  /// Modifica los datos de la persona cuidada identificada por [asignacionId].
-  ///
-  /// El backend valida los permisos del usuario logueado sobre la asignación
-  /// antes de aplicar los cambios. Retorna la [Persona] actualizada.
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona);
 
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado();
+
+  Future<void> eliminarAsignacion(int asignacionId);
+
+  Future<void> reactivarAsignacion(int asignacionId);
 }

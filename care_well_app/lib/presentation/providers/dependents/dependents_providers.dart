@@ -1,8 +1,7 @@
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/presentation/providers/auth/auth_providers.dart';
+import 'package:care_well_app/presentation/providers/di_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../domain/entities/entities.dart';
-import '../di_providers.dart';
-import '../auth/auth_providers.dart';
 
 // ─── Provider base ────────────────────────────────────────────────────────────
 
@@ -18,35 +17,45 @@ final misAsignacionesProvider = FutureProvider<List<AsignacionCuidado>>((
 
 // ─── Providers derivados ──────────────────────────────────────────────────────
 
-/// Asignaciones donde el usuario actúa como Responsable (activas o pendientes).
-final dependentsAsResponsableProvider = FutureProvider<List<AsignacionCuidado>>(
-  (ref) async {
-    final todas = await ref.watch(misAsignacionesProvider.future);
-    return todas
-        .where(
-          (a) =>
-              a.rol.id == RolesCuidadoConst.responsable &&
-              a.estado.id != EstadosAsignacionConst.inactiva,
-        )
-        .toList();
-  },
-);
+final activeAssignmentsAsResponsableProvider =
+    FutureProvider<List<AsignacionCuidado>>((ref) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas
+          .where(
+            (a) =>
+                a.rol.id == RolesCuidadoConst.responsable &&
+                a.estado.id != EstadosAsignacionConst.inactiva,
+          )
+          .toList();
+    });
 
-/// Asignaciones donde el usuario actúa como Cuidador (activas o pendientes).
-final dependentsAsCuidadorProvider = FutureProvider<List<AsignacionCuidado>>((
+final activeAssignmentsAsCuidadorProvider =
+    FutureProvider<List<AsignacionCuidado>>((ref) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas
+          .where(
+            (a) =>
+                a.rol.id == RolesCuidadoConst.cuidador &&
+                a.estado.id != EstadosAsignacionConst.inactiva,
+          )
+          .toList();
+    });
+
+final assignmentsAsResponsableProvider =
+    FutureProvider<List<AsignacionCuidado>>((ref) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas
+          .where((a) => a.rol.id == RolesCuidadoConst.responsable)
+          .toList();
+    });
+
+final assignmentsAsCuidadorProvider = FutureProvider<List<AsignacionCuidado>>((
   ref,
 ) async {
   final todas = await ref.watch(misAsignacionesProvider.future);
-  return todas
-      .where(
-        (a) =>
-            a.rol.id == RolesCuidadoConst.cuidador &&
-            a.estado.id != EstadosAsignacionConst.inactiva,
-      )
-      .toList();
+  return todas.where((a) => a.rol.id == RolesCuidadoConst.cuidador).toList();
 });
 
-/// Asignación por ID, buscada en memoria (sin llamada al backend).
 final asignacionByIdProvider = FutureProvider.family<AsignacionCuidado, int>((
   ref,
   asignacionId,
@@ -103,9 +112,6 @@ final crearDependenteProvider =
     });
 
 /// Actualiza los datos de una persona a cargo existente.
-///
-/// Recibe el [asignacionId] para que el backend pueda validar los permisos
-/// del usuario logueado antes de aplicar los cambios.
 final actualizarDependenteProvider =
     Provider<Future<Persona> Function(int asignacionId, Persona persona)>((
       ref,
@@ -123,10 +129,24 @@ final actualizarDependenteProvider =
 
 /// Elimina una persona a cargo.
 final eliminarDependenteProvider =
-    Provider<Future<void> Function(int personaId)>((ref) {
-      return (personaId) async {
-        final repo = ref.read(personaRepositoryProvider);
-        await repo.eliminar(personaId);
+    Provider<Future<void> Function(int asignacionId)>((ref) {
+      return (asignacionId) async {
+        final repo = ref.read(asignacionCuidadoRepositoryProvider);
+
+        await repo.eliminarAsignacion(asignacionId);
+
+        ref.invalidate(misAsignacionesProvider);
+      };
+    });
+
+/// Reactiva una asignación previamente eliminada (dentro del plazo de gracia).
+final reactivarDependenteProvider =
+    Provider<Future<void> Function(int asignacionId)>((ref) {
+      return (asignacionId) async {
+        final repo = ref.read(asignacionCuidadoRepositoryProvider);
+
+        await repo.reactivarAsignacion(asignacionId);
+
         ref.invalidate(misAsignacionesProvider);
       };
     });

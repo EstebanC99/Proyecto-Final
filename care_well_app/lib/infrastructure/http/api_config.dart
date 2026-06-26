@@ -16,4 +16,8 @@ class ApiConfig {
       '/api/AdministrarPersonasCargo/modificar-persona-cargo';
   static const obtenerMisAsignacionesPath =
       '/api/AdministrarPersonasCargo/obtener-mis-asignaciones';
+  static const eliminarAsignacionPath =
+      '/api/AdministrarPersonasCargo/eliminar-asignacion';
+  static const reactivarAsignacionPath =
+      '/api/AdministrarPersonasCargo/reactivar-asignacion';
 }

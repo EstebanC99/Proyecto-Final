@@ -210,24 +210,27 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
     );
   }
 
-  Future<void> _confirmarEliminar(String nombreCompleto, int personaId) async {
+  Future<void> _confirmarEliminar(AsignacionCuidado asignacion) async {
+    var nombreCompletoPersona = asignacion.personaCuidada.nombreCompleto;
+
     final confirmo = await ConfirmDialog.show(
       context,
-      title: '¿Eliminar a $nombreCompleto?',
+      title: '¿Eliminar a $nombreCompletoPersona?',
       body:
-          '$nombreCompleto será eliminado de tu lista de personas a cargo. '
-          'Esta acción no se puede deshacer.',
+          '$nombreCompletoPersona será eliminado de tu lista de personas a cargo.'
+          'Esta acción no se puede deshacer pasado los 30 días.',
       confirmLabel: 'Eliminar',
       icon: Icons.delete_outline,
       onConfirm: () async {
         final eliminar = ref.read(eliminarDependenteProvider);
-        await eliminar(personaId);
+
+        await eliminar(asignacion.id);
       },
     );
     if (confirmo && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$nombreCompleto fue eliminado.'),
+          content: Text('$nombreCompletoPersona fue eliminado.'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -296,10 +299,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                 icon: const Icon(Icons.more_vert),
                 onSelected: (value) async {
                   if (value == 'eliminar') {
-                    await _confirmarEliminar(
-                      asignacion.personaCuidada.nombreCompleto,
-                      asignacion.personaCuidada.id,
-                    );
+                    await _confirmarEliminar(asignacion);
                   }
                 },
                 itemBuilder: (_) => [
@@ -310,7 +310,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                         Icon(Icons.delete_outline, color: AppColors.error),
                         SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Eliminar persona',
+                          'Eliminar asignación',
                           style: TextStyle(color: AppColors.error),
                         ),
                       ],

@@ -234,12 +234,17 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
-    List<int> permisosCuidadoIds = const [],
   }) async {}
 
   @override
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
       throw UnimplementedError();
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) async {}
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) async {}
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

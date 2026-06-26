@@ -21,7 +21,7 @@ namespace CareWell.Repository.EquipoCuidado
 
             return this.DbSet
                 .Where(a => a.Colaborador.ID == usuarioLogueado.Persona.ID
-                         && a.Estado.ID != EstadosAsignacionCuidado.Inactiva)
+                         && a.Estado.ID != EstadosAsignacionCuidado.Inactiva || (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.UtcNow.AddDays(-30)))
                 .Select(a => new AsignacionCuidadoDataView
                 {
                     ID = a.ID,
@@ -60,7 +60,8 @@ namespace CareWell.Repository.EquipoCuidado
                     {
                         ID = p.ID,
                         Descripcion = p.Descripcion
-                    }).ToList()
+                    }).ToList(),
+                    FechaEliminacion = a.FechaEliminacion
                 }).ToList();
         }
     }

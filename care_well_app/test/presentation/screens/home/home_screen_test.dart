@@ -114,9 +114,11 @@ Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
             AuthNotifier(ref.watch(authRepositoryProvider))
               ..login(_testUsuario.persona.email!, _testUsuario.contrasena),
       ),
-      // Sobrescribe dependentsAsResponsableProvider directamente para evitar el loading
+      // Sobrescribe assignmentsAsResponsableProvider directamente para evitar el loading
       // state, lo que evita que se monte NavTileSkeleton y sus timers infinitos.
-      dependentsAsResponsableProvider.overrideWith((ref) async => asignaciones),
+      activeAssignmentsAsResponsableProvider.overrideWith(
+        (ref) async => asignaciones,
+      ),
       // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
       ultimoEstadoAnimoProvider.overrideWith((ref) async => null),
     ],

@@ -86,4 +86,22 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) async {
+    try {
+      await _dio.post(ApiConfig.eliminarAsignacionPath, data: asignacionId);
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) async {
+    try {
+      await _dio.post(ApiConfig.reactivarAsignacionPath, data: asignacionId);
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
 }

@@ -2,7 +2,13 @@ import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final autor = Persona(id: 1, nombre: 'María', apellido: 'García', documento: "123123", fechaNacimiento: DateTime.now());
+  final autor = Persona(
+    id: 1,
+    nombre: 'María',
+    apellido: 'García',
+    documento: "123123",
+    fechaNacimiento: DateTime.now(),
+  );
 
   final nota = NotaEvento(
     id: 1301,

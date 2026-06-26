@@ -45,6 +45,17 @@ AsignacionCuidado _asignacionMariaPendiente() => AsignacionCuidado(
   fechaAlta: DateTime(2024, 6, 1),
 );
 
+/// Asignación en la que María es responsable de Alicia (inactiva/eliminada).
+AsignacionCuidado _asignacionMariaInactiva() => AsignacionCuidado(
+  id: 405,
+  personaCuidada: _personaAlicia,
+  colaborador: _personaMaria,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionInactiva,
+  fechaAlta: DateTime(2024, 1, 8),
+  fechaEliminacion: DateTime(2024, 9, 1),
+);
+
 /// Fake de [PersonaRepository] para tests de dependents.
 class _FakePersonaRepository implements PersonaRepository {
   final List<Persona> _personas;
@@ -106,7 +117,6 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
-    List<int> permisosCuidadoIds = const [],
   }) async {
     _asignaciones.add(
       AsignacionCuidado(
@@ -145,6 +155,24 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       fechaAlta: actual.fechaAlta,
     );
     return persona;
+  }
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) async {
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    _asignaciones[idx] = _asignaciones[idx].copyWith(
+      estado: estadoAsignacionInactiva,
+    );
+  }
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) async {
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    _asignaciones[idx] = _asignaciones[idx].copyWith(
+      estado: estadoAsignacionActiva,
+    );
   }
 }
 
@@ -243,7 +271,7 @@ ProviderContainer _buildContainer({
 }
 
 void main() {
-  group('dependentsAsResponsableProvider', () {
+  group('assignmentsAsResponsableProvider', () {
     test(
       'retorna asignaciones donde el usuario es Responsable activo',
       () async {
@@ -251,7 +279,7 @@ void main() {
         addTearDown(container.dispose);
 
         final asignaciones = await container.read(
-          dependentsAsResponsableProvider.future,
+          activeAssignmentsAsResponsableProvider.future,
         );
 
         expect(asignaciones, isNotEmpty);
@@ -264,7 +292,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        dependentsAsResponsableProvider.future,
+        activeAssignmentsAsResponsableProvider.future,
       );
 
       expect(asignaciones, isEmpty);
@@ -285,7 +313,7 @@ void main() {
         addTearDown(container.dispose);
 
         final asignaciones = await container.read(
-          dependentsAsResponsableProvider.future,
+          activeAssignmentsAsResponsableProvider.future,
         );
 
         expect(asignaciones, isEmpty);
@@ -299,15 +327,32 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        dependentsAsResponsableProvider.future,
+        activeAssignmentsAsResponsableProvider.future,
       );
 
       expect(asignaciones, isNotEmpty);
       expect(asignaciones.first.estado.id, estadoAsignacionPendiente.id);
     });
+
+    test('excluye asignaciones inactivas', () async {
+      final container = _buildContainer(
+        asignaciones: [
+          _asignacionMariaResponsable(),
+          _asignacionMariaInactiva(),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        activeAssignmentsAsResponsableProvider.future,
+      );
+
+      expect(asignaciones, hasLength(1));
+      expect(asignaciones.first.estado.id, estadoAsignacionActiva.id);
+    });
   });
 
-  group('dependentsAsCuidadorProvider', () {
+  group('assignmentsAsCuidadorProvider', () {
     test('retorna asignaciones donde el usuario es Cuidador activo', () async {
       final asignacionCuidador = AsignacionCuidado(
         id: 404,
@@ -321,7 +366,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        dependentsAsCuidadorProvider.future,
+        activeAssignmentsAsCuidadorProvider.future,
       );
 
       expect(asignaciones, isNotEmpty);
@@ -333,10 +378,76 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        dependentsAsCuidadorProvider.future,
+        activeAssignmentsAsCuidadorProvider.future,
       );
 
       expect(asignaciones, isEmpty);
+    });
+  });
+
+  group('dependentsListResponsableProvider', () {
+    test('incluye asignaciones inactivas (eliminadas)', () async {
+      final container = _buildContainer(
+        asignaciones: [
+          _asignacionMariaResponsable(),
+          _asignacionMariaInactiva(),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        assignmentsAsResponsableProvider.future,
+      );
+
+      expect(asignaciones, hasLength(2));
+      expect(
+        asignaciones.any((a) => a.estado.id == estadoAsignacionInactiva.id),
+        isTrue,
+      );
+    });
+
+    test('excluye asignaciones de rol Cuidador', () async {
+      final asignacionCuidador = AsignacionCuidado(
+        id: 406,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoCuidador,
+        estado: estadoAsignacionActiva,
+        fechaAlta: DateTime(2024, 1, 1),
+      );
+      final container = _buildContainer(asignaciones: [asignacionCuidador]);
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        assignmentsAsResponsableProvider.future,
+      );
+
+      expect(asignaciones, isEmpty);
+    });
+  });
+
+  group('dependentsListCuidadorProvider', () {
+    test('incluye asignaciones inactivas (eliminadas)', () async {
+      final asignacionCuidadorInactiva = AsignacionCuidado(
+        id: 407,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoCuidador,
+        estado: estadoAsignacionInactiva,
+        fechaAlta: DateTime(2024, 1, 1),
+        fechaEliminacion: DateTime(2024, 9, 1),
+      );
+      final container = _buildContainer(
+        asignaciones: [asignacionCuidadorInactiva],
+      );
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        assignmentsAsCuidadorProvider.future,
+      );
+
+      expect(asignaciones, hasLength(1));
+      expect(asignaciones.first.estado.id, estadoAsignacionInactiva.id);
     });
   });
 
@@ -428,7 +539,34 @@ void main() {
 
       final eliminarFn = container.read(eliminarDependenteProvider);
 
-      await expectLater(eliminarFn(_personaAlicia.id), completes);
+      await expectLater(eliminarFn(401), completes);
+    });
+  });
+
+  group('reactivarDependenteProvider', () {
+    test('reactiva la asignación sin lanzar excepción', () async {
+      final container = _buildContainer(
+        asignaciones: [_asignacionMariaInactiva()],
+      );
+      addTearDown(container.dispose);
+
+      final reactivarFn = container.read(reactivarDependenteProvider);
+
+      await expectLater(reactivarFn(405), completes);
+    });
+
+    test('tras reactivar, la asignación vuelve a estado activo', () async {
+      final container = _buildContainer(
+        asignaciones: [_asignacionMariaInactiva()],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(reactivarDependenteProvider)(405);
+
+      final asignaciones = await container.read(
+        assignmentsAsResponsableProvider.future,
+      );
+      expect(asignaciones.single.estado.id, estadoAsignacionActiva.id);
     });
   });
 }

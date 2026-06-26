@@ -11,6 +11,7 @@ class AsignacionCuidado extends BaseEntity {
   final RolCuidado rol;
   final EstadoAsignacionCuidado estado;
   final DateTime fechaAlta;
+  final DateTime? fechaEliminacion;
   final List<PermisoCuidado> permisos;
 
   const AsignacionCuidado({
@@ -20,6 +21,7 @@ class AsignacionCuidado extends BaseEntity {
     required this.rol,
     required this.estado,
     required this.fechaAlta,
+    this.fechaEliminacion,
     this.permisos = const [],
   });
 
@@ -31,6 +33,7 @@ class AsignacionCuidado extends BaseEntity {
     RolCuidado? rol,
     EstadoAsignacionCuidado? estado,
     DateTime? fechaAlta,
+    DateTime? fechaEliminacion,
     List<PermisoCuidado>? permisos,
   }) {
     return AsignacionCuidado(
@@ -40,6 +43,7 @@ class AsignacionCuidado extends BaseEntity {
       rol: rol ?? this.rol,
       estado: estado ?? this.estado,
       fechaAlta: fechaAlta ?? this.fechaAlta,
+      fechaEliminacion: fechaEliminacion ?? this.fechaEliminacion,
       permisos: permisos ?? this.permisos,
     );
   }

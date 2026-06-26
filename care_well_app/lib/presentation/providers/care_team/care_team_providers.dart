@@ -33,9 +33,11 @@ final personasSeleccionablesProvider =
       if (usuario == null) return [];
 
       final comoResponsable = await ref.watch(
-        dependentsAsResponsableProvider.future,
+        activeAssignmentsAsResponsableProvider.future,
       );
-      final comoCuidador = await ref.watch(dependentsAsCuidadorProvider.future);
+      final comoCuidador = await ref.watch(
+        activeAssignmentsAsCuidadorProvider.future,
+      );
 
       return [
         PersonaContextOption(

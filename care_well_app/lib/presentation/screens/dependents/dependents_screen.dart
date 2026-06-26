@@ -18,8 +18,8 @@ class DependentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final responsableAsync = ref.watch(dependentsAsResponsableProvider);
-    final cuidadorAsync = ref.watch(dependentsAsCuidadorProvider);
+    final responsableAsync = ref.watch(assignmentsAsResponsableProvider);
+    final cuidadorAsync = ref.watch(assignmentsAsCuidadorProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -48,14 +48,70 @@ class DependentsScreen extends ConsumerWidget {
   }
 }
 
-class _Body extends StatelessWidget {
+class _Body extends ConsumerWidget {
   const _Body({required this.responsableAsync, required this.cuidadorAsync});
 
   final AsyncValue<List<AsignacionCuidado>> responsableAsync;
   final AsyncValue<List<AsignacionCuidado>> cuidadorAsync;
 
+  /// Construye el callback de tap para una asignación según su estado y rol.
+  ///
+  /// - Inactiva + Responsable → confirma la reactivación.
+  /// - Inactiva + Cuidador → no interactiva (`null`).
+  /// - Activa o pendiente → navega al detalle.
+  VoidCallback? _onTapAsignacion(
+    BuildContext context,
+    WidgetRef ref,
+    AsignacionCuidado a,
+  ) {
+    final esInactiva = a.estado.id == EstadosAsignacionConst.inactiva;
+    if (esInactiva) {
+      if (a.rol.id == RolesCuidadoConst.responsable) {
+        return () => _confirmarReactivar(context, ref, a);
+      }
+      return null;
+    }
+    return () => context.pushNamed(
+      AppRoutes.dependentDetailName,
+      pathParameters: {'id': a.id.toString()},
+    );
+  }
+
+  /// Muestra el diálogo de confirmación y reactiva la asignación.
+  Future<void> _confirmarReactivar(
+    BuildContext context,
+    WidgetRef ref,
+    AsignacionCuidado asignacion,
+  ) async {
+    final nombre = asignacion.personaCuidada.nombreCompleto;
+
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: '¿Reactivar esta asignación?',
+      body:
+          '$nombre volverá a tu lista de personas a cargo y se '
+          'cancelará su baja definitiva.',
+      confirmLabel: 'Reactivar',
+      icon: Icons.restore,
+      accentColor: AppColors.primary,
+      onConfirm: () async {
+        final reactivar = ref.read(reactivarDependenteProvider);
+        await reactivar(asignacion.id);
+      },
+    );
+
+    if (confirmo && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$nombre fue reactivado.'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,10 +141,7 @@ class _Body extends StatelessWidget {
                     .map(
                       (a) => PersonCard(
                         asignacion: a,
-                        onTap: () => context.pushNamed(
-                          AppRoutes.dependentDetailName,
-                          pathParameters: {'id': a.id.toString()},
-                        ),
+                        onTap: _onTapAsignacion(context, ref, a),
                       ),
                     )
                     .toList(),
@@ -126,10 +179,7 @@ class _Body extends StatelessWidget {
                     .map(
                       (a) => PersonCard(
                         asignacion: a,
-                        onTap: () => context.pushNamed(
-                          AppRoutes.dependentDetailName,
-                          pathParameters: {'id': a.id.toString()},
-                        ),
+                        onTap: _onTapAsignacion(context, ref, a),
                       ),
                     )
                     .toList(),

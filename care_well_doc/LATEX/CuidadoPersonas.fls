@@ -1,8 +1,8 @@
-PWD d:/Projects/Proyecto-Final/care_well_doc/LATEX
+PWD D:/Projects/Proyecto-Final/care_well_doc/LATEX
 INPUT c:/texlive/2026/texmf.cnf
 INPUT c:/texlive/2026/texmf-dist/web2c/texmf.cnf
 INPUT c:/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT d:/Projects/Proyecto-Final/care_well_doc/LATEX/CuidadoPersonas.tex
+INPUT CuidadoPersonas.tex
 OUTPUT CuidadoPersonas.log
 INPUT c:/texlive/2026/texmf-dist/tex/latex/base/article.cls
 INPUT c:/texlive/2026/texmf-dist/tex/latex/base/article.cls

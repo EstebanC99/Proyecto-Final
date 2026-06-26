@@ -1,17 +1,17 @@
 # Fdb version 4
-["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1780950741.75058 0
-  "CuidadoPersonas.bcf" 1780950741 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
+["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1782483355.95853 0
+  "CuidadoPersonas.bcf" 1782483355 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
   "Recursos/Bibliografia.bib" 1780344302 2322 98b7398011f3cca573e23d5f73ba9047 ""
   (generated)
   "CuidadoPersonas.bbl"
   "CuidadoPersonas.blg"
   (rewritten before read)
-["pdflatex"] 1780950736.16583 "d:/Projects/Proyecto-Final/care_well_doc/LATEX/CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1780950741.75148 0
-  "CuidadoPersonas.aux" 1780950741 13444 fb1c55802ce4f950e9b6f0c1c0c59b81 "pdflatex"
+["pdflatex"] 1782483351.83962 "CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1782483355.95956 0
+  "CuidadoPersonas.aux" 1782483355 13444 61dfdf68453305f785ca98088fe22b91 "pdflatex"
   "CuidadoPersonas.bbl" 1780518397 14026 fbaeb0e5fc79189b15fe5b18eafe3f0a "biber CuidadoPersonas"
-  "CuidadoPersonas.run.xml" 1780950741 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
-  "CuidadoPersonas.tex" 1780950732 134221 e51f38755469a6242e53163692d1029c ""
-  "CuidadoPersonas.toc" 1780950741 7600 4de1ec9c9f82e284b120a27cecfd33fc "pdflatex"
+  "CuidadoPersonas.run.xml" 1782483355 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
+  "CuidadoPersonas.tex" 1782483334 136898 e7f135be411b25d34cb95ac8bb80cf00 ""
+  "CuidadoPersonas.toc" 1782483355 7600 ceb6d49348ab06b2f3d56736b32c11ca "pdflatex"
   "Imagenes/DER.png" 1780344302 105674 e9b3cb90b504b9ac7e078a0d543487f2 ""
   "Imagenes/IterativoIncremental.png" 1780344302 35584 87e45a5672097f8cbadbba62b405a6a9 ""
   "Imagenes/LogoUTN.png" 1780344302 12626 e66b0cd860fb45faa188f715304b8a98 ""
@@ -193,7 +193,6 @@
   "c:/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1780359328 5619402 ad1310ccf7f36101ef3e8f014a173c46 ""
   "c:/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1780359602 3656616 ae020a202a886bcd6727264f4a635475 ""
   "c:/texlive/2026/texmf.cnf" 1780359292 713 e69b156964470283e0530f5060668171 ""
-  "d:/Projects/Proyecto-Final/care_well_doc/LATEX/CuidadoPersonas.tex" 1780950732 134221 e51f38755469a6242e53163692d1029c ""
   (generated)
   "CuidadoPersonas.aux"
   "CuidadoPersonas.bcf"

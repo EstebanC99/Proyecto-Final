@@ -63,36 +63,36 @@
 \contentsline {section}{\numberline {9}Cálculo del tamaño del sistema}{49}{}%
 \contentsline {subsection}{\numberline {9.1}Iniciar Sesión}{49}{}%
 \contentsline {subsection}{\numberline {9.2}ABM de Usuarios}{50}{}%
-\contentsline {subsection}{\numberline {9.3}Menú Principal}{50}{}%
+\contentsline {subsection}{\numberline {9.3}Menú Principal}{51}{}%
 \contentsline {subsection}{\numberline {9.4}Mi Perfil}{52}{}%
 \contentsline {subsection}{\numberline {9.5}Configuración}{52}{}%
 \contentsline {subsection}{\numberline {9.6}ABM de Responsables}{53}{}%
 \contentsline {subsection}{\numberline {9.7}ABM de Cuidadores}{53}{}%
 \contentsline {subsubsection}{\numberline {9.7.1}Catálogo de permisos del sistema}{54}{}%
 \contentsline {subsection}{\numberline {9.8}ABM de Personas a Cargo}{55}{}%
-\contentsline {subsection}{\numberline {9.9}Gestión de Agenda}{56}{}%
+\contentsline {subsection}{\numberline {9.9}Gestión de Agenda}{57}{}%
 \contentsline {subsection}{\numberline {9.10}Chats}{57}{}%
-\contentsline {subsection}{\numberline {9.11}Análisis de Datos}{57}{}%
+\contentsline {subsection}{\numberline {9.11}Análisis de Datos}{58}{}%
 \contentsline {subsection}{\numberline {9.12}Emergencia}{58}{}%
-\contentsline {subsection}{\numberline {9.13}Gestión de Salud}{58}{}%
-\contentsline {subsection}{\numberline {9.14}Gestión de Eventos}{59}{}%
-\contentsline {subsection}{\numberline {9.15}Reglas de negocio transversales}{60}{}%
-\contentsline {subsection}{\numberline {9.16}Limitaciones conocidas del MVP}{61}{}%
-\contentsline {section}{\numberline {10}Análisis de riesgos}{62}{}%
-\contentsline {subsection}{\numberline {10.1}Riesgos}{62}{}%
-\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{62}{}%
-\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{62}{}%
-\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{62}{}%
-\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{64}{}%
-\contentsline {subsubsection}{\numberline {10.3.3}Planes}{65}{}%
-\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{66}{}%
-\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{66}{}%
-\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{67}{}%
-\contentsline {subsubsection}{\numberline {10.4.3}Planes}{68}{}%
-\contentsline {section}{\numberline {11}Diseño}{69}{}%
-\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{69}{}%
-\contentsline {subsection}{\numberline {11.2}Accesibilidad}{69}{}%
-\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{69}{}%
-\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{69}{}%
-\contentsline {subsection}{\numberline {11.5}Prototipo}{70}{}%
-\contentsline {section}{Referencias}{71}{}%
+\contentsline {subsection}{\numberline {9.13}Gestión de Salud}{59}{}%
+\contentsline {subsection}{\numberline {9.14}Gestión de Eventos}{60}{}%
+\contentsline {subsection}{\numberline {9.15}Reglas de negocio transversales}{61}{}%
+\contentsline {subsection}{\numberline {9.16}Limitaciones conocidas del MVP}{62}{}%
+\contentsline {section}{\numberline {10}Análisis de riesgos}{63}{}%
+\contentsline {subsection}{\numberline {10.1}Riesgos}{63}{}%
+\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{63}{}%
+\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{63}{}%
+\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{63}{}%
+\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{65}{}%
+\contentsline {subsubsection}{\numberline {10.3.3}Planes}{66}{}%
+\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{67}{}%
+\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{67}{}%
+\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{68}{}%
+\contentsline {subsubsection}{\numberline {10.4.3}Planes}{69}{}%
+\contentsline {section}{\numberline {11}Diseño}{70}{}%
+\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{70}{}%
+\contentsline {subsection}{\numberline {11.2}Accesibilidad}{70}{}%
+\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{70}{}%
+\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{70}{}%
+\contentsline {subsection}{\numberline {11.5}Prototipo}{71}{}%
+\contentsline {section}{Referencias}{72}{}%

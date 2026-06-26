@@ -31,4 +31,12 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
   @override
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() =>
       _datasource.obtenerAsignacionesUsuarioLogueado();
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) =>
+      _datasource.eliminarAsignacion(asignacionId);
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) =>
+      _datasource.reactivarAsignacion(asignacionId);
 }
