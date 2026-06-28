@@ -204,10 +204,72 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
         '${fecha.year}';
   }
 
-  void _mostrarProximamente() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad disponible próximamente.')),
+  /// Acepta una invitación de cuidado pendiente: activa la asignación y vuelve
+  /// a la lista. Acción positiva (no destructiva).
+  Future<void> _aceptarAsignacion(AsignacionCuidado asignacion) async {
+    final nombre = asignacion.personaCuidada.nombreCompleto;
+
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: '¿Aceptar esta invitación?',
+      body: 'Formarás parte del equipo de cuidado de $nombre.',
+      confirmLabel: 'Aceptar',
+      icon: Icons.check_circle_outline,
+      accentColor: AppColors.success,
+      onConfirm: () async {
+        final activar = ref.read(activarDependenteProvider);
+        await activar(asignacion.id);
+      },
     );
+
+    if (confirmo && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Te uniste al equipo de cuidado de $nombre.'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.goNamed(AppRoutes.dependentsName);
+      }
+    }
+  }
+
+  /// Rechaza una invitación de cuidado pendiente: elimina la asignación y
+  /// vuelve a la lista.
+  Future<void> _rechazarAsignacion(AsignacionCuidado asignacion) async {
+    final nombre = asignacion.personaCuidada.nombreCompleto;
+
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: '¿Rechazar esta invitación?',
+      body:
+          'No formarás parte del equipo de cuidado de $nombre. '
+          'La invitación será eliminada.',
+      confirmLabel: 'Rechazar',
+      icon: Icons.cancel_outlined,
+      accentColor: AppColors.error,
+      onConfirm: () async {
+        final eliminar = ref.read(eliminarDependenteProvider);
+        await eliminar(asignacion.id);
+      },
+    );
+
+    if (confirmo && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Rechazaste la invitación de $nombre.'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.goNamed(AppRoutes.dependentsName);
+      }
+    }
   }
 
   Future<void> _confirmarEliminar(AsignacionCuidado asignacion) async {
@@ -277,7 +339,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                         'Aceptar',
                         style: TextStyle(color: AppColors.success),
                       ),
-                      onPressed: _mostrarProximamente,
+                      onPressed: () => _aceptarAsignacion(asignacion),
                     ),
                     TextButton.icon(
                       icon: const Icon(
@@ -289,7 +351,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                         'Rechazar',
                         style: TextStyle(color: AppColors.error),
                       ),
-                      onPressed: _mostrarProximamente,
+                      onPressed: () => _rechazarAsignacion(asignacion),
                     ),
                   ],
                 );

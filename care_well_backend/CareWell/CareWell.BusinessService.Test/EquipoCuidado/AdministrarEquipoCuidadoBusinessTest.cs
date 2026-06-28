@@ -1,13 +1,13 @@
 ﻿using CareWell.BusinessService.EquipoCuidado;
 using CareWell.Commands.EquipoCuidado;
+using CareWell.DataViews.EquipoCuidado;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.EquipoCuidado;
 using CareWell.Domain.Factories;
-using CareWell.Domain.General;
 using CareWell.Domain.Validadores;
 using CareWell.Domain.ValueObjects.EquipoCuidado;
-using CareWell.Domain.ValueObjects.General;
+using CareWell.Queries.EquipoCuidado;
 using CareWell.Repository.EquipoCuidado;
 using CareWell.Repository.General;
 using CareWell.Security;
@@ -15,61 +15,94 @@ using Moq;
 
 namespace CareWell.BusinessService.Test.EquipoCuidado
 {
-    public class AdministrarEquipoCuidadoBusinessTest : BusinessTestClassBase<AdministrarPersonasCargoBusinessService>
+    public class AdministrarEquipoCuidadoBusinessTest : BusinessTestClassBase<AdministrarEquipoCuidadoBusinessService>
     {
-        private Mock<IBaseFactory> baseFactory;
         private Mock<IUserContext> userContext;
         private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
-        private Mock<IPersonaRepository> personaRepository;
-        private Mock<IAsignacionCuidadoRepository> asignacionCuidadoRepository;
         private Mock<IValidadorPermisoAccion> validadorPermisoAccion;
+        private Mock<IPersonaRepository> personaRepository;
+        private Mock<IBaseFactory> baseFactory;
+        private Mock<IAsignacionCuidadoRepository> asignacionCuidadoRepository;
 
         protected override void InitializeTest()
         {
             base.InitializeTest();
 
-            this.baseFactory = new Mock<IBaseFactory>();
             this.userContext = new Mock<IUserContext>();
             this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
-            this.personaRepository = new Mock<IPersonaRepository>();
-            this.asignacionCuidadoRepository = new Mock<IAsignacionCuidadoRepository>();
             this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
+            this.personaRepository = new Mock<IPersonaRepository>();
+            this.baseFactory = new Mock<IBaseFactory>();
+            this.asignacionCuidadoRepository = new Mock<IAsignacionCuidadoRepository>();
 
-            this.Target = new AdministrarPersonasCargoBusinessService(this.unitOfWork.Object,
-                                                                      this.baseFactory.Object,
+            this.Target = new AdministrarEquipoCuidadoBusinessService(this.unitOfWork.Object,
                                                                       this.userContext.Object,
                                                                       this.entityLoaderDomainService.Object,
+                                                                      this.validadorPermisoAccion.Object,
                                                                       this.personaRepository.Object,
-                                                                      this.asignacionCuidadoRepository.Object,
-                                                                      this.validadorPermisoAccion.Object);
+                                                                      this.baseFactory.Object,
+                                                                      this.asignacionCuidadoRepository.Object);
         }
 
-        public class ElMetodo_CrearPersonaCargo : AdministrarEquipoCuidadoBusinessTest
+        public class ElMetodo_ObtenerAsignacionesPorPersonaCuidada : AdministrarEquipoCuidadoBusinessTest
         {
-            private CrearPersonaCargoCommand command;
-            private Mock<Persona> personaCuidada;
+            private AsignacionCuidadoQuery query;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.query = Mock.Of<AsignacionCuidadoQuery>(q => q.PersonaCuidadaID == 1);
+            }
+
+            private List<AsignacionCuidadoDataView> Action()
+            {
+                return this.Target.ObtenerAsignacionesPorPersonaCuidada(this.query);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_ObtenerAsignacionesPorPersonaCuidada_del_Repository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.ObtenerAsignacionesPorPersonaCuidada(this.query.PersonaCuidadaID), Times.Once);
+            }
+        }
+
+        public class ElMetodo_Asignar : AdministrarEquipoCuidadoBusinessTest
+        {
+            private CrearAsignacionCuidadoCommand command;
             private Mock<AsignacionCuidado> asignacionCuidado;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
-                this.command = Mock.Of<CrearPersonaCargoCommand>();
+                this.command = Mock.Of<CrearAsignacionCuidadoCommand>(c =>
+                    c.PersonaCuidadaID == 1 &&
+                    c.ColaboradorEmail == "email@ejemplo" &&
+                    c.RolCuidadoID == 2 &&
+                    c.PermisosIDs == new List<int> { 3 }
+                );
 
-                this.personaCuidada = new Mock<Persona>();
                 this.asignacionCuidado = new Mock<AsignacionCuidado>();
 
-                this.baseFactory.Setup(s => s.Crear<Persona>()).Returns(this.personaCuidada.Object);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<Usuario>(It.IsAny<int>())).Returns(Mock.Of<Usuario>());
+
                 this.baseFactory.Setup(s => s.Crear<AsignacionCuidado>()).Returns(this.asignacionCuidado.Object);
             }
 
             private void Action()
             {
-                this.Target.CrearPersonaCargo(this.command);
+                this.Target.Asignar(this.command);
             }
 
             [Fact]
-            public void Lee_el_UsuarioID_del_UserContext()
+            public void Lee_una_vez_el_UsuarioID_del_UserContext()
             {
                 // Arrange
 
@@ -81,32 +114,21 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_Usario_del_EntityLoaderDomainService_con_el_UsuarioID_del_UserContext()
+            public void Llama_una_vez_al_metodo_GetByID_Usuario_del_EntityLoaderDomainService_con_el_id_de_usuario_logueado()
             {
                 // Arrange
-                this.userContext.Setup(s => s.UsuarioID).Returns(99);
+                var usuarioID = 99;
+                this.userContext.Setup(s => s.UsuarioID).Returns(usuarioID);
 
                 // Action
                 this.Action();
 
                 // Assert
-                this.entityLoaderDomainService.Verify(v => v.GetByID<Usuario>(this.userContext.Object.UsuarioID), Times.Once);
+                this.entityLoaderDomainService.Verify(v => v.GetByID<Usuario>(usuarioID), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Crear_Persona_de_la_BaseFactory()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.baseFactory.Verify(v => v.Crear<Persona>(), Times.Once);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_CrearModificar_de_la_Persona()
+            public void Llama_una_vez_al_metodo_GetByID_del_PersonaRepository()
             {
                 // Arrange
 
@@ -114,11 +136,11 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.personaCuidada.Verify(v => v.CrearModificar(It.IsAny<CrearModificarPersona>()), Times.Once);
+                this.personaRepository.Verify(v => v.GetByID(this.command.PersonaCuidadaID), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Add_del_PersonaRepository()
+            public void Llama_una_vez_al_metodo_GetByEmail_del_PersonaRepository()
             {
                 // Arrange
 
@@ -126,11 +148,35 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.personaRepository.Verify(v => v.Add(this.personaCuidada.Object), Times.Once);
+                this.personaRepository.Verify(v => v.GetByEmail(this.command.ColaboradorEmail), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Crear_AsignacionCuidado_de_la_BaseFactory()
+            public void Llama_una_vez_al_metodo_GetByID_RolCuidado_del_EntityLoaderDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<RolCuidado>(this.command.RolCuidadoID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_al_metodo_GetByID_PermisoCuidado_del_EntityLoaderDomainService_tantas_veces_como_permisos_haya()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<PermisoCuidado>(It.Is<int>(p => this.command.PermisosIDs.Contains(p))), Times.Exactly(this.command.PermisosIDs.Count));
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Crear_AsignacionCuidado_del_BaseFactory()
             {
                 // Arrange
 
@@ -142,7 +188,7 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_AsignarResponsable_de_la_AsignacionCuidado()
+            public void Llama_una_vez_al_metodo_Asignar_de_la_AsignacionCuidado()
             {
                 // Arrange
 
@@ -150,12 +196,13 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.asignacionCuidado.Verify(v => v.AsignarResponsable(It.IsAny<CrearAsignacionResponsable>(),
-                                                                        this.entityLoaderDomainService.Object), Times.Once);
+                this.asignacionCuidado.Verify(v => v.Asignar(It.IsAny<CrearAsignacion>(),
+                                                             this.entityLoaderDomainService.Object,
+                                                             this.validadorPermisoAccion.Object), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Add_del_AsignacionCuidadoRepository()
+            public void Llama_una_vez_al_metodo_Add_de_AsignacionCuidadoRepository()
             {
                 // Arrange
 
@@ -179,41 +226,34 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             }
         }
 
-        public class ElMetodo_ModificarPersonaCargo : AdministrarEquipoCuidadoBusinessTest
+        public class ElMetodo_ModificarPermisos : AdministrarEquipoCuidadoBusinessTest
         {
-            private ModificarPersonaCargoCommand command;
+            private ModificarPermisosAsignacionCommand command;
             private Mock<AsignacionCuidado> asignacionCuidado;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
+                this.command = Mock.Of<ModificarPermisosAsignacionCommand>(c =>
+                    c.AsignacionCuidadoID == 1 &&
+                    c.PermisosIDs == new List<int> { 3 }
+                );
+
                 this.asignacionCuidado = new Mock<AsignacionCuidado>();
 
-                this.command = Mock.Of<ModificarPersonaCargoCommand>(c => c.AsignacionCuidadoID == 1);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<Usuario>(It.IsAny<int>())).Returns(Mock.Of<Usuario>());
 
                 this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
             }
 
             private void Action()
             {
-                this.Target.ModificarPersonaCargo(this.command);
+                this.Target.ModificarPermisos(this.command);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.command.AsignacionCuidadoID), Times.Once);
-            }
-
-            [Fact]
-            public void Lee_el_UsuarioID_del_UserContext()
+            public void Lee_una_vez_el_UsuarioID_del_UserContext()
             {
                 // Arrange
 
@@ -225,20 +265,21 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_Usario_del_EntityLoaderDomainService_con_el_UsuarioID_del_UserContext()
+            public void Llama_una_vez_al_metodo_GetByID_Usuario_del_EntityLoaderDomainService_con_el_id_de_usuario_logueado()
             {
                 // Arrange
-                this.userContext.Setup(s => s.UsuarioID).Returns(99);
+                var usuarioID = 99;
+                this.userContext.Setup(s => s.UsuarioID).Returns(usuarioID);
 
                 // Action
                 this.Action();
 
                 // Assert
-                this.entityLoaderDomainService.Verify(v => v.GetByID<Usuario>(this.userContext.Object.UsuarioID), Times.Once);
+                this.entityLoaderDomainService.Verify(v => v.GetByID<Usuario>(usuarioID), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_ModificarInformacionPersona_de_la_AsinacionCuidado()
+            public void Llama_al_metodo_GetByID_PermisoCuidado_del_EntityLoaderDomainService_tantas_veces_como_permisos_haya()
             {
                 // Arrange
 
@@ -246,12 +287,11 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.asignacionCuidado.Verify(v => v.ModificarInformacionPersona(It.IsAny<ModificarInformacionPersona>(),
-                                                                                 this.validadorPermisoAccion.Object), Times.Once);
+                this.entityLoaderDomainService.Verify(v => v.GetByID<PermisoCuidado>(It.Is<int>(p => this.command.PermisosIDs.Contains(p))), Times.Exactly(this.command.PermisosIDs.Count));
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
+            public void Llama_una_vez_al_metodo_GetByID_del_AsignacionCuidadoRepository()
             {
                 // Arrange
 
@@ -259,33 +299,11 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
-            }
-        }
-
-        public class ElMetodo_EliminarAsignacion : AdministrarEquipoCuidadoBusinessTest
-        {
-            private int asignacionCuidadoID;
-            private Mock<AsignacionCuidado> asignacionCuidado;
-
-            protected override void InitializeTest()
-            {
-                base.InitializeTest();
-
-                this.asignacionCuidado = new Mock<AsignacionCuidado>();
-
-                this.asignacionCuidadoID = 1;
-
-                this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
-            }
-
-            private void Action()
-            {
-                this.Target.EliminarAsignacion(this.asignacionCuidadoID);
+                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.command.AsignacionCuidadoID), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
+            public void Llama_una_vez_al_metodo_ModificarPermisos_de_la_AsignacionCuidado()
             {
                 // Arrange
 
@@ -293,77 +311,8 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.asignacionCuidadoID), Times.Once);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_Eliminar_de_la_AsinacionCuidado()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.asignacionCuidado.Verify(v => v.Eliminar(this.entityLoaderDomainService.Object), Times.Once);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
-            }
-        }
-
-        public class ElMetodo_ReactivarAsignacion : AdministrarEquipoCuidadoBusinessTest
-        {
-            private int asignacionCuidadoID;
-            private Mock<AsignacionCuidado> asignacionCuidado;
-
-            protected override void InitializeTest()
-            {
-                base.InitializeTest();
-
-                this.asignacionCuidado = new Mock<AsignacionCuidado>();
-
-                this.asignacionCuidadoID = 1;
-
-                this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
-            }
-
-            private void Action()
-            {
-                this.Target.ReactivarAsignacion(this.asignacionCuidadoID);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.asignacionCuidadoID), Times.Once);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_Reactivar_de_la_AsinacionCuidado()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.asignacionCuidado.Verify(v => v.Reactivar(this.entityLoaderDomainService.Object), Times.Once);
+                this.asignacionCuidado.Verify(v => v.ModificarPermisos(It.IsAny<ModificarPermisosAsignacion>(),
+                                                                       this.validadorPermisoAccion.Object), Times.Once);
             }
 
             [Fact]

@@ -167,6 +167,15 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   }
 
   @override
+  Future<void> activarAsignacion(int asignacionId) async {
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    _asignaciones[idx] = _asignaciones[idx].copyWith(
+      estado: estadoAsignacionActiva,
+    );
+  }
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) async {
     final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
     if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
@@ -174,6 +183,19 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       estado: estadoAsignacionActiva,
     );
   }
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) => throw UnimplementedError();
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 }
 
 /// Fake de [CareTeamRepository] para tests de dependents.
@@ -382,6 +404,100 @@ void main() {
       );
 
       expect(asignaciones, isEmpty);
+    });
+  });
+
+  group('pendingAssignmentsAsCuidadorProvider', () {
+    AsignacionCuidado pendienteCuidador() => AsignacionCuidado(
+      id: 408,
+      personaCuidada: _personaAlicia,
+      colaborador: _personaMaria,
+      rol: rolCuidadoCuidador,
+      estado: estadoAsignacionPendiente,
+      fechaAlta: DateTime(2024, 6, 1),
+    );
+
+    test('retorna invitaciones de cuidador en estado pendiente', () async {
+      final container = _buildContainer(asignaciones: [pendienteCuidador()]);
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        pendingAssignmentsAsCuidadorProvider.future,
+      );
+
+      expect(asignaciones, hasLength(1));
+      expect(asignaciones.first.id, 408);
+    });
+
+    test('excluye cuidador activo', () async {
+      final activaCuidador = AsignacionCuidado(
+        id: 409,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoCuidador,
+        estado: estadoAsignacionActiva,
+        fechaAlta: DateTime(2024, 1, 1),
+      );
+      final container = _buildContainer(asignaciones: [activaCuidador]);
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        pendingAssignmentsAsCuidadorProvider.future,
+      );
+
+      expect(asignaciones, isEmpty);
+    });
+
+    test('excluye responsable pendiente (otro rol)', () async {
+      final container = _buildContainer(
+        asignaciones: [_asignacionMariaPendiente()],
+      );
+      addTearDown(container.dispose);
+
+      final asignaciones = await container.read(
+        pendingAssignmentsAsCuidadorProvider.future,
+      );
+
+      expect(asignaciones, isEmpty);
+    });
+  });
+
+  group('activarDependenteProvider', () {
+    test('activa la invitación pendiente sin lanzar excepción', () async {
+      final pendiente = AsignacionCuidado(
+        id: 410,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoCuidador,
+        estado: estadoAsignacionPendiente,
+        fechaAlta: DateTime(2024, 6, 1),
+      );
+      final container = _buildContainer(asignaciones: [pendiente]);
+      addTearDown(container.dispose);
+
+      final activarFn = container.read(activarDependenteProvider);
+
+      await expectLater(activarFn(410), completes);
+    });
+
+    test('tras activar, la invitación deja de estar pendiente', () async {
+      final pendiente = AsignacionCuidado(
+        id: 411,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoCuidador,
+        estado: estadoAsignacionPendiente,
+        fechaAlta: DateTime(2024, 6, 1),
+      );
+      final container = _buildContainer(asignaciones: [pendiente]);
+      addTearDown(container.dispose);
+
+      await container.read(activarDependenteProvider)(411);
+
+      final pendientes = await container.read(
+        pendingAssignmentsAsCuidadorProvider.future,
+      );
+      expect(pendientes, isEmpty);
     });
   });
 

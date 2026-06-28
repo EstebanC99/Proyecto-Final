@@ -119,6 +119,9 @@ Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
       activeAssignmentsAsResponsableProvider.overrideWith(
         (ref) async => asignaciones,
       ),
+      activeAssignmentsAsCuidadorProvider.overrideWith(
+        (ref) async => <AsignacionCuidado>[],
+      ),
       // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
       ultimoEstadoAnimoProvider.overrideWith((ref) async => null),
     ],

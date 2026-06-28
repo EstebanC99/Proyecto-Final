@@ -15,7 +15,7 @@ import '../../widgets/widgets.dart';
 /// Muestra el header, la fila de accesos rápidos, el grid 2×2 de secciones
 /// y el tile de emergencia siempre visible.
 /// El tile de "Personas a cargo" alterna entre skeleton, empty state y tile
-/// normal según el estado de [activeAssignmentsAsResponsableProvider].
+/// normal según el estado de [allActiveAssignmentsProvider].
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
     final usuario = authState.valueOrNull;
     final userName = usuario?.persona.nombre ?? '';
 
-    final dependentsAsync = ref.watch(activeAssignmentsAsResponsableProvider);
+    final dependentsAsync = ref.watch(allActiveAssignmentsProvider);
     final ultimoAnimoAsync = ref.watch(ultimoEstadoAnimoProvider);
     final ultimoAnimo = ultimoAnimoAsync.valueOrNull;
 

@@ -70,7 +70,7 @@ class CareTeamScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final personaCtxAsync = ref.watch(careTeamContextPersonaProvider);
-    final esResponsableAsync = ref.watch(esResponsableProvider);
+    final puedeAdministrarAsync = ref.watch(puedeAdministrarEquipoProvider);
     final usuario = ref.watch(authStateProvider).valueOrNull;
 
     return Scaffold(
@@ -79,10 +79,10 @@ class CareTeamScreen extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         title: const Text('Equipo de cuidado'),
         actions: [
-          esResponsableAsync.when(
+          puedeAdministrarAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (e, st) => const SizedBox.shrink(),
-            data: (esResp) => esResp
+            data: (puede) => puede
                 ? Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.sm),
                     child: Container(
@@ -124,8 +124,8 @@ class CareTeamScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: esResponsableAsync.maybeWhen(
-        data: (esResp) => esResp
+      floatingActionButton: puedeAdministrarAsync.maybeWhen(
+        data: (puede) => puede
             ? FloatingActionButton(
                 onPressed: () => _mostrarSelectorAlta(context),
                 backgroundColor: AppColors.primary,
@@ -152,6 +152,9 @@ class _TeamBody extends ConsumerWidget {
     final asignacionesAsync = ref.watch(
       careTeamAssignmentsProvider(personaCtx.id),
     );
+    final puedeAdministrar =
+        ref.watch(puedeAdministrarEquipoProvider).valueOrNull ?? false;
+    final esResponsable = ref.watch(esResponsableProvider).valueOrNull ?? false;
 
     return asignacionesAsync.when(
       loading: () => const _SkeletonTeam(),
@@ -161,73 +164,152 @@ class _TeamBody extends ConsumerWidget {
       ),
       data: (asignaciones) {
         final responsables = asignaciones
-            .where((a) => a.rol.id == RolesCuidadoConst.responsable)
+            .where(
+              (a) =>
+                  a.rol.id == RolesCuidadoConst.responsable &&
+                  a.estado.id == EstadosAsignacionConst.activa,
+            )
             .toList();
         final cuidadores = asignaciones
-            .where((a) => a.rol.id == RolesCuidadoConst.cuidador)
+            .where(
+              (a) =>
+                  a.rol.id == RolesCuidadoConst.cuidador &&
+                  a.estado.id == EstadosAsignacionConst.activa,
+            )
+            .toList();
+        final pendientes = asignaciones
+            .where((a) => a.estado.id == EstadosAsignacionConst.pendiente)
             .toList();
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            0,
-            AppSpacing.lg,
-            88,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Selector de contexto
-              const SizedBox(height: AppSpacing.lg),
-              const ContextSelector(),
-              const SizedBox(height: AppSpacing.lg),
+        return RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            ref.invalidate(careTeamAssignmentsProvider(personaCtx.id));
+            await ref.read(careTeamAssignmentsProvider(personaCtx.id).future);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              88,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Selector de contexto
+                const SizedBox(height: AppSpacing.lg),
+                const ContextSelector(),
+                const SizedBox(height: AppSpacing.lg),
 
-              // Responsables
-              _SectionHeader('RESPONSABLES'),
-              const SizedBox(height: AppSpacing.sm),
-              if (responsables.isEmpty)
-                _EmptySubsection('No hay responsables asignados.')
-              else
-                ...responsables.map(
-                  (a) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: MemberCard(
-                      asignacion: a,
-                      isCurrentUser: a.colaborador.id == usuarioId,
-                      onTap: () => context.pushNamed(
-                        AppRoutes.careTeamMemberName,
-                        pathParameters: {'memberId': a.id.toString()},
+                // Solicitudes pendientes (solo Responsables, si hay alguna).
+                if (esResponsable && pendientes.isNotEmpty) ...[
+                  _SectionHeader('SOLICITUDES PENDIENTES'),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...pendientes.map(
+                    (a) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _PendingRequestCard(
+                        asignacion: a,
+                        onCancelar: () =>
+                            _confirmarCancelarSolicitud(context, ref, a),
                       ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
 
-              const SizedBox(height: AppSpacing.lg),
-
-              // Cuidadores
-              _SectionHeader('CUIDADORES'),
-              const SizedBox(height: AppSpacing.sm),
-              if (cuidadores.isEmpty)
-                _EmptySubsection('No hay cuidadores asignados.')
-              else
-                ...cuidadores.map(
-                  (a) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: MemberCard(
-                      asignacion: a,
-                      isCurrentUser: a.colaborador.id == usuarioId,
-                      onTap: () => context.pushNamed(
-                        AppRoutes.careTeamMemberName,
-                        pathParameters: {'memberId': a.id.toString()},
+                // Responsables
+                _SectionHeader('RESPONSABLES'),
+                const SizedBox(height: AppSpacing.sm),
+                if (responsables.isEmpty)
+                  _EmptySubsection('No hay responsables asignados.')
+                else
+                  ...responsables.map(
+                    (a) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: MemberCard(
+                        asignacion: a,
+                        isCurrentUser: a.colaborador.id == usuarioId,
+                        showChevron: puedeAdministrar,
+                        onTap: puedeAdministrar
+                            ? () => context.pushNamed(
+                                AppRoutes.careTeamMemberName,
+                                pathParameters: {'memberId': a.id.toString()},
+                              )
+                            : null,
                       ),
                     ),
                   ),
-                ),
-            ],
+
+                const SizedBox(height: AppSpacing.lg),
+
+                // Cuidadores
+                _SectionHeader('CUIDADORES'),
+                const SizedBox(height: AppSpacing.sm),
+                if (cuidadores.isEmpty)
+                  _EmptySubsection('No hay cuidadores asignados.')
+                else
+                  ...cuidadores.map(
+                    (a) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: MemberCard(
+                        asignacion: a,
+                        isCurrentUser: a.colaborador.id == usuarioId,
+                        showChevron: puedeAdministrar,
+                        onTap: puedeAdministrar
+                            ? () => context.pushNamed(
+                                AppRoutes.careTeamMemberName,
+                                pathParameters: {'memberId': a.id.toString()},
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
     );
+  }
+
+  // TODO(integración): eliminarMiembroProvider sigue en demo.
+  // Conectar al endpoint real de cancelación cuando esté disponible.
+  Future<void> _confirmarCancelarSolicitud(
+    BuildContext context,
+    WidgetRef ref,
+    AsignacionCuidado asignacion,
+  ) async {
+    final nombre = asignacion.colaborador.nombreCompleto;
+
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: '¿Cancelar la solicitud?',
+      body:
+          'Se cancelará la invitación enviada a $nombre. '
+          'Podés volver a invitarlo más adelante.',
+      confirmLabel: 'Cancelar solicitud',
+      icon: Icons.cancel_outlined,
+      accentColor: AppColors.error,
+      onConfirm: () async {
+        final eliminar = ref.read(eliminarMiembroProvider);
+        await eliminar(
+          asignacionId: asignacion.id,
+          personaCuidadaId: personaCtx.id,
+        );
+      },
+    );
+
+    if (confirmo && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Solicitud a $nombre cancelada.'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
 }
 
@@ -344,6 +426,120 @@ class _SkeletonTeam extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _PendingRequestCard extends StatelessWidget {
+  const _PendingRequestCard({
+    required this.asignacion,
+    required this.onCancelar,
+  });
+
+  final AsignacionCuidado asignacion;
+  final VoidCallback onCancelar;
+
+  @override
+  Widget build(BuildContext context) {
+    final colaborador = asignacion.colaborador;
+    final esResponsable = asignacion.rol.id == RolesCuidadoConst.responsable;
+    final rolLabel = esResponsable ? 'Responsable' : 'Cuidador';
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: const Color(0xFFF5A623), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              AvatarInitial(nombre: colaborador.nombre, size: 44),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      colaborador.nombreCompleto,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (colaborador.email != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        colaborador.email!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const _PendingChip(),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Invitado como $rolLabel',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.close, size: 16),
+              label: const Text('Cancelar solicitud'),
+              onPressed: onCancelar,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: const BorderSide(color: AppColors.error),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PendingChip extends StatelessWidget {
+  const _PendingChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3CD),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: const Color(0xFFF5A623), width: 1),
+      ),
+      child: const Text(
+        'Pendiente',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF7A5200),
+        ),
       ),
     );
   }

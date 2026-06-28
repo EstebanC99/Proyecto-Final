@@ -66,7 +66,23 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   Future<void> eliminarAsignacion(int asignacionId) async {}
 
   @override
+  Future<void> activarAsignacion(int asignacionId) async {}
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) async {}
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) async => [];
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
@@ -111,8 +127,10 @@ Widget _wrap(Widget child) => ProviderScope(
       _FakeAsignacionCuidadoRepository(),
     ),
     careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
-    // Forzar esResponsableProvider a true para que el FAB y el botón sean visibles.
+    // Forzar esResponsableProvider a true para que la sección de pendientes sea visible.
     esResponsableProvider.overrideWith((ref) async => true),
+    // Forzar puedeAdministrarEquipoProvider a true para que el FAB y el botón "+" sean visibles.
+    puedeAdministrarEquipoProvider.overrideWith((ref) async => true),
   ],
   child: MaterialApp(home: child),
 );

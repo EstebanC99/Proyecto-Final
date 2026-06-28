@@ -9,7 +9,9 @@ class ApiConfig {
 
   static const loginPath = '/api/Authorization/login';
   static const refreshPath = '/api/Authorization/refresh-token';
+
   static const cuentaPath = '/api/Cuenta/crear';
+
   static const crearPersonaCargoPath =
       '/api/AdministrarPersonasCargo/crear-persona-cargo';
   static const modificarPersonaCargoPath =
@@ -18,6 +20,12 @@ class ApiConfig {
       '/api/AdministrarPersonasCargo/obtener-mis-asignaciones';
   static const eliminarAsignacionPath =
       '/api/AdministrarPersonasCargo/eliminar-asignacion';
+  static const activarAsignacionPath =
+      '/api/AdministrarPersonasCargo/activar-asignacion';
   static const reactivarAsignacionPath =
       '/api/AdministrarPersonasCargo/reactivar-asignacion';
+
+  static const obtenerAsignacionesPorPersona =
+      '/api/AdministrarEquipoCuidado/obtener-asignaciones';
+  static const asignar = '/api/AdministrarEquipoCuidado/asignar';
 }

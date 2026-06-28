@@ -16,7 +16,7 @@ namespace CareWell.API.Controllers.EquipoCuidado
             this.AdministrarEquipoCuidadoBusinessService = administrarEquipoCuidadoBusinessService;
         }
 
-        [HttpGet("obtener-mis-asignaciones")]
+        [HttpPost("obtener-mis-asignaciones")]
         public List<AsignacionCuidadoDataView> ObtenerAsignacionesPorUsuarioLogueado()
         {
             return this.AdministrarEquipoCuidadoBusinessService.ObtenerAsignacionesUsuarioLogueado();
@@ -38,6 +38,12 @@ namespace CareWell.API.Controllers.EquipoCuidado
         public void EliminarAsignacion([FromBody] int asignacionID)
         {
             this.AdministrarEquipoCuidadoBusinessService.EliminarAsignacion(asignacionID);
+        }
+
+        [HttpPost("activar-asignacion")]
+        public void ActivarAsignacion([FromBody] int asignacionID)
+        {
+            this.AdministrarEquipoCuidadoBusinessService.ActivarAsignacion(asignacionID);
         }
 
         [HttpPost("reactivar-asignacion")]

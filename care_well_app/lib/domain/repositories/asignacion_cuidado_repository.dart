@@ -1,6 +1,12 @@
 import '../entities/entities.dart';
 
 abstract class AsignacionCuidadoRepository {
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado();
+
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  );
+
   Future<void> crearPersonaCargo({
     required String nombre,
     required String apellido,
@@ -12,9 +18,16 @@ abstract class AsignacionCuidadoRepository {
 
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona);
 
-  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado();
-
   Future<void> eliminarAsignacion(int asignacionId);
 
+  Future<void> activarAsignacion(int asignacionId);
+
   Future<void> reactivarAsignacion(int asignacionId);
+
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  });
 }

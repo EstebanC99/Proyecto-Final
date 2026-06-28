@@ -6,19 +6,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ─── Provider base ────────────────────────────────────────────────────────────
 
 /// Todas las asignaciones del usuario logueado (activas, pendientes e inactivas).
-final misAsignacionesProvider = FutureProvider<List<AsignacionCuidado>>((
-  ref,
-) async {
-  final usuario = ref.watch(authStateProvider).valueOrNull;
-  if (usuario == null) return [];
-  final repo = ref.watch(asignacionCuidadoRepositoryProvider);
-  return repo.obtenerAsignacionesUsuarioLogueado();
-});
+final misAsignacionesProvider =
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
+      final usuario = ref.watch(authStateProvider).valueOrNull;
+      if (usuario == null) return [];
+      final repo = ref.watch(asignacionCuidadoRepositoryProvider);
+      return repo.obtenerAsignacionesUsuarioLogueado();
+    });
 
 // ─── Providers derivados ──────────────────────────────────────────────────────
 
 final activeAssignmentsAsResponsableProvider =
-    FutureProvider<List<AsignacionCuidado>>((ref) async {
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
       final todas = await ref.watch(misAsignacionesProvider.future);
       return todas
           .where(
@@ -30,7 +29,7 @@ final activeAssignmentsAsResponsableProvider =
     });
 
 final activeAssignmentsAsCuidadorProvider =
-    FutureProvider<List<AsignacionCuidado>>((ref) async {
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
       final todas = await ref.watch(misAsignacionesProvider.future);
       return todas
           .where(
@@ -41,32 +40,63 @@ final activeAssignmentsAsCuidadorProvider =
           .toList();
     });
 
+/// Todas las asignaciones activas del usuario, sin importar el rol
+/// (Responsable o Cuidador). Une [activeAssignmentsAsResponsableProvider] y
+/// [activeAssignmentsAsCuidadorProvider]. Alimenta el tile de "Personas a cargo"
+/// del Home, que debe mostrarse en estado normal ante cualquier asignación activa.
+final allActiveAssignmentsProvider =
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
+      final comoResponsable = await ref.watch(
+        activeAssignmentsAsResponsableProvider.future,
+      );
+      final comoCuidador = await ref.watch(
+        activeAssignmentsAsCuidadorProvider.future,
+      );
+      return [...comoResponsable, ...comoCuidador];
+    });
+
 final assignmentsAsResponsableProvider =
-    FutureProvider<List<AsignacionCuidado>>((ref) async {
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
       final todas = await ref.watch(misAsignacionesProvider.future);
       return todas
           .where((a) => a.rol.id == RolesCuidadoConst.responsable)
           .toList();
     });
 
-final assignmentsAsCuidadorProvider = FutureProvider<List<AsignacionCuidado>>((
-  ref,
-) async {
-  final todas = await ref.watch(misAsignacionesProvider.future);
-  return todas.where((a) => a.rol.id == RolesCuidadoConst.cuidador).toList();
-});
+final assignmentsAsCuidadorProvider =
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas
+          .where((a) => a.rol.id == RolesCuidadoConst.cuidador)
+          .toList();
+    });
 
-final asignacionByIdProvider = FutureProvider.family<AsignacionCuidado, int>((
-  ref,
-  asignacionId,
-) async {
-  final todas = await ref.watch(misAsignacionesProvider.future);
-  return todas.firstWhere(
-    (a) => a.id == asignacionId,
-    orElse: () =>
-        throw StateError('Asignación no encontrada en memoria: $asignacionId'),
-  );
-});
+/// Invitaciones de cuidado pendientes de aceptación donde el usuario es Cuidador.
+///
+/// Derivado de [misAsignacionesProvider]: filtra rol Cuidador en estado
+/// pendiente. Alimenta la sección de invitaciones de [DependentsScreen].
+final pendingAssignmentsAsCuidadorProvider =
+    FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas
+          .where(
+            (a) =>
+                a.rol.id == RolesCuidadoConst.cuidador &&
+                a.estado.id == EstadosAsignacionConst.pendiente,
+          )
+          .toList();
+    });
+
+final asignacionByIdProvider = FutureProvider.autoDispose
+    .family<AsignacionCuidado, int>((ref, asignacionId) async {
+      final todas = await ref.watch(misAsignacionesProvider.future);
+      return todas.firstWhere(
+        (a) => a.id == asignacionId,
+        orElse: () => throw StateError(
+          'Asignación no encontrada en memoria: $asignacionId',
+        ),
+      );
+    });
 
 // ─── Acciones mutadoras ───────────────────────────────────────────────────────
 
@@ -134,6 +164,18 @@ final eliminarDependenteProvider =
         final repo = ref.read(asignacionCuidadoRepositoryProvider);
 
         await repo.eliminarAsignacion(asignacionId);
+
+        ref.invalidate(misAsignacionesProvider);
+      };
+    });
+
+/// Activa una asignación pendiente (dentro del plazo de gracia).
+final activarDependenteProvider =
+    Provider<Future<void> Function(int asignacionId)>((ref) {
+      return (asignacionId) async {
+        final repo = ref.read(asignacionCuidadoRepositoryProvider);
+
+        await repo.activarAsignacion(asignacionId);
 
         ref.invalidate(misAsignacionesProvider);
       };

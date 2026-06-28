@@ -21,48 +21,65 @@ namespace CareWell.Repository.EquipoCuidado
 
             return this.DbSet
                 .Where(a => a.Colaborador.ID == usuarioLogueado.Persona.ID
-                         && a.Estado.ID != EstadosAsignacionCuidado.Inactiva || (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.UtcNow.AddDays(-30)))
-                .Select(a => new AsignacionCuidadoDataView
+                         && (a.Estado.ID != EstadosAsignacionCuidado.Inactiva || (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.Now.AddDays(-30))))
+                .ToList()
+                .Select(MapToDataView)
+                .ToList();
+        }
+
+        public List<AsignacionCuidadoDataView> ObtenerAsignacionesPorPersonaCuidada(int personaCuidadaID)
+        {
+            return this.DbSet
+                .Where(a => a.PersonaCuidada.ID == personaCuidadaID
+                         && a.Estado.ID != EstadosAsignacionCuidado.Inactiva)
+                .ToList()
+                .Select(MapToDataView)
+                .ToList();
+        }
+
+        private static AsignacionCuidadoDataView MapToDataView(AsignacionCuidado asignacionCuidado)
+        {
+            return new AsignacionCuidadoDataView
+            {
+                ID = asignacionCuidado.ID,
+                Persona = new DataViews.General.PersonaDataView
                 {
-                    ID = a.ID,
-                    Persona = new DataViews.General.PersonaDataView
-                    {
-                        ID = a.PersonaCuidada.ID,
-                        Nombre = a.PersonaCuidada.Nombre,
-                        Apellido = a.PersonaCuidada.Apellido,
-                        Documento = a.PersonaCuidada.Documento,
-                        FechaNacimiento = a.PersonaCuidada.FechaNacimiento,
-                        Email = a.PersonaCuidada.Email,
-                        Telefono = a.PersonaCuidada.Telefono
-                    },
-                    Colaborador = new DataViews.General.PersonaDataView
-                    {
-                        ID = a.Colaborador.ID,
-                        Nombre = a.Colaborador.Nombre,
-                        Apellido = a.Colaborador.Apellido,
-                        Documento = a.Colaborador.Documento,
-                        FechaNacimiento = a.Colaborador.FechaNacimiento,
-                        Email = a.Colaborador.Email,
-                        Telefono = a.Colaborador.Telefono
-                    },
-                    Rol = new BaseEntityDataView
-                    {
-                        ID = a.Rol.ID,
-                        Descripcion = a.Rol.Descripcion
-                    },
-                    Estado = new BaseEntityDataView
-                    {
-                        ID = a.Estado.ID,
-                        Descripcion = a.Estado.Descripcion
-                    },
-                    FechaAlta = a.FechaAlta,
-                    Permisos = a.Permisos.Select(p => new BaseEntityDataView
-                    {
-                        ID = p.ID,
-                        Descripcion = p.Descripcion
-                    }).ToList(),
-                    FechaEliminacion = a.FechaEliminacion
-                }).ToList();
+                    ID = asignacionCuidado.PersonaCuidada.ID,
+                    Nombre = asignacionCuidado.PersonaCuidada.Nombre,
+                    Apellido = asignacionCuidado.PersonaCuidada.Apellido,
+                    Documento = asignacionCuidado.PersonaCuidada.Documento,
+                    FechaNacimiento = asignacionCuidado.PersonaCuidada.FechaNacimiento,
+                    Email = asignacionCuidado.PersonaCuidada.Email,
+                    Telefono = asignacionCuidado.PersonaCuidada.Telefono
+                },
+                Colaborador = new DataViews.General.PersonaDataView
+                {
+                    ID = asignacionCuidado.Colaborador.ID,
+                    Nombre = asignacionCuidado.Colaborador.Nombre,
+                    Apellido = asignacionCuidado.Colaborador.Apellido,
+                    Documento = asignacionCuidado.Colaborador.Documento,
+                    FechaNacimiento = asignacionCuidado.Colaborador.FechaNacimiento,
+                    Email = asignacionCuidado.Colaborador.Email,
+                    Telefono = asignacionCuidado.Colaborador.Telefono
+                },
+                Rol = new BaseEntityDataView
+                {
+                    ID = asignacionCuidado.Rol.ID,
+                    Descripcion = asignacionCuidado.Rol.Descripcion
+                },
+                Estado = new BaseEntityDataView
+                {
+                    ID = asignacionCuidado.Estado.ID,
+                    Descripcion = asignacionCuidado.Estado.Descripcion
+                },
+                FechaAlta = asignacionCuidado.FechaAlta,
+                Permisos = asignacionCuidado.Permisos.Select(p => new BaseEntityDataView
+                {
+                    ID = p.ID,
+                    Descripcion = p.Descripcion
+                }).ToList(),
+                FechaEliminacion = asignacionCuidado.FechaEliminacion
+            };
         }
     }
 }

@@ -52,6 +52,23 @@ AsignacionCuidado _asignacionCarlos() => AsignacionCuidado(
   fechaAlta: DateTime(2024, 1, 10),
 );
 
+/// Asignación de María (usuario logueado) como Responsable de Alicia, con el
+/// permiso [PermisosCuidadoConst.administrarEquipo] habilitado.
+AsignacionCuidado _asignacionMariaConAdministrarEquipo() => AsignacionCuidado(
+  id: 401,
+  personaCuidada: _personaAlicia,
+  colaborador: _personaMaria,
+  rol: rolCuidadoResponsable,
+  estado: estadoAsignacionActiva,
+  fechaAlta: DateTime(2024, 1, 8),
+  permisos: const [
+    PermisoCuidado(
+      id: PermisosCuidadoConst.administrarEquipo,
+      descripcion: 'Administrar equipo de cuidado',
+    ),
+  ],
+);
+
 // ─── Fakes ────────────────────────────────────────────────────────────────────
 
 class _FakePersonaRepository implements PersonaRepository {
@@ -122,8 +139,27 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 
   @override
+  Future<void> activarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) =>
       throw UnimplementedError();
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) async => _asignaciones
+      .where((a) => a.personaCuidada.id == personaCuidadaId)
+      .toList();
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
@@ -336,6 +372,39 @@ void main() {
       expect(opciones.length, 1);
       expect(opciones.first.rol, PersonaContextRol.propio);
     });
+
+    test(
+      'excluye personas con asignación pendiente (invitación no aceptada)',
+      () async {
+        // María (usuario logueado) es Responsable de Alicia, pero la
+        // asignación todavía está en estado pendiente.
+        final asignacionPendiente = AsignacionCuidado(
+          id: 403,
+          personaCuidada: _personaAlicia,
+          colaborador: _personaMaria,
+          rol: rolCuidadoResponsable,
+          estado: estadoAsignacionPendiente,
+          fechaAlta: DateTime(2024, 1, 12),
+        );
+
+        final container = _buildContainer(
+          asignaciones: [asignacionPendiente],
+          personas: [_personaMaria, _personaAlicia],
+        );
+        addTearDown(container.dispose);
+
+        final opciones = await container.read(
+          personasSeleccionablesProvider.future,
+        );
+
+        // Alicia no debe aparecer porque su asignación no está activa.
+        expect(opciones.any((o) => o.persona.id == _personaAlicia.id), isFalse);
+        // Solo queda el propio usuario.
+        expect(opciones.length, 1);
+        expect(opciones.first.persona.id, _personaMaria.id);
+        expect(opciones.first.rol, PersonaContextRol.propio);
+      },
+    );
   });
 
   group('careTeamAssignmentsProvider', () {
@@ -484,6 +553,89 @@ void main() {
 
       expect(esResponsable, isFalse);
     });
+  });
+
+  group('puedeAdministrarEquipoProvider', () {
+    test(
+      'retorna true cuando la asignación propia activa incluye administrarEquipo',
+      () async {
+        // María (usuario logueado) es Responsable de Alicia (contexto default)
+        // y su asignación incluye el permiso administrarEquipo.
+        final container = _buildContainer(
+          asignaciones: [
+            _asignacionMariaConAdministrarEquipo(),
+            _asignacionCarlos(),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final puede = await container.read(
+          puedeAdministrarEquipoProvider.future,
+        );
+
+        expect(puede, isTrue);
+      },
+    );
+
+    test(
+      'retorna false cuando la asignación propia no incluye administrarEquipo',
+      () async {
+        // Asignación default de María (sin permisos poblados).
+        final container = _buildContainer();
+        addTearDown(container.dispose);
+
+        final puede = await container.read(
+          puedeAdministrarEquipoProvider.future,
+        );
+
+        expect(puede, isFalse);
+      },
+    );
+
+    test('retorna false cuando no hay usuario autenticado', () async {
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith(
+            (ref) =>
+                AuthNotifier(ref.watch(authRepositoryProvider))
+                  ..state = const AsyncValue.data(null),
+          ),
+          personaRepositoryProvider.overrideWithValue(
+            _FakePersonaRepository([_personaMaria, _personaAlicia]),
+          ),
+          asignacionCuidadoRepositoryProvider.overrideWithValue(
+            _FakeAsignacionCuidadoRepository([]),
+          ),
+          careTeamRepositoryProvider.overrideWithValue(
+            _FakeCareTeamRepository([]),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final puede = await container.read(puedeAdministrarEquipoProvider.future);
+
+      expect(puede, isFalse);
+    });
+
+    test(
+      'retorna false cuando no existe asignación activa propia (contexto propio)',
+      () async {
+        final container = _buildContainer();
+        addTearDown(container.dispose);
+
+        // Contexto propio (María): no tiene asignaciones donde ella sea la
+        // persona cuidada, por lo que no hay asignación propia activa.
+        container.read(selectedPersonaIdProvider.notifier).state =
+            _personaMaria.id;
+
+        final puede = await container.read(
+          puedeAdministrarEquipoProvider.future,
+        );
+
+        expect(puede, isFalse);
+      },
+    );
   });
 
   group('actualizarPermisosProvider', () {

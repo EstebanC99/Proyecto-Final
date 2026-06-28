@@ -8,6 +8,15 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
   const AsignacionCuidadoRepositoryImpl(this._datasource);
 
   @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() =>
+      _datasource.obtenerAsignacionesUsuarioLogueado();
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) => _datasource.obtenerAsignacionesPorPersona(personaCuidadaId);
+
+  @override
   Future<void> crearPersonaCargo({
     required String nombre,
     required String apellido,
@@ -29,14 +38,27 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
       _datasource.modificarPersonaCargo(asignacionId, persona);
 
   @override
-  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() =>
-      _datasource.obtenerAsignacionesUsuarioLogueado();
-
-  @override
   Future<void> eliminarAsignacion(int asignacionId) =>
       _datasource.eliminarAsignacion(asignacionId);
 
   @override
+  Future<void> activarAsignacion(int asignacionId) =>
+      _datasource.activarAsignacion(asignacionId);
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) =>
       _datasource.reactivarAsignacion(asignacionId);
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => _datasource.asignarPersonaEquipoCuidado(
+    personaCuidadaId: personaCuidadaId,
+    colaboradorEmail: colaboradorEmail,
+    rolCuidadoId: rolCuidadoId,
+    permisosCuidadoIds: permisosCuidadoIds,
+  );
 }

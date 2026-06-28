@@ -18,6 +18,9 @@ Widget _wrapHome() {
       activeAssignmentsAsResponsableProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
+      activeAssignmentsAsCuidadorProvider.overrideWith(
+        (ref) async => <AsignacionCuidado>[],
+      ),
     ],
     child: const MaterialApp(home: HomeScreen()),
   );

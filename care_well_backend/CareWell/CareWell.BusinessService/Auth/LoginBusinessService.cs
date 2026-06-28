@@ -32,7 +32,7 @@ namespace CareWell.BusinessService.Auth
             if (usuario == null || !this.PasswordHasherDomainService.Verificar(query.Contrasena, usuario.ContrasenaHash))
                 throw new UnauthorizedAccessException();
 
-            var expiracion = DateTime.UtcNow.AddMinutes(30);
+            var expiracion = DateTime.Now.AddMinutes(30);
             var accessTokenDataView = this.TokenAutorizacionBusinessService.GenerarTokenAcceso(new GenerarTokenAccesoQuery
             {
                 UsuarioID = usuario.ID,

@@ -21,6 +21,45 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   }
 
   @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async {
+    try {
+      final response = await _dio.post(ApiConfig.obtenerMisAsignacionesPath);
+
+      final asignacionesModel = _jsonToAsignacionesCuidadoModel(
+        response.data as List<dynamic>,
+      );
+
+      return asignacionesModel
+          .map((e) => AsignacionCuidadoMapper.fromModel(e))
+          .toList();
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) async {
+    try {
+      final response = await _dio.post(
+        ApiConfig.obtenerAsignacionesPorPersona,
+        data: {'personaCuidadaId': personaCuidadaId},
+      );
+
+      final asignacionesModel = _jsonToAsignacionesCuidadoModel(
+        response.data as List<dynamic>,
+      );
+
+      return asignacionesModel
+          .map((e) => AsignacionCuidadoMapper.fromModel(e))
+          .toList();
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
   Future<void> crearPersonaCargo({
     required String nombre,
     required String apellido,
@@ -71,23 +110,6 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   }
 
   @override
-  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async {
-    try {
-      final response = await _dio.get(ApiConfig.obtenerMisAsignacionesPath);
-
-      final asignacionesModel = _jsonToAsignacionesCuidadoModel(
-        response.data as List<dynamic>,
-      );
-
-      return asignacionesModel
-          .map((e) => AsignacionCuidadoMapper.fromModel(e))
-          .toList();
-    } on DioException catch (e) {
-      throw ApiExceptionMapper.map(e);
-    }
-  }
-
-  @override
   Future<void> eliminarAsignacion(int asignacionId) async {
     try {
       await _dio.post(ApiConfig.eliminarAsignacionPath, data: asignacionId);
@@ -97,9 +119,40 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   }
 
   @override
+  Future<void> activarAsignacion(int asignacionId) async {
+    try {
+      await _dio.post(ApiConfig.activarAsignacionPath, data: asignacionId);
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) async {
     try {
       await _dio.post(ApiConfig.reactivarAsignacionPath, data: asignacionId);
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) async {
+    try {
+      await _dio.post(
+        ApiConfig.asignar,
+        data: {
+          'personaCuidadaId': personaCuidadaId,
+          'colaboradorEmail': colaboradorEmail,
+          'rolCuidadoId': rolCuidadoId,
+          'permisosIds': permisosCuidadoIds,
+        },
+      );
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
     }

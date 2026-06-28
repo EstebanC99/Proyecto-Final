@@ -25,7 +25,7 @@
 
         public virtual bool HabilitadoUso()
         {
-            return !this.Revocado && this.Expiracion > DateTime.UtcNow;
+            return !this.Revocado && this.Expiracion > DateTime.Now;
         }
     }
 }

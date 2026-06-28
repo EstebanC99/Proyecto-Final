@@ -30,6 +30,7 @@ namespace CareWell.BusinessService
 
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
             services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
+            services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
 
             #endregion
 

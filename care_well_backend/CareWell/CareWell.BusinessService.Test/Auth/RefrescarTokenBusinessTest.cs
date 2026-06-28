@@ -140,7 +140,7 @@ namespace CareWell.BusinessService.Test.Auth
             public void Setea_la_expiracion_en_la_respuesta()
             {
                 // Arrange
-                var expiracion = DateTime.UtcNow.AddMinutes(30);
+                var expiracion = DateTime.Now.AddMinutes(30);
 
                 // Action
                 var respuesta = this.Action();

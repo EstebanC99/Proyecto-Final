@@ -116,7 +116,7 @@ namespace CareWell.Domain.Test.Auth
                 // Arrange
                 this.Target.Crear("TK1",
                                   Mock.Of<Usuario>(),
-                                  DateTime.UtcNow.AddMinutes(1));
+                                  DateTime.Now.AddMinutes(1));
 
                 // Action
                 var respuesta = this.Action();
@@ -144,7 +144,7 @@ namespace CareWell.Domain.Test.Auth
                 // Arrange
                 this.Target.Crear("TK1",
                                   Mock.Of<Usuario>(),
-                                  DateTime.UtcNow.AddMinutes(-1));
+                                  DateTime.Now.AddMinutes(-1));
 
                 // Action
                 var respuesta = this.Action();

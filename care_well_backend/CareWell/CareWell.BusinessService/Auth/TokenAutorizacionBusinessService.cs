@@ -56,7 +56,7 @@ namespace CareWell.BusinessService.Auth
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 
             var accessToken =  new JwtSecurityTokenHandler().WriteToken(token);
@@ -65,7 +65,7 @@ namespace CareWell.BusinessService.Auth
             
             refreshToken.Crear(Guid.NewGuid().ToString("N"),
                                this.EntityLoaderDomainService.GetByID<Usuario>(query.UsuarioID),
-                               DateTime.UtcNow.AddDays(30));
+                               DateTime.Now.AddDays(30));
 
             this.RefreshTokenRepository.Add(refreshToken);
 

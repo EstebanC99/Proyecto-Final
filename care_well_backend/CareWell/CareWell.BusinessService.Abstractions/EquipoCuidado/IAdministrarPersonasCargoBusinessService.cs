@@ -10,6 +10,7 @@ namespace CareWell.BusinessService.Abstractions.EquipoCuidado
         void CrearPersonaCargo(CrearPersonaCargoCommand command);
         void ModificarPersonaCargo(ModificarPersonaCargoCommand command);
         void EliminarAsignacion(int asignacionCuidadoID);
+        void ActivarAsignacion(int asignacionCuidadoID);
         void ReactivarAsignacion(int asignacionCuidadoID);
     }
 }

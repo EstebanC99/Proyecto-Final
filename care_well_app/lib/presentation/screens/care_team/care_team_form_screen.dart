@@ -35,6 +35,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
   // Estado de éxito
   bool _exitoso = false;
   String _emailAgregado = '';
+  String _personaNombre = '';
 
   /// Mapa de permisos por id: true = activo, false = inactivo.
   late Map<int, bool> _permisos;
@@ -89,7 +90,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
           .toList();
 
       // Construimos un RolCuidado con el id correcto; el provider lo busca por id.
-      final rolNombre = RolCuidado(
+      final rolCuidado = RolCuidado(
         id: _esResponsable
             ? RolesCuidadoConst.responsable
             : RolesCuidadoConst.cuidador,
@@ -100,13 +101,14 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
         personaCuidadaId: personaCtx.id,
         email: _emailController.text.trim(),
         permisos: permisosActivos,
-        rolNombre: rolNombre,
+        rol: rolCuidado,
       );
 
       if (!mounted) return;
       setState(() {
         _exitoso = true;
         _emailAgregado = _emailController.text.trim();
+        _personaNombre = personaCtx.nombreCompleto;
         _isLoading = false;
       });
     } catch (e) {
@@ -128,14 +130,12 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     if (_exitoso) {
       final personaCtxAsync = ref.watch(careTeamContextPersonaProvider);
 
-      final title = _esResponsable
-          ? 'Responsable agregado'
-          : 'Cuidador agregado';
-
       return SuccessView(
-        title: title,
+        title: 'Solicitud enviada',
         highlightedName: _emailAgregado,
-        subtitle: ' fue agregado al equipo.',
+        subtitle:
+            ' recibirá la solicitud para unirse al equipo de cuidado de '
+            '$_personaNombre.',
         primaryButtonLabel: 'Volver al equipo',
         onPrimaryTap: () {
           // Invalidar para forzar recarga al volver.

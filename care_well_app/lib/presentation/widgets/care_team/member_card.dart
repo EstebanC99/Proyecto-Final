@@ -14,7 +14,7 @@ class MemberCard extends StatelessWidget {
     super.key,
     required this.asignacion,
     required this.isCurrentUser,
-    required this.onTap,
+    this.onTap,
     this.showChevron = true,
   });
 
@@ -24,8 +24,8 @@ class MemberCard extends StatelessWidget {
   /// Indica si este miembro es el usuario autenticado.
   final bool isCurrentUser;
 
-  /// Callback al tocar la tarjeta.
-  final VoidCallback onTap;
+  /// Callback al tocar la tarjeta. Si es `null`, la tarjeta queda en modo solo lectura.
+  final VoidCallback? onTap;
 
   /// Si es `false` oculta el chevron (útil para headers de detalle).
   final bool showChevron;

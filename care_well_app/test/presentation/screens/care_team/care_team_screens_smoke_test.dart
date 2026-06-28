@@ -105,7 +105,23 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   Future<void> eliminarAsignacion(int asignacionId) async {}
 
   @override
+  Future<void> activarAsignacion(int asignacionId) async {}
+
+  @override
   Future<void> reactivarAsignacion(int asignacionId) async {}
+
+  @override
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
+    int personaCuidadaId,
+  ) async => [_asignacionMaria(), _asignacionCarlos()];
+
+  @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 }
 
 class _FakeCareTeamRepository implements CareTeamRepository {
