@@ -10,5 +10,8 @@ namespace CareWell.BusinessService.Abstractions.EquipoCuidado
 
         void Asignar(CrearAsignacionCuidadoCommand command);
         void ModificarPermisos(ModificarPermisosAsignacionCommand command);
+        void EliminarAsignacion(int asignacionCuidadoID);
+        void ActivarAsignacion(int asignacionCuidadoID);
+        void ReactivarAsignacion(int asignacionCuidadoID);
     }
 }

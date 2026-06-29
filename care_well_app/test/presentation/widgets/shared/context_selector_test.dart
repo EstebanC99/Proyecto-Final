@@ -36,7 +36,9 @@ Widget _wrap(Widget child, {List<Override> overrides = const []}) {
 
 /// Construye overrides con una sola persona seleccionable (el propio usuario).
 List<Override> _solaUnaOpcion() => [
-  careTeamContextPersonaProvider.overrideWith((ref) async => _personaMaria),
+  personaVisualizacionSeleccionadaProvider.overrideWith(
+    (ref) async => _personaMaria,
+  ),
   personasSeleccionablesProvider.overrideWith(
     (ref) async => [
       PersonaContextOption(
@@ -49,7 +51,7 @@ List<Override> _solaUnaOpcion() => [
 
 /// Construye overrides con dos personas seleccionables.
 List<Override> _variosOpciones({int? selectedId}) => [
-  careTeamContextPersonaProvider.overrideWith(
+  personaVisualizacionSeleccionadaProvider.overrideWith(
     (ref) async =>
         selectedId == _personaAlicia.id ? _personaAlicia : _personaMaria,
   ),
@@ -147,7 +149,7 @@ void main() {
     });
 
     testWidgets(
-      'al seleccionar una opción en el sheet se actualiza selectedPersonaIdProvider',
+      'al seleccionar una opción en el sheet se actualiza personaVisualizacionSeleccionadaIdProvider',
       (tester) async {
         late ProviderContainer container;
 
@@ -175,7 +177,10 @@ void main() {
         await tester.tap(find.text('Alicia Rodríguez'));
         await tester.pumpAndSettle();
 
-        expect(container.read(selectedPersonaIdProvider), _personaAlicia.id);
+        expect(
+          container.read(personaVisualizacionSeleccionadaIdProvider),
+          _personaAlicia.id,
+        );
       },
     );
 
@@ -184,7 +189,9 @@ void main() {
         _wrap(
           const ContextSelector(),
           overrides: [
-            careTeamContextPersonaProvider.overrideWith((ref) async => null),
+            personaVisualizacionSeleccionadaProvider.overrideWith(
+              (ref) async => null,
+            ),
             personasSeleccionablesProvider.overrideWith((ref) async => []),
           ],
         ),

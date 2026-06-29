@@ -331,6 +331,7 @@ INPUT ./Imagenes/IterativoIncremental.png
 INPUT ./Imagenes/IterativoIncremental.png
 INPUT ./Imagenes/IterativoIncremental.png
 INPUT ./Imagenes/IterativoIncremental.png
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmbxti10.tfm
 INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmti7.tfm
 INPUT ./Imagenes/MenuPrincipal.jpg
 INPUT ./Imagenes/MenuPrincipal.jpg
@@ -348,6 +349,7 @@ INPUT CuidadoPersonas.run.xml
 OUTPUT CuidadoPersonas.run.xml
 INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb
 INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb
 INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb
 INPUT c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb

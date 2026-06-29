@@ -15,10 +15,10 @@ Widget _wrapHome() {
     overrides: [
       // Sobreescribe assignmentsAsResponsableProvider con lista vacía resuelta para evitar
       // el NavTileSkeleton, que tiene un AnimationController de shimmer infinito.
-      activeAssignmentsAsResponsableProvider.overrideWith(
+      asignacionesActivasComoResponsableProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
-      activeAssignmentsAsCuidadorProvider.overrideWith(
+      asignacionesActivasComoCuidadorProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
     ],

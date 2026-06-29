@@ -69,7 +69,7 @@ class CareTeamScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final personaCtxAsync = ref.watch(careTeamContextPersonaProvider);
+    final personaCtxAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final puedeAdministrarAsync = ref.watch(puedeAdministrarEquipoProvider);
     final usuario = ref.watch(authStateProvider).valueOrNull;
 
@@ -150,11 +150,13 @@ class _TeamBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asignacionesAsync = ref.watch(
-      careTeamAssignmentsProvider(personaCtx.id),
+      asignacionesPorPersonaCuidadaProvider(personaCtx.id),
     );
     final puedeAdministrar =
         ref.watch(puedeAdministrarEquipoProvider).valueOrNull ?? false;
-    final esResponsable = ref.watch(esResponsableProvider).valueOrNull ?? false;
+    final esResponsable =
+        ref.watch(esResponsablePersonaSeleccionadaProvider).valueOrNull ??
+        false;
 
     return asignacionesAsync.when(
       loading: () => const _SkeletonTeam(),
@@ -180,12 +182,19 @@ class _TeamBody extends ConsumerWidget {
         final pendientes = asignaciones
             .where((a) => a.estado.id == EstadosAsignacionConst.pendiente)
             .toList();
+        final reactivables = asignaciones
+            .where((a) => a.estado.id == EstadosAsignacionConst.inactiva)
+            .toList();
 
         return RefreshIndicator(
           color: AppColors.primary,
           onRefresh: () async {
-            ref.invalidate(careTeamAssignmentsProvider(personaCtx.id));
-            await ref.read(careTeamAssignmentsProvider(personaCtx.id).future);
+            ref.invalidate(
+              asignacionesPorPersonaCuidadaProvider(personaCtx.id),
+            );
+            await ref.read(
+              asignacionesPorPersonaCuidadaProvider(personaCtx.id).future,
+            );
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -267,6 +276,22 @@ class _TeamBody extends ConsumerWidget {
                       ),
                     ),
                   ),
+
+                // Recientemente eliminados (solo quienes administran).
+                if (puedeAdministrar && reactivables.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  _SectionHeader('RECIENTEMENTE ELIMINADOS'),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...reactivables.map(
+                    (a) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _ReactivableCard(
+                        asignacion: a,
+                        onReactivar: () => _confirmarReactivar(context, ref, a),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -294,11 +319,8 @@ class _TeamBody extends ConsumerWidget {
       icon: Icons.cancel_outlined,
       accentColor: AppColors.error,
       onConfirm: () async {
-        final eliminar = ref.read(eliminarMiembroProvider);
-        await eliminar(
-          asignacionId: asignacion.id,
-          personaCuidadaId: personaCtx.id,
-        );
+        final eliminar = ref.read(eliminarAsignacionProvider);
+        await eliminar(asignacion: asignacion);
       },
     );
 
@@ -306,6 +328,40 @@ class _TeamBody extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Solicitud a $nombre cancelada.'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
+  Future<void> _confirmarReactivar(
+    BuildContext context,
+    WidgetRef ref,
+    AsignacionCuidado asignacion,
+  ) async {
+    final nombre = asignacion.colaborador.nombreCompleto;
+    final rolLabel = asignacion.rol.id == RolesCuidadoConst.responsable
+        ? 'responsable'
+        : 'cuidador';
+
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: '¿Reactivar a $nombre?',
+      body:
+          '$nombre volverá a tener acceso como $rolLabel de '
+          '${asignacion.personaCuidada.nombre} con los permisos que tenía.',
+      confirmLabel: 'Reactivar',
+      icon: Icons.restore_outlined,
+      onConfirm: () async {
+        final reactivar = ref.read(reactivarAsignacionProvider);
+        await reactivar(asignacion: asignacion);
+      },
+    );
+
+    if (confirmo && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$nombre fue reactivado en el equipo.'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -540,6 +596,97 @@ class _PendingChip extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: Color(0xFF7A5200),
         ),
+      ),
+    );
+  }
+}
+
+class _ReactivableCard extends StatelessWidget {
+  const _ReactivableCard({required this.asignacion, required this.onReactivar});
+
+  final AsignacionCuidado asignacion;
+  final VoidCallback onReactivar;
+
+  @override
+  Widget build(BuildContext context) {
+    final colaborador = asignacion.colaborador;
+    final esResponsable = asignacion.rol.id == RolesCuidadoConst.responsable;
+    final rolLabel = esResponsable ? 'Responsable' : 'Cuidador';
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColors.outline, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              AvatarInitial(nombre: colaborador.nombre, size: 44),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      colaborador.nombreCompleto,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (colaborador.email != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        colaborador.email!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        DeletedAssignmentChip(
+                          fechaEliminacion: asignacion.fechaEliminacion,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            'Era $rolLabel',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.restore_outlined, size: 16),
+              label: const Text('Reactivar'),
+              onPressed: onReactivar,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

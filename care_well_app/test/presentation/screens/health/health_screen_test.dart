@@ -28,7 +28,7 @@ Widget _wrap({Persona? persona}) {
     overrides: [
       healthPersonaContextProvider.overrideWith((ref) async => personaEfectiva),
       // ContextSelector necesita estos providers.
-      careTeamContextPersonaProvider.overrideWith(
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => personaEfectiva,
       ),
       personasSeleccionablesProvider.overrideWith(
@@ -78,7 +78,9 @@ void main() {
         ProviderScope(
           overrides: [
             healthPersonaContextProvider.overrideWith((ref) async => null),
-            careTeamContextPersonaProvider.overrideWith((ref) async => null),
+            personaVisualizacionSeleccionadaProvider.overrideWith(
+              (ref) async => null,
+            ),
             personasSeleccionablesProvider.overrideWith((ref) async => []),
           ],
           child: const MaterialApp(home: HealthScreen()),

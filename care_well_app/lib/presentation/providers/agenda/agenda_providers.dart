@@ -1,16 +1,14 @@
+import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/entities.dart';
 import '../../../infrastructure/notifications/local_notification_scheduler.dart';
-import '../auth/auth_providers.dart';
-import '../care_team/care_team_providers.dart';
-import '../di_providers.dart';
 
 // ─── Contexto de persona para la agenda ──────────────────────────────────────
 
 /// Persona de contexto para la agenda (reutiliza [careTeamContextPersonaProvider]).
 final agendaPersonaContextProvider = FutureProvider<Persona?>(
-  (ref) => ref.watch(careTeamContextPersonaProvider.future),
+  (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
 
 // ─── Permisos de gestión ──────────────────────────────────────────────────────

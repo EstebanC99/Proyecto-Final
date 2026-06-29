@@ -12,7 +12,7 @@ import '../../widgets/widgets.dart';
 
 /// Pantalla raíz post-login: menú principal de CareWell.
 ///
-/// Muestra el header, la fila de accesos rápidos, el grid 2×2 de secciones
+/// Muestra el header, el selector de contexto, el grid 2×2 de secciones
 /// y el tile de emergencia siempre visible.
 /// El tile de "Personas a cargo" alterna entre skeleton, empty state y tile
 /// normal según el estado de [allActiveAssignmentsProvider].
@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
     final usuario = authState.valueOrNull;
     final userName = usuario?.persona.nombre ?? '';
 
-    final dependentsAsync = ref.watch(allActiveAssignmentsProvider);
+    final dependentsAsync = ref.watch(asignacionesActivasProvider);
     final ultimoAnimoAsync = ref.watch(ultimoEstadoAnimoProvider);
     final ultimoAnimo = ultimoAnimoAsync.valueOrNull;
 
@@ -73,15 +73,9 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Header
-                HomeHeader(userName: userName),
-                const SizedBox(height: AppSpacing.md),
-
-                // Fila de accesos rápidos
-                QuickAccessRow(
-                  delay: const Duration(milliseconds: 100),
-                  onTapProfile: () => context.pushNamed(AppRoutes.profileName),
-                  onTapSettings: () =>
-                      context.pushNamed(AppRoutes.settingsName),
+                HomeHeader(
+                  userName: userName,
+                  onTapProfile: () => context.pushNamed(AppRoutes.settingsName),
                 ),
                 const SizedBox(height: AppSpacing.md),
 

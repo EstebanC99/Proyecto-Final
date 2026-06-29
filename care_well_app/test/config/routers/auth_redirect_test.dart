@@ -48,6 +48,12 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 
   @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {}
+
+  @override
   Future<void> eliminarAsignacion(int asignacionId) async {}
 
   @override

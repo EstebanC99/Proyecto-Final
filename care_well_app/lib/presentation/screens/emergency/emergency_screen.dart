@@ -20,7 +20,7 @@ class EmergencyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final equipoAsync = ref.watch(equipoEmergenciaProvider);
     final puedeAsync = ref.watch(puedeActivarEmergenciaProvider);
-    final personaAsync = ref.watch(careTeamContextPersonaProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
     final puede = puedeAsync.valueOrNull ?? false;
     final persona = personaAsync.valueOrNull;
@@ -182,7 +182,9 @@ class EmergencyScreen extends ConsumerWidget {
 
   Future<void> _handleTap(BuildContext context, WidgetRef ref) async {
     final equipo = ref.read(equipoEmergenciaProvider).valueOrNull ?? [];
-    final persona = ref.read(careTeamContextPersonaProvider).valueOrNull;
+    final persona = ref
+        .read(personaVisualizacionSeleccionadaProvider)
+        .valueOrNull;
     if (persona == null) return;
 
     final confirmo = await EmergencyConfirmDialog.show(

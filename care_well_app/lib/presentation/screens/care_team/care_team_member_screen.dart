@@ -101,11 +101,8 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
       confirmLabel: 'Quitar del equipo',
       icon: Icons.person_remove_outlined,
       onConfirm: () async {
-        final eliminar = ref.read(eliminarMiembroProvider);
-        await eliminar(
-          asignacionId: asignacion.id,
-          personaCuidadaId: asignacion.personaCuidada.id,
-        );
+        final eliminar = ref.read(eliminarAsignacionProvider);
+        await eliminar(asignacion: asignacion);
       },
     );
     if (confirmo && mounted) {
@@ -140,7 +137,9 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final asignacionAsync = ref.watch(assignmentByIdProvider(widget.memberId));
+    final asignacionAsync = ref.watch(
+      asignacionPersonaSeleccionadaPorIdProvider(widget.memberId),
+    );
 
     return PopScope(
       canPop: false,

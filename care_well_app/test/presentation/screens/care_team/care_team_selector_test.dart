@@ -63,6 +63,12 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 
   @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {}
+
+  @override
   Future<void> eliminarAsignacion(int asignacionId) async {}
 
   @override
@@ -128,7 +134,7 @@ Widget _wrap(Widget child) => ProviderScope(
     ),
     careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
     // Forzar esResponsableProvider a true para que la sección de pendientes sea visible.
-    esResponsableProvider.overrideWith((ref) async => true),
+    esResponsablePersonaSeleccionadaProvider.overrideWith((ref) async => true),
     // Forzar puedeAdministrarEquipoProvider a true para que el FAB y el botón "+" sean visibles.
     puedeAdministrarEquipoProvider.overrideWith((ref) async => true),
   ],

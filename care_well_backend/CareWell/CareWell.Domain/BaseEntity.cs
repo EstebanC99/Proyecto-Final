@@ -27,5 +27,7 @@
 
             return HashCode.Combine(GetType(), this.ID);
         }
+
+        public virtual bool IsTransient() => this.ID == default;
     }
 }

@@ -1,9 +1,7 @@
+import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/entities.dart';
-import '../auth/auth_providers.dart';
-import '../care_team/care_team_providers.dart';
-import '../di_providers.dart';
 
 // ─── Miembros del equipo para emergencia ─────────────────────────────────────
 
@@ -13,7 +11,9 @@ import '../di_providers.dart';
 final equipoEmergenciaProvider = FutureProvider<List<AsignacionCuidado>>((
   ref,
 ) async {
-  final persona = await ref.watch(careTeamContextPersonaProvider.future);
+  final persona = await ref.watch(
+    personaVisualizacionSeleccionadaProvider.future,
+  );
   if (persona == null) return [];
   final asignaciones = await ref
       .watch(careTeamRepositoryProvider)
@@ -37,7 +37,9 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
   final usuario = ref.watch(authStateProvider).valueOrNull;
   if (usuario == null) return false;
 
-  final persona = await ref.watch(careTeamContextPersonaProvider.future);
+  final persona = await ref.watch(
+    personaVisualizacionSeleccionadaProvider.future,
+  );
   if (persona == null) return false;
 
   final repo = ref.watch(careTeamRepositoryProvider);
@@ -75,7 +77,9 @@ final activarEmergenciaProvider = Provider<Future<Emergencia> Function()>((
     final usuario = ref.read(authStateProvider).valueOrNull;
     if (usuario == null) throw Exception('Sin sesión activa');
 
-    final persona = await ref.read(careTeamContextPersonaProvider.future);
+    final persona = await ref.read(
+      personaVisualizacionSeleccionadaProvider.future,
+    );
     if (persona == null) throw Exception('Sin persona de contexto');
 
     final miembros = await ref.read(equipoEmergenciaProvider.future);

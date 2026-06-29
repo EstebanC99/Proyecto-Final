@@ -18,9 +18,11 @@ class DependentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final responsableAsync = ref.watch(assignmentsAsResponsableProvider);
-    final cuidadorAsync = ref.watch(assignmentsAsCuidadorProvider);
-    final pendientesAsync = ref.watch(pendingAssignmentsAsCuidadorProvider);
+    final responsableAsync = ref.watch(asignacionesComoResponsableProvider);
+    final cuidadorAsync = ref.watch(asignacionesComoCuidadorProvider);
+    final pendientesAsync = ref.watch(
+      asignacionesPendientesComoCuidadorProvider,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -99,8 +101,8 @@ class _Body extends ConsumerWidget {
       icon: Icons.check_circle_outline,
       accentColor: AppColors.success,
       onConfirm: () async {
-        final activar = ref.read(activarDependenteProvider);
-        await activar(asignacion.id);
+        final activar = ref.read(activarAsignacionProvider);
+        await activar(asignacion: asignacion);
       },
     );
 
@@ -131,8 +133,8 @@ class _Body extends ConsumerWidget {
       icon: Icons.cancel_outlined,
       accentColor: AppColors.error,
       onConfirm: () async {
-        final eliminar = ref.read(eliminarDependenteProvider);
-        await eliminar(asignacion.id);
+        final eliminar = ref.read(eliminarAsignacionProvider);
+        await eliminar(asignacion: asignacion);
       },
     );
 
@@ -164,8 +166,8 @@ class _Body extends ConsumerWidget {
       icon: Icons.restore,
       accentColor: AppColors.primary,
       onConfirm: () async {
-        final reactivar = ref.read(reactivarDependenteProvider);
-        await reactivar(asignacion.id);
+        final reactivar = ref.read(reactivarAsignacionProvider);
+        await reactivar(asignacion: asignacion);
       },
     );
 

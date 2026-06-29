@@ -20,7 +20,7 @@ namespace CareWell.Domain.EquipoCuidado
 
         public virtual DateTime FechaAlta { get; private set; }
 
-        public virtual DateTime? FechaEliminacion { get; set; }
+        public virtual DateTime? FechaEliminacion { get; private set; }
 
         public virtual List<PermisoCuidado> Permisos { get; private set; }
 
@@ -31,7 +31,8 @@ namespace CareWell.Domain.EquipoCuidado
 
         public virtual void Asignar(CrearAsignacion crearAsignacion,
                                     IEntityLoaderDomainService entityLoaderDomainService,
-                                    IValidadorPermisoAccion validadorPermisoAccion)
+                                    IValidadorPermisoAccion validadorPermisoAccion,
+                                    IValidarExistenciaAsignacionCuidado validarExistenciaAsignacionCuidado)
         {
             if (!validadorPermisoAccion.PermiteAdministrarEquipoCuidado(crearAsignacion.PersonaCuidada, crearAsignacion.Asignador))
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
@@ -48,14 +49,18 @@ namespace CareWell.Domain.EquipoCuidado
             if (crearAsignacion.Permisos.Count == default)
                 throw new ValidacionDominioException(Mensajes.DebeSeleccionarUnoMasPermisos);
 
+            if (validarExistenciaAsignacionCuidado.ExisteAsignacionColaboradorElegido(crearAsignacion.PersonaCuidada, crearAsignacion.Colaborador))
+                throw new ValidacionDominioException(Mensajes.YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado);
+
             this.PersonaCuidada = crearAsignacion.PersonaCuidada;
             this.Colaborador = crearAsignacion.Colaborador;
             this.Rol = crearAsignacion.Rol;
 
             this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Pendiente);
             this.FechaAlta = DateTime.Now;
+            this.FechaEliminacion = null;
 
-            this.Permisos.AddRange(crearAsignacion.Permisos);
+            this.ActualizarPermisos(crearAsignacion.Permisos);
         }
 
         public virtual void AsignarResponsable(CrearAsignacionResponsable crearPersonaCargo,
@@ -93,7 +98,6 @@ namespace CareWell.Domain.EquipoCuidado
         public virtual void Eliminar(IEntityLoaderDomainService entityLoaderDomainService)
         {
             this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Inactiva);
-
             this.FechaEliminacion = DateTime.Now;
         }
 
@@ -105,14 +109,19 @@ namespace CareWell.Domain.EquipoCuidado
             this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Activa);
         }
 
-        public virtual void Reactivar(IEntityLoaderDomainService entityLoaderDomainService)
+        public virtual void Reactivar(Persona reactivador, 
+                                      IEntityLoaderDomainService entityLoaderDomainService)
         {
             if (!this.FechaEliminacion.HasValue) return;
 
             if (this.FechaEliminacion.Value < DateTime.Now.AddDays(-30))
                 throw new ValidacionDominioException(Mensajes.NoPuedeReactivarUnaAsignacionPasadoLos30Dias);
 
-            this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Activa);
+            if (reactivador.ID == this.Colaborador.ID)
+                this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Activa);
+            else
+                this.Estado = entityLoaderDomainService.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Pendiente);
+
             this.FechaEliminacion = null;
         }
 
@@ -125,17 +134,20 @@ namespace CareWell.Domain.EquipoCuidado
             if (!validadorPermisoAccion.PermiteAdministrarEquipoCuidado(this.PersonaCuidada, modificarPermisos.Asignador))
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
 
-            foreach (var permisoAsignado in modificarPermisos.NuevosPermisos)
-            {
-                if (!this.Permisos.Any(p => p.ID == permisoAsignado.ID))
-                    this.Permisos.Add(permisoAsignado);
-            }
-
-            foreach (var permisoExistente in this.Permisos)
-            {
-                if (!modificarPermisos.NuevosPermisos.Any(p => p.ID == permisoExistente.ID))
-                    this.Permisos.Remove(permisoExistente);
-            }
+            this.ActualizarPermisos(modificarPermisos.NuevosPermisos);
         }
+
+        #region Metodos Privados
+
+        private void ActualizarPermisos(List<PermisoCuidado> permisosSeleccionados)
+        {
+            var permisosAgregar = permisosSeleccionados.Where(permisoNuevo => !this.Permisos.Select(p => p.ID).Contains(permisoNuevo.ID)).ToList();
+            this.Permisos.AddRange(permisosAgregar);
+
+            var permisosEliminar = this.Permisos.Where(permisoExistente => !permisosSeleccionados.Select(p => p.ID).Contains(permisoExistente.ID)).ToList();
+            permisosEliminar.ForEach(p => this.Permisos.Remove(p));
+        }
+
+        #endregion
     }
 }

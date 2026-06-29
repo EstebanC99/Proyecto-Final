@@ -113,7 +113,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final crearDependente = ref.read(crearDependenteProvider);
+      final crearDependente = ref.read(crearPersonaCargoProvider);
       await crearDependente(
         nombre: _nombreController.text.trim(),
         apellido: _apellidoController.text.trim(),

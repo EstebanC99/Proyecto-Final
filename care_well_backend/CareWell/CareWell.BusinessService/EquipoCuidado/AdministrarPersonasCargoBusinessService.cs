@@ -96,32 +96,5 @@ namespace CareWell.BusinessService.EquipoCuidado
 
             this.UnitOfWork.SaveChanges();
         }
-
-        public void EliminarAsignacion(int asignacionCuidadoID)
-        {
-            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
-
-            asignacionCuidado.Eliminar(this.EntityLoaderDomainService);
-
-            this.UnitOfWork.SaveChanges();
-        }
-
-        public void ActivarAsignacion(int asignacionCuidadoID)
-        {
-            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
-
-            asignacionCuidado.Activar(this.EntityLoaderDomainService);
-
-            this.UnitOfWork.SaveChanges();
-        }
-
-        public void ReactivarAsignacion(int asignacionCuidadoID)
-        {
-            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
-
-            asignacionCuidado.Reactivar(this.EntityLoaderDomainService);
-
-            this.UnitOfWork.SaveChanges();
-        }
     }
 }

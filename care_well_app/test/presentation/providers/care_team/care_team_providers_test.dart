@@ -135,8 +135,17 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 
   @override
-  Future<void> eliminarAsignacion(int asignacionId) =>
-      throw UnimplementedError();
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {}
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) async {
+    final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
+    if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
+    _asignaciones.removeAt(idx);
+  }
 
   @override
   Future<void> activarAsignacion(int asignacionId) =>
@@ -257,15 +266,21 @@ ProviderContainer _buildContainer({
 }
 
 void main() {
-  group('careTeamContextPersonaProvider', () {
+  group('personaVisualizacionSeleccionadaProvider', () {
     test(
-      'retorna la primera persona donde el usuario es Responsable',
+      'retorna la persona donde el usuario es Responsable cuando se la selecciona',
       () async {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
+        // Seleccionar explícitamente a la persona a cargo (Alicia).
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
+            _personaAlicia.id;
+
         final persona = await container.read(
-          careTeamContextPersonaProvider.future,
+          personaVisualizacionSeleccionadaProvider.future,
         );
 
         expect(persona, isNotNull);
@@ -281,7 +296,7 @@ void main() {
 
         // Sin asignaciones: solo queda el propio usuario → retorna personaMaria.
         final persona = await container.read(
-          careTeamContextPersonaProvider.future,
+          personaVisualizacionSeleccionadaProvider.future,
         );
 
         // El propio usuario es la única opción disponible → no es null.
@@ -297,11 +312,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Seleccionar al propio usuario (María) explícitamente.
-        container.read(selectedPersonaIdProvider.notifier).state =
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
             _personaMaria.id;
 
         final persona = await container.read(
-          careTeamContextPersonaProvider.future,
+          personaVisualizacionSeleccionadaProvider.future,
         );
 
         expect(persona, isNotNull);
@@ -316,10 +333,13 @@ void main() {
         addTearDown(container.dispose);
 
         // ID inexistente: debe volver a opciones.first (María, el propio usuario).
-        container.read(selectedPersonaIdProvider.notifier).state = 99999;
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
+            99999;
 
         final persona = await container.read(
-          careTeamContextPersonaProvider.future,
+          personaVisualizacionSeleccionadaProvider.future,
         );
 
         expect(persona, isNotNull);
@@ -407,13 +427,13 @@ void main() {
     );
   });
 
-  group('careTeamAssignmentsProvider', () {
+  group('asignacionesPorPersonaCuidadaProvider', () {
     test('retorna las asignaciones de la persona cuidada', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        careTeamAssignmentsProvider(_personaAlicia.id).future,
+        asignacionesPorPersonaCuidadaProvider(_personaAlicia.id).future,
       );
 
       expect(asignaciones, isNotEmpty);
@@ -428,20 +448,26 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        careTeamAssignmentsProvider(99999).future,
+        asignacionesPorPersonaCuidadaProvider(99999).future,
       );
 
       expect(asignaciones, isEmpty);
     });
   });
 
-  group('assignmentByIdProvider', () {
+  group('asignacionPersonaSeleccionadaPorIdProvider', () {
     test('retorna la asignación correcta por ID', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
+      // Seleccionar a la persona a cargo (Alicia) como contexto.
+      container
+              .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+              .state =
+          _personaAlicia.id;
+
       final asignacion = await container.read(
-        assignmentByIdProvider(402).future,
+        asignacionPersonaSeleccionadaPorIdProvider(402).future,
       );
 
       expect(asignacion, isNotNull);
@@ -453,7 +479,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignacion = await container.read(
-        assignmentByIdProvider(99999).future,
+        asignacionPersonaSeleccionadaPorIdProvider(99999).future,
       );
 
       expect(asignacion, isNull);
@@ -484,7 +510,9 @@ void main() {
         addTearDown(container.dispose);
 
         // Seleccionar explícitamente a María (el propio usuario).
-        container.read(selectedPersonaIdProvider.notifier).state =
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
             _personaMaria.id;
 
         final esPropio = await container.read(esContextoPropioProvider.future);
@@ -498,7 +526,12 @@ void main() {
         final container = _buildContainer();
         addTearDown(container.dispose);
 
-        // Contexto default con asignaciones → Alicia (primera Responsable).
+        // Seleccionar a la persona a cargo (Alicia) como contexto.
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
+            _personaAlicia.id;
+
         final esPropio = await container.read(esContextoPropioProvider.future);
         expect(esPropio, isFalse);
       },
@@ -538,21 +571,12 @@ void main() {
         addTearDown(container.dispose);
 
         final esResponsable = await container.read(
-          esResponsableProvider.future,
+          esResponsablePersonaSeleccionadaProvider.future,
         );
 
         expect(esResponsable, isTrue);
       },
     );
-
-    test('retorna false si el usuario no tiene asignaciones', () async {
-      final container = _buildContainer(asignaciones: []);
-      addTearDown(container.dispose);
-
-      final esResponsable = await container.read(esResponsableProvider.future);
-
-      expect(esResponsable, isFalse);
-    });
   });
 
   group('puedeAdministrarEquipoProvider', () {
@@ -583,6 +607,12 @@ void main() {
         // Asignación default de María (sin permisos poblados).
         final container = _buildContainer();
         addTearDown(container.dispose);
+
+        // Seleccionar a la persona a cargo (Alicia) como contexto.
+        container
+                .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+                .state =
+            _personaAlicia.id;
 
         final puede = await container.read(
           puedeAdministrarEquipoProvider.future,
@@ -617,25 +647,6 @@ void main() {
 
       expect(puede, isFalse);
     });
-
-    test(
-      'retorna false cuando no existe asignación activa propia (contexto propio)',
-      () async {
-        final container = _buildContainer();
-        addTearDown(container.dispose);
-
-        // Contexto propio (María): no tiene asignaciones donde ella sea la
-        // persona cuidada, por lo que no hay asignación propia activa.
-        container.read(selectedPersonaIdProvider.notifier).state =
-            _personaMaria.id;
-
-        final puede = await container.read(
-          puedeAdministrarEquipoProvider.future,
-        );
-
-        expect(puede, isFalse);
-      },
-    );
   });
 
   group('actualizarPermisosProvider', () {
@@ -660,29 +671,32 @@ void main() {
     });
   });
 
-  group('eliminarMiembroProvider', () {
+  group('eliminarAsignacionProvider', () {
     test('elimina la asignación correctamente', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final eliminarFn = container.read(eliminarMiembroProvider);
+      final eliminarFn = container.read(eliminarAsignacionProvider);
 
-      await expectLater(
-        eliminarFn(asignacionId: 402, personaCuidadaId: _personaAlicia.id),
-        completes,
-      );
+      await expectLater(eliminarFn(asignacion: _asignacionCarlos()), completes);
     });
 
     test('lanza excepción si la asignación no existe', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final eliminarFn = container.read(eliminarMiembroProvider);
+      final eliminarFn = container.read(eliminarAsignacionProvider);
 
-      await expectLater(
-        eliminarFn(asignacionId: 99999, personaCuidadaId: _personaAlicia.id),
-        throwsException,
+      final inexistente = AsignacionCuidado(
+        id: 99999,
+        personaCuidada: _personaAlicia,
+        colaborador: _personaMaria,
+        rol: rolCuidadoResponsable,
+        estado: estadoAsignacionActiva,
+        fechaAlta: DateTime(2024, 1, 1),
       );
+
+      await expectLater(eliminarFn(asignacion: inexistente), throwsException);
     });
   });
 }

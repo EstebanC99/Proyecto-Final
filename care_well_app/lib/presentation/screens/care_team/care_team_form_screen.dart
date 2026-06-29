@@ -78,7 +78,9 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final personaCtx = await ref.read(careTeamContextPersonaProvider.future);
+      final personaCtx = await ref.read(
+        personaVisualizacionSeleccionadaProvider.future,
+      );
       if (personaCtx == null) {
         throw Exception('No hay persona de contexto.');
       }
@@ -128,7 +130,9 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
   @override
   Widget build(BuildContext context) {
     if (_exitoso) {
-      final personaCtxAsync = ref.watch(careTeamContextPersonaProvider);
+      final personaCtxAsync = ref.watch(
+        personaVisualizacionSeleccionadaProvider,
+      );
 
       return SuccessView(
         title: 'Solicitud enviada',
@@ -141,7 +145,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
           // Invalidar para forzar recarga al volver.
           personaCtxAsync.whenData((p) {
             if (p != null) {
-              ref.invalidate(careTeamAssignmentsProvider(p.id));
+              ref.invalidate(asignacionesPorPersonaCuidadaProvider(p.id));
             }
           });
           if (context.canPop()) {
@@ -153,7 +157,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
       );
     }
 
-    final personaCtxAsync = ref.watch(careTeamContextPersonaProvider);
+    final personaCtxAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final personaNombre = personaCtxAsync.valueOrNull?.nombreCompleto ?? '...';
 
     final title = _esResponsable ? 'Agregar responsable' : 'Agregar cuidador';

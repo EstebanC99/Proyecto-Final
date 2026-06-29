@@ -116,10 +116,10 @@ Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
       ),
       // Sobrescribe assignmentsAsResponsableProvider directamente para evitar el loading
       // state, lo que evita que se monte NavTileSkeleton y sus timers infinitos.
-      activeAssignmentsAsResponsableProvider.overrideWith(
+      asignacionesActivasComoResponsableProvider.overrideWith(
         (ref) async => asignaciones,
       ),
-      activeAssignmentsAsCuidadorProvider.overrideWith(
+      asignacionesActivasComoCuidadorProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
       // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
@@ -202,12 +202,6 @@ void main() {
       );
       await _settleAnimations(tester);
       expect(find.byType(EmergencyTile), findsOneWidget);
-    });
-
-    testWidgets('QuickAccessRow se muestra', (tester) async {
-      await tester.pumpWidget(_wrap(asignaciones: []));
-      await _settleAnimations(tester);
-      expect(find.byType(QuickAccessRow), findsOneWidget);
     });
 
     testWidgets('tiles fijos del grid siempre se muestran', (tester) async {

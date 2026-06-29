@@ -18,14 +18,16 @@ class ApiConfig {
       '/api/AdministrarPersonasCargo/modificar-persona-cargo';
   static const obtenerMisAsignacionesPath =
       '/api/AdministrarPersonasCargo/obtener-mis-asignaciones';
-  static const eliminarAsignacionPath =
-      '/api/AdministrarPersonasCargo/eliminar-asignacion';
-  static const activarAsignacionPath =
-      '/api/AdministrarPersonasCargo/activar-asignacion';
-  static const reactivarAsignacionPath =
-      '/api/AdministrarPersonasCargo/reactivar-asignacion';
 
   static const obtenerAsignacionesPorPersona =
       '/api/AdministrarEquipoCuidado/obtener-asignaciones';
   static const asignar = '/api/AdministrarEquipoCuidado/asignar';
+  static const modificarPermisosAsignacion =
+      '/api/AdministrarEquipoCuidado/modificar-permisos-asignacion';
+  static const eliminarAsignacionPath =
+      '/api/AdministrarEquipoCuidado/eliminar-asignacion';
+  static const activarAsignacionPath =
+      '/api/AdministrarEquipoCuidado/activar-asignacion';
+  static const reactivarAsignacionPath =
+      '/api/AdministrarEquipoCuidado/reactivar-asignacion';
 }

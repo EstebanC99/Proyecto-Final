@@ -140,7 +140,7 @@ ProviderContainer _makeContainer({
             AuthNotifier(ref.watch(authRepositoryProvider))
               ..state = AsyncValue.data(_usuarioDemoMaria),
       ),
-      careTeamContextPersonaProvider.overrideWith(
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
       careTeamRepositoryProvider.overrideWithValue(
@@ -272,7 +272,7 @@ void main() {
                     AuthNotifier(ref.watch(authRepositoryProvider))
                       ..state = AsyncValue.data(_usuarioDemoMaria),
               ),
-              careTeamContextPersonaProvider.overrideWith(
+              personaVisualizacionSeleccionadaProvider.overrideWith(
                 (ref) async => _personaMaria,
               ),
               careTeamRepositoryProvider.overrideWithValue(

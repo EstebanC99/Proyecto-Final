@@ -37,7 +37,7 @@ final _asignacion = AsignacionCuidado(
 Widget _wrap({bool puedeActivar = true, List<AsignacionCuidado>? equipo}) {
   return ProviderScope(
     overrides: [
-      careTeamContextPersonaProvider.overrideWith(
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
       equipoEmergenciaProvider.overrideWith(

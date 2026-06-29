@@ -18,16 +18,21 @@ abstract class AsignacionCuidadoDatasource {
 
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona);
 
-  Future<void> eliminarAsignacion(int asignacionId);
-
-  Future<void> activarAsignacion(int asignacionId);
-
-  Future<void> reactivarAsignacion(int asignacionId);
-
   Future<void> asignarPersonaEquipoCuidado({
     required int personaCuidadaId,
     required String colaboradorEmail,
     required int rolCuidadoId,
     required List<int> permisosCuidadoIds,
   });
+
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  });
+
+  Future<void> eliminarAsignacion(int asignacionId);
+
+  Future<void> activarAsignacion(int asignacionId);
+
+  Future<void> reactivarAsignacion(int asignacionId);
 }

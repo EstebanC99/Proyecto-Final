@@ -37,6 +37,7 @@ namespace CareWell.BusinessService
             #region Domain
 
             services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
+            services.AddScoped<IValidarExistenciaAsignacionCuidado, ValidarExistenciaAsignacionCuidado>();
 
             #endregion
 

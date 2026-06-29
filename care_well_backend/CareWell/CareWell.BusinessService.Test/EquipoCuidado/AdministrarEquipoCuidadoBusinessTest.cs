@@ -5,6 +5,7 @@ using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.EquipoCuidado;
 using CareWell.Domain.Factories;
+using CareWell.Domain.General;
 using CareWell.Domain.Validadores;
 using CareWell.Domain.ValueObjects.EquipoCuidado;
 using CareWell.Queries.EquipoCuidado;
@@ -20,6 +21,7 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
         private Mock<IUserContext> userContext;
         private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
         private Mock<IValidadorPermisoAccion> validadorPermisoAccion;
+        private Mock<IValidarExistenciaAsignacionCuidado> validarExistenciaAsignacionCuidado;
         private Mock<IPersonaRepository> personaRepository;
         private Mock<IBaseFactory> baseFactory;
         private Mock<IAsignacionCuidadoRepository> asignacionCuidadoRepository;
@@ -31,6 +33,7 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             this.userContext = new Mock<IUserContext>();
             this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
             this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
+            this.validarExistenciaAsignacionCuidado = new Mock<IValidarExistenciaAsignacionCuidado>();
             this.personaRepository = new Mock<IPersonaRepository>();
             this.baseFactory = new Mock<IBaseFactory>();
             this.asignacionCuidadoRepository = new Mock<IAsignacionCuidadoRepository>();
@@ -39,6 +42,7 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                                                                       this.userContext.Object,
                                                                       this.entityLoaderDomainService.Object,
                                                                       this.validadorPermisoAccion.Object,
+                                                                      this.validarExistenciaAsignacionCuidado.Object,
                                                                       this.personaRepository.Object,
                                                                       this.baseFactory.Object,
                                                                       this.asignacionCuidadoRepository.Object);
@@ -90,6 +94,7 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 );
 
                 this.asignacionCuidado = new Mock<AsignacionCuidado>();
+                this.asignacionCuidado.Setup(s => s.IsTransient()).Returns(true);
 
                 this.entityLoaderDomainService.Setup(s => s.GetByID<Usuario>(It.IsAny<int>())).Returns(Mock.Of<Usuario>());
 
@@ -176,7 +181,19 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Crear_AsignacionCuidado_del_BaseFactory()
+            public void Llama_una_vez_al_metodo_GetInactiveByColaborador_de_AsignacionCuidadoRepository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.GetInactiveByColaborador(It.IsAny<Persona>(), It.IsAny<Persona>()), Times.Once);
+            }
+
+            [Fact]
+            public void Si_no_encuentra_asignacion_inactiva_existente_llama_una_vez_al_metodo_Crear_AsignacionCuidado_del_BaseFactory()
             {
                 // Arrange
 
@@ -185,6 +202,20 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
 
                 // Assert
                 this.baseFactory.Verify(v => v.Crear<AsignacionCuidado>(), Times.Once);
+            }
+
+
+            [Fact]
+            public void Si_encuentra_asignacion_inactiva_existente_no_llama_nunca_al_metodo_Crear_AsignacionCuidado_del_BaseFactory()
+            {
+                // Arrange
+                this.asignacionCuidadoRepository.Setup(v => v.GetInactiveByColaborador(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(this.asignacionCuidado.Object);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.baseFactory.Verify(v => v.Crear<AsignacionCuidado>(), Times.Never);
             }
 
             [Fact]
@@ -198,11 +229,12 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 // Assert
                 this.asignacionCuidado.Verify(v => v.Asignar(It.IsAny<CrearAsignacion>(),
                                                              this.entityLoaderDomainService.Object,
-                                                             this.validadorPermisoAccion.Object), Times.Once);
+                                                             this.validadorPermisoAccion.Object,
+                                                             this.validarExistenciaAsignacionCuidado.Object), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Add_de_AsignacionCuidadoRepository()
+            public void Si_la_asignacion_es_nueva_llama_una_vez_al_metodo_Add_de_AsignacionCuidadoRepository()
             {
                 // Arrange
 
@@ -211,6 +243,20 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
 
                 // Assert
                 this.asignacionCuidadoRepository.Verify(v => v.Add(this.asignacionCuidado.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Si_la_asignacion_ya_existia_no_llama_nunca_al_metodo_Add_de_AsignacionCuidadoRepository()
+            {
+                // Arrange
+                this.asignacionCuidado.Setup(s => s.IsTransient()).Returns(false);
+                this.asignacionCuidadoRepository.Setup(v => v.GetInactiveByColaborador(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(this.asignacionCuidado.Object);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.Add(It.IsAny<AsignacionCuidado>()), Times.Never);
             }
 
             [Fact]
@@ -313,6 +359,213 @@ namespace CareWell.BusinessService.Test.EquipoCuidado
                 // Assert
                 this.asignacionCuidado.Verify(v => v.ModificarPermisos(It.IsAny<ModificarPermisosAsignacion>(),
                                                                        this.validadorPermisoAccion.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
+            }
+        }
+
+        public class ElMetodo_EliminarAsignacion : AdministrarEquipoCuidadoBusinessTest
+        {
+            private int asignacionCuidadoID;
+            private Mock<AsignacionCuidado> asignacionCuidado;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.asignacionCuidado = new Mock<AsignacionCuidado>();
+
+                this.asignacionCuidadoID = 1;
+
+                this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
+            }
+
+            private void Action()
+            {
+                this.Target.EliminarAsignacion(this.asignacionCuidadoID);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.asignacionCuidadoID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Eliminar_de_la_AsinacionCuidado()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidado.Verify(v => v.Eliminar(this.entityLoaderDomainService.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
+            }
+        }
+
+        public class ElMetodo_ActivarAsignacion : AdministrarEquipoCuidadoBusinessTest
+        {
+            private int asignacionCuidadoID;
+            private Mock<AsignacionCuidado> asignacionCuidado;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.asignacionCuidado = new Mock<AsignacionCuidado>();
+
+                this.asignacionCuidadoID = 1;
+
+                this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
+            }
+
+            private void Action()
+            {
+                this.Target.ActivarAsignacion(this.asignacionCuidadoID);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.asignacionCuidadoID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Activar_de_la_AsinacionCuidado()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidado.Verify(v => v.Activar(this.entityLoaderDomainService.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
+            }
+        }
+
+        public class ElMetodo_ReactivarAsignacion : AdministrarEquipoCuidadoBusinessTest
+        {
+            private int asignacionCuidadoID;
+            private Mock<Usuario> usuarioReactivador;
+            private Mock<AsignacionCuidado> asignacionCuidado;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.usuarioReactivador = new Mock<Usuario>();
+                this.usuarioReactivador.Setup(s => s.Persona).Returns(Mock.Of<Persona>());
+
+                this.asignacionCuidado = new Mock<AsignacionCuidado>();
+
+                this.asignacionCuidadoID = 1;
+
+                this.asignacionCuidadoRepository.Setup(s => s.GetByID(It.IsAny<int>())).Returns(this.asignacionCuidado.Object);
+
+                this.entityLoaderDomainService.Setup(s => s.GetByID<Usuario>(It.IsAny<int>())).Returns(this.usuarioReactivador.Object);
+            }
+
+            private void Action()
+            {
+                this.Target.ReactivarAsignacion(this.asignacionCuidadoID);
+            }
+
+            [Fact]
+            public void Lee_una_vez_el_UsuarioID_del_UserContext()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.userContext.Verify(v => v.UsuarioID, Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_Usuario_del_EntityLoaderDomainService_con_el_id_de_usuario_logueado()
+            {
+                // Arrange
+                var usuarioID = 99;
+                this.userContext.Setup(s => s.UsuarioID).Returns(usuarioID);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<Usuario>(usuarioID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_Usario_del_AsignacionCuidadoRepository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidadoRepository.Verify(v => v.GetByID(this.asignacionCuidadoID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Reactivar_de_la_AsinacionCuidado()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.asignacionCuidado.Verify(v => v.Reactivar(this.usuarioReactivador.Object.Persona,
+                                                               this.entityLoaderDomainService.Object), Times.Once);
             }
 
             [Fact]

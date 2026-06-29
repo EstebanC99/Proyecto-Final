@@ -1,15 +1,12 @@
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../domain/entities/entities.dart';
-import '../auth/auth_providers.dart';
-import '../care_team/care_team_providers.dart';
-import '../di_providers.dart';
 
 // ─── Contexto de persona para Mi salud ───────────────────────────────────────
 
 /// Persona de contexto para el módulo salud (reutiliza [careTeamContextPersonaProvider]).
 final healthPersonaContextProvider = FutureProvider<Persona?>(
-  (ref) => ref.watch(careTeamContextPersonaProvider.future),
+  (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
 
 // ─── Permisos RBAC ────────────────────────────────────────────────────────────

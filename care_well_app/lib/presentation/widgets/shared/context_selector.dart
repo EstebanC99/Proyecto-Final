@@ -22,9 +22,9 @@ class ContextSelector extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final personaAsync = ref.watch(careTeamContextPersonaProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final opcionesAsync = ref.watch(personasSeleccionablesProvider);
-    final selectedId = ref.watch(selectedPersonaIdProvider);
+    final selectedId = ref.watch(personaVisualizacionSeleccionadaIdProvider);
 
     return personaAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -73,7 +73,8 @@ class ContextSelector extends ConsumerWidget {
         opciones: opciones,
         selectedId: selectedId,
         onSelect: (id) {
-          ref.read(selectedPersonaIdProvider.notifier).state = id;
+          ref.read(personaVisualizacionSeleccionadaIdProvider.notifier).state =
+              id;
           Navigator.pop(context);
         },
       ),

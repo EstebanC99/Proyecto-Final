@@ -241,6 +241,12 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 
   @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {}
+
+  @override
   Future<void> eliminarAsignacion(int asignacionId) async {}
 
   @override
@@ -298,6 +304,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
+      // Seleccionar a la persona a cargo (Alicia) como contexto de agenda.
+      container
+              .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+              .state =
+          _personaAlicia.id;
+
       final eventos = await container.read(agendaEventosProvider.future);
 
       expect(eventos.length, 2);
@@ -318,7 +330,7 @@ void main() {
     test(
       'retorna true cuando el contexto es el propio usuario (sin asignaciones)',
       () async {
-        // Sin asignaciones: careTeamContextPersonaProvider resuelve a María (propio usuario).
+        // Sin asignaciones: personaVisualizacionSeleccionadaProvider resuelve a María (propio usuario).
         // esContextoPropioProvider debe retornar true → puedeGestionarAgenda = true.
         final container = _buildContainer(asignaciones: []);
         addTearDown(container.dispose);
@@ -350,7 +362,7 @@ void main() {
             notificationSchedulerProvider.overrideWithValue(
               FakeNotificationScheduler(),
             ),
-            careTeamContextPersonaProvider.overrideWith(
+            personaVisualizacionSeleccionadaProvider.overrideWith(
               (ref) async => _personaAlicia,
             ),
           ],
@@ -391,7 +403,7 @@ void main() {
           notificationSchedulerProvider.overrideWithValue(
             FakeNotificationScheduler(),
           ),
-          careTeamContextPersonaProvider.overrideWith(
+          personaVisualizacionSeleccionadaProvider.overrideWith(
             (ref) async => _personaAlicia,
           ),
         ],
@@ -459,6 +471,12 @@ void main() {
 
       final container = _buildContainer(eventos: [evento]);
       addTearDown(container.dispose);
+
+      // Seleccionar a la persona a cargo (Alicia) como contexto de agenda.
+      container
+              .read(personaVisualizacionSeleccionadaIdProvider.notifier)
+              .state =
+          _personaAlicia.id;
 
       final resultado = await container.read(
         agendaEventoByIdProvider(703).future,

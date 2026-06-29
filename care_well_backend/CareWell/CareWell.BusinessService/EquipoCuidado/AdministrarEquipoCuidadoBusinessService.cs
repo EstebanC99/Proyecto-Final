@@ -20,6 +20,7 @@ namespace CareWell.BusinessService.EquipoCuidado
         private IUserContext UserContext { get; set; }
         private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
         private IValidadorPermisoAccion ValidadorPermisoAccion { get; set; }
+        private IValidarExistenciaAsignacionCuidado ValidarExistenciaAsignacionCuidado { get; set; }
         private IPersonaRepository PersonaRepository { get; set; }
         private IBaseFactory Factory { get; set; }
         private IAsignacionCuidadoRepository AsignacionCuidadoRepository { get; set; }
@@ -28,6 +29,7 @@ namespace CareWell.BusinessService.EquipoCuidado
                                                        IUserContext userContext,
                                                        IEntityLoaderDomainService entityLoaderDomainService,
                                                        IValidadorPermisoAccion validadorPermisoAccion,
+                                                       IValidarExistenciaAsignacionCuidado validarExistenciaAsignacionCuidado,
                                                        IPersonaRepository personaRepository,
                                                        IBaseFactory baseFactory,
                                                        IAsignacionCuidadoRepository asignacionCuidadoRepository)
@@ -36,6 +38,7 @@ namespace CareWell.BusinessService.EquipoCuidado
             this.UserContext = userContext;
             this.EntityLoaderDomainService = entityLoaderDomainService;
             this.ValidadorPermisoAccion = validadorPermisoAccion;
+            this.ValidarExistenciaAsignacionCuidado = validarExistenciaAsignacionCuidado;
             this.PersonaRepository = personaRepository;
             this.Factory = baseFactory;
             this.AsignacionCuidadoRepository = asignacionCuidadoRepository;
@@ -63,13 +66,18 @@ namespace CareWell.BusinessService.EquipoCuidado
                 Permisos: permisosCuidado
             );
 
-            var asignacionCuidado = this.Factory.Crear<AsignacionCuidado>();
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetInactiveByColaborador(personaCuidada, colaborador);
+
+            if (asignacionCuidado is null)
+                asignacionCuidado = this.Factory.Crear<AsignacionCuidado>();
 
             asignacionCuidado.Asignar(crearAsignacion,
                                       this.EntityLoaderDomainService,
-                                      this.ValidadorPermisoAccion);
+                                      this.ValidadorPermisoAccion,
+                                      this.ValidarExistenciaAsignacionCuidado);
 
-            this.AsignacionCuidadoRepository.Add(asignacionCuidado);
+            if (asignacionCuidado.IsTransient())
+                this.AsignacionCuidadoRepository.Add(asignacionCuidado);
 
             this.UnitOfWork.SaveChanges();
         }
@@ -87,6 +95,36 @@ namespace CareWell.BusinessService.EquipoCuidado
 
             asignacionCuidado.ModificarPermisos(modificarPermisos,
                                                 this.ValidadorPermisoAccion);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void EliminarAsignacion(int asignacionCuidadoID)
+        {
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
+
+            asignacionCuidado.Eliminar(this.EntityLoaderDomainService);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void ActivarAsignacion(int asignacionCuidadoID)
+        {
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
+
+            asignacionCuidado.Activar(this.EntityLoaderDomainService);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void ReactivarAsignacion(int asignacionCuidadoID)
+        {
+            var usuarioReactivador = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
+
+            var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(asignacionCuidadoID);
+
+            asignacionCuidado.Reactivar(usuarioReactivador.Persona,
+                                        this.EntityLoaderDomainService);
 
             this.UnitOfWork.SaveChanges();
         }

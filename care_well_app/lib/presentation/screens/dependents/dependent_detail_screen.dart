@@ -140,7 +140,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
             : _telefonoController.text.trim(),
       );
 
-      final actualizar = ref.read(actualizarDependenteProvider);
+      final actualizar = ref.read(actualizarPersonaCargoProvider);
       final resultado = await actualizar(
         widget.asignacionId,
         personaActualizada,
@@ -217,8 +217,8 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       icon: Icons.check_circle_outline,
       accentColor: AppColors.success,
       onConfirm: () async {
-        final activar = ref.read(activarDependenteProvider);
-        await activar(asignacion.id);
+        final activar = ref.read(activarAsignacionProvider);
+        await activar(asignacion: asignacion);
       },
     );
 
@@ -252,8 +252,8 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       icon: Icons.cancel_outlined,
       accentColor: AppColors.error,
       onConfirm: () async {
-        final eliminar = ref.read(eliminarDependenteProvider);
-        await eliminar(asignacion.id);
+        final eliminar = ref.read(eliminarAsignacionProvider);
+        await eliminar(asignacion: asignacion);
       },
     );
 
@@ -284,9 +284,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       confirmLabel: 'Eliminar',
       icon: Icons.delete_outline,
       onConfirm: () async {
-        final eliminar = ref.read(eliminarDependenteProvider);
+        final eliminar = ref.read(eliminarAsignacionProvider);
 
-        await eliminar(asignacion.id);
+        await eliminar(asignacion: asignacion);
       },
     );
     if (confirmo && mounted) {
@@ -309,7 +309,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final asignacionAsync = ref.watch(
-      asignacionByIdProvider(widget.asignacionId),
+      miAsignacionPorIdProvider(widget.asignacionId),
     );
 
     return Scaffold(

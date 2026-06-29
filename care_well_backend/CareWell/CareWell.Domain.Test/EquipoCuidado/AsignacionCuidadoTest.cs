@@ -25,6 +25,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             private CrearAsignacion crearAsignacion;
             private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
             private Mock<IValidadorPermisoAccion> validadorPermisoAccion;
+            private Mock<IValidarExistenciaAsignacionCuidado> validarExistenciaAsignacionCuidado;
 
             protected override void InitializeTest()
             {
@@ -42,13 +43,17 @@ namespace CareWell.Domain.Test.EquipoCuidado
 
                 this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
                 this.validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
+
+                this.validarExistenciaAsignacionCuidado = new Mock<IValidarExistenciaAsignacionCuidado>();
+                this.validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(false);
             }
 
             private void Action()
             {
                 this.Target.Asignar(this.crearAsignacion,
                                     this.entityLoaderDomainService.Object,
-                                    this.validadorPermisoAccion.Object);
+                                    this.validadorPermisoAccion.Object,
+                                    this.validarExistenciaAsignacionCuidado.Object);
             }
 
             [Fact]
@@ -144,6 +149,30 @@ namespace CareWell.Domain.Test.EquipoCuidado
             }
 
             [Fact]
+            public void Llama_una_vez_al_metodo_ExisteAsignacionColaboradorElegido_del_ValidarExistenciaAsignacionCuidado()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.validarExistenciaAsignacionCuidado.Verify(v => v.ExisteAsignacionColaboradorElegido(this.crearAsignacion.PersonaCuidada,
+                                                                                                         this.crearAsignacion.Colaborador), Times.Once);
+            }
+
+            [Fact]
+            public void Si_el_ValidarExistenciaAsignacionCuidado_devuelve_true_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado, excepcionEsperada.Message);
+            }
+
+            [Fact]
             public void Setea_la_propiedad_PersonaCuidada()
             {
                 // Arrange
@@ -218,9 +247,37 @@ namespace CareWell.Domain.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Setea_la_lista_de_Permisos()
+            public void Setea_la_propiedad_FechaEliminacion_en_null()
             {
                 // Arrange
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Inactiva)).Returns(Mock.Of<EstadoAsignacionCuidado>(e => e.ID == EstadosAsignacionCuidado.Inactiva));
+                this.Target.Eliminar(this.entityLoaderDomainService.Object);
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Null(this.Target.FechaEliminacion);
+            }
+
+            [Fact]
+            public void Agrega_los_permisos_que_no_existian_a_la_lista_de_Permisos()
+            {
+                // Arrange
+                this.Target.Permisos.Clear();
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equivalent(this.crearAsignacion.Permisos, this.Target.Permisos);
+            }
+
+            [Fact]
+            public void Elimina_los_permisos_que_no_se_seleccionaron_de_la_lista_de_Permisos()
+            {
+                // Arrange
+                this.Target.Permisos.Add(Mock.Of<PermisoCuidado>(p => p.ID == PermisosCuidado.ActivarEmergencia));
 
                 // Action
                 this.Action();
@@ -587,9 +644,13 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 var validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
                 validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
 
+                var validarExistenciaAsignacionCuidado = new Mock<IValidarExistenciaAsignacionCuidado>();
+                validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(false);
+
                 this.Target.Asignar(crearAsignacion,
                                     this.entityLoaderDomainService.Object,
-                                    validadorPermisoAccion.Object);
+                                    validadorPermisoAccion.Object,
+                                    validarExistenciaAsignacionCuidado.Object);
 
                 #endregion
             }
@@ -642,20 +703,39 @@ namespace CareWell.Domain.Test.EquipoCuidado
 
         public class ElMetodo_Reactivar : AsignacionCuidadoTest
         {
+            private Mock<Persona> reactivador;
             private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
+                this.reactivador = new Mock<Persona>();
+
                 this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+
+                #region AsignarResponsable
+
+                var crearAsignacionResponsable = new CrearAsignacionResponsable(
+                    Mock.Of<Persona>(),
+                    Mock.Of<Usuario>(u => u.Persona == Mock.Of<Persona>())
+                );
+
+                var entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+                entityLoaderDomainService.Setup(s => s.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Activa)).Returns(Mock.Of<EstadoAsignacionCuidado>(e => e.ID == EstadosAsignacionCuidado.Activa));
+
+                this.Target.AsignarResponsable(crearAsignacionResponsable,
+                                               entityLoaderDomainService.Object);
+
+                #endregion
 
                 this.Target.Eliminar(this.entityLoaderDomainService.Object);
             }
 
             private void Action()
             {
-                this.Target.Reactivar(this.entityLoaderDomainService.Object);
+                this.Target.Reactivar(this.reactivador.Object,
+                                      this.entityLoaderDomainService.Object);
             }
 
             private class AsignacionCuidadoTestClass : AsignacionCuidado
@@ -688,7 +768,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_GetByID_EstadoAsignacionCuidado_del_EntityLoaderDomainService_con_el_estado_Activa()
+            public void Si_la_persona_reactivador_es_la_misma_que_el_colaborador_llama_una_vez_al_metodo_GetByID_EstadoAsignacionCuidado_del_EntityLoaderDomainService_con_el_estado_Activa()
             {
                 // Arrange
 
@@ -697,6 +777,19 @@ namespace CareWell.Domain.Test.EquipoCuidado
 
                 // Assert
                 this.entityLoaderDomainService.Verify(v => v.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Activa), Times.Once);
+            }
+
+            [Fact]
+            public void Si_la_persona_reactivador_es_distinta_que_el_colaborador_llama_una_vez_al_metodo_GetByID_EstadoAsignacionCuidado_del_EntityLoaderDomainService_con_el_estado_Pendiente()
+            {
+                // Arrange
+                this.reactivador.Setup(s => s.ID).Returns(99);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<EstadoAsignacionCuidado>(EstadosAsignacionCuidado.Pendiente), Times.Once);
             }
 
             [Fact]

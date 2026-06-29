@@ -2,6 +2,8 @@
 using CareWell.DataViews.EquipoCuidado;
 using CareWell.Domain.Auth;
 using CareWell.Domain.EquipoCuidado;
+using CareWell.Domain.General;
+using CareWell.Global.Constantes;
 using CareWell.Global.Constantes.EquipoCuidado;
 
 namespace CareWell.Repository.EquipoCuidado
@@ -11,7 +13,7 @@ namespace CareWell.Repository.EquipoCuidado
         public AsignacionCuidadoRepository(CareWellDbContext dbContext) : base(dbContext)
         {
         }
-
+        
         public List<AsignacionCuidadoDataView> ObtenerAsignacionesPorUsuario(int usuarioID)
         {
             var usuarioLogueado = this.DbContext.Set<Usuario>().Find(usuarioID);
@@ -21,7 +23,9 @@ namespace CareWell.Repository.EquipoCuidado
 
             return this.DbSet
                 .Where(a => a.Colaborador.ID == usuarioLogueado.Persona.ID
-                         && (a.Estado.ID != EstadosAsignacionCuidado.Inactiva || (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.Now.AddDays(-30))))
+                         && (a.Estado.ID != EstadosAsignacionCuidado.Inactiva
+                            ||
+                            (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.Now.AddDays(-RestriccionesNegocio.CantidadDiasLimiteParaReactivacionDeAsignacion))))
                 .ToList()
                 .Select(MapToDataView)
                 .ToList();
@@ -31,11 +35,24 @@ namespace CareWell.Repository.EquipoCuidado
         {
             return this.DbSet
                 .Where(a => a.PersonaCuidada.ID == personaCuidadaID
-                         && a.Estado.ID != EstadosAsignacionCuidado.Inactiva)
+                         && (a.Estado.ID != EstadosAsignacionCuidado.Inactiva
+                            ||
+                            (a.Estado.ID == EstadosAsignacionCuidado.Inactiva && a.FechaEliminacion > DateTime.Now.AddDays(-RestriccionesNegocio.CantidadDiasLimiteParaReactivacionDeAsignacion))))
                 .ToList()
                 .Select(MapToDataView)
                 .ToList();
         }
+
+
+        public AsignacionCuidado GetInactiveByColaborador(Persona personaCuidada, Persona colaborador)
+        {
+            return this.DbSet
+                .FirstOrDefault(a => a.PersonaCuidada.ID == personaCuidada.ID
+                                  && a.Colaborador.ID == colaborador.ID
+                                  && a.Estado.ID == EstadosAsignacionCuidado.Inactiva);
+        }
+
+        #region Metodos Privados
 
         private static AsignacionCuidadoDataView MapToDataView(AsignacionCuidado asignacionCuidado)
         {
@@ -81,5 +98,7 @@ namespace CareWell.Repository.EquipoCuidado
                 FechaEliminacion = asignacionCuidado.FechaEliminacion
             };
         }
+
+        #endregion
     }
 }

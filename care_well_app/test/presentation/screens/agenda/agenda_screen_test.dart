@@ -70,7 +70,7 @@ Widget _wrap({
         FakeNotificationScheduler(),
       ),
       // ContextSelector necesita estos providers.
-      careTeamContextPersonaProvider.overrideWith(
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => personaEfectiva,
       ),
       personasSeleccionablesProvider.overrideWith(

@@ -19,5 +19,6 @@
         public const string TelefonoRequerido = "El teléfono es requerido.";
         public const string UsuarioNoHabilitadoParaEjecutarAccion = "Usuario no habilitado para ejecutar la acción.";
         public const string NoSePuedeActivarUnaAsignacionConEstadoDiferentePendiente = "No es posible activar una asignación con estado diferente a 'Pendiente'.";
+        public const string YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado = "Ya existe una asignación registrada para el colaborador seleccionado.";
     }
 }

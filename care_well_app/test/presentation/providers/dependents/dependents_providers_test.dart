@@ -158,6 +158,12 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   }
 
   @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {}
+
+  @override
   Future<void> eliminarAsignacion(int asignacionId) async {
     final idx = _asignaciones.indexWhere((a) => a.id == asignacionId);
     if (idx < 0) throw Exception('Asignación no encontrada: $asignacionId');
@@ -293,7 +299,7 @@ ProviderContainer _buildContainer({
 }
 
 void main() {
-  group('assignmentsAsResponsableProvider', () {
+  group('asignacionesComoResponsableProvider', () {
     test(
       'retorna asignaciones donde el usuario es Responsable activo',
       () async {
@@ -301,7 +307,7 @@ void main() {
         addTearDown(container.dispose);
 
         final asignaciones = await container.read(
-          activeAssignmentsAsResponsableProvider.future,
+          asignacionesActivasComoResponsableProvider.future,
         );
 
         expect(asignaciones, isNotEmpty);
@@ -314,7 +320,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        activeAssignmentsAsResponsableProvider.future,
+        asignacionesActivasComoResponsableProvider.future,
       );
 
       expect(asignaciones, isEmpty);
@@ -335,26 +341,12 @@ void main() {
         addTearDown(container.dispose);
 
         final asignaciones = await container.read(
-          activeAssignmentsAsResponsableProvider.future,
+          asignacionesActivasComoResponsableProvider.future,
         );
 
         expect(asignaciones, isEmpty);
       },
     );
-
-    test('incluye asignaciones pendientes (no las excluye)', () async {
-      final container = _buildContainer(
-        asignaciones: [_asignacionMariaPendiente()],
-      );
-      addTearDown(container.dispose);
-
-      final asignaciones = await container.read(
-        activeAssignmentsAsResponsableProvider.future,
-      );
-
-      expect(asignaciones, isNotEmpty);
-      expect(asignaciones.first.estado.id, estadoAsignacionPendiente.id);
-    });
 
     test('excluye asignaciones inactivas', () async {
       final container = _buildContainer(
@@ -366,7 +358,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        activeAssignmentsAsResponsableProvider.future,
+        asignacionesActivasComoResponsableProvider.future,
       );
 
       expect(asignaciones, hasLength(1));
@@ -374,7 +366,7 @@ void main() {
     });
   });
 
-  group('assignmentsAsCuidadorProvider', () {
+  group('asignacionesComoCuidadorProvider', () {
     test('retorna asignaciones donde el usuario es Cuidador activo', () async {
       final asignacionCuidador = AsignacionCuidado(
         id: 404,
@@ -388,7 +380,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        activeAssignmentsAsCuidadorProvider.future,
+        asignacionesActivasComoCuidadorProvider.future,
       );
 
       expect(asignaciones, isNotEmpty);
@@ -400,14 +392,14 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        activeAssignmentsAsCuidadorProvider.future,
+        asignacionesActivasComoCuidadorProvider.future,
       );
 
       expect(asignaciones, isEmpty);
     });
   });
 
-  group('pendingAssignmentsAsCuidadorProvider', () {
+  group('asignacionesPendientesComoCuidadorProvider', () {
     AsignacionCuidado pendienteCuidador() => AsignacionCuidado(
       id: 408,
       personaCuidada: _personaAlicia,
@@ -422,7 +414,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        pendingAssignmentsAsCuidadorProvider.future,
+        asignacionesPendientesComoCuidadorProvider.future,
       );
 
       expect(asignaciones, hasLength(1));
@@ -442,7 +434,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        pendingAssignmentsAsCuidadorProvider.future,
+        asignacionesPendientesComoCuidadorProvider.future,
       );
 
       expect(asignaciones, isEmpty);
@@ -455,14 +447,14 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        pendingAssignmentsAsCuidadorProvider.future,
+        asignacionesPendientesComoCuidadorProvider.future,
       );
 
       expect(asignaciones, isEmpty);
     });
   });
 
-  group('activarDependenteProvider', () {
+  group('activarAsignacionProvider', () {
     test('activa la invitación pendiente sin lanzar excepción', () async {
       final pendiente = AsignacionCuidado(
         id: 410,
@@ -475,9 +467,9 @@ void main() {
       final container = _buildContainer(asignaciones: [pendiente]);
       addTearDown(container.dispose);
 
-      final activarFn = container.read(activarDependenteProvider);
+      final activarFn = container.read(activarAsignacionProvider);
 
-      await expectLater(activarFn(410), completes);
+      await expectLater(activarFn(asignacion: pendiente), completes);
     });
 
     test('tras activar, la invitación deja de estar pendiente', () async {
@@ -492,10 +484,10 @@ void main() {
       final container = _buildContainer(asignaciones: [pendiente]);
       addTearDown(container.dispose);
 
-      await container.read(activarDependenteProvider)(411);
+      await container.read(activarAsignacionProvider)(asignacion: pendiente);
 
       final pendientes = await container.read(
-        pendingAssignmentsAsCuidadorProvider.future,
+        asignacionesPendientesComoCuidadorProvider.future,
       );
       expect(pendientes, isEmpty);
     });
@@ -512,7 +504,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        assignmentsAsResponsableProvider.future,
+        asignacionesComoResponsableProvider.future,
       );
 
       expect(asignaciones, hasLength(2));
@@ -535,7 +527,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        assignmentsAsResponsableProvider.future,
+        asignacionesComoResponsableProvider.future,
       );
 
       expect(asignaciones, isEmpty);
@@ -559,7 +551,7 @@ void main() {
       addTearDown(container.dispose);
 
       final asignaciones = await container.read(
-        assignmentsAsCuidadorProvider.future,
+        asignacionesComoCuidadorProvider.future,
       );
 
       expect(asignaciones, hasLength(1));
@@ -567,13 +559,13 @@ void main() {
     });
   });
 
-  group('asignacionByIdProvider', () {
+  group('miAsignacionPorIdProvider', () {
     test('retorna la asignación con el id correcto', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
       final asignacion = await container.read(
-        asignacionByIdProvider(401).future,
+        miAsignacionPorIdProvider(401).future,
       );
 
       expect(asignacion.id, 401);
@@ -585,18 +577,18 @@ void main() {
       addTearDown(container.dispose);
 
       await expectLater(
-        container.read(asignacionByIdProvider(99999).future),
+        container.read(miAsignacionPorIdProvider(99999).future),
         throwsA(isA<StateError>()),
       );
     });
   });
 
-  group('crearDependenteProvider', () {
+  group('crearPersonaCargoProvider', () {
     test('crea persona sin lanzar excepción', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final crearFn = container.read(crearDependenteProvider);
+      final crearFn = container.read(crearPersonaCargoProvider);
 
       await expectLater(
         crearFn(
@@ -617,7 +609,7 @@ void main() {
       // Primero leer para establecer el estado.
       await container.read(misAsignacionesProvider.future);
 
-      final crearFn = container.read(crearDependenteProvider);
+      final crearFn = container.read(crearPersonaCargoProvider);
       await crearFn(
         nombre: 'Pedro',
         apellido: 'López',
@@ -631,12 +623,12 @@ void main() {
     });
   });
 
-  group('actualizarDependenteProvider', () {
+  group('actualizarPersonaCargoProvider', () {
     test('actualiza y retorna la persona modificada', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final actualizarFn = container.read(actualizarDependenteProvider);
+      final actualizarFn = container.read(actualizarPersonaCargoProvider);
 
       // asignacionId=401 corresponde a _asignacionMariaResponsable().
       final actualizada = await actualizarFn(
@@ -648,27 +640,33 @@ void main() {
     });
   });
 
-  group('eliminarDependenteProvider', () {
+  group('eliminarAsignacionProvider', () {
     test('elimina la persona sin lanzar excepción', () async {
       final container = _buildContainer();
       addTearDown(container.dispose);
 
-      final eliminarFn = container.read(eliminarDependenteProvider);
+      final eliminarFn = container.read(eliminarAsignacionProvider);
 
-      await expectLater(eliminarFn(401), completes);
+      await expectLater(
+        eliminarFn(asignacion: _asignacionMariaResponsable()),
+        completes,
+      );
     });
   });
 
-  group('reactivarDependenteProvider', () {
+  group('reactivarAsignacionProvider', () {
     test('reactiva la asignación sin lanzar excepción', () async {
       final container = _buildContainer(
         asignaciones: [_asignacionMariaInactiva()],
       );
       addTearDown(container.dispose);
 
-      final reactivarFn = container.read(reactivarDependenteProvider);
+      final reactivarFn = container.read(reactivarAsignacionProvider);
 
-      await expectLater(reactivarFn(405), completes);
+      await expectLater(
+        reactivarFn(asignacion: _asignacionMariaInactiva()),
+        completes,
+      );
     });
 
     test('tras reactivar, la asignación vuelve a estado activo', () async {
@@ -677,10 +675,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(reactivarDependenteProvider)(405);
+      await container.read(reactivarAsignacionProvider)(
+        asignacion: _asignacionMariaInactiva(),
+      );
 
       final asignaciones = await container.read(
-        assignmentsAsResponsableProvider.future,
+        asignacionesComoResponsableProvider.future,
       );
       expect(asignaciones.single.estado.id, estadoAsignacionActiva.id);
     });

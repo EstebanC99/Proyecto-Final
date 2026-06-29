@@ -7,13 +7,15 @@ import '../../../config/theme/app_spacing.dart';
 /// Barra de identidad y saludo del menú principal.
 ///
 /// Lado izquierdo: ícono de marca + wordmark bicolor "CareWell".
-/// Lado derecho: avatar con inicial + saludo (decorativo, no tappable).
-/// El acceso al perfil se realiza mediante el botón "Perfil" del QuickAccessRow.
+/// Lado derecho tappable — navega a Configuración vía [onTapProfile].
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key, required this.userName});
+  const HomeHeader({super.key, required this.userName, this.onTapProfile});
 
   /// Nombre del usuario para el saludo y la inicial del avatar.
   final String userName;
+
+  /// Callback invocado al tocar el área derecha (avatar + saludo).
+  final VoidCallback? onTapProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -61,40 +63,58 @@ class HomeHeader extends StatelessWidget {
 
             const Spacer(),
 
-            // Área derecha: avatar + saludo (estático, no tappable)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Avatar circular con inicial
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryContainer,
-                    shape: BoxShape.circle,
+            // Área derecha tappable: avatar + saludo. Navega a Configuración.
+            Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: InkWell(
+                onTap: () => onTapProfile?.call(),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: AppSpacing.minTapTarget,
                   ),
-                  child: Center(
-                    child: Text(
-                      initial,
-                      style: const TextStyle(
-                        color: AppColors.onPrimaryContainer,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Avatar circular con inicial
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryContainer,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              initial,
+                              style: const TextStyle(
+                                color: AppColors.onPrimaryContainer,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        // Saludo
+                        Text(
+                          'Hola, $userName',
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                // Saludo
-                Text(
-                  'Hola, $userName',
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),

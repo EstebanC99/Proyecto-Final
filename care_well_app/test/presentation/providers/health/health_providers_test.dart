@@ -218,7 +218,7 @@ ProviderContainer _makeContainer({
               ..state = AsyncValue.data(_usuarioDemoMaria),
       ),
       // Fija el contexto a Alicia (persona ajena) en ambas cadenas de providers.
-      careTeamContextPersonaProvider.overrideWith(
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),
@@ -251,7 +251,9 @@ ProviderContainer _makeContainerContextPropio({
               ..state = AsyncValue.data(_usuarioDemoMaria),
       ),
       // Contexto = María (propio usuario).
-      careTeamContextPersonaProvider.overrideWith((ref) async => _personaMaria),
+      personaVisualizacionSeleccionadaProvider.overrideWith(
+        (ref) async => _personaMaria,
+      ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
       careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository([])),
       healthRepositoryProvider.overrideWithValue(

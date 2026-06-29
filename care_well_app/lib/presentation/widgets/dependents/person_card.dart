@@ -5,6 +5,7 @@ import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../profile/role_badge.dart';
 import '../shared/avatar_initial.dart';
+import '../shared/deleted_assignment_chip.dart';
 
 /// Calcula la edad en años a partir de [fechaNacimiento].
 ///
@@ -20,23 +21,6 @@ int? calcularEdad(DateTime? fechaNacimiento) {
   );
   if (hoy.isBefore(cumpleEsteAnio)) edad--;
   return edad < 0 ? null : edad;
-}
-
-/// Plazo de gracia (en días) durante el cual una asignación eliminada puede
-/// reactivarse antes de su baja definitiva.
-const int _diasGraciaEliminacion = 30;
-
-/// Construye el texto del chip de asignación eliminada con el countdown de
-/// días restantes hasta la baja definitiva.
-///
-/// Retorna solo `"Eliminada"` si [fechaEliminacion] es nula.
-String buildDeletedChipLabel(DateTime? fechaEliminacion) {
-  if (fechaEliminacion == null) return 'Eliminada';
-  final diasTranscurridos = DateTime.now().difference(fechaEliminacion).inDays;
-  final restantes = _diasGraciaEliminacion - diasTranscurridos;
-  if (restantes <= 0) return 'Eliminada · vence hoy';
-  if (restantes == 1) return 'Eliminada · vence en 1 día';
-  return 'Eliminada · vence en $restantes días';
 }
 
 /// Tarjeta de asignación de cuidado para la lista de personas a cargo (US-13).
@@ -118,10 +102,10 @@ class PersonCard extends StatelessWidget {
                           // Flexible para que el chip ceda espacio y haga
                           // ellipsis en lugar de desbordar el Row.
                           Flexible(
-                            child: _DeletedChip(
-                              label: buildDeletedChipLabel(
-                                asignacion.fechaEliminacion,
-                              ),
+                            child: DeletedAssignmentChip(
+                              label:
+                                  'Eliminada · '
+                                  '${reactivacionCountdownLabel(asignacion.fechaEliminacion)}',
                             ),
                           ),
                         ] else if (esPendiente) ...[
@@ -152,37 +136,6 @@ class PersonCard extends StatelessWidget {
         vertical: 5,
       ),
       child: esInactiva ? Opacity(opacity: 0.6, child: card) : card,
-    );
-  }
-}
-
-/// Chip de estado para asignaciones eliminadas (inactivas).
-///
-/// Tono gris neutro; el texto incluye el countdown hasta la baja definitiva.
-class _DeletedChip extends StatelessWidget {
-  const _DeletedChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        border: Border.all(color: AppColors.outline, width: 1),
-      ),
-      child: Text(
-        label,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
-        ),
-      ),
     );
   }
 }

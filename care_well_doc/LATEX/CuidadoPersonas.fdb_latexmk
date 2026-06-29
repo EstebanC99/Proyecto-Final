@@ -1,17 +1,17 @@
 # Fdb version 4
-["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1782483355.95853 0
-  "CuidadoPersonas.bcf" 1782483355 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
+["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1782762044.50656 0
+  "CuidadoPersonas.bcf" 1782762044 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
   "Recursos/Bibliografia.bib" 1780344302 2322 98b7398011f3cca573e23d5f73ba9047 ""
   (generated)
   "CuidadoPersonas.bbl"
   "CuidadoPersonas.blg"
   (rewritten before read)
-["pdflatex"] 1782483351.83962 "CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1782483355.95956 0
-  "CuidadoPersonas.aux" 1782483355 13444 61dfdf68453305f785ca98088fe22b91 "pdflatex"
+["pdflatex"] 1782762040.76992 "CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1782762044.50746 0
+  "CuidadoPersonas.aux" 1782762044 13444 8bfecdc979dd646a5bd4df2a390f8283 "pdflatex"
   "CuidadoPersonas.bbl" 1780518397 14026 fbaeb0e5fc79189b15fe5b18eafe3f0a "biber CuidadoPersonas"
-  "CuidadoPersonas.run.xml" 1782483355 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
-  "CuidadoPersonas.tex" 1782483334 136898 e7f135be411b25d34cb95ac8bb80cf00 ""
-  "CuidadoPersonas.toc" 1782483355 7600 ceb6d49348ab06b2f3d56736b32c11ca "pdflatex"
+  "CuidadoPersonas.run.xml" 1782762044 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
+  "CuidadoPersonas.tex" 1782762000 142625 c5785cf5394618b10e403a060eda215e ""
+  "CuidadoPersonas.toc" 1782762044 7600 0ec6d44e70987c6f3b5d56b015dd14c0 "pdflatex"
   "Imagenes/DER.png" 1780344302 105674 e9b3cb90b504b9ac7e078a0d543487f2 ""
   "Imagenes/IterativoIncremental.png" 1780344302 35584 87e45a5672097f8cbadbba62b405a6a9 ""
   "Imagenes/LogoUTN.png" 1780344302 12626 e66b0cd860fb45faa188f715304b8a98 ""
@@ -24,6 +24,7 @@
   "c:/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1780346153 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1780345395 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1780345395 1324 c910af8c371558dc20f2d7822f66fe64 ""
+  "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmbxti10.tfm" 1780345395 1532 9162035f4e7176612125649e348e2195 ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm" 1780345395 1300 63a6111ee6274895728663cf4b4e7e81 ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1780345395 1524 4414a8315f39513458b80dfc63bff03a ""
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1780345395 1512 f21f83efb36853c0b70002322c1ab3ad ""
@@ -41,6 +42,7 @@
   "c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmtt12.tfm" 1780345395 772 9a936b7f5e2ff0557fce0f62822f0bbf ""
   "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1780344386 34811 78b52f49e893bcba91bd7581cdc144c0 ""
   "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1780344386 32080 340ef9bf63678554ee606688e7b5339d ""
+  "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb" 1780344386 36554 b67dc2cfa451409e100b3fcf5f506509 ""
   "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb" 1780344386 32001 6aeea3afe875097b1eb0da29acd61e28 ""
   "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb" 1780344386 36741 0ee9e374ec3e30da87cdfb0ea3575226 ""
   "c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1780344386 35752 024fb6c41858982481f6968b5fc26508 ""

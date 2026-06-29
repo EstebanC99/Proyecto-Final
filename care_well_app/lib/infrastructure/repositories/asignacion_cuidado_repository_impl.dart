@@ -38,18 +38,6 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
       _datasource.modificarPersonaCargo(asignacionId, persona);
 
   @override
-  Future<void> eliminarAsignacion(int asignacionId) =>
-      _datasource.eliminarAsignacion(asignacionId);
-
-  @override
-  Future<void> activarAsignacion(int asignacionId) =>
-      _datasource.activarAsignacion(asignacionId);
-
-  @override
-  Future<void> reactivarAsignacion(int asignacionId) =>
-      _datasource.reactivarAsignacion(asignacionId);
-
-  @override
   Future<void> asignarPersonaEquipoCuidado({
     required int personaCuidadaId,
     required String colaboradorEmail,
@@ -61,4 +49,25 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
     rolCuidadoId: rolCuidadoId,
     permisosCuidadoIds: permisosCuidadoIds,
   );
+
+  @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) => _datasource.modificarPermisosAsignacion(
+    asignacionId: asignacionId,
+    permisosSeleccionados: permisosSeleccionados,
+  );
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) =>
+      _datasource.eliminarAsignacion(asignacionId);
+
+  @override
+  Future<void> activarAsignacion(int asignacionId) =>
+      _datasource.activarAsignacion(asignacionId);
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) =>
+      _datasource.reactivarAsignacion(asignacionId);
 }

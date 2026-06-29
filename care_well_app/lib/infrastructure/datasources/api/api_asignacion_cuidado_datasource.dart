@@ -1,5 +1,6 @@
 import 'package:care_well_app/domain/datasources/asignacion_cuidado_datasource.dart';
 import 'package:care_well_app/domain/entities/care_team/asignacion_cuidado.dart';
+import 'package:care_well_app/domain/entities/care_team/permiso_cuidado.dart';
 import 'package:care_well_app/domain/entities/shared/persona.dart';
 import 'package:care_well_app/infrastructure/http/api_config.dart';
 import 'package:care_well_app/infrastructure/http/api_exception_mapper.dart';
@@ -86,6 +87,46 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   }
 
   @override
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) async {
+    try {
+      await _dio.post(
+        ApiConfig.asignar,
+        data: {
+          'personaCuidadaId': personaCuidadaId,
+          'colaboradorEmail': colaboradorEmail,
+          'rolCuidadoId': rolCuidadoId,
+          'permisosIds': permisosCuidadoIds,
+        },
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) async {
+    try {
+      await _dio.post(
+        ApiConfig.modificarPermisosAsignacion,
+        data: {
+          'asignacionCuidadoId': asignacionId,
+          'permisosIDs': permisosSeleccionados.map((p) => p.id).toList(),
+        },
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  @override
   Future<Persona> modificarPersonaCargo(
     int asignacionId,
     Persona persona,
@@ -131,28 +172,6 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
   Future<void> reactivarAsignacion(int asignacionId) async {
     try {
       await _dio.post(ApiConfig.reactivarAsignacionPath, data: asignacionId);
-    } on DioException catch (e) {
-      throw ApiExceptionMapper.map(e);
-    }
-  }
-
-  @override
-  Future<void> asignarPersonaEquipoCuidado({
-    required int personaCuidadaId,
-    required String colaboradorEmail,
-    required int rolCuidadoId,
-    required List<int> permisosCuidadoIds,
-  }) async {
-    try {
-      await _dio.post(
-        ApiConfig.asignar,
-        data: {
-          'personaCuidadaId': personaCuidadaId,
-          'colaboradorEmail': colaboradorEmail,
-          'rolCuidadoId': rolCuidadoId,
-          'permisosIds': permisosCuidadoIds,
-        },
-      );
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
     }

@@ -34,5 +34,23 @@ namespace CareWell.API.Controllers.EquipoCuidado
         {
             this.AdministrarEquipoCuidadoBusinessService.ModificarPermisos(command);
         }
+
+        [HttpPost("eliminar-asignacion")]
+        public void EliminarAsignacion([FromBody] int asignacionID)
+        {
+            this.AdministrarEquipoCuidadoBusinessService.EliminarAsignacion(asignacionID);
+        }
+
+        [HttpPost("activar-asignacion")]
+        public void ActivarAsignacion([FromBody] int asignacionID)
+        {
+            this.AdministrarEquipoCuidadoBusinessService.ActivarAsignacion(asignacionID);
+        }
+
+        [HttpPost("reactivar-asignacion")]
+        public void ReactivarAsignacion([FromBody] int asignacionID)
+        {
+            this.AdministrarEquipoCuidadoBusinessService.ReactivarAsignacion(asignacionID);
+        }
     }
 }
