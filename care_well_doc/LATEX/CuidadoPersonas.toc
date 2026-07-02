@@ -71,28 +71,28 @@
 \contentsline {subsubsection}{\numberline {9.7.1}Catálogo de permisos del sistema}{55}{}%
 \contentsline {subsection}{\numberline {9.8}ABM de Personas a Cargo}{56}{}%
 \contentsline {subsection}{\numberline {9.9}Gestión de Agenda}{58}{}%
-\contentsline {subsection}{\numberline {9.10}Chats}{59}{}%
-\contentsline {subsection}{\numberline {9.11}Análisis de Datos}{60}{}%
-\contentsline {subsection}{\numberline {9.12}Emergencia}{60}{}%
-\contentsline {subsection}{\numberline {9.13}Gestión de Salud}{60}{}%
-\contentsline {subsection}{\numberline {9.14}Gestión de Eventos}{61}{}%
-\contentsline {subsection}{\numberline {9.15}Reglas de negocio transversales}{62}{}%
-\contentsline {subsection}{\numberline {9.16}Limitaciones conocidas del MVP}{63}{}%
-\contentsline {section}{\numberline {10}Análisis de riesgos}{65}{}%
-\contentsline {subsection}{\numberline {10.1}Riesgos}{65}{}%
-\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{65}{}%
-\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{65}{}%
-\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{65}{}%
-\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{67}{}%
-\contentsline {subsubsection}{\numberline {10.3.3}Planes}{68}{}%
-\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{69}{}%
-\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{69}{}%
-\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{70}{}%
-\contentsline {subsubsection}{\numberline {10.4.3}Planes}{71}{}%
-\contentsline {section}{\numberline {11}Diseño}{72}{}%
-\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{72}{}%
-\contentsline {subsection}{\numberline {11.2}Accesibilidad}{72}{}%
-\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{72}{}%
-\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{72}{}%
-\contentsline {subsection}{\numberline {11.5}Prototipo}{73}{}%
-\contentsline {section}{Referencias}{74}{}%
+\contentsline {subsection}{\numberline {9.10}Chats}{60}{}%
+\contentsline {subsection}{\numberline {9.11}Análisis de Datos}{61}{}%
+\contentsline {subsection}{\numberline {9.12}Emergencia}{61}{}%
+\contentsline {subsection}{\numberline {9.13}Gestión de Salud}{62}{}%
+\contentsline {subsection}{\numberline {9.14}Gestión de Eventos}{63}{}%
+\contentsline {subsection}{\numberline {9.15}Reglas de negocio transversales}{64}{}%
+\contentsline {subsection}{\numberline {9.16}Limitaciones conocidas del MVP}{65}{}%
+\contentsline {section}{\numberline {10}Análisis de riesgos}{67}{}%
+\contentsline {subsection}{\numberline {10.1}Riesgos}{67}{}%
+\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{67}{}%
+\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{67}{}%
+\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{67}{}%
+\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{69}{}%
+\contentsline {subsubsection}{\numberline {10.3.3}Planes}{70}{}%
+\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{71}{}%
+\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{71}{}%
+\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{72}{}%
+\contentsline {subsubsection}{\numberline {10.4.3}Planes}{73}{}%
+\contentsline {section}{\numberline {11}Diseño}{74}{}%
+\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{74}{}%
+\contentsline {subsection}{\numberline {11.2}Accesibilidad}{74}{}%
+\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{74}{}%
+\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{74}{}%
+\contentsline {subsection}{\numberline {11.5}Prototipo}{75}{}%
+\contentsline {section}{Referencias}{76}{}%

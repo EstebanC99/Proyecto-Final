@@ -1,8 +1,13 @@
-﻿using CareWell.BusinessService.Abstractions.Auth;
+﻿using CareWell.BusinessService.Abstractions.Agenda;
+using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.BusinessService.Abstractions.EquipoCuidado;
+using CareWell.BusinessService.Abstractions.Salud;
+using CareWell.BusinessService.Agenda;
 using CareWell.BusinessService.Auth;
 using CareWell.BusinessService.EquipoCuidado;
+using CareWell.BusinessService.Salud;
 using CareWell.Domain.DomainServices;
+using CareWell.Domain.DomainServices.Agenda;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.Factories;
 using CareWell.Domain.Validadores;
@@ -31,6 +36,8 @@ namespace CareWell.BusinessService
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
             services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
             services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
+            services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
+            services.AddScoped<IAdministrarEventoAgendaBusinessService, AdministrarEventoAgendaBusinessService>();
 
             #endregion
 
@@ -38,6 +45,8 @@ namespace CareWell.BusinessService
 
             services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
             services.AddScoped<IValidarExistenciaAsignacionCuidado, ValidarExistenciaAsignacionCuidado>();
+            services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
+            services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
 
             #endregion
 

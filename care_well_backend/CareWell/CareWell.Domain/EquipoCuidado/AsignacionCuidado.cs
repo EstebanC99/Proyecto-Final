@@ -34,8 +34,7 @@ namespace CareWell.Domain.EquipoCuidado
                                     IValidadorPermisoAccion validadorPermisoAccion,
                                     IValidarExistenciaAsignacionCuidado validarExistenciaAsignacionCuidado)
         {
-            if (!validadorPermisoAccion.PermiteAdministrarEquipoCuidado(crearAsignacion.PersonaCuidada, crearAsignacion.Asignador))
-                throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
+            validadorPermisoAccion.ValidarPuedeAdministrarEquipoCuidado(crearAsignacion.PersonaCuidada, crearAsignacion.Asignador);
 
             if (crearAsignacion.PersonaCuidada is null)
                 throw new ValidacionDominioException(Mensajes.PersonaNoExiste);
@@ -89,8 +88,7 @@ namespace CareWell.Domain.EquipoCuidado
             if (this.Estado.ID != EstadosAsignacionCuidado.Activa)
                 throw new ValidacionDominioException(Mensajes.EstadoAsignacionNoPermiteEjecutarAccion);
 
-            if (!validadorPermisoAccion.PermiteModificarDatosPersonaCargo(this, modificarAsignacionResponsable.UsuarioModificador))
-                throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
+            validadorPermisoAccion.ValidarPuedeModificarDatosPersonaCargo(this, modificarAsignacionResponsable.UsuarioModificador);
 
             this.PersonaCuidada.CrearModificar(modificarAsignacionResponsable);
         }
@@ -131,8 +129,7 @@ namespace CareWell.Domain.EquipoCuidado
             if (this.Estado.ID != EstadosAsignacionCuidado.Activa)
                 throw new ValidacionDominioException(Mensajes.EstadoAsignacionNoPermiteEjecutarAccion);
 
-            if (!validadorPermisoAccion.PermiteAdministrarEquipoCuidado(this.PersonaCuidada, modificarPermisos.Asignador))
-                throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
+            validadorPermisoAccion.ValidarPuedeAdministrarEquipoCuidado(this.PersonaCuidada, modificarPermisos.Asignador);
 
             this.ActualizarPermisos(modificarPermisos.NuevosPermisos);
         }

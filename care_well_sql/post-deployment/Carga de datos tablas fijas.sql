@@ -3,15 +3,23 @@
 --------------------------------------------------------------------------
 
 
------------------------- TipoEventoAgenda --------------------------------
-SET IDENTITY_INSERT t_TipoEventoAgenda ON;
-INSERT INTO t_TipoEventoAgenda (ID_TipoEventoAgenda, Descripcion) VALUES
-(1, 'Cita Médica'),
-(2, 'Medicación'),
-(3, 'Rehabilitación'),
-(4, 'Control'),
-(5, 'Otro');
-SET IDENTITY_INSERT t_TipoEventoAgenda OFF;
+------------------------ TipoEvento --------------------------------
+SET IDENTITY_INSERT t_TipoEvento ON;
+INSERT INTO t_TipoEvento (ID_TipoEvento, Descripcion, Agendable) VALUES
+(1, 'Cita Médica', 1),
+(2, 'Medicación', 1),
+(3, 'Rehabilitación', 1),
+(4, 'Control', 1),
+(5, 'Hospitalizacion', 0),
+(6, 'Cirugia', 1),
+(7, 'Tratamiento', 1),
+(8, 'Bienestar', 0),
+(9, 'Síntoma', 0),
+(10, 'Diagnóstico', 0),
+(11, 'Vacuna', 1),
+(12, 'Actividad Física', 1),
+(13, 'Otro', 1);
+SET IDENTITY_INSERT t_TipoEvento OFF;
 GO
 --------------------------------------------------------------------------
 
@@ -67,23 +75,6 @@ INSERT INTO t_EstadoAnimo (ID_EstadoAnimo, Descripcion) VALUES
 (4, 'Mal'),
 (5, 'Muy Mal');
 SET IDENTITY_INSERT t_EstadoAnimo OFF;
-GO
---------------------------------------------------------------------------
-
------------------------- TipoEventoSalud ---------------------------------
-SET IDENTITY_INSERT t_TipoEventoSalud ON;
-INSERT INTO t_TipoEventoSalud (ID_TipoEventoSalud, Descripcion) VALUES
-(1, 'Cita Médica'),
-(2, 'Hospitalización'),
-(3, 'Medicación'),
-(4, 'Cirugía'),
-(5, 'Tratamiento'),
-(6, 'Bienestar'),
-(7, 'Síntoma'),
-(8, 'Diagnóstico'),
-(9, 'Vacuna'),
-(10, 'Otro');
-SET IDENTITY_INSERT t_TipoEventoSalud OFF;
 GO
 --------------------------------------------------------------------------
 

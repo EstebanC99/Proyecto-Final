@@ -53,20 +53,38 @@ namespace CareWell.Repository.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime?>("FechaHoraFin")
-                        .HasColumnType("datetime2");
+                    b.Property<long>("Duracion")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("FechaHoraInicio")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaUltimaGeneracionEventoSalud")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FechasExceptuadas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("GenerarEventoSalud")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<int>("ID_Persona")
                         .HasColumnType("int");
 
-                    b.Property<int>("ID_TipoEventoAgenda")
+                    b.Property<int>("ID_Persona_Creador")
                         .HasColumnType("int");
 
-                    b.Property<int>("ID_Usuario")
+                    b.Property<int>("ID_TipoEvento")
                         .HasColumnType("int");
+
+                    b.Property<int?>("MinutosAnticipacionRecordatorio")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReglaRecurrencia")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -77,55 +95,11 @@ namespace CareWell.Repository.Migrations
 
                     b.HasIndex("ID_Persona");
 
-                    b.HasIndex("ID_TipoEventoAgenda");
+                    b.HasIndex("ID_Persona_Creador");
 
-                    b.HasIndex("ID_Usuario");
+                    b.HasIndex("ID_TipoEvento");
 
                     b.ToTable("t_EventoAgenda", (string)null);
-                });
-
-            modelBuilder.Entity("CareWell.Domain.Agenda.EventoAgendaRecordatorio", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID_EventoAgendaRecordatorio");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<bool>("Enviado")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("FechaHoraEnvio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ID_EventoAgenda")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ID_EventoAgenda");
-
-                    b.ToTable("t_EventoAgendaRecordatorio", (string)null);
-                });
-
-            modelBuilder.Entity("CareWell.Domain.Agenda.TipoEventoAgenda", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID_TipoEventoAgenda");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("t_TipoEventoAgenda", (string)null);
                 });
 
             modelBuilder.Entity("CareWell.Domain.Auth.EstadoUsuario", b =>
@@ -380,6 +354,30 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_Persona", (string)null);
                 });
 
+            modelBuilder.Entity("CareWell.Domain.General.TipoEvento", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_TipoEvento");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<bool>("Agendable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("t_TipoEvento", (string)null);
+                });
+
             modelBuilder.Entity("CareWell.Domain.Salud.EstadoAnimo", b =>
                 {
                     b.Property<int>("ID")
@@ -415,17 +413,27 @@ namespace CareWell.Repository.Migrations
                     b.Property<DateTime>("FechaHora")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaOcurrenciaEventoAgenda")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ID_EventoAgenda")
+                        .HasColumnType("int");
+
                     b.Property<int>("ID_Persona")
                         .HasColumnType("int");
 
-                    b.Property<int>("ID_TipoEventoSalud")
+                    b.Property<int>("ID_TipoEvento")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
                     b.HasIndex("ID_Persona");
 
-                    b.HasIndex("ID_TipoEventoSalud");
+                    b.HasIndex("ID_TipoEvento");
+
+                    b.HasIndex("ID_EventoAgenda", "FechaOcurrenciaEventoAgenda")
+                        .IsUnique()
+                        .HasFilter("[ID_EventoAgenda] IS NOT NULL");
 
                     b.ToTable("t_EventoSalud", (string)null);
                 });
@@ -579,25 +587,6 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_RecomendacionMedica", (string)null);
                 });
 
-            modelBuilder.Entity("CareWell.Domain.Salud.TipoEventoSalud", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID_TipoEventoSalud");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("t_TipoEventoSalud", (string)null);
-                });
-
             modelBuilder.Entity("CareWell.Domain.Salud.TipoHabitoVida", b =>
                 {
                     b.Property<int>("ID")
@@ -640,34 +629,23 @@ namespace CareWell.Repository.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CareWell.Domain.Agenda.TipoEventoAgenda", "Tipo")
+                    b.HasOne("CareWell.Domain.General.Persona", "Creador")
                         .WithMany()
-                        .HasForeignKey("ID_TipoEventoAgenda")
+                        .HasForeignKey("ID_Persona_Creador")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CareWell.Domain.Auth.Usuario", "UsuarioCreador")
+                    b.HasOne("CareWell.Domain.General.TipoEvento", "Tipo")
                         .WithMany()
-                        .HasForeignKey("ID_Usuario")
+                        .HasForeignKey("ID_TipoEvento")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Creador");
 
                     b.Navigation("Persona");
 
                     b.Navigation("Tipo");
-
-                    b.Navigation("UsuarioCreador");
-                });
-
-            modelBuilder.Entity("CareWell.Domain.Agenda.EventoAgendaRecordatorio", b =>
-                {
-                    b.HasOne("CareWell.Domain.Agenda.EventoAgenda", "EventoAgenda")
-                        .WithMany()
-                        .HasForeignKey("ID_EventoAgenda")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventoAgenda");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Auth.RefreshToken", b =>
@@ -748,17 +726,24 @@ namespace CareWell.Repository.Migrations
 
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>
                 {
+                    b.HasOne("CareWell.Domain.Agenda.EventoAgenda", "EventoAgenda")
+                        .WithMany()
+                        .HasForeignKey("ID_EventoAgenda")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CareWell.Domain.General.Persona", "Persona")
                         .WithMany()
                         .HasForeignKey("ID_Persona")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CareWell.Domain.Salud.TipoEventoSalud", "Tipo")
+                    b.HasOne("CareWell.Domain.General.TipoEvento", "Tipo")
                         .WithMany()
-                        .HasForeignKey("ID_TipoEventoSalud")
+                        .HasForeignKey("ID_TipoEvento")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("EventoAgenda");
 
                     b.Navigation("Persona");
 

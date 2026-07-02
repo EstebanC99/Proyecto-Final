@@ -6,7 +6,9 @@ namespace CareWell.Domain.Validadores
 {
     public interface IValidadorPermisoAccion
     {
-        bool PermiteModificarDatosPersonaCargo(AsignacionCuidado asignacionCuidado, Usuario usuarioModificador);
-        bool PermiteAdministrarEquipoCuidado(Persona personaCuidada, Persona asignador);
+        void ValidarPuedeModificarDatosPersonaCargo(AsignacionCuidado asignacionCuidado, Usuario usuarioModificador);
+        void ValidarPuedeAdministrarEquipoCuidado(Persona personaCuidada, Persona asignador);
+        void ValidarPuedeAdministrarAgenda(Persona personaCuidada, Persona solicitante);
+        void ValidarVisualizacion(Persona personaCuidada, Persona solicitante);
     }
 }

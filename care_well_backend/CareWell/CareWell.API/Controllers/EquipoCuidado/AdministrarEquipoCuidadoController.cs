@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CareWell.API.Controllers.EquipoCuidado
 {
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route("api/[controller]")]
     public class AdministrarEquipoCuidadoController : ControllerBase
     {
         private IAdministrarEquipoCuidadoBusinessService AdministrarEquipoCuidadoBusinessService { get; set; }

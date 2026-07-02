@@ -42,7 +42,6 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
 
                 this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
-                this.validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
 
                 this.validarExistenciaAsignacionCuidado = new Mock<IValidarExistenciaAsignacionCuidado>();
                 this.validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(false);
@@ -65,32 +64,15 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.validadorPermisoAccion.Verify(v => v.PermiteAdministrarEquipoCuidado(this.crearAsignacion.PersonaCuidada,
+                this.validadorPermisoAccion.Verify(v => v.ValidarPuedeAdministrarEquipoCuidado(this.crearAsignacion.PersonaCuidada,
                                                                                           this.crearAsignacion.Asignador), Times.Once);
-            }
-
-            [Fact]
-            public void Si_el_ValidadorPermisoAccion_devuelve_false_arroja_un_ValidacionDominioException_con_mensaje_informativo()
-            {
-                // Arrange
-                this.validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(false);
-
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion, excepcionEsperada.Message);
             }
 
             [Fact]
             public void Si_PersonaCuidada_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacion = new CrearAsignacion(
-                    null,
-                    Mock.Of<Persona>(),
-                    Mock.Of<Persona>(),
-                    Mock.Of<RolCuidado>(),
-                    new List<PermisoCuidado> { Mock.Of<PermisoCuidado>() }
-                );
+                this.crearAsignacion = this.crearAsignacion with { PersonaCuidada = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -101,13 +83,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_Colaborador_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacion = new CrearAsignacion(
-                    Mock.Of<Persona>(),
-                    null,
-                    Mock.Of<Persona>(),
-                    Mock.Of<RolCuidado>(),
-                    new List<PermisoCuidado> { Mock.Of<PermisoCuidado>() }
-                );
+                this.crearAsignacion = this.crearAsignacion with { Colaborador = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -118,13 +94,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_Rol_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacion = new CrearAsignacion(
-                    Mock.Of<Persona>(),
-                    Mock.Of<Persona>(),
-                    Mock.Of<Persona>(),
-                    null,
-                    new List<PermisoCuidado> { Mock.Of<PermisoCuidado>() }
-                );
+                this.crearAsignacion = this.crearAsignacion with { Rol = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -135,13 +105,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_no_se_informaron_PermisosCuidado_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacion = new CrearAsignacion(
-                    Mock.Of<Persona>(),
-                    Mock.Of<Persona>(),
-                    Mock.Of<Persona>(),
-                    Mock.Of<RolCuidado>(),
-                    new List<PermisoCuidado>()
-                );
+                this.crearAsignacion = this.crearAsignacion with { Permisos = new List<PermisoCuidado>() };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -159,17 +123,6 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 // Assert
                 this.validarExistenciaAsignacionCuidado.Verify(v => v.ExisteAsignacionColaboradorElegido(this.crearAsignacion.PersonaCuidada,
                                                                                                          this.crearAsignacion.Colaborador), Times.Once);
-            }
-
-            [Fact]
-            public void Si_el_ValidarExistenciaAsignacionCuidado_devuelve_true_arroja_un_ValidacionDominioException_con_mensaje_informativo()
-            {
-                // Arrange
-                this.validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
-
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado, excepcionEsperada.Message);
             }
 
             [Fact]
@@ -314,10 +267,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_PersonaCuidada_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacionResponsable = new CrearAsignacionResponsable(
-                    null,
-                    Mock.Of<Usuario>(u => u.Persona == Mock.Of<Persona>())
-                );
+                this.crearAsignacionResponsable = this.crearAsignacionResponsable with { PersonaCuidada = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -328,10 +278,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_Usuario_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacionResponsable = new CrearAsignacionResponsable(
-                    Mock.Of<Persona>(),
-                    null
-                );
+                this.crearAsignacionResponsable = this.crearAsignacionResponsable with { UsuarioCreador = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -342,10 +289,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             public void Si_Persona_del_Usuario_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearAsignacionResponsable = new CrearAsignacionResponsable(
-                    Mock.Of<Persona>(),
-                    Mock.Of<Usuario>()
-                );
+                this.crearAsignacionResponsable = this.crearAsignacionResponsable with { UsuarioCreador = Mock.Of<Usuario>() };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -491,7 +435,6 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 );
 
                 this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
-                this.validadorPermisoAccion.Setup(s => s.PermiteModificarDatosPersonaCargo(It.IsAny<AsignacionCuidado>(), It.IsAny<Usuario>())).Returns(true);
 
                 #region AsignarResponsable
 
@@ -529,18 +472,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Si_el_ValidadorPermisoAccion_devuelve_false_arroja_un_ValidacionDominioException_con_mensaje_informativo()
-            {
-                // Arrange
-                this.validadorPermisoAccion.Setup(s => s.PermiteModificarDatosPersonaCargo(this.Target, this.modificarInformacionPersona.UsuarioModificador)).Returns(false);
-
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion, excepcionEsperada.Message);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_PermiteModificarDatosPersonaCargo_del_ValidadorPermisoAccion()
+            public void Llama_una_vez_al_metodo_ValidarPuedeModificarDatosPersonaCargo_del_ValidadorPermisoAccion()
             {
                 // Arrange
 
@@ -548,7 +480,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.validadorPermisoAccion.Verify(v => v.PermiteModificarDatosPersonaCargo(this.Target, this.modificarInformacionPersona.UsuarioModificador), Times.Once);
+                this.validadorPermisoAccion.Verify(v => v.ValidarPuedeModificarDatosPersonaCargo(this.Target, this.modificarInformacionPersona.UsuarioModificador), Times.Once);
             }
 
             [Fact]
@@ -642,7 +574,6 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 );
 
                 var validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
-                validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
 
                 var validarExistenciaAsignacionCuidado = new Mock<IValidarExistenciaAsignacionCuidado>();
                 validarExistenciaAsignacionCuidado.Setup(s => s.ExisteAsignacionColaboradorElegido(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(false);
@@ -834,7 +765,6 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 );
 
                 this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
-                this.validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(It.IsAny<Persona>(), It.IsAny<Persona>())).Returns(true);
 
                 #region AsignarResponsable
 
@@ -873,7 +803,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_PermiteModificarDatosPersonaCargo_del_ValidadorPermisoAccion()
+            public void Llama_una_vez_al_metodo_ValidarPuedeAdministrarEquipoCuidado_del_ValidadorPermisoAccion()
             {
                 // Arrange
 
@@ -881,18 +811,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
                 this.Action();
 
                 // Assert
-                this.validadorPermisoAccion.Verify(v => v.PermiteAdministrarEquipoCuidado(this.Target.PersonaCuidada, this.modificarPermisos.Asignador), Times.Once);
-            }
-
-            [Fact]
-            public void Si_el_ValidadorPermisoAccion_devuelve_false_arroja_un_ValidacionDominioException_con_mensaje_informativo()
-            {
-                // Arrange
-                this.validadorPermisoAccion.Setup(s => s.PermiteAdministrarEquipoCuidado(this.Target.PersonaCuidada, this.modificarPermisos.Asignador)).Returns(false);
-
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion, excepcionEsperada.Message);
+                this.validadorPermisoAccion.Verify(v => v.ValidarPuedeAdministrarEquipoCuidado(this.Target.PersonaCuidada, this.modificarPermisos.Asignador), Times.Once);
             }
 
             [Fact]

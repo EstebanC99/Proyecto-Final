@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ical.Net" Version="5.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CareWell.BusinessService.Abstractions\CareWell.BusinessService.Abstractions.csproj" />
     <ProjectReference Include="..\CareWell.Commands\CareWell.Commands.csproj" />
     <ProjectReference Include="..\CareWell.DataViews\CareWell.DataViews.csproj" />
