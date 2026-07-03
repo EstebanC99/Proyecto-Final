@@ -147,34 +147,35 @@ void main() {
   });
 
   group('EventoDeSaludMapper', () {
+    final refPersona = EntidadBasica(id: 1, descripcion: 'Alicia Rodríguez');
+
     final tipoSintoma = TipoEventoSalud(
-      id: TiposEventoSaludConst.sintoma,
+      id: TiposEventoAgendaConst.sintoma,
       descripcion: 'Síntoma',
     );
 
     final evento = EventoDeSalud(
       id: 1101,
-      persona: persona,
+      persona: refPersona,
       tipo: tipoSintoma,
-      fecha: DateTime(2026, 5, 28),
+      fechaHora: DateTime(2026, 5, 28),
       descripcion: 'Episodio de mareos.',
     );
 
     final model = EventoDeSaludModel(
       id: 1101,
-      personaId: 1,
+      persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
       tipo: TipoEventoSaludModel(
-        id: TiposEventoSaludConst.sintoma,
+        id: TiposEventoAgendaConst.sintoma,
         descripcion: 'Síntoma',
       ),
-      fecha: '2026-05-28T00:00:00.000',
+      fechaHora: '2026-05-28T00:00:00.000',
       descripcion: 'Episodio de mareos.',
     );
 
     test('entity → model → entity produce entidad equivalente', () {
       final roundTrip = EventoDeSaludMapper.fromModel(
         EventoDeSaludMapper.toModel(evento),
-        persona,
       );
       expect(roundTrip.id, evento.id);
       expect(roundTrip.tipo.id, evento.tipo.id);
@@ -184,7 +185,7 @@ void main() {
     test('json → model → entity → model → json produce el mismo JSON', () {
       final json = model.toJson();
       final modelFromJson = EventoDeSaludModel.fromJson(json);
-      final entity = EventoDeSaludMapper.fromModel(modelFromJson, persona);
+      final entity = EventoDeSaludMapper.fromModel(modelFromJson);
       final modelBack = EventoDeSaludMapper.toModel(entity);
       expect(modelBack.toJson(), json);
     });
@@ -192,7 +193,7 @@ void main() {
 
   group('EstadoDeAnimoMapper', () {
     final tipoSintoma = TipoEventoSalud(
-      id: TiposEventoSaludConst.sintoma,
+      id: TiposEventoAgendaConst.sintoma,
       descripcion: 'Síntoma',
     );
 
@@ -208,9 +209,9 @@ void main() {
 
     final evento = EventoDeSalud(
       id: 1101,
-      persona: persona,
+      persona: EntidadBasica(id: 1, descripcion: 'Alicia Rodríguez'),
       tipo: tipoSintoma,
-      fecha: DateTime(2026, 5, 28),
+      fechaHora: DateTime(2026, 5, 28),
       descripcion: 'Mareos.',
     );
 

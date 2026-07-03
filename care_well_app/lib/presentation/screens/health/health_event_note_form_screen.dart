@@ -58,7 +58,7 @@ class _HealthEventNoteFormScreenState
       _errorInline = null;
     });
     try {
-      await ref.read(crearNotaEventoProvider)(
+      await ref.read(agregarNotaEventoProvider)(
         eventoSaludId: widget.eventoId,
         contenido: contenido,
       );

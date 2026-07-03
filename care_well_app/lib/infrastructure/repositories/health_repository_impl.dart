@@ -52,29 +52,6 @@ class HealthRepositoryImpl implements HealthRepository {
       _datasource.eliminarRecomendacion(recomendacionId);
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) =>
-      _datasource.getEventosSaludByPersona(personaId);
-
-  @override
-  Future<EventoDeSalud> crearEventoSalud(EventoDeSalud evento) =>
-      _datasource.crearEventoSalud(evento);
-
-  @override
-  Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud evento) =>
-      _datasource.actualizarEventoSalud(evento);
-
-  @override
-  Future<void> eliminarEventoSalud(int eventoId) =>
-      _datasource.eliminarEventoSalud(eventoId);
-
-  @override
-  Future<List<NotaEvento>> getNotasByEvento(int eventoId) =>
-      _datasource.getNotasByEvento(eventoId);
-
-  @override
-  Future<NotaEvento> crearNota(NotaEvento nota) => _datasource.crearNota(nota);
-
-  @override
   Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) =>
       _datasource.getEstadosAnimoByPersona(personaId);
 

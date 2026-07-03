@@ -1,5 +1,21 @@
 import 'dart:convert';
 
+/// DTO de una referencia embebida `{id, descripcion}`.
+class EntidadBasicaModel {
+  final int id;
+  final String descripcion;
+
+  const EntidadBasicaModel({required this.id, required this.descripcion});
+
+  factory EntidadBasicaModel.fromJson(Map<String, dynamic> json) =>
+      EntidadBasicaModel(
+        id: json['id'] as int,
+        descripcion: (json['descripcion'] as String?) ?? '',
+      );
+
+  Map<String, dynamic> toJson() => {'id': id, 'descripcion': descripcion};
+}
+
 /// DTO del catálogo [TipoHabito] para serialización JSON.
 class TipoHabitoModel {
   final int id;
@@ -173,38 +189,61 @@ class RecomendacionMedicaModel {
 /// DTO de [EventoDeSalud] para serialización JSON.
 class EventoDeSaludModel {
   final int id;
-  final int personaId;
+
+  /// Persona como referencia embebida `{id, descripcion}`.
+  final EntidadBasicaModel persona;
 
   /// Tipo como objeto catálogo.
   final TipoEventoSaludModel tipo;
-  final String fecha;
+  final String fechaHora;
   final String descripcion;
+
+  /// Notas embebidas del evento.
+  final List<NotaEventoModel> notas;
+
+  /// Fecha/hora de la ocurrencia de agenda que originó el evento, si aplica.
+  final String? fechaOcurrenciaEventoAgenda;
 
   const EventoDeSaludModel({
     required this.id,
-    required this.personaId,
+    required this.persona,
     required this.tipo,
-    required this.fecha,
+    required this.fechaHora,
     required this.descripcion,
+    this.notas = const [],
+    this.fechaOcurrenciaEventoAgenda,
   });
 
   factory EventoDeSaludModel.fromJson(Map<String, dynamic> json) {
+    final notasJson = json['notas'] as List<dynamic>?;
     return EventoDeSaludModel(
       id: json['id'] as int,
-      personaId: json['personaId'] as int,
+      persona: EntidadBasicaModel.fromJson(
+        json['persona'] as Map<String, dynamic>,
+      ),
       tipo: TipoEventoSaludModel.fromJson(json['tipo'] as Map<String, dynamic>),
-      fecha: json['fecha'] as String,
+      fechaHora: json['fechaHora'] as String,
       descripcion: json['descripcion'] as String,
+      notas:
+          notasJson
+              ?.map((e) => NotaEventoModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      fechaOcurrenciaEventoAgenda:
+          json['fechaOcurrenciaEventoAgenda'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'personaId': personaId,
+      'persona': persona.toJson(),
       'tipo': tipo.toJson(),
-      'fecha': fecha,
+      'fechaHora': fechaHora,
       'descripcion': descripcion,
+      'notas': notas.map((n) => n.toJson()).toList(),
+      if (fechaOcurrenciaEventoAgenda != null)
+        'fechaOcurrenciaEventoAgenda': fechaOcurrenciaEventoAgenda,
     };
   }
 
@@ -266,14 +305,16 @@ class EstadoDeAnimoModel {
 class NotaEventoModel {
   final int id;
   final int eventoSaludId;
-  final int autorId;
+
+  /// Autor como referencia embebida `{id, descripcion}`.
+  final EntidadBasicaModel autor;
   final String fechaHora;
   final String contenido;
 
   const NotaEventoModel({
     required this.id,
     required this.eventoSaludId,
-    required this.autorId,
+    required this.autor,
     required this.fechaHora,
     required this.contenido,
   });
@@ -281,8 +322,8 @@ class NotaEventoModel {
   factory NotaEventoModel.fromJson(Map<String, dynamic> json) {
     return NotaEventoModel(
       id: json['id'] as int,
-      eventoSaludId: json['eventoSaludId'] as int,
-      autorId: json['autorId'] as int,
+      eventoSaludId: (json['eventoSaludId'] as int?) ?? 0,
+      autor: EntidadBasicaModel.fromJson(json['autor'] as Map<String, dynamic>),
       fechaHora: json['fechaHora'] as String,
       contenido: json['contenido'] as String,
     );
@@ -292,7 +333,7 @@ class NotaEventoModel {
     return {
       'id': id,
       'eventoSaludId': eventoSaludId,
-      'autorId': autorId,
+      'autor': autor.toJson(),
       'fechaHora': fechaHora,
       'contenido': contenido,
     };

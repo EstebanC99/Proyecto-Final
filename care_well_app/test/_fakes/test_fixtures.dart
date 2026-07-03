@@ -54,22 +54,22 @@ final estadoAsignacionPendiente = EstadoAsignacionCuidado(
 
 // ─── Tipos de evento de agenda ────────────────────────────────────────────────
 
-final tipoEventoAgendaCitaMedica = TipoEventoAgenda(
+final tipoEventoCitaMedica = TipoEvento(
   id: TiposEventoAgendaConst.citaMedica,
   descripcion: 'Cita médica',
 );
 
-final tipoEventoAgendaMedicacion = TipoEventoAgenda(
+final tipoEventoMedicacion = TipoEvento(
   id: TiposEventoAgendaConst.medicacion,
   descripcion: 'Medicación',
 );
 
-final tipoEventoAgendaControl = TipoEventoAgenda(
+final tipoEventoControl = TipoEvento(
   id: TiposEventoAgendaConst.control,
   descripcion: 'Control',
 );
 
-final tipoEventoAgendaOtro = TipoEventoAgenda(
+final tipoEventoOtro = TipoEvento(
   id: TiposEventoAgendaConst.otro,
   descripcion: 'Otro',
 );
@@ -77,19 +77,24 @@ final tipoEventoAgendaOtro = TipoEventoAgenda(
 // ─── Tipos de evento de salud ─────────────────────────────────────────────────
 
 final tipoEventoSaludCitaMedica = TipoEventoSalud(
-  id: TiposEventoSaludConst.citaMedica,
+  id: TiposEventoAgendaConst.citaMedica,
   descripcion: 'Cita médica',
 );
 
 final tipoEventoSaludSintoma = TipoEventoSalud(
-  id: TiposEventoSaludConst.sintoma,
+  id: TiposEventoAgendaConst.sintoma,
   descripcion: 'Síntoma',
 );
 
 final tipoEventoSaludVacuna = TipoEventoSalud(
-  id: TiposEventoSaludConst.vacuna,
+  id: TiposEventoAgendaConst.vacuna,
   descripcion: 'Vacuna',
 );
+
+// ─── Referencias embebidas (EntidadBasica) ────────────────────────────────────
+
+final refPersonaAlicia = EntidadBasica(id: 2, descripcion: 'Alicia Rodríguez');
+final refPersonaMaria = EntidadBasica(id: 1, descripcion: 'María García');
 
 // ─── Tipos de hábito ──────────────────────────────────────────────────────────
 

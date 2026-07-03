@@ -1,10 +1,12 @@
 ﻿using CareWell.BusinessService.Abstractions.Agenda;
 using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.BusinessService.Abstractions.EquipoCuidado;
+using CareWell.BusinessService.Abstractions.General;
 using CareWell.BusinessService.Abstractions.Salud;
 using CareWell.BusinessService.Agenda;
 using CareWell.BusinessService.Auth;
 using CareWell.BusinessService.EquipoCuidado;
+using CareWell.BusinessService.General;
 using CareWell.BusinessService.Salud;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Agenda;
@@ -38,6 +40,8 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<IAdministrarEventoAgendaBusinessService, AdministrarEventoAgendaBusinessService>();
+            services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
+            services.AddScoped<IAdministrarEventoSaludBusinessService, AdministrarEventoSaludBusinessService>();
 
             #endregion
 

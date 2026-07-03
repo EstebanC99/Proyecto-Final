@@ -2,11 +2,11 @@ import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/entities.dart';
-import '../../../infrastructure/notifications/local_notification_scheduler.dart';
+import '../../../domain/notifications/notifications.dart';
 
 // ─── Contexto de persona para la agenda ──────────────────────────────────────
 
-/// Persona de contexto para la agenda (reutiliza [careTeamContextPersonaProvider]).
+/// Persona de contexto para la agenda (reutiliza [personaVisualizacionSeleccionadaProvider]).
 final agendaPersonaContextProvider = FutureProvider<Persona?>(
   (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
@@ -17,7 +17,7 @@ final agendaPersonaContextProvider = FutureProvider<Persona?>(
 /// de contexto (alta, edición y eliminación de eventos).
 ///
 /// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-/// Para personas a cargo, requiere asignación activa con [CodigoPermiso.gestionarAgenda].
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.gestionarAgenda].
 final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
   // Cortocircuito: el usuario siempre puede gestionar su propia agenda.
   final esPropio = await ref.watch(esContextoPropioProvider.future);
@@ -49,185 +49,238 @@ final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
   );
 });
 
-// ─── Eventos ──────────────────────────────────────────────────────────────────
+// ─── Catálogo de tipos de evento ────────────────────────────────────────────
 
-/// Lista de eventos de la persona de contexto, ordenados cronológicamente.
-final agendaEventosProvider = FutureProvider<List<EventoAgenda>>((ref) async {
-  final persona = await ref.watch(agendaPersonaContextProvider.future);
-  if (persona == null) return [];
-
-  final repo = ref.watch(agendaRepositoryProvider);
-  final eventos = await repo.getEventosByPersona(persona.id);
-  eventos.sort((a, b) => a.fechaHoraInicio.compareTo(b.fechaHoraInicio));
-  return eventos;
+/// Catálogo completo de tipos de evento (agendables y no agendables).
+final tiposEventoProvider = FutureProvider<List<TipoEvento>>((ref) async {
+  return ref.watch(agendaRepositoryProvider).obtenerTiposEvento();
 });
 
-/// Evento individual por ID. Busca en la lista ya cargada.
-///
-/// Retorna `null` si el evento no existe.
-final agendaEventoByIdProvider = FutureProvider.family<EventoAgenda?, int>((
+/// Tipos de evento que pueden seleccionarse al crear un evento
+/// (derivado de [tiposEventoProvider], filtrando por [TipoEvento.agendable]).
+final tiposEventoAgendablesProvider = FutureProvider<List<TipoEvento>>((ref) {
+  return ref
+      .watch(tiposEventoProvider.future)
+      .then((tipos) => tipos.where((t) => t.agendable).toList());
+});
+
+// ─── Mes seleccionado y ocurrencias ─────────────────────────────────────────
+
+/// Primer día del mes actualmente visualizado en la agenda.
+final mesSeleccionadoProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, 1);
+});
+
+/// Ocurrencias de la persona de contexto dentro del mes seleccionado,
+/// ordenadas por fecha/hora de inicio.
+final ocurrenciasDelMesProvider = FutureProvider<List<OcurrenciaEventoAgenda>>((
   ref,
-  eventId,
 ) async {
-  final eventos = await ref.watch(agendaEventosProvider.future);
-  return eventos.where((e) => e.id == eventId).firstOrNull;
+  final persona = await ref.watch(agendaPersonaContextProvider.future);
+  final personaId = persona?.id;
+  if (personaId == null) return [];
+
+  final mes = ref.watch(mesSeleccionadoProvider);
+  final desde = mes;
+  final hasta = DateTime(mes.year, mes.month + 1, 1);
+
+  final ocurrencias = await ref
+      .watch(agendaRepositoryProvider)
+      .obtenerOcurrencias(personaId: personaId, desde: desde, hasta: hasta);
+  ocurrencias.sort((a, b) => a.fechaHoraInicio.compareTo(b.fechaHoraInicio));
+  return ocurrencias;
 });
 
-/// Recordatorios de un evento por su ID.
-final recordatoriosByEventoProvider =
-    FutureProvider.family<List<Recordatorio>, int>((ref, eventoId) async {
-      final repo = ref.watch(agendaRepositoryProvider);
-      return repo.getRecordatoriosByEvento(eventoId);
-    });
+// ─── Mutadores ──────────────────────────────────────────────────────────────
 
-// ─── Acciones mutadoras ───────────────────────────────────────────────────────
-
-/// Crea un nuevo evento de agenda y, si se solicita recordatorio, programa
-/// la notificación local correspondiente.
+/// Crea un evento de agenda (opcionalmente recurrente), refresca las
+/// ocurrencias del mes y resincroniza las notificaciones locales.
 final crearEventoAgendaProvider =
     Provider<
-      Future<EventoAgenda> Function({
-        required Persona personaCuidada,
-        required DateTime fechaHora,
-        required String descripcion,
-        required bool conRecordatorio,
-        required Usuario creadoPor,
+      Future<void> Function({
+        required int personaId,
+        required String titulo,
+        String? descripcion,
+        required int tipoEventoId,
+        required DateTime fechaHoraInicio,
+        required int duracionMinutos,
+        required bool generarEventoSalud,
+        int? minutosAnticipacionRecordatorio,
+        int? frecuenciaRecurrenciaId,
+        int? intervaloRecurrencia,
+        DateTime? fechaFinRecurrencia,
       })
-    >((ref) {
-      return ({
-        required personaCuidada,
-        required fechaHora,
-        required descripcion,
-        required conRecordatorio,
-        required creadoPor,
-      }) async {
-        final repo = ref.read(agendaRepositoryProvider);
-        final scheduler = ref.read(notificationSchedulerProvider);
+    >(
+      (ref) =>
+          ({
+            required personaId,
+            required titulo,
+            descripcion,
+            required tipoEventoId,
+            required fechaHoraInicio,
+            required duracionMinutos,
+            required generarEventoSalud,
+            minutosAnticipacionRecordatorio,
+            frecuenciaRecurrenciaId,
+            intervaloRecurrencia,
+            fechaFinRecurrencia,
+          }) async {
+            await ref
+                .read(agendaRepositoryProvider)
+                .crearEvento(
+                  personaId: personaId,
+                  titulo: titulo,
+                  descripcion: descripcion,
+                  tipoEventoId: tipoEventoId,
+                  fechaHoraInicio: fechaHoraInicio,
+                  duracionMinutos: duracionMinutos,
+                  generarEventoSalud: generarEventoSalud,
+                  minutosAnticipacionRecordatorio:
+                      minutosAnticipacionRecordatorio,
+                  frecuenciaRecurrenciaId: frecuenciaRecurrenciaId,
+                  intervaloRecurrencia: intervaloRecurrencia,
+                  fechaFinRecurrencia: fechaFinRecurrencia,
+                );
+            ref.invalidate(ocurrenciasDelMesProvider);
+            try {
+              await ref.read(sincronizarNotificacionesAgendaProvider)();
+            } catch (_) {
+              // sincronización de notificaciones es best-effort; no afecta el resultado
+            }
+          },
+    );
 
-        // id: 0 → la datasource asigna el ID auto-generado.
-        final eventoBase = EventoAgenda(
-          id: 0,
-          persona: personaCuidada,
-          creadoPor: creadoPor,
-          titulo: descripcion,
-          tipo: TipoEventoAgenda(
-            id: TiposEventoAgendaConst.otro,
-            descripcion: 'Otro',
-          ),
-          fechaHoraInicio: fechaHora,
-        );
-
-        final eventoCreado = await repo.crearEvento(eventoBase);
-
-        if (conRecordatorio) {
-          final recordatorio = Recordatorio(
-            id: 0,
-            eventoAgenda: eventoCreado,
-            fechaHoraEnvio: fechaHora,
-          );
-          await repo.crearRecordatorio(recordatorio);
-
-          final horaFormateada =
-              '${fechaHora.hour.toString().padLeft(2, '0')}:${fechaHora.minute.toString().padLeft(2, '0')}';
-
-          await scheduler.scheduleEventReminder(
-            notificationId: LocalNotificationScheduler.notificationIdFor(
-              eventoCreado.id,
-            ),
-            fechaHora: fechaHora,
-            titulo: 'Recordatorio de salud — ${personaCuidada.nombre}',
-            cuerpo: '${eventoCreado.titulo} · $horaFormateada',
-            payload: eventoCreado.id.toString(),
-          );
-        }
-
-        ref.invalidate(agendaEventosProvider);
-        return eventoCreado;
-      };
-    });
-
-/// Actualiza un evento existente y reprograma la notificación si corresponde.
-///
-/// Si [conRecordatorio] es `true`, cancela la notificación anterior y programa
-/// la nueva. Si es `false`, solo cancela.
-final actualizarEventoAgendaProvider =
+/// Modifica un evento existente (sin alterar su recurrencia), refresca las
+/// ocurrencias del mes y resincroniza las notificaciones locales.
+final modificarEventoAgendaProvider =
     Provider<
-      Future<EventoAgenda> Function({
-        required EventoAgenda evento,
-        required String descripcion,
-        required DateTime fechaHora,
-        required bool conRecordatorio,
+      Future<void> Function({
+        required int eventoAgendaId,
+        required String titulo,
+        String? descripcion,
+        required int tipoEventoId,
+        required DateTime fechaHoraInicio,
+        required int duracionMinutos,
+        required bool generarEventoSalud,
+        int? minutosAnticipacionRecordatorio,
       })
-    >((ref) {
-      return ({
-        required evento,
-        required descripcion,
-        required fechaHora,
-        required conRecordatorio,
-      }) async {
-        final repo = ref.read(agendaRepositoryProvider);
-        final scheduler = ref.read(notificationSchedulerProvider);
+    >(
+      (ref) =>
+          ({
+            required eventoAgendaId,
+            required titulo,
+            descripcion,
+            required tipoEventoId,
+            required fechaHoraInicio,
+            required duracionMinutos,
+            required generarEventoSalud,
+            minutosAnticipacionRecordatorio,
+          }) async {
+            await ref
+                .read(agendaRepositoryProvider)
+                .modificarEvento(
+                  eventoAgendaId: eventoAgendaId,
+                  titulo: titulo,
+                  descripcion: descripcion,
+                  tipoEventoId: tipoEventoId,
+                  fechaHoraInicio: fechaHoraInicio,
+                  duracionMinutos: duracionMinutos,
+                  generarEventoSalud: generarEventoSalud,
+                  minutosAnticipacionRecordatorio:
+                      minutosAnticipacionRecordatorio,
+                );
+            ref.invalidate(ocurrenciasDelMesProvider);
+            try {
+              await ref.read(sincronizarNotificacionesAgendaProvider)();
+            } catch (_) {
+              // sincronización de notificaciones es best-effort; no afecta el resultado
+            }
+          },
+    );
 
-        final eventoActualizado = evento.copyWith(
-          titulo: descripcion,
-          fechaHoraInicio: fechaHora,
-        );
-
-        await repo.actualizarEvento(eventoActualizado);
-
-        // Cancelar recordatorio anterior (si existía).
-        final notifId = LocalNotificationScheduler.notificationIdFor(
-          eventoActualizado.id,
-        );
-        await scheduler.cancelEventReminder(notifId);
-
-        // Eliminar recordatorios viejos de BD.
-        final recordatoriosViejos = await repo.getRecordatoriosByEvento(
-          eventoActualizado.id,
-        );
-        for (final r in recordatoriosViejos) {
-          await repo.eliminarRecordatorio(r.id);
-        }
-
-        if (conRecordatorio) {
-          final recordatorio = Recordatorio(
-            id: 0,
-            eventoAgenda: eventoActualizado,
-            fechaHoraEnvio: fechaHora,
-          );
-          await repo.crearRecordatorio(recordatorio);
-
-          final horaFormateada =
-              '${fechaHora.hour.toString().padLeft(2, '0')}:${fechaHora.minute.toString().padLeft(2, '0')}';
-
-          await scheduler.scheduleEventReminder(
-            notificationId: notifId,
-            fechaHora: fechaHora,
-            titulo:
-                'Recordatorio de salud — ${eventoActualizado.persona.nombre}',
-            cuerpo: '${eventoActualizado.titulo} · $horaFormateada',
-            payload: eventoActualizado.id.toString(),
-          );
-        }
-
-        ref.invalidate(agendaEventosProvider);
-        ref.invalidate(recordatoriosByEventoProvider(eventoActualizado.id));
-        return eventoActualizado;
-      };
-    });
-
-/// Elimina un evento y cancela su notificación local.
+/// Elimina el evento con el id dado, refresca las ocurrencias del mes y
+/// resincroniza las notificaciones locales.
 final eliminarEventoAgendaProvider =
-    Provider<Future<void> Function(EventoAgenda evento)>((ref) {
-      return (evento) async {
-        final repo = ref.read(agendaRepositoryProvider);
+    Provider<Future<void> Function(int eventoAgendaId)>(
+      (ref) => (eventoAgendaId) async {
+        await ref.read(agendaRepositoryProvider).eliminarEvento(eventoAgendaId);
+        ref.invalidate(ocurrenciasDelMesProvider);
+        try {
+          await ref.read(sincronizarNotificacionesAgendaProvider)();
+        } catch (_) {
+          // sincronización de notificaciones es best-effort; no afecta el resultado
+        }
+      },
+    );
+
+/// Cancela una ocurrencia puntual de un evento recurrente, refresca las
+/// ocurrencias del mes y resincroniza las notificaciones locales.
+final cancelarOcurrenciaProvider =
+    Provider<
+      Future<void> Function({
+        required int eventoAgendaId,
+        required DateTime fechaOcurrencia,
+      })
+    >(
+      (ref) => ({required eventoAgendaId, required fechaOcurrencia}) async {
+        await ref
+            .read(agendaRepositoryProvider)
+            .cancelarOcurrencia(
+              eventoAgendaId: eventoAgendaId,
+              fechaOcurrencia: fechaOcurrencia,
+            );
+        ref.invalidate(ocurrenciasDelMesProvider);
+        try {
+          await ref.read(sincronizarNotificacionesAgendaProvider)();
+        } catch (_) {
+          // sincronización de notificaciones es best-effort; no afecta el resultado
+        }
+      },
+    );
+
+// ─── Sincronización de notificaciones locales ───────────────────────────────
+
+/// Resincroniza las notificaciones locales de la persona de contexto:
+/// cancela todo lo programado y reprograma los recordatorios de las
+/// ocurrencias futuras (hasta 30 días) que tengan anticipación configurada.
+final sincronizarNotificacionesAgendaProvider =
+    Provider<Future<void> Function()>(
+      (ref) => () async {
+        final persona = await ref.read(agendaPersonaContextProvider.future);
+        final personaId = persona?.id;
+        if (personaId == null) return;
+
         final scheduler = ref.read(notificationSchedulerProvider);
+        await scheduler.cancelAll();
 
-        await scheduler.cancelEventReminder(
-          LocalNotificationScheduler.notificationIdFor(evento.id),
-        );
-        await repo.eliminarEvento(evento.id);
+        final ahora = DateTime.now();
+        final hasta = ahora.add(const Duration(days: 30));
+        final ocurrencias = await ref
+            .read(agendaRepositoryProvider)
+            .obtenerOcurrencias(
+              personaId: personaId,
+              desde: ahora,
+              hasta: hasta,
+            );
 
-        ref.invalidate(agendaEventosProvider);
-      };
-    });
+        for (final ocu in ocurrencias) {
+          final anticipacion = ocu.minutosAnticipacionRecordatorio;
+          if (anticipacion == null) continue;
+          final notifTime = ocu.fechaHoraInicio.subtract(
+            Duration(minutes: anticipacion),
+          );
+          if (notifTime.isAfter(ahora)) {
+            await scheduler.scheduleEventReminder(
+              notificationId: NotificationId.forOcurrencia(
+                ocu.eventoAgendaId,
+                ocu.fechaHoraInicio,
+              ),
+              fechaHora: notifTime,
+              titulo: ocu.titulo,
+              cuerpo: 'Recordatorio de evento',
+            );
+          }
+        }
+      },
+    );

@@ -1,498 +1,363 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/notifications/notifications.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/fake_notification_scheduler.dart';
-import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 2,
+final _persona = Persona(
+  id: 12,
   nombre: 'Alicia',
   apellido: 'Rodríguez',
   documento: '5234100',
   fechaNacimiento: DateTime(1943, 7, 22),
 );
 
-final _personaMaria = Persona(
-  id: 1,
-  nombre: 'María',
-  apellido: 'García',
-  documento: '28000001',
-  fechaNacimiento: DateTime(1990, 1, 1),
-  email: 'maria@test.com',
+final _tipoCita = TipoEvento(id: 1, descripcion: 'Cita Médica');
+final _tipoMedicacion = TipoEvento(id: 2, descripcion: 'Medicación');
+final _tipoNoAgendable = TipoEvento(
+  id: 99,
+  descripcion: 'Generado por el sistema',
+  agendable: false,
 );
 
-final _permisosResponsable = [
-  PermisoCuidado(
-    id: PermisosCuidadoConst.gestionarAgenda,
-    descripcion: 'Gestionar agenda',
-  ),
-];
-
-AsignacionCuidado _asignacionMaria({List<PermisoCuidado>? permisos}) =>
-    AsignacionCuidado(
-      id: 401,
-      personaCuidada: _personaAlicia,
-      colaborador: _personaMaria,
-      rol: rolCuidadoResponsable,
-      estado: estadoAsignacionActiva,
-      fechaAlta: DateTime(2024, 1, 8),
-      permisos: permisos ?? _permisosResponsable,
-    );
-
-final _usuarioDemoMaria = Usuario(
-  id: 101,
-  persona: _personaMaria,
-  contrasena: 'hash123',
-  estado: estadoUsuarioActivo,
+OcurrenciaEventoAgenda _ocurrencia({
+  required int eventoAgendaId,
+  required DateTime inicio,
+  int? minutosAnticipacion,
+}) => OcurrenciaEventoAgenda(
+  id: eventoAgendaId,
+  eventoAgendaId: eventoAgendaId,
+  personaId: _persona.id,
+  titulo: 'Evento $eventoAgendaId',
+  tipo: _tipoCita,
+  fechaHoraInicio: inicio,
+  fechaHoraFin: inicio.add(const Duration(minutes: 30)),
+  esRecurrente: false,
+  generarEventoSalud: false,
+  minutosAnticipacionRecordatorio: minutosAnticipacion,
 );
 
-// ─── Fake repositories ────────────────────────────────────────────────────────
-
-class _FakeCareTeamRepository implements CareTeamRepository {
-  final List<AsignacionCuidado> _asignaciones;
-
-  _FakeCareTeamRepository(this._asignaciones);
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    int colaboradorId,
-  ) async =>
-      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    int personaCuidadaId,
-  ) async => _asignaciones
-      .where((a) => a.personaCuidada.id == personaCuidadaId)
-      .toList();
-
-  @override
-  Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async => a;
-
-  @override
-  Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado a) async =>
-      a;
-
-  @override
-  Future<void> eliminarAsignacion(int id) async {}
-
-  @override
-  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
-
-  @override
-  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
-}
+// ─── Fake repository ────────────────────────────────────────────────────────
 
 class _FakeAgendaRepository implements AgendaRepository {
-  final List<EventoAgenda> _eventos;
-  final List<Recordatorio> _recordatorios;
+  List<OcurrenciaEventoAgenda> ocurrencias;
+  List<TipoEvento> tipos;
+
+  int obtenerOcurrenciasCount = 0;
+  DateTime? ultimoDesde;
+  DateTime? ultimoHasta;
+  int? eliminadoId;
 
   _FakeAgendaRepository({
-    List<EventoAgenda>? eventos,
-    List<Recordatorio>? recordatorios,
-  }) : _eventos = eventos ?? [],
-       _recordatorios = recordatorios ?? [];
+    List<OcurrenciaEventoAgenda>? ocurrencias,
+    List<TipoEvento>? tipos,
+  }) : ocurrencias = ocurrencias ?? [],
+       tipos = tipos ?? [];
 
   @override
-  Future<List<EventoAgenda>> getEventosByPersona(int personaId) async =>
-      _eventos.where((e) => e.persona.id == personaId).toList();
-
-  @override
-  Future<List<EventoAgenda>> getEventosByRango({
+  Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
-  }) async => _eventos
-      .where(
-        (e) =>
-            e.persona.id == personaId &&
-            !e.fechaHoraInicio.isBefore(desde) &&
-            !e.fechaHoraInicio.isAfter(hasta),
-      )
-      .toList();
-
-  @override
-  Future<EventoAgenda> crearEvento(EventoAgenda evento) async {
-    _eventos.add(evento);
-    return evento;
+  }) async {
+    obtenerOcurrenciasCount++;
+    ultimoDesde = desde;
+    ultimoHasta = hasta;
+    // Copia defensiva: el provider ordena la lista in-place.
+    return List.of(ocurrencias);
   }
 
   @override
-  Future<EventoAgenda> actualizarEvento(EventoAgenda evento) async {
-    final idx = _eventos.indexWhere((e) => e.id == evento.id);
-    if (idx >= 0) _eventos[idx] = evento;
-    return evento;
+  Future<List<TipoEvento>> obtenerTiposEvento() async => tipos;
+
+  @override
+  Future<void> crearEvento({
+    required int personaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+    int? frecuenciaRecurrenciaId,
+    int? intervaloRecurrencia,
+    DateTime? fechaFinRecurrencia,
+  }) async {}
+
+  @override
+  Future<void> modificarEvento({
+    required int eventoAgendaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+  }) async {}
+
+  @override
+  Future<void> eliminarEvento(int eventoAgendaId) async {
+    eliminadoId = eventoAgendaId;
   }
 
   @override
-  Future<void> eliminarEvento(int eventoId) async {
-    _eventos.removeWhere((e) => e.id == eventoId);
-    _recordatorios.removeWhere((r) => r.eventoAgenda.id == eventoId);
-  }
-
-  @override
-  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId) async =>
-      _recordatorios.where((r) => r.eventoAgenda.id == eventoId).toList();
-
-  @override
-  Future<Recordatorio> crearRecordatorio(Recordatorio r) async {
-    _recordatorios.add(r);
-    return r;
-  }
-
-  @override
-  Future<Recordatorio> marcarEnviado(int recordatorioId) async {
-    final idx = _recordatorios.indexWhere((r) => r.id == recordatorioId);
-    final r = _recordatorios[idx];
-    final actualizado = r.copyWith(enviado: true);
-    _recordatorios[idx] = actualizado;
-    return actualizado;
-  }
-
-  @override
-  Future<void> eliminarRecordatorio(int recordatorioId) async {
-    _recordatorios.removeWhere((r) => r.id == recordatorioId);
-  }
+  Future<void> cancelarOcurrencia({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  }) async {}
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
-ProviderContainer _buildContainer({
-  List<AsignacionCuidado>? asignaciones,
-  List<EventoAgenda>? eventos,
-  FakeNotificationScheduler? scheduler,
+ProviderContainer _makeContainer({
+  required _FakeAgendaRepository repo,
+  required FakeNotificationScheduler scheduler,
+  Persona? persona,
 }) {
-  final asigs = asignaciones ?? [_asignacionMaria()];
-  final fakeScheduler = scheduler ?? FakeNotificationScheduler();
-  final fakePersonaRepo = _FakePersonaRepository([
-    _personaMaria,
-    _personaAlicia,
-  ]);
-
   return ProviderContainer(
     overrides: [
-      authStateProvider.overrideWith(
-        (ref) =>
-            AuthNotifier(ref.watch(authRepositoryProvider))
-              ..state = AsyncValue.data(_usuarioDemoMaria),
-      ),
-      personaRepositoryProvider.overrideWithValue(fakePersonaRepo),
-      asignacionCuidadoRepositoryProvider.overrideWithValue(
-        _FakeAsignacionCuidadoRepository(asigs),
-      ),
-      careTeamRepositoryProvider.overrideWithValue(
-        _FakeCareTeamRepository(asigs),
-      ),
-      agendaRepositoryProvider.overrideWithValue(
-        _FakeAgendaRepository(eventos: eventos),
-      ),
-      notificationSchedulerProvider.overrideWithValue(fakeScheduler),
+      agendaPersonaContextProvider.overrideWith((ref) async => persona),
+      agendaRepositoryProvider.overrideWithValue(repo),
+      notificationSchedulerProvider.overrideWithValue(scheduler),
     ],
   );
-}
-
-class _FakePersonaRepository implements PersonaRepository {
-  final List<Persona> _personas;
-  _FakePersonaRepository(this._personas);
-
-  @override
-  Future<Persona> getById(int id) async =>
-      _personas.firstWhere((p) => p.id == id);
-
-  @override
-  Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [];
-
-  @override
-  Future<Persona> crear(Persona p) async => p.copyWith(id: 9999);
-
-  @override
-  Future<Persona> actualizar(Persona p) async => p;
-
-  @override
-  Future<void> eliminar(int id) async {}
-}
-
-class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
-  final List<AsignacionCuidado> _asignaciones;
-
-  _FakeAsignacionCuidadoRepository(this._asignaciones);
-
-  @override
-  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
-      _asignaciones.where((a) => a.colaborador.id == 1).toList();
-
-  @override
-  Future<void> crearPersonaCargo({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    String? email,
-    String? telefono,
-  }) async {}
-
-  @override
-  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> modificarPermisosAsignacion({
-    required int asignacionId,
-    required List<PermisoCuidado> permisosSeleccionados,
-  }) async {}
-
-  @override
-  Future<void> eliminarAsignacion(int asignacionId) async {}
-
-  @override
-  Future<void> activarAsignacion(int asignacionId) async {}
-
-  @override
-  Future<void> reactivarAsignacion(int asignacionId) async {}
-
-  @override
-  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
-    int personaCuidadaId,
-  ) => throw UnimplementedError();
-
-  @override
-  Future<void> asignarPersonaEquipoCuidado({
-    required int personaCuidadaId,
-    required String colaboradorEmail,
-    required int rolCuidadoId,
-    required List<int> permisosCuidadoIds,
-  }) => throw UnimplementedError();
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
-  group('agendaEventosProvider', () {
-    test('retorna lista vacía cuando no hay eventos', () async {
-      final container = _buildContainer(eventos: []);
-      addTearDown(container.dispose);
+  group('agenda_providers', () {
+    group('ocurrenciasDelMesProvider', () {
+      test(
+        'calcula el rango [primer día del mes, primer día del mes siguiente)',
+        () async {
+          final repo = _FakeAgendaRepository();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: FakeNotificationScheduler(),
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
 
-      final eventos = await container.read(agendaEventosProvider.future);
-      expect(eventos, isEmpty);
-    });
+          container.read(mesSeleccionadoProvider.notifier).state = DateTime(
+            2026,
+            7,
+            1,
+          );
 
-    test('retorna eventos ordenados cronológicamente', () async {
-      final eventoTardio = EventoAgenda(
-        id: 702,
-        persona: _personaAlicia,
-        creadoPor: _usuarioDemoMaria,
-        titulo: 'Evento tardío',
-        tipo: tipoEventoAgendaOtro,
-        fechaHoraInicio: DateTime(2026, 6, 15, 10, 0),
+          await container.read(ocurrenciasDelMesProvider.future);
+
+          expect(repo.ultimoDesde, DateTime(2026, 7, 1));
+          expect(repo.ultimoHasta, DateTime(2026, 8, 1));
+        },
       );
-      final eventoTemprano = EventoAgenda(
-        id: 701,
-        persona: _personaAlicia,
-        creadoPor: _usuarioDemoMaria,
-        titulo: 'Evento temprano',
-        tipo: tipoEventoAgendaOtro,
-        fechaHoraInicio: DateTime(2026, 6, 10, 8, 0),
+
+      test(
+        'el rango de diciembre pasa correctamente a enero del año siguiente',
+        () async {
+          final repo = _FakeAgendaRepository();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: FakeNotificationScheduler(),
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
+
+          container.read(mesSeleccionadoProvider.notifier).state = DateTime(
+            2026,
+            12,
+            1,
+          );
+
+          await container.read(ocurrenciasDelMesProvider.future);
+
+          expect(repo.ultimoDesde, DateTime(2026, 12, 1));
+          expect(repo.ultimoHasta, DateTime(2027, 1, 1));
+        },
       );
 
-      final container = _buildContainer(
-        eventos: [eventoTardio, eventoTemprano],
-      );
-      addTearDown(container.dispose);
-
-      // Seleccionar a la persona a cargo (Alicia) como contexto de agenda.
-      container
-              .read(personaVisualizacionSeleccionadaIdProvider.notifier)
-              .state =
-          _personaAlicia.id;
-
-      final eventos = await container.read(agendaEventosProvider.future);
-
-      expect(eventos.length, 2);
-      expect(eventos[0].id, 701);
-      expect(eventos[1].id, 702);
-    });
-  });
-
-  group('puedeGestionarAgendaProvider', () {
-    test('retorna true para usuario con permiso gestionarAgenda', () async {
-      final container = _buildContainer();
-      addTearDown(container.dispose);
-
-      final puede = await container.read(puedeGestionarAgendaProvider.future);
-      expect(puede, isTrue);
-    });
-
-    test(
-      'retorna true cuando el contexto es el propio usuario (sin asignaciones)',
-      () async {
-        // Sin asignaciones: personaVisualizacionSeleccionadaProvider resuelve a María (propio usuario).
-        // esContextoPropioProvider debe retornar true → puedeGestionarAgenda = true.
-        final container = _buildContainer(asignaciones: []);
+      test('retorna lista vacía cuando no hay persona de contexto', () async {
+        final repo = _FakeAgendaRepository(
+          ocurrencias: [
+            _ocurrencia(eventoAgendaId: 1, inicio: DateTime(2026, 7, 10)),
+          ],
+        );
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: null,
+        );
         addTearDown(container.dispose);
 
-        final puede = await container.read(puedeGestionarAgendaProvider.future);
-        expect(puede, isTrue);
-      },
-    );
+        final result = await container.read(ocurrenciasDelMesProvider.future);
 
-    test(
-      'retorna false cuando no hay asignación activa para persona ajena',
-      () async {
-        // Sobreescribir el contexto a Alicia (persona ajena) sin asignaciones
-        // → esContextoPropio = false y sin asignación → false.
-        final container = ProviderContainer(
-          overrides: [
-            authStateProvider.overrideWith(
-              (ref) =>
-                  AuthNotifier(ref.watch(authRepositoryProvider))
-                    ..state = AsyncValue.data(_usuarioDemoMaria),
-            ),
-            personaRepositoryProvider.overrideWithValue(
-              _FakePersonaRepository([_personaMaria, _personaAlicia]),
-            ),
-            careTeamRepositoryProvider.overrideWithValue(
-              _FakeCareTeamRepository([]),
-            ),
-            agendaRepositoryProvider.overrideWithValue(_FakeAgendaRepository()),
-            notificationSchedulerProvider.overrideWithValue(
-              FakeNotificationScheduler(),
-            ),
-            personaVisualizacionSeleccionadaProvider.overrideWith(
-              (ref) async => _personaAlicia,
+        expect(result, isEmpty);
+        expect(repo.obtenerOcurrenciasCount, 0);
+      });
+
+      test('ordena las ocurrencias por fechaHoraInicio ascendente', () async {
+        final tarde = _ocurrencia(
+          eventoAgendaId: 2,
+          inicio: DateTime(2026, 7, 20, 15),
+        );
+        final temprano = _ocurrencia(
+          eventoAgendaId: 1,
+          inicio: DateTime(2026, 7, 5, 9),
+        );
+        final medio = _ocurrencia(
+          eventoAgendaId: 3,
+          inicio: DateTime(2026, 7, 12, 12),
+        );
+        final repo = _FakeAgendaRepository(
+          ocurrencias: [tarde, temprano, medio],
+        );
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
+
+        final result = await container.read(ocurrenciasDelMesProvider.future);
+
+        expect(result.map((o) => o.eventoAgendaId).toList(), [1, 3, 2]);
+      });
+    });
+
+    group('tiposEventoAgendablesProvider', () {
+      test('filtra solo los tipos con agendable == true', () async {
+        final repo = _FakeAgendaRepository(
+          tipos: [_tipoCita, _tipoMedicacion, _tipoNoAgendable],
+        );
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
+
+        final agendables = await container.read(
+          tiposEventoAgendablesProvider.future,
+        );
+
+        expect(agendables.map((t) => t.id).toList(), [1, 2]);
+        expect(agendables.every((t) => t.agendable), isTrue);
+      });
+    });
+
+    group('eliminarEventoAgendaProvider', () {
+      test(
+        'elimina en el repo, invalida ocurrencias y resincroniza notificaciones',
+        () async {
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
+
+          // Precarga las ocurrencias del mes para poder observar la invalidación.
+          await container.read(ocurrenciasDelMesProvider.future);
+          final llamadasPrevias = repo.obtenerOcurrenciasCount;
+
+          await container.read(eliminarEventoAgendaProvider)(77);
+
+          // Se eliminó en el repo.
+          expect(repo.eliminadoId, 77);
+          // Se resincronizaron notificaciones (cancelAll + relectura de ocurrencias).
+          expect(scheduler.cancelAllCount, 1);
+          expect(repo.obtenerOcurrenciasCount, greaterThan(llamadasPrevias));
+
+          // Al releer, ocurrenciasDelMesProvider vuelve a consultar (fue invalidado).
+          final antes = repo.obtenerOcurrenciasCount;
+          await container.read(ocurrenciasDelMesProvider.future);
+          expect(repo.obtenerOcurrenciasCount, greaterThan(antes));
+        },
+      );
+    });
+
+    group('sincronizarNotificacionesAgendaProvider', () {
+      test(
+        'cancela todo antes de programar y solo agenda ocurrencias futuras con anticipación',
+        () async {
+          final ahora = DateTime.now();
+          final futuraConRecordatorio = _ocurrencia(
+            eventoAgendaId: 10,
+            inicio: ahora.add(const Duration(days: 2)),
+            minutosAnticipacion: 30,
+          );
+          final futuraSinRecordatorio = _ocurrencia(
+            eventoAgendaId: 20,
+            inicio: ahora.add(const Duration(days: 3)),
+            minutosAnticipacion: null,
+          );
+          final pasadaConRecordatorio = _ocurrencia(
+            eventoAgendaId: 30,
+            inicio: ahora.subtract(const Duration(days: 1)),
+            minutosAnticipacion: 30,
+          );
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository(
+            ocurrencias: [
+              futuraConRecordatorio,
+              futuraSinRecordatorio,
+              pasadaConRecordatorio,
+            ],
+          );
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)();
+
+          // cancelAll se invocó exactamente una vez, antes de programar.
+          expect(scheduler.cancelAllCount, 1);
+
+          // Solo se programó la ocurrencia futura con anticipación configurada.
+          final idEsperado = NotificationId.forOcurrencia(
+            futuraConRecordatorio.eventoAgendaId,
+            futuraConRecordatorio.fechaHoraInicio,
+          );
+          expect(scheduler.scheduled, [idEsperado]);
+        },
+      );
+
+      test('no programa nada cuando no hay persona de contexto', () async {
+        final scheduler = FakeNotificationScheduler();
+        final repo = _FakeAgendaRepository(
+          ocurrencias: [
+            _ocurrencia(
+              eventoAgendaId: 10,
+              inicio: DateTime.now().add(const Duration(days: 2)),
+              minutosAnticipacion: 30,
             ),
           ],
         );
-        addTearDown(container.dispose);
-
-        final puede = await container.read(puedeGestionarAgendaProvider.future);
-        expect(puede, isFalse);
-      },
-    );
-
-    test('retorna false para cuidador sin permiso de agenda', () async {
-      final asignacionSinPermiso = AsignacionCuidado(
-        id: 402,
-        personaCuidada: _personaAlicia,
-        colaborador: _personaMaria,
-        rol: rolCuidadoCuidador,
-        estado: estadoAsignacionActiva,
-        fechaAlta: DateTime(2024, 1, 8),
-        // permisos: const [] → default, sin permiso de agenda
-      );
-
-      // Sobreescribir el contexto a Alicia para que esContextoPropio = false.
-      final container = ProviderContainer(
-        overrides: [
-          authStateProvider.overrideWith(
-            (ref) =>
-                AuthNotifier(ref.watch(authRepositoryProvider))
-                  ..state = AsyncValue.data(_usuarioDemoMaria),
-          ),
-          personaRepositoryProvider.overrideWithValue(
-            _FakePersonaRepository([_personaMaria, _personaAlicia]),
-          ),
-          careTeamRepositoryProvider.overrideWithValue(
-            _FakeCareTeamRepository([asignacionSinPermiso]),
-          ),
-          agendaRepositoryProvider.overrideWithValue(_FakeAgendaRepository()),
-          notificationSchedulerProvider.overrideWithValue(
-            FakeNotificationScheduler(),
-          ),
-          personaVisualizacionSeleccionadaProvider.overrideWith(
-            (ref) async => _personaAlicia,
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final puede = await container.read(puedeGestionarAgendaProvider.future);
-      expect(puede, isFalse);
-    });
-  });
-
-  group('crearEventoAgendaProvider', () {
-    test(
-      'crea el evento y programa notificación cuando conRecordatorio=true',
-      () async {
-        final scheduler = FakeNotificationScheduler();
-        final container = _buildContainer(scheduler: scheduler);
-        addTearDown(container.dispose);
-
-        final crearFn = container.read(crearEventoAgendaProvider);
-        final fechaFutura = DateTime(2027, 1, 15, 10, 0);
-
-        await crearFn(
-          personaCuidada: _personaAlicia,
-          fechaHora: fechaFutura,
-          descripcion: 'Visita al médico',
-          conRecordatorio: true,
-          creadoPor: _usuarioDemoMaria,
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: scheduler,
+          persona: null,
         );
+        addTearDown(container.dispose);
 
-        expect(scheduler.scheduled, hasLength(1));
-      },
-    );
+        await container.read(sincronizarNotificacionesAgendaProvider)();
 
-    test('no programa notificación cuando conRecordatorio=false', () async {
-      final scheduler = FakeNotificationScheduler();
-      final container = _buildContainer(scheduler: scheduler);
-      addTearDown(container.dispose);
-
-      final crearFn = container.read(crearEventoAgendaProvider);
-      final fechaFutura = DateTime(2027, 1, 15, 10, 0);
-
-      await crearFn(
-        personaCuidada: _personaAlicia,
-        fechaHora: fechaFutura,
-        descripcion: 'Visita al médico',
-        conRecordatorio: false,
-        creadoPor: _usuarioDemoMaria,
-      );
-
-      expect(scheduler.scheduled, isEmpty);
-    });
-  });
-
-  group('agendaEventoByIdProvider', () {
-    test('retorna el evento correcto por ID', () async {
-      final evento = EventoAgenda(
-        id: 703,
-        persona: _personaAlicia,
-        creadoPor: _usuarioDemoMaria,
-        titulo: 'Evento X',
-        tipo: tipoEventoAgendaCitaMedica,
-        fechaHoraInicio: DateTime(2026, 6, 20, 9, 0),
-      );
-
-      final container = _buildContainer(eventos: [evento]);
-      addTearDown(container.dispose);
-
-      // Seleccionar a la persona a cargo (Alicia) como contexto de agenda.
-      container
-              .read(personaVisualizacionSeleccionadaIdProvider.notifier)
-              .state =
-          _personaAlicia.id;
-
-      final resultado = await container.read(
-        agendaEventoByIdProvider(703).future,
-      );
-      expect(resultado, isNotNull);
-      expect(resultado!.id, 703);
-    });
-
-    test('retorna null para ID inexistente', () async {
-      final container = _buildContainer(eventos: []);
-      addTearDown(container.dispose);
-
-      final resultado = await container.read(
-        agendaEventoByIdProvider(99999).future,
-      );
-      expect(resultado, isNull);
+        expect(scheduler.cancelAllCount, 0);
+        expect(scheduler.scheduled, isEmpty);
+        expect(repo.obtenerOcurrenciasCount, 0);
+      });
     });
   });
 }

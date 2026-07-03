@@ -23,22 +23,27 @@ namespace CareWell.Domain.Validadores
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
         }
 
-        public void ValidarPuedeAdministrarEquipoCuidado(Persona personaCuidada, Persona asignador)
+        public void ValidarPuedeAdministrarEquipoCuidado(Persona personaCuidada, Persona colaborador)
         {
-            this.ValidarAccionSobrePersona(personaCuidada, asignador, PermisosCuidado.AdministrarEquipo);
+            this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.AdministrarEquipo);
         }
 
-        public void ValidarPuedeAdministrarAgenda(Persona personaCuidada, Persona solicitante)
+        public void ValidarPuedeAdministrarAgenda(Persona personaCuidada, Persona colaborador)
         {
-            this.ValidarAccionSobrePersona(personaCuidada, solicitante, PermisosCuidado.GestionarAgenda);
+            this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.GestionarAgenda);
         }
 
-        public void ValidarVisualizacion(Persona personaCuidada, Persona solicitante)
+        public void ValidarPuedeAdministrarEventosSalud(Persona personaCuidada, Persona colaborador)
         {
-            if (personaCuidada.ID == solicitante.ID)
+            this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.RegistrarEventosSalud);
+        }
+
+        public void ValidarVisualizacion(Persona personaCuidada, Persona colaborador)
+        {
+            if (personaCuidada.ID == colaborador.ID)
                 return;
 
-            var asignacionCuidado = this.ObtenerAsignacionCuidadoActiva(personaCuidada, solicitante);
+            var asignacionCuidado = this.ObtenerAsignacionCuidadoActiva(personaCuidada, colaborador);
 
             if (asignacionCuidado is null)
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
@@ -46,22 +51,22 @@ namespace CareWell.Domain.Validadores
 
         #region Metodos Privados
 
-        private void ValidarAccionSobrePersona(Persona personaSeleccionada, Persona solicitante, int permisoCuidadoID)
+        private void ValidarAccionSobrePersona(Persona personaSeleccionada, Persona colaborador, int permisoCuidadoID)
         {
-            if (personaSeleccionada.ID == solicitante.ID)
+            if (personaSeleccionada.ID == colaborador.ID)
                 return;
 
-            var asignacionCuidado = this.ObtenerAsignacionCuidadoActiva(personaSeleccionada, solicitante);
+            var asignacionCuidado = this.ObtenerAsignacionCuidadoActiva(personaSeleccionada, colaborador);
 
             if (asignacionCuidado is null || !asignacionCuidado.Permisos.Any(p => p.ID == permisoCuidadoID))
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
         }
 
-        private AsignacionCuidado? ObtenerAsignacionCuidadoActiva(Persona personaSeleccionada, Persona solicitante)
+        private AsignacionCuidado? ObtenerAsignacionCuidadoActiva(Persona personaSeleccionada, Persona colaborador)
         {
             return this.EntityLoaderDomainService.Query<AsignacionCuidado>()
                 .FirstOrDefault(a => a.PersonaCuidada.ID == personaSeleccionada.ID
-                                  && a.Colaborador.ID == solicitante.ID
+                                  && a.Colaborador.ID == colaborador.ID
                                   && a.Estado.ID == EstadosAsignacionCuidado.Activa);
         }
 

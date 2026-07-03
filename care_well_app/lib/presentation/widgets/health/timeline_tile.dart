@@ -30,7 +30,10 @@ class TimelineTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = healthEventColor(evento.tipo);
     final label = healthEventLabel(evento.tipo);
-    final fechaStr = DateFormat('MMM yyyy', 'es').format(evento.fecha);
+    final fechaStr = DateFormat(
+      'd MMM · HH:mm',
+      'es',
+    ).format(evento.fechaHora.toLocal());
 
     return Semantics(
       label: 'Evento: ${evento.descripcion}, $fechaStr, tipo $label',

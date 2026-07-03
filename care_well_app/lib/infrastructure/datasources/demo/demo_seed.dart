@@ -234,94 +234,6 @@ class DemoSeed {
     permisos: permisosResponsable,
   );
 
-  // ─── Eventos de agenda ───────────────────────────────────────────────────────
-
-  static final List<EventoAgenda> eventosAgenda = [
-    // Evento futuro (mañana) con recordatorio activo — caso principal US-23/US-27.
-    EventoAgenda(
-      id: 701,
-      persona: personaAlicia,
-      creadoPor: usuarioMaria,
-      titulo: 'Consulta cardiológica',
-      descripcion: 'Control de presión arterial y electrocardiograma.',
-      tipo: TipoEventoAgenda(
-        id: TiposEventoAgendaConst.citaMedica,
-        descripcion: 'Cita médica',
-      ),
-      fechaHoraInicio: DateTime(2026, 6, 10, 10, 0),
-      fechaHoraFin: DateTime(2026, 6, 10, 11, 0),
-    ),
-    // Evento futuro (próximo) con recordatorio activo — toma de medicación.
-    EventoAgenda(
-      id: 702,
-      persona: personaAlicia,
-      creadoPor: usuarioMaria,
-      titulo: 'Toma de medicación matutina',
-      descripcion: 'Atenolol 25 mg + Enalapril 10 mg.',
-      tipo: TipoEventoAgenda(
-        id: TiposEventoAgendaConst.medicacion,
-        descripcion: 'Medicación',
-      ),
-      fechaHoraInicio: DateTime(2026, 6, 7, 8, 0),
-    ),
-    // Evento futuro — fisioterapia.
-    EventoAgenda(
-      id: 703,
-      persona: personaAlicia,
-      creadoPor: usuarioMaria,
-      titulo: 'Fisioterapia semanal',
-      descripcion: 'Sesión de rehabilitación motriz.',
-      tipo: TipoEventoAgenda(
-        id: TiposEventoAgendaConst.rehabilitacion,
-        descripcion: 'Rehabilitación',
-      ),
-      fechaHoraInicio: DateTime(2026, 6, 12, 14, 30),
-      fechaHoraFin: DateTime(2026, 6, 12, 15, 30),
-    ),
-    // Evento vencido (hace 2 días) — para demostrar estado readonly (US-25).
-    EventoAgenda(
-      id: 704,
-      persona: personaAlicia,
-      creadoPor: usuarioMaria,
-      titulo: 'Control de glucemia',
-      descripcion: 'Medición de glucemia en ayunas.',
-      tipo: TipoEventoAgenda(
-        id: TiposEventoAgendaConst.control,
-        descripcion: 'Control',
-      ),
-      fechaHoraInicio: DateTime(2026, 6, 4, 9, 0),
-    ),
-    // Evento vencido (ayer) — segundo caso de evento pasado.
-    EventoAgenda(
-      id: 705,
-      persona: personaAlicia,
-      creadoPor: usuarioMaria,
-      titulo: 'Medicación vespertina',
-      descripcion: 'Metformina 500 mg con la cena.',
-      tipo: TipoEventoAgenda(
-        id: TiposEventoAgendaConst.medicacion,
-        descripcion: 'Medicación',
-      ),
-      fechaHoraInicio: DateTime(2026, 6, 5, 20, 0),
-    ),
-  ];
-
-  // ─── Recordatorios de agenda ─────────────────────────────────────────────────
-
-  /// Recordatorios iniciales para los eventos futuros de demostración.
-  static final List<Recordatorio> recordatoriosAgenda = [
-    Recordatorio(
-      id: 801,
-      eventoAgenda: eventosAgenda[0], // 701 — Consulta cardiológica
-      fechaHoraEnvio: DateTime(2026, 6, 10, 10, 0),
-    ),
-    Recordatorio(
-      id: 802,
-      eventoAgenda: eventosAgenda[1], // 702 — Toma de medicación matutina
-      fechaHoraEnvio: DateTime(2026, 6, 7, 8, 0),
-    ),
-  ];
-
   // ─── Ficha de salud ──────────────────────────────────────────────────────────
 
   static final FichaSalud fichaSaludAlicia = FichaSalud(
@@ -415,40 +327,100 @@ class DemoSeed {
 
   // ─── Eventos de salud ────────────────────────────────────────────────────────
 
+  /// Referencias embebidas de personas usadas en eventos/notas de salud.
+  static final EntidadBasica _refAlicia = EntidadBasica(
+    id: personaAliciaId,
+    descripcion: 'Alicia Rodríguez',
+  );
+  static final EntidadBasica _refMaria = EntidadBasica(
+    id: personaMariaId,
+    descripcion: 'María García',
+  );
+  static final EntidadBasica _refLaura = EntidadBasica(
+    id: personaLauraId,
+    descripcion: 'Laura Méndez',
+  );
+
   /// Eventos de salud propios de María (usuario demo, contexto "Yo").
   static final List<EventoDeSalud> eventosSaludMaria = [
     EventoDeSalud(
       id: 1101,
-      persona: personaMaria,
+      persona: _refMaria,
       tipo: TipoEventoSalud(
-        id: TiposEventoSaludConst.citaMedica,
+        id: TiposEventoAgendaConst.citaMedica,
         descripcion: 'Cita médica',
       ),
-      fecha: DateTime(2026, 5, 20),
+      fechaHora: DateTime(2026, 5, 20, 9, 0),
       descripcion: 'Control anual con médico clínico — Dr. Alejandro Torres.',
+      notas: [
+        NotaEvento(
+          id: 1305,
+          eventoSaludId: 1101,
+          autor: _refMaria,
+          fechaHora: DateTime(2026, 5, 20, 12, 0),
+          contenido:
+              'Todo en orden. Indicó análisis de laboratorio en 6 meses.',
+        ),
+      ],
     ),
   ];
 
   static final EventoDeSalud eventoSaludMareos = EventoDeSalud(
     id: 1102,
-    persona: personaAlicia,
+    persona: _refAlicia,
     tipo: TipoEventoSalud(
-      id: TiposEventoSaludConst.sintoma,
+      id: TiposEventoAgendaConst.sintoma,
       descripcion: 'Síntoma',
     ),
-    fecha: DateTime(2026, 5, 28),
+    fechaHora: DateTime(2026, 5, 28, 8, 15),
     descripcion: 'Episodio de mareos al levantarse. Duración aprox. 5 minutos.',
+    notas: [
+      NotaEvento(
+        id: 1304,
+        eventoSaludId: 1102,
+        autor: _refMaria,
+        fechaHora: DateTime(2026, 5, 28, 10, 5),
+        contenido: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
+      ),
+      NotaEvento(
+        id: 1303,
+        eventoSaludId: 1102,
+        autor: _refMaria,
+        fechaHora: DateTime(2026, 5, 28, 11, 0),
+        contenido:
+            'Presión se normalizó a los 15 minutos. Se informó al cardiólogo por WhatsApp.',
+      ),
+    ],
   );
 
+  /// Evento generado desde una ocurrencia de agenda (badge "Desde agenda").
   static final EventoDeSalud eventoSaludControlCardiologico = EventoDeSalud(
     id: 1103,
-    persona: personaAlicia,
+    persona: _refAlicia,
     tipo: TipoEventoSalud(
-      id: TiposEventoSaludConst.citaMedica,
+      id: TiposEventoAgendaConst.citaMedica,
       descripcion: 'Cita médica',
     ),
-    fecha: DateTime(2026, 6, 2),
+    fechaHora: DateTime(2026, 6, 2, 10, 30),
     descripcion: 'Control cardiológico — Dr. Martín Sosa · Hospital Italiano.',
+    fechaOcurrenciaEventoAgenda: DateTime(2026, 6, 2, 10, 30),
+    notas: [
+      NotaEvento(
+        id: 1301,
+        eventoSaludId: 1103,
+        autor: _refMaria,
+        fechaHora: DateTime(2026, 6, 2, 14, 32),
+        contenido:
+            'El médico indicó repetir análisis en 3 meses. Solicitar turno a fin de mes.',
+      ),
+      NotaEvento(
+        id: 1302,
+        eventoSaludId: 1103,
+        autor: _refLaura,
+        fechaHora: DateTime(2026, 6, 3, 9, 15),
+        contenido: 'Acordado con Alicia hacer los análisis en Fleni.',
+      ),
+    ],
   );
 
   static final List<EventoDeSalud> eventosSaludAlicia = [
@@ -456,57 +428,13 @@ class DemoSeed {
     eventoSaludMareos,
     EventoDeSalud(
       id: 1104,
-      persona: personaAlicia,
+      persona: _refAlicia,
       tipo: TipoEventoSalud(
-        id: TiposEventoSaludConst.vacuna,
+        id: TiposEventoAgendaConst.vacuna,
         descripcion: 'Vacuna',
       ),
-      fecha: DateTime(2026, 4, 3),
+      fechaHora: DateTime(2026, 6, 3, 11, 0),
       descripcion: 'Vacuna antigripal anual.',
-    ),
-  ];
-
-  // ─── Notas de eventos de salud ───────────────────────────────────────────────
-
-  static final List<NotaEvento> notasEvento = [
-    NotaEvento(
-      id: 1301,
-      eventoSaludId: 1103,
-      autor: personaMaria,
-      fechaHora: DateTime(2026, 6, 2, 14, 32),
-      contenido:
-          'El médico indicó repetir análisis en 3 meses. Solicitar turno a fin de mes.',
-    ),
-    NotaEvento(
-      id: 1302,
-      eventoSaludId: 1103,
-      autor: personaLaura,
-      fechaHora: DateTime(2026, 6, 3, 9, 15),
-      contenido: 'Acordado con Alicia hacer los análisis en Fleni.',
-    ),
-    NotaEvento(
-      id: 1303,
-      eventoSaludId: 1102,
-      autor: personaMaria,
-      fechaHora: DateTime(2026, 5, 28, 11, 0),
-      contenido:
-          'Presión se normalizó a los 15 minutos. Se informó al cardiólogo por WhatsApp.',
-    ),
-    // Nota migrada desde el campo notas del evento 1102.
-    NotaEvento(
-      id: 1304,
-      eventoSaludId: 1102,
-      autor: personaMaria,
-      fechaHora: DateTime(2026, 5, 28, 10, 5),
-      contenido: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
-    ),
-    // Nota migrada desde el campo notas del evento 1101 (María).
-    NotaEvento(
-      id: 1305,
-      eventoSaludId: 1101,
-      autor: personaMaria,
-      fechaHora: DateTime(2026, 5, 20, 12, 0),
-      contenido: 'Todo en orden. Indicó análisis de laboratorio en 6 meses.',
     ),
   ];
 

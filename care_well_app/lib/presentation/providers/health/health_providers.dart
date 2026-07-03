@@ -99,38 +99,57 @@ final recomendacionesProvider = FutureProvider<List<RecomendacionMedica>>((
 
 // ─── Eventos de salud ─────────────────────────────────────────────────────────
 
-/// Lista de eventos de salud de la persona de contexto, ordenada descendente por fecha.
-final eventosSaludProvider = FutureProvider<List<EventoDeSalud>>((ref) async {
-  final persona = await ref.watch(healthPersonaContextProvider.future);
-  if (persona == null) return [];
-  final eventos = await ref
-      .watch(healthRepositoryProvider)
-      .getEventosSaludByPersona(persona.id);
-  return eventos..sort((a, b) => b.fecha.compareTo(a.fecha));
+/// Primer día del mes actualmente visualizado en eventos de salud.
+///
+/// Compartido entre la lista de eventos (US-30) y el historial (US-33).
+final mesEventosSaludProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, 1);
 });
 
-/// Evento de salud individual por ID. Busca en la lista ya cargada.
+/// Eventos de salud de la persona de contexto dentro del mes seleccionado,
+/// ordenados ascendente por fecha/hora.
+final eventosSaludDelMesProvider = FutureProvider<List<EventoDeSalud>>((
+  ref,
+) async {
+  final persona = await ref.watch(healthPersonaContextProvider.future);
+  if (persona == null) return [];
+
+  final mes = ref.watch(mesEventosSaludProvider);
+  final desde = mes;
+  final hasta = DateTime(mes.year, mes.month + 1, 1);
+
+  final eventos = await ref
+      .watch(eventoSaludRepositoryProvider)
+      .getEventosSaludDelMes(personaId: persona.id, desde: desde, hasta: hasta);
+  eventos.sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
+  return eventos;
+});
+
+/// Evento de salud individual por ID. Busca en la lista del mes ya cargada.
 ///
-/// Retorna `null` si no existe.
+/// Retorna `null` si no existe en el mes seleccionado.
 final eventoSaludByIdProvider = FutureProvider.family<EventoDeSalud?, int>((
   ref,
   id,
 ) async {
-  final eventos = await ref.watch(eventosSaludProvider.future);
+  final eventos = await ref.watch(eventosSaludDelMesProvider.future);
   return eventos.where((e) => e.id == id).firstOrNull;
 });
 
 // ─── Notas de eventos de salud ───────────────────────────────────────────────
 
-/// Notas del evento con [eventoId], ordenadas cronológicamente ascendente.
-final notasByEventoProvider = FutureProvider.family<List<NotaEvento>, int>((
+/// Notas del evento con [eventoId], derivadas de la lista del mes (ya vienen
+/// embebidas en el evento), ordenadas cronológicamente ascendente.
+final notasByEventoProvider = Provider.family<List<NotaEvento>, int>((
   ref,
   eventoId,
-) async {
-  final notas = await ref
-      .watch(healthRepositoryProvider)
-      .getNotasByEvento(eventoId);
-  return notas..sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
+) {
+  final eventos = ref.watch(eventosSaludDelMesProvider).valueOrNull ?? [];
+  final evento = eventos.where((e) => e.id == eventoId).firstOrNull;
+  final notas = [...?evento?.notas];
+  notas.sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
+  return notas;
 });
 
 // ─── Estados de ánimo ─────────────────────────────────────────────────────────
@@ -207,66 +226,97 @@ final crearHabitoProvider =
       };
     });
 
-/// Crea un evento de salud para la persona de contexto.
+/// Crea un evento de salud para la persona de contexto e invalida la lista del mes.
 final crearEventoSaludProvider =
     Provider<
-      Future<EventoDeSalud> Function({
-        required TipoEventoSalud tipo,
+      Future<void> Function({
+        required int tipoId,
         required String descripcion,
-        required DateTime fecha,
+        required DateTime fechaHora,
       })
     >((ref) {
-      return ({required tipo, required descripcion, required fecha}) async {
+      return ({
+        required tipoId,
+        required descripcion,
+        required fechaHora,
+      }) async {
         final persona = await ref.read(healthPersonaContextProvider.future);
         if (persona == null) throw Exception('Sin persona de contexto');
 
-        final repo = ref.read(healthRepositoryProvider);
-        final evento = EventoDeSalud(
-          id: 0,
-          persona: persona,
-          tipo: tipo,
-          fecha: fecha,
-          descripcion: descripcion,
-        );
-        final creado = await repo.crearEventoSalud(evento);
-        ref.invalidate(eventosSaludProvider);
-        return creado;
+        await ref
+            .read(eventoSaludRepositoryProvider)
+            .crearEventoSalud(
+              personaId: persona.id,
+              tipoId: tipoId,
+              fechaHora: fechaHora,
+              descripcion: descripcion,
+            );
+        ref.invalidate(eventosSaludDelMesProvider);
       };
     });
 
-/// Crea una nota en un evento de salud.
-final crearNotaEventoProvider =
+/// Elimina un evento de salud e invalida la lista del mes.
+final eliminarEventoSaludProvider =
+    Provider<Future<void> Function({required int eventoId})>((ref) {
+      return ({required eventoId}) async {
+        await ref
+            .read(eventoSaludRepositoryProvider)
+            .eliminarEventoSalud(eventoId);
+        ref.invalidate(eventosSaludDelMesProvider);
+      };
+    });
+
+/// Agrega una nota a un evento de salud e invalida la lista del mes.
+final agregarNotaEventoProvider =
     Provider<
-      Future<NotaEvento> Function({
+      Future<void> Function({
         required int eventoSaludId,
         required String contenido,
       })
     >((ref) {
       return ({required eventoSaludId, required contenido}) async {
-        final usuario = ref.read(authStateProvider).valueOrNull;
-        if (usuario == null) throw Exception('Sin sesión');
-
-        final repo = ref.read(healthRepositoryProvider);
-        final nota = NotaEvento(
-          id: 0,
-          eventoSaludId: eventoSaludId,
-          autor: usuario.persona,
-          fechaHora: DateTime.now(),
-          contenido: contenido,
-        );
-        final creada = await repo.crearNota(nota);
-        ref.invalidate(notasByEventoProvider(eventoSaludId));
-        return creada;
+        await ref
+            .read(eventoSaludRepositoryProvider)
+            .agregarNota(eventoSaludId: eventoSaludId, contenido: contenido);
+        ref.invalidate(eventosSaludDelMesProvider);
       };
     });
 
-/// Elimina un evento de salud e invalida la lista.
-final eliminarEventoSaludProvider =
-    Provider<Future<void> Function({required int eventoId})>((ref) {
-      return ({required eventoId}) async {
-        final repo = ref.read(healthRepositoryProvider);
-        await repo.eliminarEventoSalud(eventoId);
-        ref.invalidate(eventosSaludProvider);
+/// Modifica el contenido de una nota e invalida la lista del mes.
+final modificarNotaEventoProvider =
+    Provider<
+      Future<void> Function({
+        required int eventoSaludId,
+        required int notaId,
+        required String contenido,
+      })
+    >((ref) {
+      return ({
+        required eventoSaludId,
+        required notaId,
+        required contenido,
+      }) async {
+        await ref
+            .read(eventoSaludRepositoryProvider)
+            .modificarNota(
+              eventoSaludId: eventoSaludId,
+              notaId: notaId,
+              contenido: contenido,
+            );
+        ref.invalidate(eventosSaludDelMesProvider);
+      };
+    });
+
+/// Elimina una nota de un evento de salud e invalida la lista del mes.
+final eliminarNotaEventoProvider =
+    Provider<
+      Future<void> Function({required int eventoSaludId, required int notaId})
+    >((ref) {
+      return ({required eventoSaludId, required notaId}) async {
+        await ref
+            .read(eventoSaludRepositoryProvider)
+            .eliminarNota(eventoSaludId: eventoSaludId, notaId: notaId);
+        ref.invalidate(eventosSaludDelMesProvider);
       };
     });
 

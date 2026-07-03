@@ -1,13 +1,13 @@
 import '../base_entity.dart';
-import '../shared/persona.dart';
+import '../shared/entidad_basica.dart';
 
 /// Nota colaborativa registrada por un miembro del equipo sobre un [EventoDeSalud].
 class NotaEvento extends BaseEntity {
   /// ID del evento de salud al que pertenece esta nota.
   final int eventoSaludId;
 
-  /// Persona que redactó la nota.
-  final Persona autor;
+  /// Autor de la nota (referencia embebida `{id, descripcion}`).
+  final EntidadBasica autor;
 
   /// Fecha y hora en que se registró la nota.
   final DateTime fechaHora;
@@ -27,7 +27,7 @@ class NotaEvento extends BaseEntity {
   NotaEvento copyWith({
     int? id,
     int? eventoSaludId,
-    Persona? autor,
+    EntidadBasica? autor,
     DateTime? fechaHora,
     String? contenido,
   }) {

@@ -1,6 +1,7 @@
 export '../global/global_const.dart';
-export 'agenda/evento_agenda.dart';
-export 'agenda/recordatorio.dart';
+export 'agenda/frecuencia_recurrencia.dart';
+export 'agenda/ocurrencia_evento_agenda.dart';
+export 'agenda/tipo_evento.dart';
 export 'auth/estado_usuario.dart';
 export 'auth/usuario.dart';
 export 'base_entity.dart';
@@ -17,4 +18,5 @@ export 'health/nota_evento.dart';
 export 'health/recomendacion_medica.dart';
 export 'settings/aceptacion_terminos.dart';
 export 'settings/configuracion.dart';
+export 'shared/entidad_basica.dart';
 export 'shared/persona.dart';

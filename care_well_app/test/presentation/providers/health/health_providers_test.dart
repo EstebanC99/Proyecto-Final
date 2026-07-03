@@ -98,39 +98,14 @@ class _FakeCareTeamRepository implements CareTeamRepository {
 }
 
 class _FakeHealthRepository implements HealthRepository {
-  final List<EventoDeSalud> _eventos;
   final List<HabitoDeVida> _habitos;
-  final List<NotaEvento> _notas;
   final List<EstadoDeAnimo> _estadosAnimo;
 
   _FakeHealthRepository({
-    List<EventoDeSalud>? eventos,
     List<HabitoDeVida>? habitos,
-    List<NotaEvento>? notas,
     List<EstadoDeAnimo>? estadosAnimo,
-  }) : _eventos = eventos != null ? List.of(eventos) : [],
-       _habitos = habitos != null ? List.of(habitos) : [],
-       _notas = notas != null ? List.of(notas) : [],
+  }) : _habitos = habitos != null ? List.of(habitos) : [],
        _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
-
-  @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) async =>
-      _eventos.where((e) => e.persona.id == personaId).toList();
-
-  @override
-  Future<EventoDeSalud> crearEventoSalud(EventoDeSalud e) async {
-    _eventos.add(e);
-    return e;
-  }
-
-  @override
-  Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud e) async => e;
-
-  @override
-  Future<void> eliminarEventoSalud(int id) async {
-    _eventos.removeWhere((e) => e.id == id);
-    _notas.removeWhere((n) => n.eventoSaludId == id);
-  }
 
   @override
   Future<FichaSalud> getFichaSalud(int personaId) async =>
@@ -180,13 +155,6 @@ class _FakeHealthRepository implements HealthRepository {
   Future<void> eliminarRecomendacion(int id) async {}
 
   @override
-  Future<List<NotaEvento>> getNotasByEvento(int eventoId) async =>
-      _notas.where((n) => n.eventoSaludId == eventoId).toList();
-
-  @override
-  Future<NotaEvento> crearNota(NotaEvento nota) async => nota;
-
-  @override
   Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) async =>
       _estadosAnimo.where((e) => e.persona.id == personaId).toList();
 
@@ -200,6 +168,54 @@ class _FakeHealthRepository implements HealthRepository {
   Future<void> eliminarEstadoAnimo(int id) async {}
 }
 
+class _FakeEventoSaludRepository implements EventoSaludRepository {
+  final List<EventoDeSalud> _eventos;
+
+  _FakeEventoSaludRepository({List<EventoDeSalud>? eventos})
+    : _eventos = eventos != null ? List.of(eventos) : [];
+
+  // El rango [desde, hasta] se ignora en el fake: filtra solo por persona para
+  // mantener las fixtures deterministas independientemente del mes actual.
+  @override
+  Future<List<EventoDeSalud>> getEventosSaludDelMes({
+    required int personaId,
+    required DateTime desde,
+    required DateTime hasta,
+  }) async => _eventos.where((e) => e.persona.id == personaId).toList();
+
+  @override
+  Future<void> crearEventoSalud({
+    required int personaId,
+    required int tipoId,
+    required DateTime fechaHora,
+    required String descripcion,
+  }) async {}
+
+  @override
+  Future<void> eliminarEventoSalud(int eventoId) async {
+    _eventos.removeWhere((e) => e.id == eventoId);
+  }
+
+  @override
+  Future<void> agregarNota({
+    required int eventoSaludId,
+    required String contenido,
+  }) async {}
+
+  @override
+  Future<void> modificarNota({
+    required int eventoSaludId,
+    required int notaId,
+    required String contenido,
+  }) async {}
+
+  @override
+  Future<void> eliminarNota({
+    required int eventoSaludId,
+    required int notaId,
+  }) async {}
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /// Construye un container con contexto de persona AJENA (Alicia).
@@ -207,7 +223,6 @@ ProviderContainer _makeContainer({
   required List<AsignacionCuidado> asignaciones,
   List<EventoDeSalud>? eventos,
   List<HabitoDeVida>? habitos,
-  List<NotaEvento>? notas,
   List<EstadoDeAnimo>? estadosAnimo,
 }) {
   return ProviderContainer(
@@ -226,12 +241,10 @@ ProviderContainer _makeContainer({
         _FakeCareTeamRepository(asignaciones),
       ),
       healthRepositoryProvider.overrideWithValue(
-        _FakeHealthRepository(
-          eventos: eventos,
-          habitos: habitos,
-          notas: notas,
-          estadosAnimo: estadosAnimo,
-        ),
+        _FakeHealthRepository(habitos: habitos, estadosAnimo: estadosAnimo),
+      ),
+      eventoSaludRepositoryProvider.overrideWithValue(
+        _FakeEventoSaludRepository(eventos: eventos),
       ),
     ],
   );
@@ -257,11 +270,10 @@ ProviderContainer _makeContainerContextPropio({
       healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
       careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository([])),
       healthRepositoryProvider.overrideWithValue(
-        _FakeHealthRepository(
-          eventos: eventos,
-          habitos: habitos,
-          estadosAnimo: estadosAnimo,
-        ),
+        _FakeHealthRepository(habitos: habitos, estadosAnimo: estadosAnimo),
+      ),
+      eventoSaludRepositoryProvider.overrideWithValue(
+        _FakeEventoSaludRepository(eventos: eventos),
       ),
     ],
   );
@@ -271,22 +283,22 @@ ProviderContainer _makeContainerContextPropio({
 
 void main() {
   group('health_providers', () {
-    group('eventosSaludProvider', () {
-      test('retorna eventos ordenados descendente por fecha', () async {
+    group('eventosSaludDelMesProvider', () {
+      test('retorna eventos ordenados ascendente por fecha', () async {
         final eventos = [
           EventoDeSalud(
-            id: 1101,
-            persona: _personaAlicia,
-            tipo: tipoEventoSaludCitaMedica,
-            fecha: DateTime(2026, 4, 1),
-            descripcion: 'Evento antiguo',
+            id: 1102,
+            persona: refPersonaAlicia,
+            tipo: tipoEventoSaludVacuna,
+            fechaHora: DateTime(2026, 6, 1),
+            descripcion: 'Evento reciente',
           ),
           EventoDeSalud(
-            id: 1102,
-            persona: _personaAlicia,
-            tipo: tipoEventoSaludVacuna,
-            fecha: DateTime(2026, 6, 1),
-            descripcion: 'Evento reciente',
+            id: 1101,
+            persona: refPersonaAlicia,
+            tipo: tipoEventoSaludCitaMedica,
+            fechaHora: DateTime(2026, 4, 1),
+            descripcion: 'Evento antiguo',
           ),
         ];
         final container = _makeContainer(
@@ -295,8 +307,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final result = await container.read(eventosSaludProvider.future);
-        expect(result.first.fecha.isAfter(result.last.fecha), isTrue);
+        final result = await container.read(eventosSaludDelMesProvider.future);
+        expect(result.first.fechaHora.isBefore(result.last.fechaHora), isTrue);
       });
     });
 
@@ -466,34 +478,35 @@ void main() {
       test('quita el evento de la lista tras eliminar', () async {
         final evento = EventoDeSalud(
           id: 1101,
-          persona: _personaAlicia,
+          persona: refPersonaAlicia,
           tipo: tipoEventoSaludCitaMedica,
-          fecha: DateTime(2026, 5, 10),
+          fechaHora: DateTime(2026, 5, 10),
           descripcion: 'Cita médica',
-        );
-        final nota = NotaEvento(
-          id: 1301,
-          eventoSaludId: 1101,
-          autor: _personaMaria,
-          fechaHora: DateTime(2026, 5, 10, 10),
-          contenido: 'Nota de prueba',
+          notas: [
+            NotaEvento(
+              id: 1301,
+              eventoSaludId: 1101,
+              autor: refPersonaMaria,
+              fechaHora: DateTime(2026, 5, 10, 10),
+              contenido: 'Nota de prueba',
+            ),
+          ],
         );
         final container = _makeContainer(
           asignaciones: [_asignacionMaria()],
           eventos: [evento],
-          notas: [nota],
         );
         addTearDown(container.dispose);
 
         // Precondición: hay un evento.
-        final antes = await container.read(eventosSaludProvider.future);
+        final antes = await container.read(eventosSaludDelMesProvider.future);
         expect(antes, hasLength(1));
 
         // Ejecutar eliminación.
         await container.read(eliminarEventoSaludProvider)(eventoId: 1101);
 
         // El provider fue invalidado; al releer debe estar vacío.
-        final despues = await container.read(eventosSaludProvider.future);
+        final despues = await container.read(eventosSaludDelMesProvider.future);
         expect(despues, isEmpty);
       });
     });

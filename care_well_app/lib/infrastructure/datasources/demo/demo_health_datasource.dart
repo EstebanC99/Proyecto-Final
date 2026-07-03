@@ -16,14 +16,9 @@ class DemoHealthDatasource implements HealthDatasource {
   final List<RecomendacionMedica> _recomendaciones = List.of(
     DemoSeed.recomendacionesAlicia,
   );
-  final List<EventoDeSalud> _eventosSalud = List.of([
-    ...DemoSeed.eventosSaludAlicia,
-    ...DemoSeed.eventosSaludMaria,
-  ]);
   final List<EstadoDeAnimo> _estadosAnimo = List.of(
     DemoSeed.estadosAnimoAlicia,
   );
-  final List<NotaEvento> _notas = List.of(DemoSeed.notasEvento);
 
   int _nextId = 10000;
 
@@ -139,69 +134,6 @@ class DemoHealthDatasource implements HealthDatasource {
       throw Exception('Recomendación no encontrada: $recomendacionId');
     }
     _recomendaciones.removeAt(idx);
-  }
-
-  // ─── Eventos de salud ────────────────────────────────────────────────────────
-
-  @override
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId) async {
-    await Future.delayed(Duration.zero);
-    return _eventosSalud.where((e) => e.persona.id == personaId).toList();
-  }
-
-  @override
-  Future<EventoDeSalud> crearEventoSalud(EventoDeSalud evento) async {
-    await Future.delayed(Duration.zero);
-    final nuevo = EventoDeSalud(
-      id: _nextId++,
-      persona: evento.persona,
-      tipo: evento.tipo,
-      fecha: evento.fecha,
-      descripcion: evento.descripcion,
-    );
-    _eventosSalud.add(nuevo);
-    return nuevo;
-  }
-
-  @override
-  Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud evento) async {
-    await Future.delayed(Duration.zero);
-    final idx = _eventosSalud.indexWhere((e) => e.id == evento.id);
-    if (idx < 0) throw Exception('Evento de salud no encontrado: ${evento.id}');
-    _eventosSalud[idx] = evento;
-    return evento;
-  }
-
-  @override
-  Future<void> eliminarEventoSalud(int eventoId) async {
-    await Future.delayed(Duration.zero);
-    final idx = _eventosSalud.indexWhere((e) => e.id == eventoId);
-    if (idx < 0) throw Exception('Evento de salud no encontrado: $eventoId');
-    _eventosSalud.removeAt(idx);
-    // Eliminar también todas las notas asociadas al evento.
-    _notas.removeWhere((n) => n.eventoSaludId == eventoId);
-  }
-
-  // ─── Notas de eventos de salud ───────────────────────────────────────────────
-
-  @override
-  Future<List<NotaEvento>> getNotasByEvento(int eventoId) async {
-    await Future.delayed(Duration.zero);
-    return _notas.where((n) => n.eventoSaludId == eventoId).toList();
-  }
-
-  @override
-  Future<NotaEvento> crearNota(NotaEvento nota) async {
-    await Future.delayed(Duration.zero);
-    final nueva = NotaEvento(
-      id: _nextId++,
-      eventoSaludId: nota.eventoSaludId,
-      autor: nota.autor,
-      fechaHora: nota.fechaHora,
-      contenido: nota.contenido,
-    );
-    _notas.add(nueva);
-    return nueva;
   }
 
   // ─── Estados de ánimo ────────────────────────────────────────────────────────

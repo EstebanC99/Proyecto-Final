@@ -35,7 +35,6 @@ export 'health/health_events_screen.dart';
 export 'health/health_event_form_screen.dart';
 export 'health/health_event_detail_screen.dart';
 export 'health/health_event_note_form_screen.dart';
-export 'health/timeline_screen.dart';
 export 'health/mood_form_screen.dart';
 export 'health/mood_history_screen.dart';
 

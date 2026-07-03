@@ -1,39 +1,50 @@
 import '../entities/entities.dart';
 
-/// Interfaz de datasource para la agenda (eventos y recordatorios).
+/// Interfaz de datasource para la agenda.
 abstract class AgendaDatasource {
-  // ─── Eventos ─────────────────────────────────────────────────────────────────
-
-  /// Retorna todos los [EventoAgenda] de la persona con [personaId].
-  Future<List<EventoAgenda>> getEventosByPersona(int personaId);
-
-  /// Retorna los [EventoAgenda] de [personaId] dentro del rango de fechas.
-  Future<List<EventoAgenda>> getEventosByRango({
+  /// Retorna las ocurrencias de eventos de [personaId] dentro del rango.
+  Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
   });
 
-  /// Crea un nuevo [EventoAgenda] y retorna la entidad con id generado.
-  Future<EventoAgenda> crearEvento(EventoAgenda evento);
+  /// Retorna el catálogo de tipos de evento.
+  Future<List<TipoEvento>> obtenerTiposEvento();
 
-  /// Actualiza un [EventoAgenda] existente.
-  Future<EventoAgenda> actualizarEvento(EventoAgenda evento);
+  /// Crea un evento de agenda (opcionalmente recurrente).
+  Future<void> crearEvento({
+    required int personaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+    int? frecuenciaRecurrenciaId,
+    int? intervaloRecurrencia,
+    DateTime? fechaFinRecurrencia,
+  });
 
-  /// Elimina el [EventoAgenda] con [eventoId] y sus recordatorios asociados.
-  Future<void> eliminarEvento(int eventoId);
+  /// Modifica un evento existente (sin alterar su recurrencia).
+  Future<void> modificarEvento({
+    required int eventoAgendaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+  });
 
-  // ─── Recordatorios ───────────────────────────────────────────────────────────
+  /// Elimina el evento con [eventoAgendaId].
+  Future<void> eliminarEvento(int eventoAgendaId);
 
-  /// Retorna los [Recordatorio] del evento con [eventoId].
-  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId);
-
-  /// Crea un [Recordatorio] y retorna la entidad con id generado.
-  Future<Recordatorio> crearRecordatorio(Recordatorio recordatorio);
-
-  /// Marca un [Recordatorio] como enviado.
-  Future<Recordatorio> marcarEnviado(int recordatorioId);
-
-  /// Elimina el [Recordatorio] con [recordatorioId].
-  Future<void> eliminarRecordatorio(int recordatorioId);
+  /// Cancela una ocurrencia puntual de un evento recurrente.
+  Future<void> cancelarOcurrencia({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  });
 }

@@ -43,28 +43,6 @@ abstract class HealthDatasource {
   /// Elimina la [RecomendacionMedica] con [recomendacionId].
   Future<void> eliminarRecomendacion(int recomendacionId);
 
-  // ─── Eventos de salud ────────────────────────────────────────────────────────
-
-  /// Retorna los [EventoDeSalud] de la persona con [personaId].
-  Future<List<EventoDeSalud>> getEventosSaludByPersona(int personaId);
-
-  /// Crea un [EventoDeSalud] y retorna la entidad con id generado.
-  Future<EventoDeSalud> crearEventoSalud(EventoDeSalud evento);
-
-  /// Actualiza un [EventoDeSalud] existente.
-  Future<EventoDeSalud> actualizarEventoSalud(EventoDeSalud evento);
-
-  /// Elimina el [EventoDeSalud] con [eventoId].
-  Future<void> eliminarEventoSalud(int eventoId);
-
-  // ─── Notas de eventos de salud ───────────────────────────────────────────────
-
-  /// Retorna las [NotaEvento] del evento con [eventoId].
-  Future<List<NotaEvento>> getNotasByEvento(int eventoId);
-
-  /// Crea una [NotaEvento] y retorna la entidad con id generado.
-  Future<NotaEvento> crearNota(NotaEvento nota);
-
   // ─── Estados de ánimo ────────────────────────────────────────────────────────
 
   /// Retorna los [EstadoDeAnimo] de la persona con [personaId].

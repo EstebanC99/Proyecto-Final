@@ -14,6 +14,9 @@ class FakeNotificationScheduler implements NotificationScheduler {
   /// IDs de notificaciones inmediatas mostradas (via [showImmediateNotification]).
   final List<int> shown = [];
 
+  /// Cantidad de veces que se invocó [cancelAll].
+  int cancelAllCount = 0;
+
   @override
   Future<void> init() async {}
 
@@ -34,6 +37,11 @@ class FakeNotificationScheduler implements NotificationScheduler {
   @override
   Future<void> cancelEventReminder(int notificationId) async {
     cancelled.add(notificationId);
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    cancelAllCount++;
   }
 
   @override

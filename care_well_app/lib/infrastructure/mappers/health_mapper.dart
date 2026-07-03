@@ -1,6 +1,17 @@
 import '../../domain/entities/entities.dart';
 import '../models/models.dart';
 
+/// Convierte entre [EntidadBasicaModel] y [EntidadBasica].
+class EntidadBasicaMapper {
+  EntidadBasicaMapper._();
+
+  static EntidadBasica fromModel(EntidadBasicaModel model) =>
+      EntidadBasica(id: model.id, descripcion: model.descripcion);
+
+  static EntidadBasicaModel toModel(EntidadBasica entity) =>
+      EntidadBasicaModel(id: entity.id, descripcion: entity.descripcion);
+}
+
 /// Convierte entre [FichaSaludModel] y [FichaSalud].
 class FichaSaludMapper {
   FichaSaludMapper._();
@@ -104,24 +115,30 @@ class TipoEventoSaludMapper {
 class EventoDeSaludMapper {
   EventoDeSaludMapper._();
 
-  /// Requiere la [persona] ya construida (el modelo solo transporta el id).
-  static EventoDeSalud fromModel(EventoDeSaludModel model, Persona persona) {
+  static EventoDeSalud fromModel(EventoDeSaludModel model) {
     return EventoDeSalud(
       id: model.id,
-      persona: persona,
+      persona: EntidadBasicaMapper.fromModel(model.persona),
       tipo: TipoEventoSaludMapper.fromModel(model.tipo),
-      fecha: DateTime.parse(model.fecha),
+      fechaHora: DateTime.parse(model.fechaHora),
       descripcion: model.descripcion,
+      notas: model.notas.map(NotaEventoMapper.fromModel).toList(),
+      fechaOcurrenciaEventoAgenda: model.fechaOcurrenciaEventoAgenda == null
+          ? null
+          : DateTime.tryParse(model.fechaOcurrenciaEventoAgenda!),
     );
   }
 
   static EventoDeSaludModel toModel(EventoDeSalud entity) {
     return EventoDeSaludModel(
       id: entity.id,
-      personaId: entity.persona.id,
+      persona: EntidadBasicaMapper.toModel(entity.persona),
       tipo: TipoEventoSaludMapper.toModel(entity.tipo),
-      fecha: entity.fecha.toIso8601String(),
+      fechaHora: entity.fechaHora.toIso8601String(),
       descripcion: entity.descripcion,
+      notas: entity.notas.map(NotaEventoMapper.toModel).toList(),
+      fechaOcurrenciaEventoAgenda: entity.fechaOcurrenciaEventoAgenda
+          ?.toIso8601String(),
     );
   }
 }
@@ -173,12 +190,11 @@ class EstadoDeAnimoMapper {
 class NotaEventoMapper {
   NotaEventoMapper._();
 
-  /// Requiere el [autor] ya construido (el modelo solo transporta el id).
-  static NotaEvento fromModel(NotaEventoModel model, Persona autor) {
+  static NotaEvento fromModel(NotaEventoModel model) {
     return NotaEvento(
       id: model.id,
       eventoSaludId: model.eventoSaludId,
-      autor: autor,
+      autor: EntidadBasicaMapper.fromModel(model.autor),
       fechaHora: DateTime.parse(model.fechaHora),
       contenido: model.contenido,
     );
@@ -188,7 +204,7 @@ class NotaEventoMapper {
     return NotaEventoModel(
       id: entity.id,
       eventoSaludId: entity.eventoSaludId,
-      autorId: entity.autor.id,
+      autor: EntidadBasicaMapper.toModel(entity.autor),
       fechaHora: entity.fechaHora.toIso8601String(),
       contenido: entity.contenido,
     );

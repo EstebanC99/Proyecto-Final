@@ -25,6 +25,12 @@ abstract class NotificationScheduler {
   /// Cancela el recordatorio con el [notificationId] dado.
   Future<void> cancelEventReminder(int notificationId);
 
+  /// Cancela todas las notificaciones programadas.
+  ///
+  /// Se usa para resincronizar la agenda: se limpia todo y se reprograma
+  /// el estado vigente de ocurrencias.
+  Future<void> cancelAll();
+
   /// Muestra una notificación local inmediata (sin programación futura).
   Future<void> showImmediateNotification({
     required int notificationId,

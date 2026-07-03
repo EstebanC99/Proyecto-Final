@@ -17,21 +17,28 @@ final _personaAlicia = Persona(
   fechaNacimiento: DateTime(1943, 7, 22),
 );
 
+// La lista agrupa por día y expande hoy/mañana por defecto: se usa la fecha de
+// hoy para que la card del evento quede visible sin interacción.
+final _hoy = DateTime.now();
+
 final _evento = EventoDeSalud(
   id: 1101,
-  persona: _personaAlicia,
+  persona: refPersonaAlicia,
   tipo: tipoEventoSaludCitaMedica,
-  fecha: DateTime(2026, 6, 2),
+  fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day, 9),
   descripcion: 'Control cardiológico',
 );
 
 Widget _wrap({List<EventoDeSalud>? eventos, bool puedeRegistrar = true}) {
   return ProviderScope(
     overrides: [
-      eventosSaludProvider.overrideWith((ref) async => eventos ?? [_evento]),
+      eventosSaludDelMesProvider.overrideWith(
+        (ref) async => eventos ?? [_evento],
+      ),
       puedeRegistrarEventosSaludProvider.overrideWith(
         (ref) async => puedeRegistrar,
       ),
+      healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),
     ],
     child: const MaterialApp(home: HealthEventsScreen()),
   );
@@ -70,7 +77,36 @@ void main() {
     testWidgets('muestra estado vacío cuando no hay eventos', (tester) async {
       await tester.pumpWidget(_wrap(eventos: []));
       await tester.pump();
-      expect(find.text('No hay eventos registrados aún.'), findsOneWidget);
+      expect(find.text('Sin eventos en este mes.'), findsOneWidget);
+    });
+
+    testWidgets('estado inicial: muestra lista, no timeline', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+      expect(find.byType(HealthEventsMonthList), findsOneWidget);
+      expect(find.byType(HealthEventsTimelineView), findsNothing);
+    });
+
+    testWidgets('toggle: cambia de lista a línea de tiempo', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+
+      await tester.tap(find.byTooltip('Ver como línea de tiempo'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HealthEventsTimelineView), findsOneWidget);
+      expect(find.byType(HealthEventsMonthList), findsNothing);
+    });
+
+    testWidgets('FAB sigue visible en vista línea de tiempo', (tester) async {
+      await tester.pumpWidget(_wrap(puedeRegistrar: true));
+      await tester.pump();
+
+      await tester.tap(find.byTooltip('Ver como línea de tiempo'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HealthEventsTimelineView), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsOneWidget);
     });
   });
 }

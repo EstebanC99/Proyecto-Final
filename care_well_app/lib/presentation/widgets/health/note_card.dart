@@ -5,12 +5,53 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../shared/avatar_initial.dart';
+import '../shared/confirm_dialog.dart';
 
-/// Tarjeta que muestra una [NotaEvento] con avatar del autor, autoría y contenido.
+/// Tarjeta que muestra una [NotaEvento] con avatar del autor, autoría y
+/// contenido.
+///
+/// Acciones opcionales (solo se muestran cuando el usuario tiene permiso):
+/// - [onEdit]: recibe el nuevo contenido de texto. Al tocar "Editar" se abre
+///   un bottom sheet con el texto precargado.
+/// - [onDelete]: se ejecuta tras confirmación con [ConfirmDialog].
+///
+/// Cuando [onEdit] y [onDelete] son null la card se comporta igual que antes
+/// (solo lectura, sin fila de acciones).
 class NoteCard extends StatelessWidget {
-  const NoteCard({super.key, required this.nota});
+  const NoteCard({super.key, required this.nota, this.onEdit, this.onDelete});
 
   final NotaEvento nota;
+
+  /// Callback de edición: recibe el nuevo contenido validado (no vacío).
+  /// Si es null, el botón "Editar" no se muestra.
+  final Future<void> Function(String nuevoContenido)? onEdit;
+
+  /// Callback de eliminación: se ejecuta tras la confirmación del usuario.
+  /// Si es null, el botón "Eliminar" no se muestra.
+  final Future<void> Function()? onDelete;
+
+  bool get _tieneAcciones => onEdit != null || onDelete != null;
+
+  Future<void> _abrirEdicion(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) =>
+          _EditNoteSheet(contenidoInicial: nota.contenido, onGuardar: onEdit!),
+    );
+  }
+
+  Future<void> _confirmarEliminar(BuildContext context) {
+    return ConfirmDialog.show(
+      context,
+      title: '¿Eliminar esta nota?',
+      body:
+          'Esta nota se eliminará de forma definitiva y no podrá recuperarse.',
+      confirmLabel: 'Eliminar',
+      icon: Icons.delete_outline,
+      onConfirm: onDelete!,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +60,6 @@ class NoteCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
@@ -34,42 +74,312 @@ class NoteCard extends StatelessWidget {
           ),
         ],
       ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          _tieneAcciones ? AppSpacing.xs : AppSpacing.md,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Fila de autoría
+            Row(
+              children: [
+                AvatarInitial(nombre: nota.autor.descripcion, size: 28),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    nota.autor.descripcion,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Text(
+                  '$fechaStr · $horaStr',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textDisabled,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            // Contenido
+            Text(
+              nota.contenido,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.textPrimary,
+                height: 1.5,
+              ),
+            ),
+            // Fila de acciones (solo cuando hay callbacks)
+            if (_tieneAcciones) ...[
+              const SizedBox(height: AppSpacing.xs),
+              const Divider(height: 1, color: AppColors.outline),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (onEdit != null)
+                    _AccionButton(
+                      icon: Icons.edit_outlined,
+                      label: 'Editar',
+                      color: AppColors.primary,
+                      onTap: () => _abrirEdicion(context),
+                    ),
+                  if (onDelete != null)
+                    _AccionButton(
+                      icon: Icons.delete_outline,
+                      label: 'Eliminar',
+                      color: AppColors.error,
+                      onTap: () => _confirmarEliminar(context),
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Botón de acción compacto ─────────────────────────────────────────────────
+
+class _AccionButton extends StatelessWidget {
+  const _AccionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 15, color: color),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+}
+
+// ─── Bottom sheet de edición ──────────────────────────────────────────────────
+
+/// Bottom sheet para editar una nota existente.
+///
+/// Muestra un [TextField] con el [contenidoInicial] precargado y un par de
+/// botones "Cancelar" / "Guardar". Al confirmar llama [onGuardar] con el
+/// contenido nuevo (ya validado como no vacío).
+class _EditNoteSheet extends StatefulWidget {
+  const _EditNoteSheet({
+    required this.contenidoInicial,
+    required this.onGuardar,
+  });
+
+  final String contenidoInicial;
+  final Future<void> Function(String) onGuardar;
+
+  @override
+  State<_EditNoteSheet> createState() => _EditNoteSheetState();
+}
+
+class _EditNoteSheetState extends State<_EditNoteSheet> {
+  late final TextEditingController _ctrl;
+  bool _loading = false;
+  String? _error;
+
+  static const _maxChars = 500;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.contenidoInicial);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _guardar() async {
+    final contenido = _ctrl.text.trim();
+    if (contenido.isEmpty) {
+      setState(() => _error = 'La nota no puede estar vacía.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await widget.onGuardar(contenido);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo guardar la nota. Intentá de nuevo.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final charsActuales = _ctrl.text.length;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacing.xl,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Fila de autoría
+          // Handle
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.outline,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          const Text(
+            'Editar nota',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: _ctrl,
+            enabled: !_loading,
+            minLines: 4,
+            maxLines: 10,
+            maxLength: _maxChars,
+            textAlignVertical: TextAlignVertical.top,
+            buildCounter:
+                (_, {required currentLength, required isFocused, maxLength}) =>
+                    null,
+            onChanged: (_) => setState(() => _error = null),
+            decoration: InputDecoration(
+              hintText: 'Escribí tu observación sobre este evento...',
+              hintStyle: const TextStyle(color: AppColors.textDisabled),
+              errorText: _error,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                borderSide: const BorderSide(color: AppColors.outline),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                borderSide: const BorderSide(
+                  color: AppColors.healthAccent,
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(AppSpacing.md),
+            ),
+          ),
+          if (charsActuales >= 400)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                '$charsActuales/$_maxChars',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: charsActuales >= _maxChars
+                      ? AppColors.healthAccent
+                      : AppColors.textDisabled,
+                ),
+              ),
+            ),
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              AvatarInitial(nombre: nota.autor.nombre, size: 28),
-              const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(
-                  '${nota.autor.nombre} ${nota.autor.apellido}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                child: OutlinedButton(
+                  onPressed: _loading
+                      ? null
+                      : () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.outline),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    minimumSize: const Size(0, 48),
+                  ),
+                  child: const Text(
+                    'Cancelar',
+                    style: TextStyle(color: AppColors.textPrimary),
                   ),
                 ),
               ),
-              Text(
-                '$fechaStr · $horaStr',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textDisabled,
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: FilledButton(
+                  onPressed: _loading ? null : _guardar,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.healthAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    minimumSize: const Size(0, 48),
+                  ),
+                  child: _loading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Guardar',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          // Contenido
-          Text(
-            nota.contenido,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textPrimary,
-              height: 1.5,
-            ),
           ),
         ],
       ),

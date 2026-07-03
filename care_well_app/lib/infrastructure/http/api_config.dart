@@ -30,4 +30,27 @@ class ApiConfig {
       '/api/AdministrarEquipoCuidado/activar-asignacion';
   static const reactivarAsignacionPath =
       '/api/AdministrarEquipoCuidado/reactivar-asignacion';
+
+  static const obtenerOcurrenciasAgendaPath =
+      '/api/AdministrarEventoAgenda/obtener-ocurrencias';
+  static const crearEventoAgendaPath = '/api/AdministrarEventoAgenda/crear';
+  static const modificarEventoAgendaPath =
+      '/api/AdministrarEventoAgenda/modificar';
+  static const eliminarEventoAgendaPath =
+      '/api/AdministrarEventoAgenda/eliminar';
+  static const cancelarOcurrenciaAgendaPath =
+      '/api/AdministrarEventoAgenda/cancelar-ocurrencia';
+  static const obtenerTiposEventoPath =
+      '/api/AdministrarTipoEvento/obtener-todos';
+
+  static const obtenerEventosSaludPath =
+      '/api/AdministrarEventoSalud/obtener-todos';
+  static const crearEventoSaludPath = '/api/AdministrarEventoSalud/crear';
+  static const eliminarEventoSaludPath = '/api/AdministrarEventoSalud/eliminar';
+  static const agregarNotaEventoSaludPath =
+      '/api/AdministrarEventoSalud/agregar-nota';
+  static const modificarNotaEventoSaludPath =
+      '/api/AdministrarEventoSalud/modificar-nota';
+  static const eliminarNotaEventoSaludPath =
+      '/api/AdministrarEventoSalud/eliminar-nota';
 }

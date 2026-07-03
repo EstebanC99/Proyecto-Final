@@ -6,10 +6,15 @@ import 'package:intl/intl.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// Detalle de un evento de salud con notas del equipo (US-32).
+/// Detalle de un evento de salud con header tipado y notas del equipo (US-32).
+///
+/// Las notas vienen embebidas en el evento (derivadas de
+/// [notasByEventoProvider]). Los usuarios con permiso pueden agregar, editar y
+/// eliminar notas.
 class HealthEventDetailScreen extends ConsumerWidget {
   const HealthEventDetailScreen({super.key, required this.eventId});
 
@@ -18,9 +23,9 @@ class HealthEventDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventoAsync = ref.watch(eventoSaludByIdProvider(eventId));
-    final notasAsync = ref.watch(notasByEventoProvider(eventId));
-    final puedeAsync = ref.watch(puedeRegistrarEventosSaludProvider);
-    final puede = puedeAsync.valueOrNull ?? false;
+    final notas = ref.watch(notasByEventoProvider(eventId));
+    final puede =
+        ref.watch(puedeRegistrarEventosSaludProvider).valueOrNull ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -34,7 +39,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
           loading: () => const Text('Cargando...'),
-          error: (e, st) => const Text('Evento'),
+          error: (_, _) => const Text('Evento'),
         ),
         actions: [
           if (puede)
@@ -42,19 +47,27 @@ class HealthEventDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.delete_outline),
               color: AppColors.error,
               tooltip: 'Eliminar evento',
-              onPressed: () => ConfirmDialog.show(
-                context,
-                title: '¿Eliminar este evento de salud?',
-                body:
-                    'El evento y sus notas se eliminarán de forma definitiva y no podrán recuperarse.',
-                confirmLabel: 'Eliminar',
-                onConfirm: () async {
-                  await ref.read(eliminarEventoSaludProvider)(
-                    eventoId: eventId,
-                  );
-                  if (context.mounted && context.canPop()) context.pop();
-                },
-              ),
+              onPressed: () async {
+                final eliminado = await ConfirmDialog.show(
+                  context,
+                  title: '¿Eliminar este evento de salud?',
+                  body:
+                      'El evento y todas sus notas se eliminarán de forma definitiva.',
+                  confirmLabel: 'Eliminar',
+                  icon: Icons.delete_outline,
+                  onConfirm: () async {
+                    await ref.read(eliminarEventoSaludProvider)(
+                      eventoId: eventId,
+                    );
+                  },
+                );
+                // El diálogo ya cerró su propia página; navegamos con
+                // go_router a la lista para no vaciar el stack (evita el pop
+                // duplicado que dejaba la pantalla en negro).
+                if (eliminado && context.mounted) {
+                  context.go(AppRoutes.healthEvents);
+                }
+              },
             ),
         ],
       ),
@@ -70,50 +83,17 @@ class HealthEventDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Evento no encontrado.'));
           }
 
-          final fechaStr = DateFormat(
-            'd \'de\' MMMM \'de\' yyyy',
-            'es',
-          ).format(evento.fecha);
-
           return CustomScrollView(
             slivers: [
-              // Card del evento
+              // ── Header del evento ───────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      boxShadow: AppSpacing.elev1,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fechaStr,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textDisabled,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          evento.descripcion,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: _EventHeaderCard(evento: evento),
                 ),
               ),
 
-              // Encabezado de notas
+              // ── Encabezado de sección de notas ──────────────────────────
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -134,69 +114,66 @@ class HealthEventDetailScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Notas
-              notasAsync.when(
-                loading: () => const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (err, _) => SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    child: InlineErrorBanner(
-                      message: 'No se pudieron cargar las notas. $err',
+              // ── Notas ────────────────────────────────────────────────────
+              if (notas.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.description_outlined,
+                            size: 36,
+                            color: AppColors.textDisabled,
+                          ),
+                          SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Aún no hay notas. Agregá la primera.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textDisabled,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.xxxl,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, i) {
+                      final nota = notas[i];
+                      return NoteCard(
+                        nota: nota,
+                        onEdit: puede
+                            ? (nuevoContenido) =>
+                                  ref.read(modificarNotaEventoProvider)(
+                                    eventoSaludId: eventId,
+                                    notaId: nota.id,
+                                    contenido: nuevoContenido,
+                                  )
+                            : null,
+                        onDelete: puede
+                            ? () => ref.read(eliminarNotaEventoProvider)(
+                                eventoSaludId: eventId,
+                                notaId: nota.id,
+                              )
+                            : null,
+                      );
+                    }, childCount: notas.length),
+                  ),
                 ),
-                data: (notas) {
-                  if (notas.isEmpty) {
-                    return const SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: AppSpacing.xl,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.description_outlined,
-                                size: 32,
-                                color: AppColors.textDisabled,
-                              ),
-                              SizedBox(height: AppSpacing.sm),
-                              Text(
-                                'Aun no hay notas. Agregá la primera.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textDisabled,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                  return SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      0,
-                      AppSpacing.lg,
-                      AppSpacing.xxxl,
-                    ),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, i) => NoteCard(nota: notas[i]),
-                        childCount: notas.length,
-                      ),
-                    ),
-                  );
-                },
-              ),
             ],
           );
         },
@@ -212,6 +189,92 @@ class HealthEventDetailScreen extends ConsumerWidget {
               child: const Icon(Icons.note_add, color: Colors.white),
             )
           : null,
+    );
+  }
+}
+
+// ─── Header del evento ────────────────────────────────────────────────────────
+
+/// Card de presentación del evento en el detalle.
+class _EventHeaderCard extends StatelessWidget {
+  const _EventHeaderCard({required this.evento});
+
+  final EventoDeSalud evento;
+
+  @override
+  Widget build(BuildContext context) {
+    final fechaStr = DateFormat(
+      "d 'de' MMMM 'de' yyyy · HH:mm",
+      'es',
+    ).format(evento.fechaHora);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        boxShadow: AppSpacing.elev1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Fila: chip de tipo + fecha
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HealthEventTypeChip(tipo: evento.tipo),
+              const Spacer(),
+              Text(
+                fechaStr,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textDisabled,
+                ),
+              ),
+            ],
+          ),
+          // Badge "Desde agenda"
+          if (evento.fechaOcurrenciaEventoAgenda != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.event_available_outlined,
+                    size: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'Generado desde la agenda',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          // Descripción completa
+          Text(
+            evento.descripcion,
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppColors.textPrimary,
+              height: 1.55,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -63,12 +63,17 @@ final careTeamDatasourceProvider = Provider<CareTeamDatasource>(
 );
 
 final agendaDatasourceProvider = Provider<AgendaDatasource>(
-  (ref) => DemoAgendaDatasource(),
+  (ref) => ApiAgendaDatasource(ref.watch(dioClientProvider)),
 );
 
 final healthDatasourceProvider = Provider<HealthDatasource>(
   (ref) => DemoHealthDatasource(),
 );
+
+final eventoSaludDatasourceProvider = Provider<EventoSaludDatasource>((ref) {
+  if (_useDemo) return DemoEventoSaludDatasource();
+  return ApiEventoSaludDatasource(ref.watch(dioClientProvider));
+});
 
 final emergencyDatasourceProvider = Provider<EmergencyDatasource>(
   (ref) => DemoEmergencyDatasource(),
@@ -105,6 +110,10 @@ final agendaRepositoryProvider = Provider<AgendaRepository>(
 
 final healthRepositoryProvider = Provider<HealthRepository>(
   (ref) => HealthRepositoryImpl(ref.watch(healthDatasourceProvider)),
+);
+
+final eventoSaludRepositoryProvider = Provider<EventoSaludRepository>(
+  (ref) => EventoSaludRepositoryImpl(ref.watch(eventoSaludDatasourceProvider)),
 );
 
 final emergencyRepositoryProvider = Provider<EmergencyRepository>(

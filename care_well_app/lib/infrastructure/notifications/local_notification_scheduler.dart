@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../domain/notifications/notification_id.dart';
 import '../../domain/notifications/notification_scheduler.dart';
 
 /// Implementación concreta de [NotificationScheduler] usando
@@ -19,6 +20,14 @@ class LocalNotificationScheduler implements NotificationScheduler {
   /// Se usa `& 0x7fffffff` para garantizar un valor positivo en caso de
   /// desbordamiento de signo, compatible con la API de notificaciones de Android.
   static int notificationIdFor(int eventoId) => eventoId & 0x7fffffff;
+
+  /// Deriva un id de notificación estable a partir del evento base y la fecha
+  /// de la ocurrencia. Delega en [NotificationId.forOcurrencia] (la lógica vive
+  /// en `domain`); se mantiene acá por conveniencia de la impl de infraestructura.
+  static int notificationIdForOcurrencia(
+    int eventoAgendaId,
+    DateTime fechaOcurrencia,
+  ) => NotificationId.forOcurrencia(eventoAgendaId, fechaOcurrencia);
 
   @override
   Future<void> init() async {
@@ -83,7 +92,7 @@ class LocalNotificationScheduler implements NotificationScheduler {
           priority: Priority.high,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
@@ -93,6 +102,11 @@ class LocalNotificationScheduler implements NotificationScheduler {
   @override
   Future<void> cancelEventReminder(int notificationId) async {
     await _plugin.cancel(notificationId);
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    await _plugin.cancelAll();
   }
 
   @override

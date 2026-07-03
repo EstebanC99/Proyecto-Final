@@ -1,18 +1,11 @@
 import '../base_entity.dart';
-import '../shared/persona.dart';
+import '../shared/entidad_basica.dart';
+import 'nota_evento.dart';
 
 /// Tipo de evento de salud (catálogo persistido).
 ///
-/// - id 1: Cita o consulta médica.
-/// - id 2: Hospitalización o internación.
-/// - id 3: Medicación administrada o ajuste de dosis.
-/// - id 4: Cirugía o procedimiento quirúrgico.
-/// - id 5: Tratamiento en curso (fisioterapia, rehabilitación, etc.).
-/// - id 6: Evento de bienestar general.
-/// - id 7: Síntoma percibido por el dependiente o el cuidador.
-/// - id 8: Diagnóstico médico.
-/// - id 9: Aplicación de vacuna.
-/// - id 10: Otro evento de salud no categorizado.
+/// Los ids provienen del catálogo compartido de tipos de evento
+/// ([TiposEventoAgendaConst]).
 class TipoEventoSalud extends BaseEntity {
   final String descripcion;
 
@@ -29,38 +22,58 @@ class TipoEventoSalud extends BaseEntity {
 
 /// Evento clínico registrado para una persona.
 ///
-/// Las notas adicionales se gestionan como entidades [NotaEvento] separadas,
-/// alineado con el modelo de dominio del backend.
+/// Las notas del equipo vienen embebidas en [notas]. Cuando el evento fue
+/// generado automáticamente a partir de una ocurrencia de agenda,
+/// [fechaOcurrenciaEventoAgenda] indica la fecha/hora de esa ocurrencia.
 class EventoDeSalud extends BaseEntity {
-  /// Persona a la que corresponde este evento de salud.
-  final Persona persona;
+  /// Persona a la que corresponde este evento (referencia embebida).
+  final EntidadBasica persona;
 
   final TipoEventoSalud tipo;
-  final DateTime fecha;
+  final DateTime fechaHora;
   final String descripcion;
+
+  /// Notas colaborativas asociadas al evento.
+  final List<NotaEvento> notas;
+
+  /// Fecha/hora de la ocurrencia de agenda que originó este evento, si aplica.
+  final DateTime? fechaOcurrenciaEventoAgenda;
 
   const EventoDeSalud({
     required super.id,
     required this.persona,
     required this.tipo,
-    required this.fecha,
+    required this.fechaHora,
     required this.descripcion,
+    this.notas = const [],
+    this.fechaOcurrenciaEventoAgenda,
   });
+
+  /// `true` si el evento tiene al menos una nota asociada.
+  bool get tieneNotas => notas.isNotEmpty;
+
+  /// Cantidad de notas asociadas al evento.
+  int get cantidadNotas => notas.length;
 
   @override
   EventoDeSalud copyWith({
     int? id,
-    Persona? persona,
+    EntidadBasica? persona,
     TipoEventoSalud? tipo,
-    DateTime? fecha,
+    DateTime? fechaHora,
     String? descripcion,
+    List<NotaEvento>? notas,
+    DateTime? fechaOcurrenciaEventoAgenda,
   }) {
     return EventoDeSalud(
       id: id ?? this.id,
       persona: persona ?? this.persona,
       tipo: tipo ?? this.tipo,
-      fecha: fecha ?? this.fecha,
+      fechaHora: fechaHora ?? this.fechaHora,
       descripcion: descripcion ?? this.descripcion,
+      notas: notas ?? this.notas,
+      fechaOcurrenciaEventoAgenda:
+          fechaOcurrenciaEventoAgenda ?? this.fechaOcurrenciaEventoAgenda,
     );
   }
 }

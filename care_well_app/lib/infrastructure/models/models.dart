@@ -10,3 +10,4 @@ export 'emergency/emergencia_model.dart';
 export 'health/health_models.dart';
 export 'settings/configuracion_model.dart';
 export 'shared/persona_model.dart';
+export 'shared/tipo_evento_model.dart';

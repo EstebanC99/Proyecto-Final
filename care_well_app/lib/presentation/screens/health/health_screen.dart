@@ -11,7 +11,7 @@ import '../../widgets/widgets.dart';
 /// Hub principal del módulo Mi salud (US-28 a US-33).
 ///
 /// Muestra tarjetas de acceso rápido a cada sub-módulo de salud:
-/// Hábitos, Recomendaciones, Eventos, Línea de tiempo y Estado de ánimo.
+/// Hábitos, Recomendaciones, Eventos y Estado de ánimo.
 class HealthScreen extends ConsumerWidget {
   const HealthScreen({super.key});
 
@@ -102,14 +102,6 @@ class HealthScreen extends ConsumerWidget {
                       description: 'Citas, tratamientos y novedades clínicas',
                       onTap: () =>
                           context.pushNamed(AppRoutes.healthEventsName),
-                    ),
-                    HealthCategoryCard(
-                      icon: Icons.timeline,
-                      accentColor: const Color(0xFF059669),
-                      label: 'Línea de tiempo',
-                      description: 'Evolución cronológica de la salud',
-                      onTap: () =>
-                          context.pushNamed(AppRoutes.healthTimelineName),
                     ),
                     HealthCategoryCard(
                       icon: Icons.mood,

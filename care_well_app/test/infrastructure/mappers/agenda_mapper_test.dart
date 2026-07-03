@@ -1,163 +1,106 @@
-import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/infrastructure/mappers/mappers.dart';
 import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final persona = Persona(
-    id: 2,
-    nombre: 'Alicia',
-    apellido: 'Rodríguez',
-    documento: "123123",
-    fechaNacimiento: DateTime.now(),
-  );
+  group('TipoEventoMapper', () {
+    test('fromModel mapea id, descripcion y agendable', () {
+      final model = TipoEventoModel.fromJson(const {
+        'id': 1,
+        'descripcion': 'Cita Médica',
+        'agendable': true,
+      });
 
-  final usuario = Usuario(
-    id: 101,
-    persona: Persona(
-      id: 1,
-      nombre: 'María',
-      apellido: 'García',
-      documento: "123123",
-      fechaNacimiento: DateTime.now(),
-    ),
-    contrasena: 'hash123',
-    estado: EstadoUsuario(
-      id: EstadosUsuarioConst.activo,
-      descripcion: 'Activo',
-    ),
-  );
+      final tipo = TipoEventoMapper.fromModel(model);
 
-  final tipoCitaMedica = TipoEventoAgenda(
-    id: TiposEventoAgendaConst.citaMedica,
-    descripcion: 'Cita médica',
-  );
-
-  final tipoMedicacion = TipoEventoAgenda(
-    id: TiposEventoAgendaConst.medicacion,
-    descripcion: 'Medicación',
-  );
-
-  group('EventoAgendaMapper', () {
-    final evento = EventoAgenda(
-      id: 701,
-      persona: persona,
-      creadoPor: usuario,
-      titulo: 'Consulta cardiológica',
-      descripcion: 'Control anual',
-      tipo: tipoCitaMedica,
-      fechaHoraInicio: DateTime(2026, 6, 10, 10, 0),
-      fechaHoraFin: DateTime(2026, 6, 10, 11, 0),
-    );
-
-    final model = EventoAgendaModel(
-      id: 701,
-      personaId: 2,
-      creadoPorId: 101,
-      titulo: 'Consulta cardiológica',
-      descripcion: 'Control anual',
-      tipo: TipoEventoAgendaModel(
-        id: TiposEventoAgendaConst.citaMedica,
-        descripcion: 'Cita médica',
-      ),
-      fechaHoraInicio: '2026-06-10T10:00:00.000',
-      fechaHoraFin: '2026-06-10T11:00:00.000',
-    );
-
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = EventoAgendaMapper.fromModel(
-        EventoAgendaMapper.toModel(evento),
-        persona: persona,
-        creadoPor: usuario,
-      );
-      expect(roundTrip.id, evento.id);
-      expect(roundTrip.titulo, evento.titulo);
-      expect(roundTrip.tipo.id, evento.tipo.id);
-      expect(
-        roundTrip.fechaHoraInicio.toIso8601String(),
-        evento.fechaHoraInicio.toIso8601String(),
-      );
-      expect(
-        roundTrip.fechaHoraFin?.toIso8601String(),
-        evento.fechaHoraFin?.toIso8601String(),
-      );
+      expect(tipo.id, 1);
+      expect(tipo.descripcion, 'Cita Médica');
+      expect(tipo.agendable, isTrue);
     });
 
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = EventoAgendaModel.fromJson(json);
-      final entity = EventoAgendaMapper.fromModel(
-        modelFromJson,
-        persona: persona,
-        creadoPor: usuario,
-      );
-      final modelBack = EventoAgendaMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
+    test('agendable ausente en el JSON se resuelve como true por defecto', () {
+      final model = TipoEventoModel.fromJson(const {
+        'id': 4,
+        'descripcion': 'Otro',
+      });
+
+      final tipo = TipoEventoMapper.fromModel(model);
+
+      expect(tipo.agendable, isTrue);
     });
 
-    test('fechaHoraFin nulo se preserva en round-trip', () {
-      final eventoSinFin = EventoAgenda(
-        id: evento.id,
-        persona: evento.persona,
-        creadoPor: evento.creadoPor,
-        titulo: evento.titulo,
-        descripcion: evento.descripcion,
-        tipo: evento.tipo,
-        fechaHoraInicio: evento.fechaHoraInicio,
-        fechaHoraFin: null,
-      );
-      final roundTrip = EventoAgendaMapper.fromModel(
-        EventoAgendaMapper.toModel(eventoSinFin),
-        persona: persona,
-        creadoPor: usuario,
-      );
-      expect(roundTrip.fechaHoraFin, isNull);
+    test('agendable false se preserva', () {
+      final model = TipoEventoModel.fromJson(const {
+        'id': 99,
+        'descripcion': 'No agendable',
+        'agendable': false,
+      });
+
+      final tipo = TipoEventoMapper.fromModel(model);
+
+      expect(tipo.agendable, isFalse);
     });
   });
 
-  group('RecordatorioMapper', () {
-    final evento = EventoAgenda(
-      id: 702,
-      persona: persona,
-      creadoPor: usuario,
-      titulo: 'Medicación',
-      tipo: tipoMedicacion,
-      fechaHoraInicio: DateTime(2026, 6, 7, 8, 0),
-    );
+  group('OcurrenciaEventoAgendaMapper', () {
+    test('fromModel mapea un JSON realista del backend', () {
+      final model = OcurrenciaEventoAgendaModel.fromJson(const {
+        'eventoAgendaID': 501,
+        'personaID': 12,
+        'titulo': 'Control cardiológico',
+        'descripcion': 'Llevar estudios previos',
+        'tipo': {'id': 1, 'descripcion': 'Cita Médica', 'agendable': true},
+        'fechaHoraInicio': '2026-07-15T09:30:00.000',
+        'fechaHoraFin': '2026-07-15T10:00:00.000',
+        'esRecurrente': false,
+        'generarEventoSalud': true,
+        'minutosAnticipacionRecordatorio': 30,
+      });
 
-    final recordatorio = Recordatorio(
-      id: 801,
-      eventoAgenda: evento,
-      fechaHoraEnvio: DateTime(2026, 6, 7, 7, 30),
-      enviado: false,
-    );
+      final ocu = OcurrenciaEventoAgendaMapper.fromModel(model);
 
-    final model = RecordatorioModel(
-      id: 801,
-      eventoAgendaId: 702,
-      fechaHoraEnvio: '2026-06-07T07:30:00.000',
-      enviado: false,
-    );
+      // eventoAgendaID / personaID (casing del backend) → eventoAgendaId / personaId.
+      expect(ocu.eventoAgendaId, 501);
+      expect(ocu.personaId, 12);
+      // id se deriva del id del evento base.
+      expect(ocu.id, 501);
+      expect(ocu.titulo, 'Control cardiológico');
+      expect(ocu.descripcion, 'Llevar estudios previos');
 
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = RecordatorioMapper.fromModel(
-        RecordatorioMapper.toModel(recordatorio),
-        evento,
-      );
-      expect(roundTrip.id, recordatorio.id);
-      expect(roundTrip.enviado, recordatorio.enviado);
-      expect(
-        roundTrip.fechaHoraEnvio.toIso8601String(),
-        recordatorio.fechaHoraEnvio.toIso8601String(),
-      );
+      // Tipo anidado.
+      expect(ocu.tipo.id, 1);
+      expect(ocu.tipo.descripcion, 'Cita Médica');
+      expect(ocu.tipo.agendable, isTrue);
+
+      // Fechas ISO 8601 → DateTime.
+      expect(ocu.fechaHoraInicio, DateTime(2026, 7, 15, 9, 30));
+      expect(ocu.fechaHoraFin, DateTime(2026, 7, 15, 10, 0));
+
+      expect(ocu.esRecurrente, isFalse);
+      expect(ocu.generarEventoSalud, isTrue);
+      expect(ocu.minutosAnticipacionRecordatorio, 30);
     });
 
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = RecordatorioModel.fromJson(json);
-      final entity = RecordatorioMapper.fromModel(modelFromJson, evento);
-      final modelBack = RecordatorioMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
+    test('campos opcionales nulos se preservan como null', () {
+      final model = OcurrenciaEventoAgendaModel.fromJson(const {
+        'eventoAgendaID': 700,
+        'personaID': 3,
+        'titulo': 'Recordatorio simple',
+        'descripcion': null,
+        'tipo': {'id': 4, 'descripcion': 'Otro', 'agendable': true},
+        'fechaHoraInicio': '2026-08-01T08:00:00.000',
+        'fechaHoraFin': '2026-08-01T08:30:00.000',
+        'esRecurrente': true,
+        'generarEventoSalud': false,
+        'minutosAnticipacionRecordatorio': null,
+      });
+
+      final ocu = OcurrenciaEventoAgendaMapper.fromModel(model);
+
+      expect(ocu.descripcion, isNull);
+      expect(ocu.minutosAnticipacionRecordatorio, isNull);
+      expect(ocu.esRecurrente, isTrue);
+      expect(ocu.generarEventoSalud, isFalse);
     });
   });
 }

@@ -9,45 +9,78 @@ class AgendaRepositoryImpl implements AgendaRepository {
   const AgendaRepositoryImpl(this._datasource);
 
   @override
-  Future<List<EventoAgenda>> getEventosByPersona(int personaId) =>
-      _datasource.getEventosByPersona(personaId);
-
-  @override
-  Future<List<EventoAgenda>> getEventosByRango({
+  Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
-  }) => _datasource.getEventosByRango(
+  }) => _datasource.obtenerOcurrencias(
     personaId: personaId,
     desde: desde,
     hasta: hasta,
   );
 
   @override
-  Future<EventoAgenda> crearEvento(EventoAgenda evento) =>
-      _datasource.crearEvento(evento);
+  Future<List<TipoEvento>> obtenerTiposEvento() =>
+      _datasource.obtenerTiposEvento();
 
   @override
-  Future<EventoAgenda> actualizarEvento(EventoAgenda evento) =>
-      _datasource.actualizarEvento(evento);
+  Future<void> crearEvento({
+    required int personaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+    int? frecuenciaRecurrenciaId,
+    int? intervaloRecurrencia,
+    DateTime? fechaFinRecurrencia,
+  }) => _datasource.crearEvento(
+    personaId: personaId,
+    titulo: titulo,
+    descripcion: descripcion,
+    tipoEventoId: tipoEventoId,
+    fechaHoraInicio: fechaHoraInicio,
+    duracionMinutos: duracionMinutos,
+    generarEventoSalud: generarEventoSalud,
+    minutosAnticipacionRecordatorio: minutosAnticipacionRecordatorio,
+    frecuenciaRecurrenciaId: frecuenciaRecurrenciaId,
+    intervaloRecurrencia: intervaloRecurrencia,
+    fechaFinRecurrencia: fechaFinRecurrencia,
+  );
 
   @override
-  Future<void> eliminarEvento(int eventoId) =>
-      _datasource.eliminarEvento(eventoId);
+  Future<void> modificarEvento({
+    required int eventoAgendaId,
+    required String titulo,
+    String? descripcion,
+    required int tipoEventoId,
+    required DateTime fechaHoraInicio,
+    required int duracionMinutos,
+    required bool generarEventoSalud,
+    int? minutosAnticipacionRecordatorio,
+  }) => _datasource.modificarEvento(
+    eventoAgendaId: eventoAgendaId,
+    titulo: titulo,
+    descripcion: descripcion,
+    tipoEventoId: tipoEventoId,
+    fechaHoraInicio: fechaHoraInicio,
+    duracionMinutos: duracionMinutos,
+    generarEventoSalud: generarEventoSalud,
+    minutosAnticipacionRecordatorio: minutosAnticipacionRecordatorio,
+  );
 
   @override
-  Future<List<Recordatorio>> getRecordatoriosByEvento(int eventoId) =>
-      _datasource.getRecordatoriosByEvento(eventoId);
+  Future<void> eliminarEvento(int eventoAgendaId) =>
+      _datasource.eliminarEvento(eventoAgendaId);
 
   @override
-  Future<Recordatorio> crearRecordatorio(Recordatorio recordatorio) =>
-      _datasource.crearRecordatorio(recordatorio);
-
-  @override
-  Future<Recordatorio> marcarEnviado(int recordatorioId) =>
-      _datasource.marcarEnviado(recordatorioId);
-
-  @override
-  Future<void> eliminarRecordatorio(int recordatorioId) =>
-      _datasource.eliminarRecordatorio(recordatorioId);
+  Future<void> cancelarOcurrencia({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  }) => _datasource.cancelarOcurrencia(
+    eventoAgendaId: eventoAgendaId,
+    fechaOcurrencia: fechaOcurrencia,
+  );
 }
