@@ -9,7 +9,8 @@ import '../../widgets/widgets.dart';
 /// Formulario para registrar un nuevo evento de salud (US-30).
 ///
 /// El tipo de evento se selecciona desde el catálogo compartido con la agenda
-/// ([tiposEventoProvider]). La fecha admite pasado y futuro sin restricción.
+/// ([tiposEventoProvider]). Un evento de salud es algo que ya ocurrió, por lo que
+/// no se admiten fechas ni horas futuras.
 class HealthEventFormScreen extends ConsumerStatefulWidget {
   const HealthEventFormScreen({super.key, this.eventId});
 
@@ -44,14 +45,24 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
       context: context,
       initialDate: _fecha,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
     );
     if (picked != null) setState(() => _fecha = picked);
   }
 
   Future<void> _elegirHora() async {
     final picked = await showTimePicker(context: context, initialTime: _hora);
-    if (picked != null) setState(() => _hora = picked);
+    if (picked == null) return;
+    final ahora = DateTime.now();
+    final esHoy =
+        _fecha.year == ahora.year &&
+        _fecha.month == ahora.month &&
+        _fecha.day == ahora.day;
+    final horaFutura =
+        esHoy &&
+        (picked.hour > ahora.hour ||
+            (picked.hour == ahora.hour && picked.minute > ahora.minute));
+    setState(() => _hora = horaFutura ? TimeOfDay.fromDateTime(ahora) : picked);
   }
 
   Future<void> _guardar() async {

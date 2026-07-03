@@ -73,9 +73,6 @@ class _FakeAgendaRepository implements AgendaRepository {
   }
 
   @override
-  Future<List<TipoEvento>> obtenerTiposEvento() async => tipos;
-
-  @override
   Future<void> crearEvento({
     required int personaId,
     required String titulo,
@@ -126,6 +123,7 @@ ProviderContainer _makeContainer({
       agendaPersonaContextProvider.overrideWith((ref) async => persona),
       agendaRepositoryProvider.overrideWithValue(repo),
       notificationSchedulerProvider.overrideWithValue(scheduler),
+      tiposEventoProvider.overrideWith((ref) async => repo.tipos),
     ],
   );
 }

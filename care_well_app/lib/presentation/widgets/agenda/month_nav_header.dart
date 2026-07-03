@@ -26,7 +26,10 @@ class MonthNavHeader extends StatelessWidget {
   final VoidCallback onPrevious;
 
   /// Callback al presionar la flecha derecha (mes siguiente).
-  final VoidCallback onNext;
+  ///
+  /// Si es `null`, la flecha se muestra deshabilitada (p. ej. para impedir
+  /// navegar a meses futuros).
+  final VoidCallback? onNext;
 
   static const _nombresMes = [
     'Enero',
@@ -98,10 +101,11 @@ class _ArrowButton extends StatelessWidget {
 
   final IconData icon;
   final String tooltip;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final habilitado = onTap != null;
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -110,7 +114,11 @@ class _ArrowButton extends StatelessWidget {
         child: SizedBox(
           width: AppSpacing.minTapTarget,
           height: AppSpacing.minTapTarget,
-          child: Icon(icon, size: 28, color: AppColors.primary),
+          child: Icon(
+            icon,
+            size: 28,
+            color: habilitado ? AppColors.primary : AppColors.textDisabled,
+          ),
         ),
       ),
     );

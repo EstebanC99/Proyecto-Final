@@ -8,3 +8,4 @@ export 'evento_salud_datasource.dart';
 export 'health_datasource.dart';
 export 'persona_datasource.dart';
 export 'settings_datasource.dart';
+export 'tipo_evento_datasource.dart';

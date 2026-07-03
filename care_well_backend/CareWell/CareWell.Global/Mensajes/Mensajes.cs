@@ -16,6 +16,7 @@
         public const string ElEventoNoEsRecurrente = "El evento seleccionado no es recurrente.";
         public const string EmailRequerido = "El email es requerido.";
         public const string EstadoAsignacionNoPermiteEjecutarAccion = "El estado de la asignación no permite ejecutar la acción.";
+        public const string EventoSaludNoPuedeSerFuturoUtlizarAgenda = "El evento de salud no puede ser a futuro, es algo que ocurrió. Si desea registrar una cita o evento programado, utilizar la sección de 'Agenda'.";
         public const string FechaFinRecurrenciaInvalida = "La fecha de fin de recurrencia no es válida.";
         public const string FechaHoraInicioEventoRequerida = "La fecha y hora de inicio del evento es requerida.";
         public const string FechaNacimientoRequerida = "La fecha de nacimiento es requerida.";

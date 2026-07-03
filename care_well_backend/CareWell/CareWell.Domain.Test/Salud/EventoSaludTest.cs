@@ -200,6 +200,17 @@ namespace CareWell.Domain.Test.Salud
             }
 
             [Fact]
+            public void Si_la_FechaHora_es_valor_por_defecto_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.crearEventoSalud = this.crearEventoSalud with { FechaHora = default };
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.FechaHoraInicioEventoRequerida, excepcionEsperada.Message);
+            }
+
+            [Fact]
             public void Si_la_Descripcion_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
@@ -208,6 +219,17 @@ namespace CareWell.Domain.Test.Salud
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
                 Assert.Equal(Mensajes.LaDescripcionEsRequerida, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_la_FechaHora_es_a_futuro_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.crearEventoSalud = this.crearEventoSalud with { FechaHora = DateTime.Now.AddMinutes(1) };
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.EventoSaludNoPuedeSerFuturoUtlizarAgenda, excepcionEsperada.Message);
             }
 
             [Fact]

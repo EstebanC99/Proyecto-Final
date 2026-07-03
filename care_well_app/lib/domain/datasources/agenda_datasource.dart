@@ -1,4 +1,4 @@
-import '../entities/entities.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
 /// Interfaz de datasource para la agenda.
 abstract class AgendaDatasource {
@@ -8,9 +8,6 @@ abstract class AgendaDatasource {
     required DateTime desde,
     required DateTime hasta,
   });
-
-  /// Retorna el catálogo de tipos de evento.
-  Future<List<TipoEvento>> obtenerTiposEvento();
 
   /// Crea un evento de agenda (opcionalmente recurrente).
   Future<void> crearEvento({

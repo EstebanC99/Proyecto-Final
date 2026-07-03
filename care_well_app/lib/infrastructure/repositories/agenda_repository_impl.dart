@@ -20,10 +20,6 @@ class AgendaRepositoryImpl implements AgendaRepository {
   );
 
   @override
-  Future<List<TipoEvento>> obtenerTiposEvento() =>
-      _datasource.obtenerTiposEvento();
-
-  @override
   Future<void> crearEvento({
     required int personaId,
     required String titulo,

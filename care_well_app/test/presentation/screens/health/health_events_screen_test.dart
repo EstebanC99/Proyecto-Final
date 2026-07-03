@@ -18,14 +18,15 @@ final _personaAlicia = Persona(
 );
 
 // La lista agrupa por día y expande hoy/mañana por defecto: se usa la fecha de
-// hoy para que la card del evento quede visible sin interacción.
+// hoy para que la card del evento quede visible sin interacción. Se fija al
+// inicio del día para que nunca sea futura (la pantalla filtra eventos futuros).
 final _hoy = DateTime.now();
 
 final _evento = EventoDeSalud(
   id: 1101,
   persona: refPersonaAlicia,
   tipo: tipoEventoSaludCitaMedica,
-  fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day, 9),
+  fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day),
   descripcion: 'Control cardiológico',
 );
 

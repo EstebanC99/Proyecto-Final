@@ -1,6 +1,5 @@
 import 'package:care_well_app/domain/datasources/agenda_datasource.dart';
 import 'package:care_well_app/domain/entities/agenda/ocurrencia_evento_agenda.dart';
-import 'package:care_well_app/domain/entities/agenda/tipo_evento.dart';
 import 'package:care_well_app/infrastructure/http/api_config.dart';
 import 'package:care_well_app/infrastructure/http/api_exception_mapper.dart';
 import 'package:care_well_app/infrastructure/mappers/mappers.dart';
@@ -32,23 +31,6 @@ class ApiAgendaDatasource implements AgendaDatasource {
           .map(
             (e) => OcurrenciaEventoAgendaMapper.fromModel(
               OcurrenciaEventoAgendaModel.fromJson(e as Map<String, dynamic>),
-            ),
-          )
-          .toList();
-    } on DioException catch (e) {
-      throw ApiExceptionMapper.map(e);
-    }
-  }
-
-  @override
-  Future<List<TipoEvento>> obtenerTiposEvento() async {
-    try {
-      final response = await _dio.post(ApiConfig.obtenerTiposEventoPath);
-
-      return (response.data as List<dynamic>)
-          .map(
-            (e) => TipoEventoMapper.fromModel(
-              TipoEventoModel.fromJson(e as Map<String, dynamic>),
             ),
           )
           .toList();

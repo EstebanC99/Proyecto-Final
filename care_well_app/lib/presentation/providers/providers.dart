@@ -11,3 +11,4 @@ export 'profile/profile_providers.dart';
 export 'shared/acciones_por_permisos_cuidado_providers.dart';
 export 'shared/asignaciones_providers.dart';
 export 'shared/personas_providers.dart';
+export 'shared/tipos_evento_providers.dart';

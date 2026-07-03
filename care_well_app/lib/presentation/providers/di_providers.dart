@@ -1,3 +1,5 @@
+import 'package:care_well_app/domain/repositories/tipo_evento_repository.dart';
+import 'package:care_well_app/infrastructure/repositories/tipo_evento_repository_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
@@ -18,7 +20,7 @@ import '../../infrastructure/storage/token_storage.dart';
 /// para conectarse al backend real.
 const bool _useDemo = bool.fromEnvironment('USE_DEMO', defaultValue: true);
 
-// ── Infraestructura HTTP ──────────────────────────────────────────────────────
+//region Infraestructura HTTP Providers
 
 final flutterSecureStorageProvider = Provider<FlutterSecureStorage>(
   (ref) => const FlutterSecureStorage(),
@@ -32,13 +34,17 @@ final dioClientProvider = Provider<Dio>(
   (ref) => createDioClient(ref.watch(tokenStorageProvider)),
 );
 
-// ── Notificaciones ────────────────────────────────────────────────────────────
+//endregion
+
+//region Notificaciones Providers
 
 final notificationSchedulerProvider = Provider<NotificationScheduler>(
   (ref) => LocalNotificationScheduler(),
 );
 
-// ── Datasources ───────────────────────────────────────────────────────────────
+//endregion
+
+//region Datasources Providers
 
 final authDatasourceProvider = Provider<AuthDatasource>((ref) {
   if (_useDemo) return DemoAuthDatasource();
@@ -83,7 +89,13 @@ final settingsDatasourceProvider = Provider<SettingsDatasource>(
   (ref) => DemoSettingsDatasource(),
 );
 
-// ── Repositorios ──────────────────────────────────────────────────────────────
+final tipoEventoDatasourceProvider = Provider<TipoEventoDatasource>(
+  (ref) => ApiTipoEventoDatasource(ref.watch(dioClientProvider)),
+);
+
+//endregion
+
+//region Repositories Providers
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepositoryImpl(ref.watch(authDatasourceProvider)),
@@ -123,3 +135,9 @@ final emergencyRepositoryProvider = Provider<EmergencyRepository>(
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepositoryImpl(ref.watch(settingsDatasourceProvider)),
 );
+
+final tipoEventoRepositoryProvider = Provider<TipoEventoRepository>(
+  (ref) => TipoEventoRepositoryImpl(ref.watch(tipoEventoDatasourceProvider)),
+);
+
+//endregion

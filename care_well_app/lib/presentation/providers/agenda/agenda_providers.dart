@@ -11,59 +11,6 @@ final agendaPersonaContextProvider = FutureProvider<Persona?>(
   (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
 
-// ─── Permisos de gestión ──────────────────────────────────────────────────────
-
-/// Indica si el usuario autenticado puede gestionar la agenda de la persona
-/// de contexto (alta, edición y eliminación de eventos).
-///
-/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.gestionarAgenda].
-final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
-  // Cortocircuito: el usuario siempre puede gestionar su propia agenda.
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
-  final usuario = ref.watch(authStateProvider).valueOrNull;
-  if (usuario == null) return false;
-
-  final persona = await ref.watch(agendaPersonaContextProvider.future);
-  if (persona == null) return false;
-
-  final repo = ref.watch(careTeamRepositoryProvider);
-  final asignaciones = await repo.getAsignacionesByColaborador(
-    usuario.persona.id,
-  );
-
-  final asignacion = asignaciones
-      .where(
-        (a) =>
-            a.personaCuidada.id == persona.id &&
-            a.estado.id == EstadosAsignacionConst.activa,
-      )
-      .firstOrNull;
-
-  if (asignacion == null) return false;
-
-  return asignacion.permisos.any(
-    (p) => p.id == PermisosCuidadoConst.gestionarAgenda,
-  );
-});
-
-// ─── Catálogo de tipos de evento ────────────────────────────────────────────
-
-/// Catálogo completo de tipos de evento (agendables y no agendables).
-final tiposEventoProvider = FutureProvider<List<TipoEvento>>((ref) async {
-  return ref.watch(agendaRepositoryProvider).obtenerTiposEvento();
-});
-
-/// Tipos de evento que pueden seleccionarse al crear un evento
-/// (derivado de [tiposEventoProvider], filtrando por [TipoEvento.agendable]).
-final tiposEventoAgendablesProvider = FutureProvider<List<TipoEvento>>((ref) {
-  return ref
-      .watch(tiposEventoProvider.future)
-      .then((tipos) => tipos.where((t) => t.agendable).toList());
-});
-
 // ─── Mes seleccionado y ocurrencias ─────────────────────────────────────────
 
 /// Primer día del mes actualmente visualizado en la agenda.

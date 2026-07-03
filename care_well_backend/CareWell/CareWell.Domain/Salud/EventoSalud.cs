@@ -62,6 +62,9 @@ namespace CareWell.Domain.Salud
             if (string.IsNullOrEmpty(crearEventoSalud.Descripcion))
                 throw new ValidacionDominioException(Mensajes.LaDescripcionEsRequerida);
 
+            if (crearEventoSalud.FechaHora > DateTime.Now)
+                throw new ValidacionDominioException(Mensajes.EventoSaludNoPuedeSerFuturoUtlizarAgenda);
+
             this.Persona = crearEventoSalud.Persona;
             this.Tipo = crearEventoSalud.Tipo;
             this.FechaHora = crearEventoSalud.FechaHora;

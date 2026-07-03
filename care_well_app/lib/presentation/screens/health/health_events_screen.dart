@@ -47,6 +47,12 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
     );
   }
 
+  /// `true` si [mes] es el mes actual (no hay meses futuros que mostrar).
+  bool _esUltimoMes(DateTime mes) {
+    final ahora = DateTime.now();
+    return mes.year == ahora.year && mes.month == ahora.month;
+  }
+
   @override
   Widget build(BuildContext context) {
     final eventosAsync = ref.watch(eventosSaludDelMesProvider);
@@ -100,11 +106,11 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
             error: (_, _) => const SizedBox.shrink(),
           ),
 
-          // Navegación mensual
+          // Navegación mensual — no se permite avanzar a meses futuros.
           MonthNavHeader(
             mes: mes,
             onPrevious: _irMesAnterior,
-            onNext: _irMesSiguiente,
+            onNext: _esUltimoMes(mes) ? null : _irMesSiguiente,
           ),
 
           Expanded(
@@ -136,7 +142,13 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
                   );
                 }
 
-                if (eventos.isEmpty) {
+                // Filtro defensivo: nunca mostrar eventos con fecha futura.
+                final ahora = DateTime.now();
+                final eventosFiltrados = eventos
+                    .where((e) => !e.fechaHora.isAfter(ahora))
+                    .toList();
+
+                if (eventosFiltrados.isEmpty) {
                   return _EmptyMonthState(puede: puede);
                 }
 
@@ -151,13 +163,13 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
 
                 return switch (_vista) {
                   _HealthEventsViewMode.lista => HealthEventsMonthList(
-                    eventos: eventos,
+                    eventos: eventosFiltrados,
                     puedeRegistrar: puede,
                     onRefresh: onRefresh,
                     onEventoTap: onTap,
                   ),
                   _HealthEventsViewMode.timeline => HealthEventsTimelineView(
-                    eventos: eventos,
+                    eventos: eventosFiltrados,
                     onRefresh: onRefresh,
                     onEventoTap: onTap,
                   ),
