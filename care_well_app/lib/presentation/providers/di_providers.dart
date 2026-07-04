@@ -81,6 +81,14 @@ final eventoSaludDatasourceProvider = Provider<EventoSaludDatasource>((ref) {
   return ApiEventoSaludDatasource(ref.watch(dioClientProvider));
 });
 
+final habitoVidaDatasourceProvider = Provider<HabitoVidaDatasource>(
+  (ref) => ApiHabitoVidaDatasource(ref.watch(dioClientProvider)),
+);
+
+final estadoAnimoDatasourceProvider = Provider<EstadoAnimoDatasource>(
+  (ref) => ApiEstadoAnimoDatasource(ref.watch(dioClientProvider)),
+);
+
 final emergencyDatasourceProvider = Provider<EmergencyDatasource>(
   (ref) => DemoEmergencyDatasource(),
 );
@@ -126,6 +134,14 @@ final healthRepositoryProvider = Provider<HealthRepository>(
 
 final eventoSaludRepositoryProvider = Provider<EventoSaludRepository>(
   (ref) => EventoSaludRepositoryImpl(ref.watch(eventoSaludDatasourceProvider)),
+);
+
+final habitoVidaRepositoryProvider = Provider<HabitoVidaRepository>(
+  (ref) => HabitoVidaRepositoryImpl(ref.watch(habitoVidaDatasourceProvider)),
+);
+
+final estadoAnimoRepositoryProvider = Provider<EstadoAnimoRepository>(
+  (ref) => EstadoAnimoRepositoryImpl(ref.watch(estadoAnimoDatasourceProvider)),
 );
 
 final emergencyRepositoryProvider = Provider<EmergencyRepository>(

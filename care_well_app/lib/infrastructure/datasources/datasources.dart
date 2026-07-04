@@ -13,5 +13,7 @@ export 'api/api_auth_datasource.dart';
 export 'api/api_persona_datasource.dart';
 export 'api/api_asignacion_cuidado_datasource.dart';
 export 'api/api_agenda_datasource.dart';
+export 'api/api_estado_animo_datasource.dart';
 export 'api/api_evento_salud_datasource.dart';
+export 'api/api_habito_vida_datasource.dart';
 export 'api/api_tipo_evento_datasource.dart';

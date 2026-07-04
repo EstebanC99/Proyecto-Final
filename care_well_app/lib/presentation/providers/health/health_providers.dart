@@ -9,79 +9,15 @@ final healthPersonaContextProvider = FutureProvider<Persona?>(
   (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
 
-// ─── Permisos RBAC ────────────────────────────────────────────────────────────
-
-/// Helper interno: obtiene la asignación activa del usuario para la persona de contexto.
-Future<AsignacionCuidado?> _asignacionActivaDelUsuario(Ref ref) async {
-  final usuario = ref.watch(authStateProvider).valueOrNull;
-  if (usuario == null) return null;
-
-  final persona = await ref.watch(healthPersonaContextProvider.future);
-  if (persona == null) return null;
-
-  final repo = ref.watch(careTeamRepositoryProvider);
-  final asignaciones = await repo.getAsignacionesByColaborador(
-    usuario.persona.id,
-  );
-
-  return asignaciones
-      .where(
-        (a) =>
-            a.personaCuidada.id == persona.id &&
-            a.estado.id == EstadosAsignacionConst.activa,
-      )
-      .firstOrNull;
-}
-
-/// Indica si el usuario puede ver la ficha de salud.
-///
-/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-final puedeVerSaludProvider = FutureProvider<bool>((ref) async {
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
-  final asignacion = await _asignacionActivaDelUsuario(ref);
-  if (asignacion == null) return false;
-  return asignacion.permisos.any(
-    (p) => p.id == PermisosCuidadoConst.verFichaSalud,
-  );
-});
-
-/// Indica si el usuario puede registrar eventos de salud.
-///
-/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-final puedeRegistrarEventosSaludProvider = FutureProvider<bool>((ref) async {
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
-  final asignacion = await _asignacionActivaDelUsuario(ref);
-  if (asignacion == null) return false;
-  return asignacion.permisos.any(
-    (p) => p.id == PermisosCuidadoConst.registrarEventosSalud,
-  );
-});
-
-/// Indica si el usuario puede registrar hábitos de vida.
-///
-/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-final puedeRegistrarHabitosProvider = FutureProvider<bool>((ref) async {
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
-  final asignacion = await _asignacionActivaDelUsuario(ref);
-  if (asignacion == null) return false;
-  return asignacion.permisos.any(
-    (p) => p.id == PermisosCuidadoConst.registrarHabitos,
-  );
-});
-
 // ─── Hábitos de vida ──────────────────────────────────────────────────────────
 
 /// Lista de hábitos de la persona de contexto.
 final habitosProvider = FutureProvider<List<HabitoDeVida>>((ref) async {
   final persona = await ref.watch(healthPersonaContextProvider.future);
   if (persona == null) return [];
-  return ref.watch(healthRepositoryProvider).getHabitosByPersona(persona.id);
+  return ref
+      .watch(habitoVidaRepositoryProvider)
+      .getHabitosByPersona(persona.id);
 });
 
 // ─── Recomendaciones médicas ─────────────────────────────────────────────────
@@ -154,14 +90,25 @@ final notasByEventoProvider = Provider.family<List<NotaEvento>, int>((
 
 // ─── Estados de ánimo ─────────────────────────────────────────────────────────
 
-/// Lista de estados de ánimo de la persona de contexto, ordenada descendente.
+/// Estados de ánimo de la persona de contexto dentro del mes actual, ordenados
+/// descendente por fecha (el más reciente primero).
 final estadosAnimoProvider = FutureProvider<List<EstadoDeAnimo>>((ref) async {
   final persona = await ref.watch(healthPersonaContextProvider.future);
   if (persona == null) return [];
+  final ahora = DateTime.now();
+  final desde = DateTime(ahora.year, ahora.month, 1);
+  final hasta = DateTime(ahora.year, ahora.month + 1, 1);
   final estados = await ref
-      .watch(healthRepositoryProvider)
-      .getEstadosAnimoByPersona(persona.id);
+      .watch(estadoAnimoRepositoryProvider)
+      .obtenerPorFechas(persona: persona, desde: desde, hasta: hasta);
   return estados..sort((a, b) => b.fecha.compareTo(a.fecha));
+});
+
+/// Estado de ánimo registrado hoy para la persona de contexto, o `null`.
+final animoHoyProvider = FutureProvider<EstadoDeAnimo?>((ref) async {
+  final persona = await ref.watch(healthPersonaContextProvider.future);
+  if (persona == null) return null;
+  return ref.watch(estadoAnimoRepositoryProvider).obtenerAnimoHoy(persona);
 });
 
 // ─── Acciones mutadoras ───────────────────────────────────────────────────────
@@ -177,17 +124,29 @@ final habitoByIdProvider = FutureProvider.family<HabitoDeVida?, int>((
   return habitos.where((h) => h.id == id).firstOrNull;
 });
 
-/// Actualiza un hábito de vida existente e invalida la lista.
-final actualizarHabitoProvider =
-    Provider<Future<HabitoDeVida> Function({required HabitoDeVida habito})>((
-      ref,
-    ) {
-      return ({required habito}) async {
-        final repo = ref.read(healthRepositoryProvider);
-        final actualizado = await repo.actualizarHabito(habito);
+/// Modifica el tipo y descripción de un hábito e invalida la lista.
+final modificarHabitoProvider =
+    Provider<
+      Future<void> Function({
+        required int habitoId,
+        required int tipoId,
+        required String descripcion,
+      })
+    >((ref) {
+      return ({
+        required habitoId,
+        required tipoId,
+        required descripcion,
+      }) async {
+        await ref
+            .read(habitoVidaRepositoryProvider)
+            .modificarHabito(
+              habitoId: habitoId,
+              tipoId: tipoId,
+              descripcion: descripcion,
+            );
         ref.invalidate(habitosProvider);
-        ref.invalidate(habitoByIdProvider(habito.id));
-        return actualizado;
+        ref.invalidate(habitoByIdProvider(habitoId));
       };
     });
 
@@ -195,34 +154,80 @@ final actualizarHabitoProvider =
 final eliminarHabitoProvider =
     Provider<Future<void> Function({required int habitoId})>((ref) {
       return ({required habitoId}) async {
-        final repo = ref.read(healthRepositoryProvider);
-        await repo.eliminarHabito(habitoId);
+        await ref.read(habitoVidaRepositoryProvider).eliminarHabito(habitoId);
         ref.invalidate(habitosProvider);
       };
     });
 
-/// Crea un hábito de vida para la persona de contexto.
+/// Crea un hábito de vida para la persona de contexto e invalida la lista.
 final crearHabitoProvider =
     Provider<
-      Future<HabitoDeVida> Function({
-        required TipoHabito tipo,
-        required String descripcion,
-      })
+      Future<void> Function({required int tipoId, required String descripcion})
     >((ref) {
-      return ({required tipo, required descripcion}) async {
+      return ({required tipoId, required descripcion}) async {
         final persona = await ref.read(healthPersonaContextProvider.future);
         if (persona == null) throw Exception('Sin persona de contexto');
-
-        final repo = ref.read(healthRepositoryProvider);
-        final habito = HabitoDeVida(
-          id: 0,
-          persona: persona,
-          tipo: tipo,
-          descripcion: descripcion,
-        );
-        final creado = await repo.crearHabito(habito);
+        await ref
+            .read(habitoVidaRepositoryProvider)
+            .crearHabito(
+              personaId: persona.id,
+              tipoId: tipoId,
+              descripcion: descripcion,
+            );
         ref.invalidate(habitosProvider);
-        return creado;
+      };
+    });
+
+/// Registra que el hábito fue realizado hoy e invalida la lista.
+final crearRealizacionProvider =
+    Provider<
+      Future<void> Function({required int habitoId, String? comentarios})
+    >((ref) {
+      return ({required habitoId, comentarios}) async {
+        await ref
+            .read(habitoVidaRepositoryProvider)
+            .crearRealizacion(habitoId: habitoId, comentarios: comentarios);
+        ref.invalidate(habitosProvider);
+        ref.invalidate(habitoByIdProvider(habitoId));
+      };
+    });
+
+/// Modifica el comentario de una realización e invalida la lista.
+final modificarRealizacionProvider =
+    Provider<
+      Future<void> Function({
+        required int habitoId,
+        required int realizacionId,
+        String? comentarios,
+      })
+    >((ref) {
+      return ({required habitoId, required realizacionId, comentarios}) async {
+        await ref
+            .read(habitoVidaRepositoryProvider)
+            .modificarRealizacion(
+              habitoId: habitoId,
+              realizacionId: realizacionId,
+              comentarios: comentarios,
+            );
+        ref.invalidate(habitosProvider);
+        ref.invalidate(habitoByIdProvider(habitoId));
+      };
+    });
+
+/// Elimina la realización de hoy de un hábito e invalida la lista.
+final eliminarRealizacionProvider =
+    Provider<
+      Future<void> Function({required int habitoId, required int realizacionId})
+    >((ref) {
+      return ({required habitoId, required realizacionId}) async {
+        await ref
+            .read(habitoVidaRepositoryProvider)
+            .eliminarRealizacion(
+              habitoId: habitoId,
+              realizacionId: realizacionId,
+            );
+        ref.invalidate(habitosProvider);
+        ref.invalidate(habitoByIdProvider(habitoId));
       };
     });
 
@@ -320,37 +325,24 @@ final eliminarNotaEventoProvider =
       };
     });
 
-/// Último estado de ánimo registrado para la persona de contexto.
-///
-/// La lista [estadosAnimoProvider] ya viene ordenada descendente, por lo que
-/// el primero es el más reciente. Retorna `null` si no hay registros.
-final ultimoEstadoAnimoProvider = FutureProvider<EstadoDeAnimo?>((ref) async {
-  final estados = await ref.watch(estadosAnimoProvider.future);
-  return estados.firstOrNull;
-});
-
-/// Registra el estado de ánimo de la persona de contexto.
+/// Registra el estado de ánimo de la persona de contexto e invalida los
+/// providers de ánimo (el de hoy y la lista del mes).
 final registrarAnimoProvider =
     Provider<
-      Future<EstadoDeAnimo> Function({
-        required EstadoAnimo estado,
-        String? observaciones,
-      })
+      Future<void> Function({required int estadoAnimoId, String? observaciones})
     >((ref) {
-      return ({required estado, observaciones}) async {
+      return ({required estadoAnimoId, observaciones}) async {
         final persona = await ref.read(healthPersonaContextProvider.future);
-        if (persona == null) throw Exception('Sin persona de contexto');
+        if (persona == null) throw Exception('No hay persona de contexto');
 
-        final repo = ref.read(healthRepositoryProvider);
-        final animo = EstadoDeAnimo(
-          id: 0,
-          persona: persona,
-          fecha: DateTime.now(),
-          estado: estado,
-          observaciones: observaciones,
-        );
-        final creado = await repo.crearEstadoAnimo(animo);
+        await ref
+            .read(estadoAnimoRepositoryProvider)
+            .registrar(
+              personaId: persona.id,
+              estadoAnimoId: estadoAnimoId,
+              observaciones: observaciones,
+            );
+        ref.invalidate(animoHoyProvider);
         ref.invalidate(estadosAnimoProvider);
-        return creado;
       };
     });

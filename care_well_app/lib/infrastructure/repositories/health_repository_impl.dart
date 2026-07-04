@@ -3,6 +3,10 @@ import '../../domain/entities/entities.dart';
 import '../../domain/repositories/repositories.dart';
 
 /// Implementación de [HealthRepository] que delega al [HealthDatasource] inyectado.
+///
+/// Solo gestiona ficha de salud y recomendaciones médicas. Los hábitos de vida
+/// se gestionan en [HabitoVidaRepositoryImpl] y los estados de ánimo en
+/// [EstadoAnimoRepositoryImpl].
 class HealthRepositoryImpl implements HealthRepository {
   final HealthDatasource _datasource;
 
@@ -15,22 +19,6 @@ class HealthRepositoryImpl implements HealthRepository {
   @override
   Future<FichaSalud> guardarFichaSalud(FichaSalud ficha) =>
       _datasource.guardarFichaSalud(ficha);
-
-  @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) =>
-      _datasource.getHabitosByPersona(personaId);
-
-  @override
-  Future<HabitoDeVida> crearHabito(HabitoDeVida habito) =>
-      _datasource.crearHabito(habito);
-
-  @override
-  Future<HabitoDeVida> actualizarHabito(HabitoDeVida habito) =>
-      _datasource.actualizarHabito(habito);
-
-  @override
-  Future<void> eliminarHabito(int habitoId) =>
-      _datasource.eliminarHabito(habitoId);
 
   @override
   Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
@@ -50,20 +38,4 @@ class HealthRepositoryImpl implements HealthRepository {
   @override
   Future<void> eliminarRecomendacion(int recomendacionId) =>
       _datasource.eliminarRecomendacion(recomendacionId);
-
-  @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) =>
-      _datasource.getEstadosAnimoByPersona(personaId);
-
-  @override
-  Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo estadoAnimo) =>
-      _datasource.crearEstadoAnimo(estadoAnimo);
-
-  @override
-  Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo estadoAnimo) =>
-      _datasource.actualizarEstadoAnimo(estadoAnimo);
-
-  @override
-  Future<void> eliminarEstadoAnimo(int estadoAnimoId) =>
-      _datasource.eliminarEstadoAnimo(estadoAnimoId);
 }

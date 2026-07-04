@@ -178,7 +178,9 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
-            child: InlineErrorBanner(message: 'No se pudo cargar el miembro.'),
+            child: InlineErrorBanner(
+              message: e.toString().replaceFirst('Exception: ', ''),
+            ),
           ),
           data: (asignacion) {
             if (asignacion == null) {

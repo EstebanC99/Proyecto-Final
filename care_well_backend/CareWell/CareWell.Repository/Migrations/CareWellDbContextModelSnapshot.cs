@@ -472,6 +472,11 @@ namespace CareWell.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -489,6 +494,32 @@ namespace CareWell.Repository.Migrations
                     b.HasIndex("ID_TipoHabitoVida");
 
                     b.ToTable("t_HabitoVida", (string)null);
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.HabitoVidaRealizacion", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_HabitoVidaRealizacion");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Comentarios")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("FechaHoraRealizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ID_HabitoVida")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_HabitoVida");
+
+                    b.ToTable("t_HabitoVidaRealizacion", (string)null);
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.NotaEventoSalud", b =>
@@ -780,6 +811,17 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("Tipo");
                 });
 
+            modelBuilder.Entity("CareWell.Domain.Salud.HabitoVidaRealizacion", b =>
+                {
+                    b.HasOne("CareWell.Domain.Salud.HabitoVida", "HabitoVida")
+                        .WithMany("Realizaciones")
+                        .HasForeignKey("ID_HabitoVida")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HabitoVida");
+                });
+
             modelBuilder.Entity("CareWell.Domain.Salud.NotaEventoSalud", b =>
                 {
                     b.HasOne("CareWell.Domain.Salud.EventoSalud", "EventoSalud")
@@ -839,6 +881,11 @@ namespace CareWell.Repository.Migrations
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>
                 {
                     b.Navigation("Notas");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.HabitoVida", b =>
+                {
+                    b.Navigation("Realizaciones");
                 });
 #pragma warning restore 612, 618
         }

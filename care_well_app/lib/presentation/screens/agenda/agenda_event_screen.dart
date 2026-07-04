@@ -144,11 +144,11 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
           ),
         );
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo guardar el evento. Intentá de nuevo.'),
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: AppColors.error,
           ),
         );

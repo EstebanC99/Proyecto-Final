@@ -68,17 +68,18 @@ class HabitDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.delete_outline),
               color: AppColors.error,
               tooltip: 'Eliminar',
-              onPressed: () => ConfirmDialog.show(
-                context,
-                title: '¿Eliminar este hábito?',
-                body:
-                    'El registro dejará de mostrarse en la lista. Esta acción no se puede deshacer.',
-                confirmLabel: 'Eliminar',
-                onConfirm: () async {
-                  await ref.read(eliminarHabitoProvider)(habitoId: habitId);
-                  if (context.mounted && context.canPop()) context.pop();
-                },
-              ),
+              onPressed: () async {
+                final eliminado = await ConfirmDialog.show(
+                  context,
+                  title: '¿Eliminar este hábito?',
+                  body:
+                      'El registro dejará de mostrarse en la lista. Esta acción no se puede deshacer.',
+                  confirmLabel: 'Eliminar',
+                  onConfirm: () =>
+                      ref.read(eliminarHabitoProvider)(habitoId: habitId),
+                );
+                if (eliminado && context.mounted) context.pop();
+              },
             ),
           ],
         ],
@@ -161,7 +162,7 @@ class HabitDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Text(
-                        '${habito.persona.nombre} ${habito.persona.apellido}',
+                        habito.persona.descripcion,
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -169,11 +170,126 @@ class HabitDetailScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Realización de hoy
+                  const Divider(),
+                  const SizedBox(height: AppSpacing.sm),
+                  const Text(
+                    'REALIZACIÓN DE HOY',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  GestureDetector(
+                    onTap: puede
+                        ? () => HabitoRealizacionSheet.show(
+                            context,
+                            ref,
+                            habito: habito,
+                          )
+                        : null,
+                    child: _RealizacionDetalleCard(habito: habito),
+                  ),
                 ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ─── Tarjeta de realización de hoy ───────────────────────────────────────────
+
+class _RealizacionDetalleCard extends StatelessWidget {
+  const _RealizacionDetalleCard({required this.habito});
+  final HabitoDeVida habito;
+
+  @override
+  Widget build(BuildContext context) {
+    final realizacion = habito.realizacion;
+    final realizado = realizacion != null;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: realizado
+            ? AppColors.successContainer
+            : AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            realizado
+                ? Icons.check_circle_outline
+                : Icons.radio_button_unchecked,
+            size: 20,
+            color: realizado ? AppColors.success : AppColors.textDisabled,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  realizado ? 'Realizado' : 'Pendiente',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: realizado
+                        ? AppColors.success
+                        : AppColors.textDisabled,
+                  ),
+                ),
+                if (realizado) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${realizacion.fechaHora.hour.toString().padLeft(2, '0')}:${realizacion.fechaHora.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  if (realizacion.comentarios != null &&
+                      realizacion.comentarios!.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      realizacion.comentarios!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textPrimary,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ],
+                if (!realizado)
+                  const Text(
+                    'Tocá para marcar como realizado.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textDisabled,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (realizado)
+            const Icon(
+              Icons.edit_outlined,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+        ],
       ),
     );
   }

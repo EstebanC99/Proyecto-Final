@@ -43,6 +43,17 @@ class ApiConfig {
   static const obtenerTiposEventoPath =
       '/api/AdministrarTipoEvento/obtener-todos';
 
+  static const obtenerHabitosPath = '/api/AdministrarHabitoVida/obtener-todos';
+  static const crearHabitoPath = '/api/AdministrarHabitoVida/crear';
+  static const modificarHabitoPath = '/api/AdministrarHabitoVida/modificar';
+  static const eliminarHabitoPath = '/api/AdministrarHabitoVida/eliminar';
+  static const crearRealizacionHabitoPath =
+      '/api/AdministrarHabitoVida/crear-realizacion';
+  static const modificarRealizacionHabitoPath =
+      '/api/AdministrarHabitoVida/modificar-realizacion';
+  static const eliminarRealizacionHabitoPath =
+      '/api/AdministrarHabitoVida/eliminar-realizacion';
+
   static const obtenerEventosSaludPath =
       '/api/AdministrarEventoSalud/obtener-todos';
   static const crearEventoSaludPath = '/api/AdministrarEventoSalud/crear';
@@ -53,4 +64,11 @@ class ApiConfig {
       '/api/AdministrarEventoSalud/modificar-nota';
   static const eliminarNotaEventoSaludPath =
       '/api/AdministrarEventoSalud/eliminar-nota';
+
+  static const obtenerAnimoHoyPath =
+      '/api/AdministrarPersonaEstadoAnimo/obtener-animo-hoy';
+  static const obtenerAnimoPorFechasPath =
+      '/api/AdministrarPersonaEstadoAnimo/obtener-por-fechas';
+  static const registrarAnimoPath =
+      '/api/AdministrarPersonaEstadoAnimo/registrar';
 }

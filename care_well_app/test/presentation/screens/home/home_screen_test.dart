@@ -122,8 +122,8 @@ Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
       asignacionesActivasComoCuidadorProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
-      // Sin estados de ánimo en tests: el badge queda nulo y no rompe el layout.
-      ultimoEstadoAnimoProvider.overrideWith((ref) async => null),
+      // Sin ánimo de hoy en tests: el badge muestra '?' (neutro).
+      animoHoyProvider.overrideWith((ref) async => null),
     ],
     child: const MaterialApp(home: HomeScreen()),
   );
@@ -213,6 +213,18 @@ void main() {
       expect(find.text('Calendario'), findsOneWidget);
       expect(find.text('Equipo de cuidado'), findsOneWidget);
       expect(find.text('Salud'), findsOneWidget);
+    });
+
+    testWidgets('badge de ánimo muestra "?" cuando no hay registro hoy', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
+      await _settleAnimations(tester);
+
+      // Con animoHoy == null el badge del NavTile de Salud muestra '?'.
+      expect(find.text('?'), findsOneWidget);
     });
   });
 }

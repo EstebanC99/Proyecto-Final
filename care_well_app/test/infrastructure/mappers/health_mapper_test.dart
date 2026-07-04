@@ -62,44 +62,49 @@ void main() {
   });
 
   group('HabitoDeVidaMapper', () {
-    final tipoActividadFisica = TipoHabito(
-      id: TiposHabitoConst.actividadFisica,
-      descripcion: 'Actividad física',
-    );
-
-    final habito = HabitoDeVida(
-      id: 901,
-      persona: persona,
-      tipo: tipoActividadFisica,
-      descripcion: 'Caminata diaria.',
-    );
-
     final model = HabitoDeVidaModel(
       id: 901,
-      personaId: 1,
-      tipo: TipoHabitoModel(
+      persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
+      tipo: EntidadBasicaModel(
         id: TiposHabitoConst.actividadFisica,
         descripcion: 'Actividad física',
       ),
       descripcion: 'Caminata diaria.',
+      activo: true,
+      realizacion: null,
     );
 
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = HabitoDeVidaMapper.fromModel(
-        HabitoDeVidaMapper.toModel(habito),
-        persona,
-      );
-      expect(roundTrip.id, habito.id);
-      expect(roundTrip.tipo.id, habito.tipo.id);
-      expect(roundTrip.descripcion, habito.descripcion);
+    test('model → entity mapea correctamente todos los campos', () {
+      final entity = HabitoDeVidaMapper.fromModel(model);
+      expect(entity.id, 901);
+      expect(entity.persona.id, 1);
+      expect(entity.persona.descripcion, 'Alicia Rodríguez');
+      expect(entity.tipo.id, TiposHabitoConst.actividadFisica);
+      expect(entity.descripcion, 'Caminata diaria.');
+      expect(entity.realizacion, isNull);
     });
 
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = HabitoDeVidaModel.fromJson(json);
-      final entity = HabitoDeVidaMapper.fromModel(modelFromJson, persona);
-      final modelBack = HabitoDeVidaMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
+    test('model con realizacion → entidad con realizacion', () {
+      final modelConRealizacion = HabitoDeVidaModel(
+        id: 901,
+        persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
+        tipo: EntidadBasicaModel(
+          id: TiposHabitoConst.actividadFisica,
+          descripcion: 'Actividad física',
+        ),
+        descripcion: 'Caminata diaria.',
+        activo: true,
+        realizacion: HabitoVidaRealizacionModel(
+          id: 9010,
+          comentarios: 'Completada.',
+          fechaHoraRealizacion: '2026-07-03T08:30:00.000',
+        ),
+      );
+      final entity = HabitoDeVidaMapper.fromModel(modelConRealizacion);
+      expect(entity.realizacion, isNotNull);
+      expect(entity.realizacion!.id, 9010);
+      expect(entity.realizacion!.habitoId, 901);
+      expect(entity.realizacion!.comentarios, 'Completada.');
     });
   });
 
@@ -191,84 +196,43 @@ void main() {
     });
   });
 
-  group('EstadoDeAnimoMapper', () {
-    final tipoSintoma = TipoEventoSalud(
-      id: TiposEventoAgendaConst.sintoma,
-      descripcion: 'Síntoma',
+  group('PersonaEstadoAnimoMapper', () {
+    final model = PersonaEstadoAnimoModel(
+      id: 55,
+      estadoAnimo: EstadoAnimoModel(
+        id: EstadosAnimoConst.bien,
+        descripcion: 'Bien',
+      ),
+      fechaHora: '2026-07-03T10:15:00',
+      observaciones: 'Estuvo tranquila.',
     );
 
-    final estadoMal = EstadoAnimo(
-      id: EstadosAnimoConst.mal,
-      descripcion: 'Mal',
-    );
-
-    final estadoBien = EstadoAnimo(
-      id: EstadosAnimoConst.bien,
-      descripcion: 'Bien',
-    );
-
-    final evento = EventoDeSalud(
-      id: 1101,
-      persona: EntidadBasica(id: 1, descripcion: 'Alicia Rodríguez'),
-      tipo: tipoSintoma,
-      fechaHora: DateTime(2026, 5, 28),
-      descripcion: 'Mareos.',
-    );
-
-    final estadoConEvento = EstadoDeAnimo(
-      id: 1201,
-      persona: persona,
-      eventoDeSalud: evento,
-      fecha: DateTime(2026, 5, 28),
-      estado: estadoMal,
-      observaciones: 'Preocupada.',
-    );
-
-    final model = EstadoDeAnimoModel(
-      id: 1201,
-      personaId: 1,
-      eventoDeSaludId: 1101,
-      fecha: '2026-05-28T00:00:00.000',
-      estado: EstadoAnimoModel(id: EstadosAnimoConst.mal, descripcion: 'Mal'),
-      observaciones: 'Preocupada.',
-    );
-
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = EstadoDeAnimoMapper.fromModel(
-        EstadoDeAnimoMapper.toModel(estadoConEvento),
-        persona,
-        eventoDeSalud: evento,
-      );
-      expect(roundTrip.id, estadoConEvento.id);
-      expect(roundTrip.estado.id, estadoConEvento.estado.id);
-      expect(roundTrip.observaciones, estadoConEvento.observaciones);
-      expect(roundTrip.eventoDeSalud?.id, evento.id);
+    test('model → entity mapea todos los campos', () {
+      final entity = PersonaEstadoAnimoMapper.fromModel(model, persona);
+      expect(entity.id, 55);
+      expect(entity.estado.id, EstadosAnimoConst.bien);
+      expect(entity.estado.descripcion, 'Bien');
+      expect(entity.fecha, DateTime.parse('2026-07-03T10:15:00'));
+      expect(entity.observaciones, 'Estuvo tranquila.');
+      expect(entity.persona.id, persona.id);
     });
 
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = EstadoDeAnimoModel.fromJson(json);
-      final entity = EstadoDeAnimoMapper.fromModel(
-        modelFromJson,
-        persona,
-        eventoDeSalud: evento,
-      );
-      final modelBack = EstadoDeAnimoMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
+    test('eventoDeSalud siempre es null (los DataViews no lo traen)', () {
+      final entity = PersonaEstadoAnimoMapper.fromModel(model, persona);
+      expect(entity.eventoDeSalud, isNull);
     });
 
-    test('eventoDeSalud nulo se preserva en round-trip', () {
-      final sinEvento = EstadoDeAnimo(
-        id: 1202,
-        persona: persona,
-        fecha: DateTime(2026, 6, 4),
-        estado: estadoBien,
+    test('observaciones nulas se preservan', () {
+      final sinObs = PersonaEstadoAnimoModel(
+        id: 56,
+        estadoAnimo: EstadoAnimoModel(
+          id: EstadosAnimoConst.regular,
+          descripcion: 'Regular',
+        ),
+        fechaHora: '2026-07-03T09:00:00',
       );
-      final roundTrip = EstadoDeAnimoMapper.fromModel(
-        EstadoDeAnimoMapper.toModel(sinEvento),
-        persona,
-      );
-      expect(roundTrip.eventoDeSalud, isNull);
+      final entity = PersonaEstadoAnimoMapper.fromModel(sinObs, persona);
+      expect(entity.observaciones, isNull);
     });
   });
 }

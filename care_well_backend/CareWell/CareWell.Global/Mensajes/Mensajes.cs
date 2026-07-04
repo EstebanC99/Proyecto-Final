@@ -24,10 +24,13 @@
         public const string NombreRequerido = "El nombre es requerido.";
         public const string NombreUsuarioEnUso = "El nombre de usuario ingresado ya esta en uso.";
         public const string NoPuedeReactivarUnaAsignacionPasadoLos30Dias = "No puede reactivar una asignación, pasados los 30 días desde su inactivación.";
+        public const string NoSePudoEncontrarLaRealizacionDeHabitoSeleccionada = "No se pudo encontrar la realización de hábito seleccionada.";
         public const string NoSePuedeActivarUnaAsignacionConEstadoDiferentePendiente = "No es posible activar una asignación con estado diferente a 'Pendiente'.";
         public const string NoSePuedeCancelarOcurrenciaPasada = "No se puede cancelar una ocurrencia de evento pasado.";
         public const string NoSePuedeEliminarEventoYaIniciado = "No se puede eliminar un evento ya iniciado.";
+        public const string NoSePuedeIndicarRealizacionDeUnHabitoInactivo = "No se puede indicar una realización de un hábito inactivo.";
         public const string NoSePuedeModificarEventoYaIniciado = "No se puede modificar un evento ya iniciado.";
+        public const string NoSePuedeModificarUnHabitoInactivo = "No se puede modificar un hábito inactivo.";
         public const string NotaNoEncontrada = "La nota del evento de salud seleccionada no se pudo encontrar.";
         public const string PersonaColaboradorRequerido = "La persona elegida no existe como colaborador.";
         public const string PersonaNoExiste = "La persona ingresada no existe.";
@@ -36,8 +39,10 @@
         public const string TelefonoRequerido = "El teléfono es requerido.";
         public const string TipoEventoNoEsAgendable = "El tipo de evento elegido no es agendable.";
         public const string TipoEventoRequerido = "El tipo de evento es requerido.";
+        public const string TipoHabitoRequerido = "El tipo de habito es requerido.";
         public const string TituloEventoRequerido = "El titulo del evento es requerido.";
         public const string UsuarioNoHabilitadoParaEjecutarAccion = "Usuario no habilitado para ejecutar la acción.";
         public const string YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado = "Ya existe una asignación registrada para el colaborador seleccionado.";
+        public const string EstadoAnimoRequerido = "El estado de ánimo es requerido.";
     }
 }

@@ -189,7 +189,7 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo eliminar la cuenta.')),
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
         );
       }
     }

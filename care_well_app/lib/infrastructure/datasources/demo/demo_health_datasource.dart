@@ -3,21 +3,18 @@ import '../../../domain/entities/entities.dart';
 import 'demo_seed.dart';
 
 /// Implementación demo (en memoria) de [HealthDatasource].
+///
+/// Solo gestiona ficha de salud y recomendaciones médicas. Los hábitos de vida
+/// y los estados de ánimo se gestionan vía sus datasources API (siempre API,
+/// sin demo).
 class DemoHealthDatasource implements HealthDatasource {
   /// Fichas de salud indexadas por persona.id.
   final Map<int, FichaSalud> _fichas = {
     DemoSeed.personaAliciaId: DemoSeed.fichaSaludAlicia,
   };
 
-  final List<HabitoDeVida> _habitos = List.of([
-    ...DemoSeed.habitosAlicia,
-    ...DemoSeed.habitosMaria,
-  ]);
   final List<RecomendacionMedica> _recomendaciones = List.of(
     DemoSeed.recomendacionesAlicia,
-  );
-  final List<EstadoDeAnimo> _estadosAnimo = List.of(
-    DemoSeed.estadosAnimoAlicia,
   );
 
   int _nextId = 10000;
@@ -47,44 +44,6 @@ class DemoHealthDatasource implements HealthDatasource {
           );
     _fichas[ficha.persona.id] = guardada;
     return guardada;
-  }
-
-  // ─── Hábitos de vida ─────────────────────────────────────────────────────────
-
-  @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async {
-    await Future.delayed(Duration.zero);
-    return _habitos.where((h) => h.persona.id == personaId).toList();
-  }
-
-  @override
-  Future<HabitoDeVida> crearHabito(HabitoDeVida habito) async {
-    await Future.delayed(Duration.zero);
-    final nuevo = HabitoDeVida(
-      id: _nextId++,
-      persona: habito.persona,
-      tipo: habito.tipo,
-      descripcion: habito.descripcion,
-    );
-    _habitos.add(nuevo);
-    return nuevo;
-  }
-
-  @override
-  Future<HabitoDeVida> actualizarHabito(HabitoDeVida habito) async {
-    await Future.delayed(Duration.zero);
-    final idx = _habitos.indexWhere((h) => h.id == habito.id);
-    if (idx < 0) throw Exception('Hábito no encontrado: ${habito.id}');
-    _habitos[idx] = habito;
-    return habito;
-  }
-
-  @override
-  Future<void> eliminarHabito(int habitoId) async {
-    await Future.delayed(Duration.zero);
-    final idx = _habitos.indexWhere((h) => h.id == habitoId);
-    if (idx < 0) throw Exception('Hábito no encontrado: $habitoId');
-    _habitos.removeAt(idx);
   }
 
   // ─── Recomendaciones médicas ─────────────────────────────────────────────────
@@ -134,49 +93,5 @@ class DemoHealthDatasource implements HealthDatasource {
       throw Exception('Recomendación no encontrada: $recomendacionId');
     }
     _recomendaciones.removeAt(idx);
-  }
-
-  // ─── Estados de ánimo ────────────────────────────────────────────────────────
-
-  @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) async {
-    await Future.delayed(Duration.zero);
-    return _estadosAnimo.where((e) => e.persona.id == personaId).toList();
-  }
-
-  @override
-  Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo estadoAnimo) async {
-    await Future.delayed(Duration.zero);
-    final nuevo = EstadoDeAnimo(
-      id: _nextId++,
-      persona: estadoAnimo.persona,
-      eventoDeSalud: estadoAnimo.eventoDeSalud,
-      fecha: estadoAnimo.fecha,
-      estado: estadoAnimo.estado,
-      observaciones: estadoAnimo.observaciones,
-    );
-    _estadosAnimo.add(nuevo);
-    return nuevo;
-  }
-
-  @override
-  Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo estadoAnimo) async {
-    await Future.delayed(Duration.zero);
-    final idx = _estadosAnimo.indexWhere((e) => e.id == estadoAnimo.id);
-    if (idx < 0) {
-      throw Exception('Estado de ánimo no encontrado: ${estadoAnimo.id}');
-    }
-    _estadosAnimo[idx] = estadoAnimo;
-    return estadoAnimo;
-  }
-
-  @override
-  Future<void> eliminarEstadoAnimo(int estadoAnimoId) async {
-    await Future.delayed(Duration.zero);
-    final idx = _estadosAnimo.indexWhere((e) => e.id == estadoAnimoId);
-    if (idx < 0) {
-      throw Exception('Estado de ánimo no encontrado: $estadoAnimoId');
-    }
-    _estadosAnimo.removeAt(idx);
   }
 }

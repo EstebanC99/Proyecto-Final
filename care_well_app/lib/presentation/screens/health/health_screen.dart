@@ -82,7 +82,8 @@ class HealthScreen extends ConsumerWidget {
                       icon: Icons.self_improvement,
                       accentColor: AppColors.habitsAccent,
                       label: 'Hábitos de vida',
-                      description: 'Alimentación, ejercicio, sueño y bienestar',
+                      description:
+                          'Rutinas diarias aconsejables para el bienestar de la persona.',
                       onTap: () =>
                           context.pushNamed(AppRoutes.healthHabitsName),
                     ),
@@ -99,7 +100,8 @@ class HealthScreen extends ConsumerWidget {
                       icon: Icons.event_note_outlined,
                       accentColor: const Color(0xFF0284C7),
                       label: 'Eventos de salud',
-                      description: 'Citas, tratamientos y novedades clínicas',
+                      description:
+                          'Eventos esporádicos que ocurrieron sin anticipación y deben registrarse.',
                       onTap: () =>
                           context.pushNamed(AppRoutes.healthEventsName),
                     ),

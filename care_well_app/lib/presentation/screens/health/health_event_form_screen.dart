@@ -85,8 +85,8 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo registrar el evento. Intentá de nuevo.'),
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: AppColors.error,
           ),
         );

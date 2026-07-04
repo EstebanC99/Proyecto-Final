@@ -15,6 +15,8 @@ namespace CareWell.Repository.Config.Salud
             builder.HasOne(e => e.Persona).WithMany().HasForeignKey("ID_Persona").OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.Tipo).WithMany().HasForeignKey("ID_TipoHabitoVida").OnDelete(DeleteBehavior.Restrict);
             builder.Property(e => e.Descripcion).IsRequired();
+            builder.Property(e => e.Activo).IsRequired().HasDefaultValue(true);
+            builder.HasMany(e => e.Realizaciones).WithOne(n => n.HabitoVida).HasForeignKey("ID_HabitoVida").OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

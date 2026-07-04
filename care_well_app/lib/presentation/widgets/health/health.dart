@@ -11,3 +11,4 @@ export 'mood_picker.dart';
 export 'mood_bar_chart.dart';
 export 'timeline_tile.dart';
 export 'note_card.dart';
+export 'habito_realizacion_sheet.dart';

@@ -47,26 +47,41 @@ class TipoHabitoMapper {
       TipoHabitoModel(id: entity.id, descripcion: entity.descripcion);
 }
 
+/// Convierte entre [HabitoVidaRealizacionModel] y [RealizacionHabito].
+class RealizacionHabitoMapper {
+  RealizacionHabitoMapper._();
+
+  /// [habitoId] se toma del hábito padre, no del JSON (evita depender del casing
+  /// del acrónimo "ID" en la serialización del backend).
+  static RealizacionHabito fromModel(
+    HabitoVidaRealizacionModel model, {
+    required int habitoId,
+  }) {
+    return RealizacionHabito(
+      id: model.id,
+      habitoId: habitoId,
+      fechaHora: DateTime.parse(model.fechaHoraRealizacion),
+      comentarios: model.comentarios,
+    );
+  }
+}
+
 /// Convierte entre [HabitoDeVidaModel] y [HabitoDeVida].
 class HabitoDeVidaMapper {
   HabitoDeVidaMapper._();
 
-  /// Requiere la [persona] ya construida (el modelo solo transporta el id).
-  static HabitoDeVida fromModel(HabitoDeVidaModel model, Persona persona) {
+  static HabitoDeVida fromModel(HabitoDeVidaModel model) {
     return HabitoDeVida(
       id: model.id,
-      persona: persona,
-      tipo: TipoHabitoMapper.fromModel(model.tipo),
+      persona: EntidadBasicaMapper.fromModel(model.persona),
+      tipo: TipoHabito(id: model.tipo.id, descripcion: model.tipo.descripcion),
       descripcion: model.descripcion,
-    );
-  }
-
-  static HabitoDeVidaModel toModel(HabitoDeVida entity) {
-    return HabitoDeVidaModel(
-      id: entity.id,
-      personaId: entity.persona.id,
-      tipo: TipoHabitoMapper.toModel(entity.tipo),
-      descripcion: entity.descripcion,
+      realizacion: model.realizacion != null
+          ? RealizacionHabitoMapper.fromModel(
+              model.realizacion!,
+              habitoId: model.id,
+            )
+          : null,
     );
   }
 }
@@ -154,34 +169,24 @@ class EstadoAnimoMapper {
       EstadoAnimoModel(id: entity.id, descripcion: entity.descripcion);
 }
 
-/// Convierte entre [EstadoDeAnimoModel] y [EstadoDeAnimo].
-class EstadoDeAnimoMapper {
-  EstadoDeAnimoMapper._();
+/// Convierte [PersonaEstadoAnimoModel] a [EstadoDeAnimo].
+class PersonaEstadoAnimoMapper {
+  PersonaEstadoAnimoMapper._();
 
-  /// Requiere la [persona] ya construida; [eventoDeSalud] es opcional.
+  /// Requiere la [persona] ya construida. Los DataViews de estos endpoints no
+  /// traen evento de salud asociado, por lo que [EstadoDeAnimo.eventoDeSalud]
+  /// queda siempre en `null`.
   static EstadoDeAnimo fromModel(
-    EstadoDeAnimoModel model,
-    Persona persona, {
-    EventoDeSalud? eventoDeSalud,
-  }) {
+    PersonaEstadoAnimoModel model,
+    Persona persona,
+  ) {
     return EstadoDeAnimo(
       id: model.id,
       persona: persona,
-      eventoDeSalud: eventoDeSalud,
-      fecha: DateTime.parse(model.fecha),
-      estado: EstadoAnimoMapper.fromModel(model.estado),
+      eventoDeSalud: null,
+      fecha: DateTime.parse(model.fechaHora),
+      estado: EstadoAnimoMapper.fromModel(model.estadoAnimo),
       observaciones: model.observaciones,
-    );
-  }
-
-  static EstadoDeAnimoModel toModel(EstadoDeAnimo entity) {
-    return EstadoDeAnimoModel(
-      id: entity.id,
-      personaId: entity.persona.id,
-      eventoDeSaludId: entity.eventoDeSalud?.id,
-      fecha: entity.fecha.toIso8601String(),
-      estado: EstadoAnimoMapper.toModel(entity.estado),
-      observaciones: entity.observaciones,
     );
   }
 }

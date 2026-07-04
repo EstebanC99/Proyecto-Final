@@ -11,20 +11,6 @@ abstract class HealthDatasource {
   /// Crea o actualiza la [FichaSalud] de una persona.
   Future<FichaSalud> guardarFichaSalud(FichaSalud ficha);
 
-  // ─── Hábitos de vida ─────────────────────────────────────────────────────────
-
-  /// Retorna los [HabitoDeVida] registrados para la persona con [personaId].
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId);
-
-  /// Crea un [HabitoDeVida] y retorna la entidad con id generado.
-  Future<HabitoDeVida> crearHabito(HabitoDeVida habito);
-
-  /// Actualiza un [HabitoDeVida] existente.
-  Future<HabitoDeVida> actualizarHabito(HabitoDeVida habito);
-
-  /// Elimina el [HabitoDeVida] con [habitoId].
-  Future<void> eliminarHabito(int habitoId);
-
   // ─── Recomendaciones médicas ─────────────────────────────────────────────────
 
   /// Retorna las [RecomendacionMedica] de la persona con [personaId].
@@ -42,18 +28,4 @@ abstract class HealthDatasource {
 
   /// Elimina la [RecomendacionMedica] con [recomendacionId].
   Future<void> eliminarRecomendacion(int recomendacionId);
-
-  // ─── Estados de ánimo ────────────────────────────────────────────────────────
-
-  /// Retorna los [EstadoDeAnimo] de la persona con [personaId].
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId);
-
-  /// Crea un [EstadoDeAnimo] y retorna la entidad con id generado.
-  Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo estadoAnimo);
-
-  /// Actualiza un [EstadoDeAnimo] existente.
-  Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo estadoAnimo);
-
-  /// Elimina el [EstadoDeAnimo] con [estadoAnimoId].
-  Future<void> eliminarEstadoAnimo(int estadoAnimoId);
 }

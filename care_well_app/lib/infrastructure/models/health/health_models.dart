@@ -102,39 +102,77 @@ class FichaSaludModel {
   String toRawJson() => json.encode(toJson());
 }
 
-/// DTO de [HabitoDeVida] para serialización JSON.
-class HabitoDeVidaModel {
+/// DTO de la realización diaria de un hábito de vida.
+class HabitoVidaRealizacionModel {
   final int id;
-  final int personaId;
+  final String? comentarios;
+  final String fechaHoraRealizacion;
 
-  /// Tipo como objeto catálogo.
-  final TipoHabitoModel tipo;
-  final String descripcion;
-
-  const HabitoDeVidaModel({
+  const HabitoVidaRealizacionModel({
     required this.id,
-    required this.personaId,
-    required this.tipo,
-    required this.descripcion,
+    this.comentarios,
+    required this.fechaHoraRealizacion,
   });
 
-  factory HabitoDeVidaModel.fromJson(Map<String, dynamic> json) {
-    return HabitoDeVidaModel(
+  factory HabitoVidaRealizacionModel.fromJson(Map<String, dynamic> json) {
+    return HabitoVidaRealizacionModel(
       id: json['id'] as int,
-      personaId: json['personaId'] as int,
-      tipo: TipoHabitoModel.fromJson(json['tipo'] as Map<String, dynamic>),
-      descripcion: json['descripcion'] as String,
+      comentarios: json['comentarios'] as String?,
+      fechaHoraRealizacion: json['fechaHoraRealizacion'] as String,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'personaId': personaId,
-      'tipo': tipo.toJson(),
-      'descripcion': descripcion,
-    };
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    if (comentarios != null) 'comentarios': comentarios,
+    'fechaHoraRealizacion': fechaHoraRealizacion,
+  };
+}
+
+/// DTO de [HabitoDeVida] para serialización JSON.
+///
+/// El backend devuelve [persona] y [tipo] como `{id, descripcion}` (BaseEntityDataView).
+class HabitoDeVidaModel {
+  final int id;
+  final EntidadBasicaModel persona;
+  final EntidadBasicaModel tipo;
+  final String descripcion;
+  final bool activo;
+  final HabitoVidaRealizacionModel? realizacion;
+
+  const HabitoDeVidaModel({
+    required this.id,
+    required this.persona,
+    required this.tipo,
+    required this.descripcion,
+    required this.activo,
+    this.realizacion,
+  });
+
+  factory HabitoDeVidaModel.fromJson(Map<String, dynamic> json) {
+    final realizacionJson = json['realizacion'] as Map<String, dynamic>?;
+    return HabitoDeVidaModel(
+      id: json['id'] as int,
+      persona: EntidadBasicaModel.fromJson(
+        json['persona'] as Map<String, dynamic>,
+      ),
+      tipo: EntidadBasicaModel.fromJson(json['tipo'] as Map<String, dynamic>),
+      descripcion: json['descripcion'] as String,
+      activo: json['activo'] as bool? ?? true,
+      realizacion: realizacionJson != null
+          ? HabitoVidaRealizacionModel.fromJson(realizacionJson)
+          : null,
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'persona': persona.toJson(),
+    'tipo': tipo.toJson(),
+    'descripcion': descripcion,
+    'activo': activo,
+    if (realizacion != null) 'realizacion': realizacion!.toJson(),
+  };
 
   factory HabitoDeVidaModel.fromRawJson(String source) =>
       HabitoDeVidaModel.fromJson(json.decode(source) as Map<String, dynamic>);
@@ -253,50 +291,44 @@ class EventoDeSaludModel {
   String toRawJson() => json.encode(toJson());
 }
 
-/// DTO de [EstadoDeAnimo] para serialización JSON.
-class EstadoDeAnimoModel {
+/// DTO de `PersonaEstadoAnimoDataView` para serialización JSON.
+///
+/// El backend devuelve [estadoAnimo] como objeto catálogo `{id, descripcion}`
+/// y la [fechaHora] la fija el servidor.
+class PersonaEstadoAnimoModel {
   final int id;
-  final int personaId;
-  final int? eventoDeSaludId;
-  final String fecha;
-
-  /// Estado como objeto catálogo.
-  final EstadoAnimoModel estado;
+  final EstadoAnimoModel estadoAnimo;
+  final String fechaHora;
   final String? observaciones;
 
-  const EstadoDeAnimoModel({
+  const PersonaEstadoAnimoModel({
     required this.id,
-    required this.personaId,
-    this.eventoDeSaludId,
-    required this.fecha,
-    required this.estado,
+    required this.estadoAnimo,
+    required this.fechaHora,
     this.observaciones,
   });
 
-  factory EstadoDeAnimoModel.fromJson(Map<String, dynamic> json) {
-    return EstadoDeAnimoModel(
-      id: json['id'] as int,
-      personaId: json['personaId'] as int,
-      eventoDeSaludId: json['eventoDeSaludId'] as int?,
-      fecha: json['fecha'] as String,
-      estado: EstadoAnimoModel.fromJson(json['estado'] as Map<String, dynamic>),
-      observaciones: json['observaciones'] as String?,
-    );
-  }
+  factory PersonaEstadoAnimoModel.fromJson(Map<String, dynamic> json) =>
+      PersonaEstadoAnimoModel(
+        id: json['id'] as int,
+        estadoAnimo: EstadoAnimoModel.fromJson(
+          json['estadoAnimo'] as Map<String, dynamic>,
+        ),
+        fechaHora: json['fechaHora'] as String,
+        observaciones: json['observaciones'] as String?,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'personaId': personaId,
-      if (eventoDeSaludId != null) 'eventoDeSaludId': eventoDeSaludId,
-      'fecha': fecha,
-      'estado': estado.toJson(),
-      if (observaciones != null) 'observaciones': observaciones,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'estadoAnimo': estadoAnimo.toJson(),
+    'fechaHora': fechaHora,
+    if (observaciones != null) 'observaciones': observaciones,
+  };
 
-  factory EstadoDeAnimoModel.fromRawJson(String source) =>
-      EstadoDeAnimoModel.fromJson(json.decode(source) as Map<String, dynamic>);
+  factory PersonaEstadoAnimoModel.fromRawJson(String source) =>
+      PersonaEstadoAnimoModel.fromJson(
+        json.decode(source) as Map<String, dynamic>,
+      );
 
   String toRawJson() => json.encode(toJson());
 }

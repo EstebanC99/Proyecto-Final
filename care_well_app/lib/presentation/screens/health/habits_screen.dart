@@ -18,6 +18,7 @@ class HabitsScreen extends ConsumerWidget {
     final habitosAsync = ref.watch(habitosProvider);
     final puedeRegistrarAsync = ref.watch(puedeRegistrarHabitosProvider);
     final puedeRegistrar = puedeRegistrarAsync.valueOrNull ?? false;
+    final personaAsync = ref.watch(healthPersonaContextProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -27,61 +28,99 @@ class HabitsScreen extends ConsumerWidget {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
       ),
-      body: habitosAsync.when(
-        loading: () => _HabitosSkeleton(),
-        error: (err, _) => Center(
-          child: InlineErrorBanner(
-            message: 'No se pudieron cargar los hábitos. $err',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Selector de persona de contexto
+          personaAsync.when(
+            data: (persona) => persona != null
+                ? const Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.md,
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                    ),
+                    child: ContextSelector(),
+                  )
+                : const SizedBox.shrink(),
+            loading: () => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
           ),
-        ),
-        data: (habitos) {
-          if (habitos.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.self_improvement,
-                      size: 64,
-                      color: AppColors.textDisabled,
-                    ),
-                    SizedBox(height: AppSpacing.md),
-                    Text(
-                      'Sin hábitos registrados',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Empezá a registrar hábitos con el botón +',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textDisabled,
-                      ),
-                    ),
-                  ],
+
+          Expanded(
+            child: habitosAsync.when(
+              loading: () => _HabitosSkeleton(),
+              error: (err, _) => Center(
+                child: InlineErrorBanner(
+                  message: 'No se pudieron cargar los hábitos. $err',
                 ),
               ),
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            itemCount: habitos.length,
-            itemBuilder: (context, i) => _HabitoCard(
-              habito: habitos[i],
-              onTap: () => context.pushNamed(
-                AppRoutes.healthHabitDetailName,
-                pathParameters: {'id': habitos[i].id.toString()},
-              ),
+              data: (habitos) {
+                if (habitos.isEmpty) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.self_improvement,
+                            size: 64,
+                            color: AppColors.textDisabled,
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Text(
+                            'Sin hábitos registrados',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Empezá a registrar hábitos con el botón +',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textDisabled,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return RefreshIndicator(
+                  color: AppColors.habitsAccent,
+                  onRefresh: () async {
+                    ref.invalidate(habitosProvider);
+                    await ref.read(habitosProvider.future);
+                  },
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    itemCount: habitos.length,
+                    itemBuilder: (context, i) => _HabitoCard(
+                      habito: habitos[i],
+                      onTap: () => context.pushNamed(
+                        AppRoutes.healthHabitDetailName,
+                        pathParameters: {'id': habitos[i].id.toString()},
+                      ),
+                      onToggleRealizacion: puedeRegistrar
+                          ? () => HabitoRealizacionSheet.show(
+                              context,
+                              ref,
+                              habito: habitos[i],
+                            )
+                          : null,
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: puedeRegistrar
           ? FloatingActionButton(
@@ -98,10 +137,18 @@ class HabitsScreen extends ConsumerWidget {
 // ─── HabitoCard ───────────────────────────────────────────────────────────────
 
 class _HabitoCard extends StatelessWidget {
-  const _HabitoCard({required this.habito, required this.onTap});
+  const _HabitoCard({
+    required this.habito,
+    required this.onTap,
+    this.onToggleRealizacion,
+  });
 
   final HabitoDeVida habito;
   final VoidCallback onTap;
+
+  /// Callback para marcar/desmarcar la realización. Null si el usuario no tiene
+  /// permiso (el chip se muestra pero no es accionable).
+  final VoidCallback? onToggleRealizacion;
 
   static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
 
@@ -122,6 +169,7 @@ class _HabitoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final realizado = habito.realizacion != null;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -174,13 +222,54 @@ class _HabitoCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: AppColors.textDisabled,
+            const SizedBox(width: AppSpacing.sm),
+            GestureDetector(
+              onTap: onToggleRealizacion,
+              child: _RealizacionChip(realizado: realizado),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─── Chip de estado de realización ───────────────────────────────────────────
+
+class _RealizacionChip extends StatelessWidget {
+  const _RealizacionChip({required this.realizado});
+  final bool realizado;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: realizado
+            ? AppColors.successContainer
+            : AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            realizado
+                ? Icons.check_circle_outline
+                : Icons.radio_button_unchecked,
+            size: 13,
+            color: realizado ? AppColors.success : AppColors.textDisabled,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            realizado ? 'Realizado' : 'Pendiente',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: realizado ? AppColors.success : AppColors.textDisabled,
+            ),
+          ),
+        ],
       ),
     );
   }

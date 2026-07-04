@@ -98,15 +98,6 @@ class _FakeCareTeamRepository implements CareTeamRepository {
 }
 
 class _FakeHealthRepository implements HealthRepository {
-  final List<HabitoDeVida> _habitos;
-  final List<EstadoDeAnimo> _estadosAnimo;
-
-  _FakeHealthRepository({
-    List<HabitoDeVida>? habitos,
-    List<EstadoDeAnimo>? estadosAnimo,
-  }) : _habitos = habitos != null ? List.of(habitos) : [],
-       _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
-
   @override
   Future<FichaSalud> getFichaSalud(int personaId) async =>
       throw UnimplementedError();
@@ -114,28 +105,6 @@ class _FakeHealthRepository implements HealthRepository {
   @override
   Future<FichaSalud> guardarFichaSalud(FichaSalud ficha) async =>
       throw UnimplementedError();
-
-  @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async =>
-      _habitos.where((h) => h.persona.id == personaId).toList();
-
-  @override
-  Future<HabitoDeVida> crearHabito(HabitoDeVida habito) async {
-    _habitos.add(habito);
-    return habito;
-  }
-
-  @override
-  Future<HabitoDeVida> actualizarHabito(HabitoDeVida habito) async {
-    final idx = _habitos.indexWhere((h) => h.id == habito.id);
-    if (idx >= 0) _habitos[idx] = habito;
-    return habito;
-  }
-
-  @override
-  Future<void> eliminarHabito(int habitoId) async {
-    _habitos.removeWhere((h) => h.id == habitoId);
-  }
 
   @override
   Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
@@ -153,19 +122,84 @@ class _FakeHealthRepository implements HealthRepository {
 
   @override
   Future<void> eliminarRecomendacion(int id) async {}
+}
+
+class _FakeEstadoAnimoRepository implements EstadoAnimoRepository {
+  final List<EstadoDeAnimo> _estadosAnimo;
+
+  _FakeEstadoAnimoRepository({List<EstadoDeAnimo>? estadosAnimo})
+    : _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
 
   @override
-  Future<List<EstadoDeAnimo>> getEstadosAnimoByPersona(int personaId) async =>
-      _estadosAnimo.where((e) => e.persona.id == personaId).toList();
+  Future<EstadoDeAnimo?> obtenerAnimoHoy(Persona persona) async => _estadosAnimo
+      .where((e) => e.persona.id == persona.id)
+      .fold<EstadoDeAnimo?>(
+        null,
+        (mas, e) => mas == null || e.fecha.isAfter(mas.fecha) ? e : mas,
+      );
 
   @override
-  Future<EstadoDeAnimo> crearEstadoAnimo(EstadoDeAnimo e) async => e;
+  Future<List<EstadoDeAnimo>> obtenerPorFechas({
+    required Persona persona,
+    required DateTime desde,
+    required DateTime hasta,
+  }) async => _estadosAnimo.where((e) => e.persona.id == persona.id).toList();
 
   @override
-  Future<EstadoDeAnimo> actualizarEstadoAnimo(EstadoDeAnimo e) async => e;
+  Future<void> registrar({
+    required int personaId,
+    required int estadoAnimoId,
+    String? observaciones,
+  }) async {}
+}
+
+class _FakeHabitoVidaRepository implements HabitoVidaRepository {
+  final List<HabitoDeVida> _habitos;
+
+  _FakeHabitoVidaRepository({List<HabitoDeVida>? habitos})
+    : _habitos = habitos != null ? List.of(habitos) : [];
 
   @override
-  Future<void> eliminarEstadoAnimo(int id) async {}
+  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async =>
+      _habitos.where((h) => h.persona.id == personaId).toList();
+
+  @override
+  Future<void> crearHabito({
+    required int personaId,
+    required int tipoId,
+    required String descripcion,
+  }) async {}
+
+  @override
+  Future<void> modificarHabito({
+    required int habitoId,
+    required int tipoId,
+    required String descripcion,
+  }) async {}
+
+  @override
+  Future<void> eliminarHabito(int habitoId) async {
+    _habitos.removeWhere((h) => h.id == habitoId);
+  }
+
+  @override
+  Future<void> crearRealizacion({
+    required int habitoId,
+    String? comentarios,
+  }) async {}
+
+  @override
+  Future<void> modificarRealizacion({
+    required int habitoId,
+    required int realizacionId,
+    String? comentarios,
+  }) async {}
+
+  @override
+  Future<void> eliminarRealizacion({
+    required int habitoId,
+    required int realizacionId,
+  }) async {}
 }
 
 class _FakeEventoSaludRepository implements EventoSaludRepository {
@@ -240,8 +274,12 @@ ProviderContainer _makeContainer({
       careTeamRepositoryProvider.overrideWithValue(
         _FakeCareTeamRepository(asignaciones),
       ),
-      healthRepositoryProvider.overrideWithValue(
-        _FakeHealthRepository(habitos: habitos, estadosAnimo: estadosAnimo),
+      healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
+      estadoAnimoRepositoryProvider.overrideWithValue(
+        _FakeEstadoAnimoRepository(estadosAnimo: estadosAnimo),
+      ),
+      habitoVidaRepositoryProvider.overrideWithValue(
+        _FakeHabitoVidaRepository(habitos: habitos),
       ),
       eventoSaludRepositoryProvider.overrideWithValue(
         _FakeEventoSaludRepository(eventos: eventos),
@@ -269,8 +307,12 @@ ProviderContainer _makeContainerContextPropio({
       ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
       careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository([])),
-      healthRepositoryProvider.overrideWithValue(
-        _FakeHealthRepository(habitos: habitos, estadosAnimo: estadosAnimo),
+      healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
+      estadoAnimoRepositoryProvider.overrideWithValue(
+        _FakeEstadoAnimoRepository(estadosAnimo: estadosAnimo),
+      ),
+      habitoVidaRepositoryProvider.overrideWithValue(
+        _FakeHabitoVidaRepository(habitos: habitos),
       ),
       eventoSaludRepositoryProvider.overrideWithValue(
         _FakeEventoSaludRepository(eventos: eventos),
@@ -401,45 +443,36 @@ void main() {
       );
     });
 
-    // ─── ultimoEstadoAnimoProvider ────────────────────────────────────────────
+    // ─── animoHoyProvider ─────────────────────────────────────────────────────
 
-    group('ultimoEstadoAnimoProvider', () {
-      test(
-        'retorna el estado más reciente (primero de la lista descendente)',
-        () async {
-          final estadoAntiguo = EstadoDeAnimo(
-            id: 1201,
-            persona: _personaAlicia,
-            fecha: DateTime(2026, 5, 1),
-            estado: estadoAnimoRegular,
-          );
-          final estadoReciente = EstadoDeAnimo(
-            id: 1202,
-            persona: _personaAlicia,
-            fecha: DateTime(2026, 6, 1),
-            estado: estadoAnimoMuyBien,
-          );
-          final container = _makeContainer(
-            asignaciones: [_asignacionMaria()],
-            estadosAnimo: [estadoAntiguo, estadoReciente],
-          );
-          addTearDown(container.dispose);
+    group('animoHoyProvider', () {
+      test('retorna el estado de ánimo cuando hay registro hoy', () async {
+        final animoHoy = EstadoDeAnimo(
+          id: 1202,
+          persona: _personaAlicia,
+          fecha: DateTime.now(),
+          estado: estadoAnimoMuyBien,
+        );
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          estadosAnimo: [animoHoy],
+        );
+        addTearDown(container.dispose);
 
-          final ultimo = await container.read(ultimoEstadoAnimoProvider.future);
-          expect(ultimo, isNotNull);
-          expect(ultimo!.estado.id, EstadosAnimoConst.muyBien);
-        },
-      );
+        final hoy = await container.read(animoHoyProvider.future);
+        expect(hoy, isNotNull);
+        expect(hoy!.estado.id, EstadosAnimoConst.muyBien);
+      });
 
-      test('retorna null cuando no hay estados registrados', () async {
+      test('retorna null cuando no hay ánimo registrado hoy', () async {
         final container = _makeContainer(
           asignaciones: [_asignacionMaria()],
           estadosAnimo: [],
         );
         addTearDown(container.dispose);
 
-        final ultimo = await container.read(ultimoEstadoAnimoProvider.future);
-        expect(ultimo, isNull);
+        final hoy = await container.read(animoHoyProvider.future);
+        expect(hoy, isNull);
       });
     });
 
@@ -449,7 +482,10 @@ void main() {
       test('quita el hábito de la lista tras eliminar', () async {
         final habito = HabitoDeVida(
           id: 901,
-          persona: _personaAlicia,
+          persona: EntidadBasica(
+            id: _personaAlicia.id,
+            descripcion: 'Alicia Rodríguez',
+          ),
           tipo: tipoHabitoAlimentacion,
           descripcion: 'Desayuno saludable',
         );

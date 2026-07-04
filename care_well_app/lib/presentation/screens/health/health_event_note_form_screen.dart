@@ -73,7 +73,7 @@ class _HealthEventNoteFormScreenState
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('No se pudo guardar la nota.'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: AppColors.error,
           ),
         );

@@ -112,7 +112,9 @@ class CareTeamScreen extends ConsumerWidget {
         loading: () => const _SkeletonTeam(),
         error: (e, _) => Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
-          child: InlineErrorBanner(message: 'No se pudo cargar el equipo.'),
+          child: InlineErrorBanner(
+            message: e.toString().replaceFirst('Exception: ', ''),
+          ),
         ),
         data: (personaCtx) {
           if (personaCtx == null) {
@@ -162,7 +164,9 @@ class _TeamBody extends ConsumerWidget {
       loading: () => const _SkeletonTeam(),
       error: (e, _) => Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
-        child: InlineErrorBanner(message: 'No se pudo cargar el equipo.'),
+        child: InlineErrorBanner(
+          message: e.toString().replaceFirst('Exception: ', ''),
+        ),
       ),
       data: (asignaciones) {
         final responsables = asignaciones

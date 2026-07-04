@@ -10,7 +10,7 @@ import '../../providers/providers.dart';
 ///
 /// En modo creación ([habitId] es null) usa [crearHabitoProvider].
 /// En modo edición ([habitId] no es null) precarga el hábito existente
-/// y usa [actualizarHabitoProvider].
+/// y usa [modificarHabitoProvider].
 class HabitFormScreen extends ConsumerStatefulWidget {
   const HabitFormScreen({super.key, this.habitId});
 
@@ -39,7 +39,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     descripcion: 'Alimentación',
   );
   final _descripcionCtrl = TextEditingController();
-  DateTime _fecha = DateTime.now();
   bool _loading = false;
   bool _precargado = false;
 
@@ -97,18 +96,11 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     setState(() => _loading = true);
     try {
       if (_esEdicion) {
-        // Modo edición: necesitamos el hábito original para conservar su persona.
-        final original = await ref.read(
-          habitoByIdProvider(widget.habitId!).future,
-        );
-        if (original == null) throw Exception('Hábito no encontrado');
-        final actualizado = HabitoDeVida(
-          id: original.id,
-          persona: original.persona,
-          tipo: _tipo,
+        await ref.read(modificarHabitoProvider)(
+          habitoId: widget.habitId!,
+          tipoId: _tipo.id,
           descripcion: desc,
         );
-        await ref.read(actualizarHabitoProvider)(habito: actualizado);
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -116,7 +108,10 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
           );
         }
       } else {
-        await ref.read(crearHabitoProvider)(tipo: _tipo, descripcion: desc);
+        await ref.read(crearHabitoProvider)(
+          tipoId: _tipo.id,
+          descripcion: desc,
+        );
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -128,7 +123,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('No se pudo guardar. Intentá de nuevo.'),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -136,16 +131,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  Future<void> _elegirFecha() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _fecha,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) setState(() => _fecha = picked);
   }
 
   @override
@@ -218,43 +203,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Fecha
-            const _SectionLabel('Fecha'),
-            const SizedBox(height: AppSpacing.sm),
-            InkWell(
-              onTap: _loading ? null : _elegirFecha,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.md,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.outline),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  color: AppColors.surface,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today_outlined,
-                      size: 20,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      '${_fecha.day}/${_fecha.month}/${_fecha.year}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),

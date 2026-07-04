@@ -14,8 +14,12 @@ class ApiExceptionMapper {
 
     return switch (statusCode) {
       400 => ValidacionException(mensaje ?? 'Datos inválidos.'),
-      401 => const CredencialesInvalidasException(),
-      404 => const RecursoNoEncontradoException(),
+      401 => CredencialesInvalidasException(
+        mensaje ?? 'Credenciales inválidas.',
+      ),
+      404 => RecursoNoEncontradoException(
+        mensaje ?? 'El recurso solicitado no fue encontrado.',
+      ),
       409 => const CuentaExistenteException(),
       _ => const ServidorException(),
     };

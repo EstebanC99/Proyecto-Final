@@ -1,6 +1,10 @@
 class RecursoNoEncontradoException implements Exception {
-  const RecursoNoEncontradoException();
+  const RecursoNoEncontradoException([
+    this.mensaje = 'El recurso solicitado no fue encontrado.',
+  ]);
+
+  final String mensaje;
 
   @override
-  String toString() => 'El recurso solicitado no fue encontrado.';
+  String toString() => mensaje;
 }

@@ -238,12 +238,12 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
     try {
       await widget.onGuardar(contenido);
       if (mounted) Navigator.of(context).pop();
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo guardar la nota. Intentá de nuevo.'),
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: AppColors.error,
           ),
         );

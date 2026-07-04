@@ -32,32 +32,36 @@ class HomeScreen extends ConsumerWidget {
     final userName = usuario?.persona.nombre ?? '';
 
     final dependentsAsync = ref.watch(asignacionesActivasProvider);
-    final ultimoAnimoAsync = ref.watch(ultimoEstadoAnimoProvider);
-    final ultimoAnimo = ultimoAnimoAsync.valueOrNull;
+    final animoHoyAsync = ref.watch(animoHoyProvider);
+    final animoHoy = animoHoyAsync.valueOrNull;
 
     // Badge de estado de ánimo para el NavTile de Salud.
-    Widget? animoBadge;
-    if (ultimoAnimo != null) {
-      animoBadge = Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: moodLevelColor(moodLevel(ultimoAnimo.estado)),
-            width: 2,
-          ),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+    // Siempre visible: muestra el emoji si hay ánimo registrado hoy, o '?' si no.
+    final Widget animoBadge = Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: animoHoy != null
+              ? moodLevelColor(moodLevel(animoHoy.estado))
+              : AppColors.textDisabled,
+          width: 2,
         ),
-        child: Center(
-          child: Text(
-            moodEmoji(ultimoAnimo.estado),
-            style: const TextStyle(fontSize: 12),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      ),
+      child: Center(
+        child: Text(
+          animoHoy != null ? moodEmoji(animoHoy.estado) : '?',
+          style: TextStyle(
+            fontSize: 12,
+            color: animoHoy != null ? null : AppColors.textDisabled,
+            fontWeight: animoHoy != null ? null : FontWeight.bold,
           ),
         ),
-      );
-    }
+      ),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,

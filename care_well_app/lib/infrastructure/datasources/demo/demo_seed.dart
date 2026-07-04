@@ -248,62 +248,6 @@ class DemoSeed {
         'Laboratorio (mayo 2026): glucemia 130 mg/dL, HbA1c 7.2%.',
   );
 
-  // ─── Hábitos de vida ─────────────────────────────────────────────────────────
-
-  /// Hábitos propios de María (usuario demo, contexto "Yo").
-  static final List<HabitoDeVida> habitosMaria = [
-    HabitoDeVida(
-      id: 901,
-      persona: personaMaria,
-      tipo: TipoHabito(
-        id: TiposHabitoConst.actividadFisica,
-        descripcion: 'Actividad física',
-      ),
-      descripcion:
-          'Caminata de 30 minutos antes del trabajo, cinco días a la semana.',
-    ),
-    HabitoDeVida(
-      id: 902,
-      persona: personaMaria,
-      tipo: TipoHabito(
-        id: TiposHabitoConst.hidratacion,
-        descripcion: 'Hidratación',
-      ),
-      descripcion: 'Dos litros de agua por día. Recuerda beber entre comidas.',
-    ),
-  ];
-
-  static final List<HabitoDeVida> habitosAlicia = [
-    HabitoDeVida(
-      id: 903,
-      persona: personaAlicia,
-      tipo: TipoHabito(
-        id: TiposHabitoConst.actividadFisica,
-        descripcion: 'Actividad física',
-      ),
-      descripcion:
-          'Caminata de 20 minutos por el parque, tres veces por semana.',
-    ),
-    HabitoDeVida(
-      id: 904,
-      persona: personaAlicia,
-      tipo: TipoHabito(
-        id: TiposHabitoConst.alimentacion,
-        descripcion: 'Alimentación',
-      ),
-      descripcion: 'Dieta baja en sodio y azúcares simples. Sin sal de mesa.',
-    ),
-    HabitoDeVida(
-      id: 905,
-      persona: personaAlicia,
-      tipo: TipoHabito(
-        id: TiposHabitoConst.hidratacion,
-        descripcion: 'Hidratación',
-      ),
-      descripcion: 'Ingesta de al menos 1,5 litros de agua por día.',
-    ),
-  ];
-
   // ─── Recomendaciones médicas ─────────────────────────────────────────────────
 
   static final List<RecomendacionMedica> recomendacionesAlicia = [
@@ -435,26 +379,6 @@ class DemoSeed {
       ),
       fechaHora: DateTime(2026, 6, 3, 11, 0),
       descripcion: 'Vacuna antigripal anual.',
-    ),
-  ];
-
-  // ─── Estados de ánimo ────────────────────────────────────────────────────────
-
-  static final List<EstadoDeAnimo> estadosAnimoAlicia = [
-    EstadoDeAnimo(
-      id: 1201,
-      persona: personaAlicia,
-      fecha: DateTime(2026, 6, 4),
-      estado: EstadoAnimo(id: EstadosAnimoConst.bien, descripcion: 'Bien'),
-      observaciones: 'Estuvo animada en el desayuno.',
-    ),
-    EstadoDeAnimo(
-      id: 1202,
-      persona: personaAlicia,
-      eventoDeSalud: eventoSaludMareos,
-      fecha: DateTime(2026, 5, 28),
-      estado: EstadoAnimo(id: EstadosAnimoConst.mal, descripcion: 'Mal'),
-      observaciones: 'Preocupada tras el episodio de mareos.',
     ),
   ];
 

@@ -54,37 +54,95 @@ final puedeAdministrarEquipoProvider = FutureProvider.autoDispose<bool>((
   );
 });
 
-/// Indica si el usuario autenticado puede gestionar la agenda de la persona
-/// de contexto (alta, edición y eliminación de eventos).
+/// Helper interno: obtiene la asignación activa del usuario autenticado para la
+/// persona actualmente seleccionada en la visualización.
 ///
-/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
-/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.gestionarAgenda].
-final puedeGestionarAgendaProvider = FutureProvider<bool>((ref) async {
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
+/// Retorna `null` si no hay usuario, si no hay persona de contexto o si el
+/// usuario no tiene una asignación activa sobre ella.
+Future<AsignacionCuidado?> _asignacionActivaParaContexto(Ref ref) async {
   final usuario = ref.watch(authStateProvider).valueOrNull;
-  if (usuario == null) return false;
+  if (usuario == null) return null;
 
-  final persona = await ref.watch(agendaPersonaContextProvider.future);
-  if (persona == null) return false;
+  final persona = await ref.watch(
+    personaVisualizacionSeleccionadaProvider.future,
+  );
+  if (persona == null) return null;
 
   final repo = ref.watch(careTeamRepositoryProvider);
   final asignaciones = await repo.getAsignacionesByColaborador(
     usuario.persona.id,
   );
 
-  final asignacion = asignaciones
+  return asignaciones
       .where(
         (a) =>
             a.personaCuidada.id == persona.id &&
             a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;
+}
 
+/// Indica si el usuario autenticado puede gestionar la agenda de la persona
+/// de contexto (alta, edición y eliminación de eventos).
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.gestionarAgenda].
+final puedeGestionarAgendaProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
   if (asignacion == null) return false;
 
   return asignacion.permisos.any(
     (p) => p.id == PermisosCuidadoConst.gestionarAgenda,
+  );
+});
+
+/// Indica si el usuario puede ver la ficha de salud.
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+final puedeVerSaludProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  if (asignacion == null) return false;
+  return asignacion.permisos.any(
+    (p) => p.id == PermisosCuidadoConst.verFichaSalud,
+  );
+});
+
+/// Indica si el usuario puede registrar eventos de salud.
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+final puedeRegistrarEventosSaludProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  if (asignacion == null) return false;
+  return asignacion.permisos.any(
+    (p) => p.id == PermisosCuidadoConst.registrarEventosSalud,
+  );
+});
+
+/// Indica si el usuario puede registrar hábitos de vida.
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+final puedeRegistrarHabitosProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  if (asignacion == null) return false;
+  return asignacion.permisos.any(
+    (p) => p.id == PermisosCuidadoConst.registrarHabitos,
   );
 });

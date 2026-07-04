@@ -28,6 +28,8 @@ namespace CareWell.Repository
             services.AddScoped<IEventoAgendaRepository, EventoAgendaRepository>();
             services.AddScoped<IEventoSaludRepository, EventoSaludRepository>();
             services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
+            services.AddScoped<IHabitoVidaRepository, HabitoVidaRepository>();
+            services.AddScoped<IPersonaEstadoAnimoRepository, PersonaEstadoAnimoRepository>();
 
             #endregion
 

@@ -9,17 +9,9 @@ import '../../../_fakes/test_fixtures.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-final _personaAlicia = Persona(
-  id: 2,
-  nombre: 'Alicia',
-  apellido: 'Rodríguez',
-  documento: '5234100',
-  fechaNacimiento: DateTime(1943, 7, 22),
-);
-
 final _habito = HabitoDeVida(
   id: 901,
-  persona: _personaAlicia,
+  persona: EntidadBasica(id: 2, descripcion: 'Alicia Rodríguez'),
   tipo: tipoHabitoActividadFisica,
   descripcion: 'Caminata diaria de 30 minutos.',
 );
