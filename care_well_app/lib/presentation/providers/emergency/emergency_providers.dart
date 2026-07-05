@@ -15,9 +15,9 @@ final equipoEmergenciaProvider = FutureProvider<List<AsignacionCuidado>>((
     personaVisualizacionSeleccionadaProvider.future,
   );
   if (persona == null) return [];
-  final asignaciones = await ref
-      .watch(careTeamRepositoryProvider)
-      .getAsignacionesByPersonaCuidada(persona.id);
+  final asignaciones = await ref.watch(
+    asignacionesPorPersonaCuidadaProvider(persona.id).future,
+  );
   return asignaciones
       .where((a) => a.estado.id == EstadosAsignacionConst.activa)
       .toList();
@@ -42,15 +42,14 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
   );
   if (persona == null) return false;
 
-  final repo = ref.watch(careTeamRepositoryProvider);
-  final asignaciones = await repo.getAsignacionesByColaborador(
-    usuario.persona.id,
+  final asignaciones = await ref.watch(
+    asignacionesPorPersonaCuidadaProvider(persona.id).future,
   );
 
   final asignacion = asignaciones
       .where(
         (a) =>
-            a.personaCuidada.id == persona.id &&
+            a.colaborador.id == usuario.persona.id &&
             a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;

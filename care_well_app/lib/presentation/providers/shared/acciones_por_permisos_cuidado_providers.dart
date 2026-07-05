@@ -19,41 +19,6 @@ final esContextoPropioProvider = FutureProvider.autoDispose<bool>((ref) async {
   return persona.id == usuario.persona.id;
 });
 
-/// `true` si el usuario logueado tiene el permiso [PermisosCuidadoConst.administrarEquipo]
-/// sobre la persona de contexto.
-///
-/// Cortocircuito: si el contexto es el propio usuario, siempre puede administrar su equipo.
-final puedeAdministrarEquipoProvider = FutureProvider.autoDispose<bool>((
-  ref,
-) async {
-  final usuarioAsync = ref.watch(authStateProvider);
-  final usuario = usuarioAsync.valueOrNull;
-  if (usuario == null) return false;
-
-  final esPropio = await ref.watch(esContextoPropioProvider.future);
-  if (esPropio) return true;
-
-  final personaSeleccionada = await ref.watch(
-    personaVisualizacionSeleccionadaProvider.future,
-  );
-  if (personaSeleccionada == null) return false;
-
-  final asignacionesPersonaSeleccionada = await ref.watch(
-    asignacionesPorPersonaCuidadaProvider(personaSeleccionada.id).future,
-  );
-
-  final propia = asignacionesPersonaSeleccionada.where(
-    (a) =>
-        a.colaborador.id == usuario.persona.id &&
-        a.estado.id == EstadosAsignacionConst.activa,
-  );
-  if (propia.isEmpty) return false;
-
-  return propia.first.permisos.any(
-    (p) => p.id == PermisosCuidadoConst.administrarEquipo,
-  );
-});
-
 /// Helper interno: obtiene la asignación activa del usuario autenticado para la
 /// persona actualmente seleccionada en la visualización.
 ///
@@ -68,19 +33,37 @@ Future<AsignacionCuidado?> _asignacionActivaParaContexto(Ref ref) async {
   );
   if (persona == null) return null;
 
-  final repo = ref.watch(careTeamRepositoryProvider);
-  final asignaciones = await repo.getAsignacionesByColaborador(
-    usuario.persona.id,
+  final asignaciones = await ref.watch(
+    asignacionesPorPersonaCuidadaProvider(persona.id).future,
   );
 
   return asignaciones
       .where(
         (a) =>
-            a.personaCuidada.id == persona.id &&
+            a.colaborador.id == usuario.persona.id &&
             a.estado.id == EstadosAsignacionConst.activa,
       )
       .firstOrNull;
 }
+
+/// Indica si el usuario autenticado puede gestionar el equipo de cuidad de la persona
+/// de contexto (alta, edición y eliminación de eventos).
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.administrarEquipo].
+final puedeAdministrarEquipoProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  if (asignacion == null) return false;
+
+  return asignacion.permisos.any(
+    (p) => p.id == PermisosCuidadoConst.administrarEquipo,
+  );
+});
 
 /// Indica si el usuario autenticado puede gestionar la agenda de la persona
 /// de contexto (alta, edición y eliminación de eventos).
@@ -101,9 +84,11 @@ final puedeGestionarAgendaProvider = FutureProvider.autoDispose<bool>((
   );
 });
 
-/// Indica si el usuario puede ver la ficha de salud.
+/// Indica si el usuario autenticado puede ver la ficha de salud de la persona
+/// de contexto.
 ///
 /// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.verFichaSalud].
 final puedeVerSaludProvider = FutureProvider.autoDispose<bool>((ref) async {
   final esPropio = await ref.watch(esContextoPropioProvider.future);
   if (esPropio) return true;
@@ -115,9 +100,11 @@ final puedeVerSaludProvider = FutureProvider.autoDispose<bool>((ref) async {
   );
 });
 
-/// Indica si el usuario puede registrar eventos de salud.
+/// Indica si el usuario autenticado puede registrar eventos de salud de la persona
+/// de contexto (alta, edición y eliminación de eventos).
 ///
 /// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.registrarEventosSalud].
 final puedeRegistrarEventosSaludProvider = FutureProvider.autoDispose<bool>((
   ref,
 ) async {
@@ -131,9 +118,11 @@ final puedeRegistrarEventosSaludProvider = FutureProvider.autoDispose<bool>((
   );
 });
 
-/// Indica si el usuario puede registrar hábitos de vida.
+/// Indica si el usuario autenticado puede registrar hábitos de la persona
+/// de contexto (alta, edición y eliminación de eventos).
 ///
 /// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.registrarHabitos].
 final puedeRegistrarHabitosProvider = FutureProvider.autoDispose<bool>((
   ref,
 ) async {
