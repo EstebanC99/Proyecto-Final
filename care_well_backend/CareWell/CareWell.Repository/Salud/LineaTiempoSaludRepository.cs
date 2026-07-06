@@ -37,6 +37,7 @@ namespace CareWell.Repository.Salud
                 })
                 .ToList();
 
+
             var estadosAnimo = this.DbContext.Set<PersonaEstadoAnimo>()
                 .Where(e => e.Persona.ID == query.PersonaID
                          && e.FechaHora >= query.FechaDesde && e.FechaHora <= query.FechaHasta)
