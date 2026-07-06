@@ -1,4 +1,4 @@
-import '../entities/entities.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
 abstract class AsignacionCuidadoRepository {
   Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado();

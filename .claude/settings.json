@@ -4,5 +4,8 @@
       "Edit",
       "Write"
     ]
+  },
+  "worktree": {
+    "bgIsolation": "none"
   }
 }

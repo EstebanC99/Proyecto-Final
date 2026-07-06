@@ -98,12 +98,12 @@ final refPersonaMaria = EntidadBasica(id: 1, descripcion: 'María García');
 
 // ─── Tipos de hábito ──────────────────────────────────────────────────────────
 
-final tipoHabitoActividadFisica = TipoHabito(
+final tipoHabitoActividadFisica = TipoHabitoVida(
   id: TiposHabitoConst.actividadFisica,
   descripcion: 'Actividad física',
 );
 
-final tipoHabitoAlimentacion = TipoHabito(
+final tipoHabitoAlimentacion = TipoHabitoVida(
   id: TiposHabitoConst.alimentacion,
   descripcion: 'Alimentación',
 );

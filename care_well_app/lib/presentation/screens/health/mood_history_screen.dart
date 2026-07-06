@@ -152,31 +152,11 @@ class MoodHistoryScreen extends ConsumerWidget {
 class _MoodRecordItem extends StatelessWidget {
   const _MoodRecordItem({required this.estado});
 
-  final EstadoDeAnimo estado;
-
-  /// El [id] de [EstadoAnimo] coincide con el nivel numérico (1–5).
-  static int _enumToLevel(EstadoAnimo e) => e.id;
-
-  static String _emojiForEnum(EstadoAnimo e) {
-    switch (e.id) {
-      case EstadosAnimoConst.muyMal:
-        return '😞';
-      case EstadosAnimoConst.mal:
-        return '😕';
-      case EstadosAnimoConst.regular:
-        return '😐';
-      case EstadosAnimoConst.bien:
-        return '🙂';
-      case EstadosAnimoConst.muyBien:
-        return '😄';
-      default:
-        return '😐';
-    }
-  }
+  final PersonaEstadoAnimo estado;
 
   @override
   Widget build(BuildContext context) {
-    final level = _enumToLevel(estado.estado);
+    final level = moodLevel(estado.estado);
     final color = moodLevelColor(level);
     final fecha = DateFormat('d MMM yyyy', 'es').format(estado.fecha);
 
@@ -200,7 +180,7 @@ class _MoodRecordItem extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  _emojiForEnum(estado.estado),
+                  moodEmoji(estado.estado),
                   style: const TextStyle(fontSize: 18),
                 ),
               ),

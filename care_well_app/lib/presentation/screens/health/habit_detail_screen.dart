@@ -18,9 +18,9 @@ class HabitDetailScreen extends ConsumerWidget {
 
   final int habitId;
 
-  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
+  static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
 
-  static IconData _iconTipo(TipoHabito tipo) {
+  static IconData _iconTipo(TipoHabitoVida tipo) {
     switch (tipo.id) {
       case TiposHabitoConst.actividadFisica:
         return Icons.directions_run;
@@ -39,6 +39,11 @@ class HabitDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final habitoAsync = ref.watch(habitoByIdProvider(habitId));
     final puede = ref.watch(puedeRegistrarHabitosProvider).valueOrNull ?? false;
+    // El registro de cumplimiento diario (marcar realizado / comentar) está
+    // disponible para cualquier miembro activo del equipo, sin exigir el
+    // permiso de ABM de hábitos.
+    final esMiembroEquipo =
+        ref.watch(esMiembroEquipoActivoProvider).valueOrNull ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -186,7 +191,7 @@ class HabitDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   GestureDetector(
-                    onTap: puede
+                    onTap: esMiembroEquipo
                         ? () => HabitoRealizacionSheet.show(
                             context,
                             ref,
@@ -209,7 +214,7 @@ class HabitDetailScreen extends ConsumerWidget {
 
 class _RealizacionDetalleCard extends StatelessWidget {
   const _RealizacionDetalleCard({required this.habito});
-  final HabitoDeVida habito;
+  final HabitoVida habito;
 
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../domain/entities/entities.dart';
-import 'mood_picker.dart';
+import 'mood_dial_selector.dart';
 
 /// Gráfico de barras de los últimos 7 días de estados de ánimo.
 ///
@@ -12,7 +12,7 @@ import 'mood_picker.dart';
 class MoodBarChart extends StatelessWidget {
   const MoodBarChart({super.key, required this.estados});
 
-  final List<EstadoDeAnimo> estados;
+  final List<PersonaEstadoAnimo> estados;
 
   @override
   Widget build(BuildContext context) {

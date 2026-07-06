@@ -64,39 +64,66 @@ AsignacionCuidado _asignacion(
 
 // ─── Fakes ────────────────────────────────────────────────────────────────────
 
-class _FakeCareTeamRepository implements CareTeamRepository {
+/// Fake de [AsignacionCuidadoRepository]. La cadena de providers de permisos
+/// resuelve la asignación de contexto vía [obtenerAsignacionesPorPersona]; el
+/// resto de métodos no se ejercitan en estos tests.
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   final List<AsignacionCuidado> _asignaciones;
 
-  _FakeCareTeamRepository(this._asignaciones);
+  _FakeAsignacionCuidadoRepository(List<AsignacionCuidado> asignaciones)
+    : _asignaciones = List.of(asignaciones);
 
   @override
-  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
     int personaCuidadaId,
   ) async => _asignaciones
       .where((a) => a.personaCuidada.id == personaCuidadaId)
       .toList();
 
   @override
-  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    int colaboradorId,
-  ) async =>
-      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      // El usuario demo (María, id=1) es el colaborador de sus asignaciones.
+      _asignaciones.where((a) => a.colaborador.id == 1).toList();
 
   @override
-  Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async => a;
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+  }) => throw UnimplementedError();
 
   @override
-  Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado a) async =>
-      a;
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 
   @override
-  Future<void> eliminarAsignacion(int id) async {}
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 
   @override
-  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) => throw UnimplementedError();
 
   @override
-  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
+  Future<void> eliminarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> activarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
 }
 
 class _FakeEmergencyRepository implements EmergencyRepository {
@@ -143,8 +170,8 @@ ProviderContainer _makeContainer({
       personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
-      careTeamRepositoryProvider.overrideWithValue(
-        _FakeCareTeamRepository(asignaciones),
+      asignacionCuidadoRepositoryProvider.overrideWithValue(
+        _FakeAsignacionCuidadoRepository(asignaciones),
       ),
       emergencyRepositoryProvider.overrideWithValue(fakeEmergencyRepo),
       notificationSchedulerProvider.overrideWithValue(scheduler),
@@ -275,8 +302,8 @@ void main() {
               personaVisualizacionSeleccionadaProvider.overrideWith(
                 (ref) async => _personaMaria,
               ),
-              careTeamRepositoryProvider.overrideWithValue(
-                _FakeCareTeamRepository([]),
+              asignacionCuidadoRepositoryProvider.overrideWithValue(
+                _FakeAsignacionCuidadoRepository(const []),
               ),
               emergencyRepositoryProvider.overrideWithValue(
                 _FakeEmergencyRepository(),

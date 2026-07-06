@@ -1,8 +1,7 @@
-import '../../domain/datasources/datasources.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [AgendaRepository] que delega al [AgendaDatasource] inyectado.
 class AgendaRepositoryImpl implements AgendaRepository {
   final AgendaDatasource _datasource;
 

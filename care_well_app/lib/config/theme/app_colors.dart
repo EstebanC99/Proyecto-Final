@@ -46,6 +46,14 @@ abstract final class AppColors {
   static const Color moodAccent = Color(0xFF7C3AED);
   static const Color moodContainer = Color(0xFFEDE9FE);
 
+  // Escala de estado de ánimo (dial rojo → verde, de peor a mejor).
+  // Se usan como anillo al 100% y como fondo del blob al 16%.
+  static const Color moodScaleVeryBad = Color(0xFFD14343); // rojo
+  static const Color moodScaleBad = Color(0xFFEA580C); // naranja
+  static const Color moodScaleNeutral = Color(0xFFE0A100); // ámbar
+  static const Color moodScaleGood = Color(0xFF65A30D); // lima
+  static const Color moodScaleVeryGood = Color(0xFF2E9E5B); // verde
+
   // Emergencia
   static const Color emergencyRed = Color(0xFFD14343);
   static const Color emergencyContainer = Color(0xFFFEE2E2);

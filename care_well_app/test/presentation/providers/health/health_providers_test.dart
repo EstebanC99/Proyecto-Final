@@ -62,39 +62,66 @@ final _usuarioDemoMaria = Usuario(
 
 // ─── Fake repositories ────────────────────────────────────────────────────────
 
-class _FakeCareTeamRepository implements CareTeamRepository {
+/// Fake de [AsignacionCuidadoRepository]. La cadena de providers de permisos
+/// resuelve la asignación de contexto vía [obtenerAsignacionesPorPersona]; el
+/// resto de métodos no se ejercitan en estos tests.
+class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   final List<AsignacionCuidado> _asignaciones;
 
-  _FakeCareTeamRepository(this._asignaciones);
+  _FakeAsignacionCuidadoRepository(List<AsignacionCuidado> asignaciones)
+    : _asignaciones = List.of(asignaciones);
 
   @override
-  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    int colaboradorId,
-  ) async =>
-      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
+  Future<List<AsignacionCuidado>> obtenerAsignacionesPorPersona(
     int personaCuidadaId,
   ) async => _asignaciones
       .where((a) => a.personaCuidada.id == personaCuidadaId)
       .toList();
 
   @override
-  Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async => a;
+  Future<List<AsignacionCuidado>> obtenerAsignacionesUsuarioLogueado() async =>
+      // El usuario demo (María, id=1) es el colaborador de sus asignaciones.
+      _asignaciones.where((a) => a.colaborador.id == 1).toList();
 
   @override
-  Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado a) async =>
-      a;
+  Future<void> crearPersonaCargo({
+    required String nombre,
+    required String apellido,
+    required String documento,
+    required DateTime fechaNacimiento,
+    String? email,
+    String? telefono,
+  }) => throw UnimplementedError();
 
   @override
-  Future<void> eliminarAsignacion(int id) async {}
+  Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona) =>
+      throw UnimplementedError();
 
   @override
-  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
+  Future<void> asignarPersonaEquipoCuidado({
+    required int personaCuidadaId,
+    required String colaboradorEmail,
+    required int rolCuidadoId,
+    required List<int> permisosCuidadoIds,
+  }) => throw UnimplementedError();
 
   @override
-  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
+  Future<void> modificarPermisosAsignacion({
+    required int asignacionId,
+    required List<PermisoCuidado> permisosSeleccionados,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<void> eliminarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> activarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> reactivarAsignacion(int asignacionId) =>
+      throw UnimplementedError();
 }
 
 class _FakeHealthRepository implements HealthRepository {
@@ -125,21 +152,21 @@ class _FakeHealthRepository implements HealthRepository {
 }
 
 class _FakeEstadoAnimoRepository implements EstadoAnimoRepository {
-  final List<EstadoDeAnimo> _estadosAnimo;
+  final List<PersonaEstadoAnimo> _estadosAnimo;
 
-  _FakeEstadoAnimoRepository({List<EstadoDeAnimo>? estadosAnimo})
+  _FakeEstadoAnimoRepository({List<PersonaEstadoAnimo>? estadosAnimo})
     : _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
 
   @override
-  Future<EstadoDeAnimo?> obtenerAnimoHoy(Persona persona) async => _estadosAnimo
+  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona) async => _estadosAnimo
       .where((e) => e.persona.id == persona.id)
-      .fold<EstadoDeAnimo?>(
+      .fold<PersonaEstadoAnimo?>(
         null,
         (mas, e) => mas == null || e.fecha.isAfter(mas.fecha) ? e : mas,
       );
 
   @override
-  Future<List<EstadoDeAnimo>> obtenerPorFechas({
+  Future<List<PersonaEstadoAnimo>> obtenerPorFechas({
     required Persona persona,
     required DateTime desde,
     required DateTime hasta,
@@ -154,13 +181,13 @@ class _FakeEstadoAnimoRepository implements EstadoAnimoRepository {
 }
 
 class _FakeHabitoVidaRepository implements HabitoVidaRepository {
-  final List<HabitoDeVida> _habitos;
+  final List<HabitoVida> _habitos;
 
-  _FakeHabitoVidaRepository({List<HabitoDeVida>? habitos})
+  _FakeHabitoVidaRepository({List<HabitoVida>? habitos})
     : _habitos = habitos != null ? List.of(habitos) : [];
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async =>
+  Future<List<HabitoVida>> getHabitosByPersona(int personaId) async =>
       _habitos.where((h) => h.persona.id == personaId).toList();
 
   @override
@@ -203,15 +230,15 @@ class _FakeHabitoVidaRepository implements HabitoVidaRepository {
 }
 
 class _FakeEventoSaludRepository implements EventoSaludRepository {
-  final List<EventoDeSalud> _eventos;
+  final List<EventoSalud> _eventos;
 
-  _FakeEventoSaludRepository({List<EventoDeSalud>? eventos})
+  _FakeEventoSaludRepository({List<EventoSalud>? eventos})
     : _eventos = eventos != null ? List.of(eventos) : [];
 
   // El rango [desde, hasta] se ignora en el fake: filtra solo por persona para
   // mantener las fixtures deterministas independientemente del mes actual.
   @override
-  Future<List<EventoDeSalud>> getEventosSaludDelMes({
+  Future<List<EventoSalud>> getEventosSaludDelMes({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
@@ -255,9 +282,9 @@ class _FakeEventoSaludRepository implements EventoSaludRepository {
 /// Construye un container con contexto de persona AJENA (Alicia).
 ProviderContainer _makeContainer({
   required List<AsignacionCuidado> asignaciones,
-  List<EventoDeSalud>? eventos,
-  List<HabitoDeVida>? habitos,
-  List<EstadoDeAnimo>? estadosAnimo,
+  List<EventoSalud>? eventos,
+  List<HabitoVida>? habitos,
+  List<PersonaEstadoAnimo>? estadosAnimo,
 }) {
   return ProviderContainer(
     overrides: [
@@ -271,8 +298,8 @@ ProviderContainer _makeContainer({
         (ref) async => _personaAlicia,
       ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),
-      careTeamRepositoryProvider.overrideWithValue(
-        _FakeCareTeamRepository(asignaciones),
+      asignacionCuidadoRepositoryProvider.overrideWithValue(
+        _FakeAsignacionCuidadoRepository(asignaciones),
       ),
       healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
       estadoAnimoRepositoryProvider.overrideWithValue(
@@ -290,9 +317,9 @@ ProviderContainer _makeContainer({
 
 /// Construye un container con contexto de persona PROPIA (María).
 ProviderContainer _makeContainerContextPropio({
-  List<EventoDeSalud>? eventos,
-  List<HabitoDeVida>? habitos,
-  List<EstadoDeAnimo>? estadosAnimo,
+  List<EventoSalud>? eventos,
+  List<HabitoVida>? habitos,
+  List<PersonaEstadoAnimo>? estadosAnimo,
 }) {
   return ProviderContainer(
     overrides: [
@@ -306,7 +333,9 @@ ProviderContainer _makeContainerContextPropio({
         (ref) async => _personaMaria,
       ),
       healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
-      careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository([])),
+      asignacionCuidadoRepositoryProvider.overrideWithValue(
+        _FakeAsignacionCuidadoRepository(const []),
+      ),
       healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
       estadoAnimoRepositoryProvider.overrideWithValue(
         _FakeEstadoAnimoRepository(estadosAnimo: estadosAnimo),
@@ -328,14 +357,14 @@ void main() {
     group('eventosSaludDelMesProvider', () {
       test('retorna eventos ordenados ascendente por fecha', () async {
         final eventos = [
-          EventoDeSalud(
+          EventoSalud(
             id: 1102,
             persona: refPersonaAlicia,
             tipo: tipoEventoSaludVacuna,
             fechaHora: DateTime(2026, 6, 1),
             descripcion: 'Evento reciente',
           ),
-          EventoDeSalud(
+          EventoSalud(
             id: 1101,
             persona: refPersonaAlicia,
             tipo: tipoEventoSaludCitaMedica,
@@ -447,7 +476,7 @@ void main() {
 
     group('animoHoyProvider', () {
       test('retorna el estado de ánimo cuando hay registro hoy', () async {
-        final animoHoy = EstadoDeAnimo(
+        final animoHoy = PersonaEstadoAnimo(
           id: 1202,
           persona: _personaAlicia,
           fecha: DateTime.now(),
@@ -480,7 +509,7 @@ void main() {
 
     group('eliminarHabitoProvider', () {
       test('quita el hábito de la lista tras eliminar', () async {
-        final habito = HabitoDeVida(
+        final habito = HabitoVida(
           id: 901,
           persona: EntidadBasica(
             id: _personaAlicia.id,
@@ -512,14 +541,14 @@ void main() {
 
     group('eliminarEventoSaludProvider', () {
       test('quita el evento de la lista tras eliminar', () async {
-        final evento = EventoDeSalud(
+        final evento = EventoSalud(
           id: 1101,
           persona: refPersonaAlicia,
           tipo: tipoEventoSaludCitaMedica,
           fechaHora: DateTime(2026, 5, 10),
           descripcion: 'Cita médica',
           notas: [
-            NotaEvento(
+            NotaEventoSalud(
               id: 1301,
               eventoSaludId: 1101,
               autor: refPersonaMaria,

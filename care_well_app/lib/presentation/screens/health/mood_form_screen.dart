@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -17,10 +18,12 @@ class MoodFormScreen extends ConsumerStatefulWidget {
 }
 
 class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
-  int? _selectedLevel;
+  // El dial siempre muestra un valor; arranca en "Regular" (centro de la
+  // escala). El registro queda deshabilitado hasta la primera interacción.
+  int _level = EstadosAnimoConst.regular;
+  bool _hasInteracted = false;
   final _observacionesCtrl = TextEditingController();
   bool _loading = false;
-  String? _moodError;
 
   @override
   void dispose() {
@@ -29,17 +32,10 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
   }
 
   Future<void> _registrar() async {
-    if (_selectedLevel == null) {
-      setState(() => _moodError = 'Seleccioná un estado de ánimo.');
-      return;
-    }
-    setState(() {
-      _loading = true;
-      _moodError = null;
-    });
+    setState(() => _loading = true);
     try {
       await ref.read(registrarAnimoProvider)(
-        estadoAnimoId: _selectedLevel!,
+        estadoAnimoId: _level,
         observaciones: _observacionesCtrl.text.trim().isEmpty
             ? null
             : _observacionesCtrl.text.trim(),
@@ -134,33 +130,25 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                     ),
                   ),
 
-                  // MoodPicker
+                  // Selector tipo dial (carrusel de niveles)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.xl,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
-                    child: MoodPicker(
-                      selectedLevel: _selectedLevel,
+                    child: MoodDialSelector(
+                      selectedLevel: _level,
                       onChanged: (level) => setState(() {
-                        _selectedLevel = level;
-                        _moodError = null;
+                        _level = level;
+                        _hasInteracted = true;
                       }),
                     ),
                   ),
-                  if (_moodError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        _moodError!,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.error,
-                        ),
-                      ),
-                    ),
                   const SizedBox(height: AppSpacing.xl),
 
                   // Observación (opcional)
@@ -204,38 +192,77 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xxxl),
 
-                  // Botón registrar
+                  // Botón registrar: outlined violeta hasta la 1ª interacción,
+                  // luego pasa a filled y queda habilitado.
                   SizedBox(
                     width: double.infinity,
                     height: AppSpacing.buttonHeight,
-                    child: FilledButton(
-                      onPressed: _loading ? null : _registrar,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.moodAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusLg,
-                          ),
-                        ),
-                      ),
-                      child: _loading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: Colors.white,
+                    child: _hasInteracted
+                        ? FilledButton(
+                            onPressed: _loading ? null : _registrar,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.moodAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusLg,
+                                ),
                               ),
-                            )
-                          : const Text(
+                            ),
+                            child: _loading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Registrar',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          )
+                        : OutlinedButton(
+                            onPressed: null,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                color: AppColors.moodAccent,
+                                width: 2,
+                              ),
+                              disabledForegroundColor: AppColors.moodAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusLg,
+                                ),
+                              ),
+                            ),
+                            child: const Text(
                               'Registrar',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                    ),
+                          ),
                   ),
+                  if (!_hasInteracted)
+                    const Padding(
+                      padding: EdgeInsets.only(top: AppSpacing.sm),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Tocá las flechas para elegir un estado y confirmar.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

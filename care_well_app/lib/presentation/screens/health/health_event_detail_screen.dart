@@ -199,7 +199,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
 class _EventHeaderCard extends StatelessWidget {
   const _EventHeaderCard({required this.evento});
 
-  final EventoDeSalud evento;
+  final EventoSalud evento;
 
   @override
   Widget build(BuildContext context) {

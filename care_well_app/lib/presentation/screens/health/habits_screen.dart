@@ -18,6 +18,11 @@ class HabitsScreen extends ConsumerWidget {
     final habitosAsync = ref.watch(habitosProvider);
     final puedeRegistrarAsync = ref.watch(puedeRegistrarHabitosProvider);
     final puedeRegistrar = puedeRegistrarAsync.valueOrNull ?? false;
+    // El registro de cumplimiento diario (marcar realizado / comentar) está
+    // disponible para cualquier miembro activo del equipo, sin exigir el
+    // permiso de ABM de hábitos.
+    final esMiembroEquipo =
+        ref.watch(esMiembroEquipoActivoProvider).valueOrNull ?? false;
     final personaAsync = ref.watch(healthPersonaContextProvider);
 
     return Scaffold(
@@ -107,7 +112,7 @@ class HabitsScreen extends ConsumerWidget {
                         AppRoutes.healthHabitDetailName,
                         pathParameters: {'id': habitos[i].id.toString()},
                       ),
-                      onToggleRealizacion: puedeRegistrar
+                      onToggleRealizacion: esMiembroEquipo
                           ? () => HabitoRealizacionSheet.show(
                               context,
                               ref,
@@ -143,16 +148,16 @@ class _HabitoCard extends StatelessWidget {
     this.onToggleRealizacion,
   });
 
-  final HabitoDeVida habito;
+  final HabitoVida habito;
   final VoidCallback onTap;
 
   /// Callback para marcar/desmarcar la realización. Null si el usuario no tiene
   /// permiso (el chip se muestra pero no es accionable).
   final VoidCallback? onToggleRealizacion;
 
-  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
+  static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
 
-  static IconData _iconTipo(TipoHabito tipo) {
+  static IconData _iconTipo(TipoHabitoVida tipo) {
     switch (tipo.id) {
       case TiposHabitoConst.actividadFisica:
         return Icons.directions_run;

@@ -35,24 +35,25 @@ namespace CareWell.BusinessService
 
             #region Business Services
 
-            services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
-            services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
             services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
-            services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<IAdministrarEventoAgendaBusinessService, AdministrarEventoAgendaBusinessService>();
-            services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
             services.AddScoped<IAdministrarEventoSaludBusinessService, AdministrarEventoSaludBusinessService>();
             services.AddScoped<IAdministrarHabitoVidaBusinessService, AdministrarHabitoVidaBusinessService>();
             services.AddScoped<IAdministrarPersonaEstadoAnimoBusinessService, AdministrarPersonaEstadoAnimoBusinessService>();
+            services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
+            services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
+            services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
+            services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
+            services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
 
             #endregion
 
             #region Domain
 
+            services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
+            services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
             services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
             services.AddScoped<IValidarExistenciaAsignacionCuidado, ValidarExistenciaAsignacionCuidado>();
-            services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
-            services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
 
             #endregion
 

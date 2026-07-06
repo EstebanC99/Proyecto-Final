@@ -1,19 +1,18 @@
-import '../../domain/datasources/estado_animo_datasource.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/estado_animo_repository.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [EstadoAnimoRepository] que delega al [EstadoAnimoDatasource] inyectado.
 class EstadoAnimoRepositoryImpl implements EstadoAnimoRepository {
   final EstadoAnimoDatasource _datasource;
 
   const EstadoAnimoRepositoryImpl(this._datasource);
 
   @override
-  Future<EstadoDeAnimo?> obtenerAnimoHoy(Persona persona) =>
+  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona) =>
       _datasource.obtenerAnimoHoy(persona);
 
   @override
-  Future<List<EstadoDeAnimo>> obtenerPorFechas({
+  Future<List<PersonaEstadoAnimo>> obtenerPorFechas({
     required Persona persona,
     required DateTime desde,
     required DateTime hasta,

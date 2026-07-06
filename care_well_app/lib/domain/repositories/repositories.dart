@@ -8,5 +8,6 @@ export 'estado_animo_repository.dart';
 export 'evento_salud_repository.dart';
 export 'habito_vida_repository.dart';
 export 'health_repository.dart';
+export 'linea_tiempo_salud_repository.dart';
 export 'persona_repository.dart';
 export 'settings_repository.dart';

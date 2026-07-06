@@ -76,7 +76,7 @@ IconData healthEventIcon(TipoEventoSalud tipo) => _iconForTipo(tipo);
 Color healthEventColor(TipoEventoSalud tipo) => _colorForTipo(tipo);
 String healthEventLabel(TipoEventoSalud tipo) => _labelForTipo(tipo);
 
-/// Card de un [EventoDeSalud] para la lista mensual y la línea de tiempo.
+/// Card de un [EventoSalud] para la lista mensual y la línea de tiempo.
 ///
 /// Parámetros:
 /// - [tieneNotas]: muestra un indicador discreto cuando el evento tiene notas.
@@ -91,7 +91,7 @@ class HealthEventCard extends StatelessWidget {
     this.mostrarFecha = true,
   });
 
-  final EventoDeSalud evento;
+  final EventoSalud evento;
   final VoidCallback onTap;
 
   /// Si es `true`, muestra un pequeño indicador de notas bajo la descripción.

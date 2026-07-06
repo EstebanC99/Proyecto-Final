@@ -15,7 +15,7 @@ abstract final class HabitoRealizacionSheet {
   static Future<void> show(
     BuildContext context,
     WidgetRef ref, {
-    required HabitoDeVida habito,
+    required HabitoVida habito,
   }) {
     if (habito.realizacion == null) {
       return _showMarcar(context, ref, habito: habito);
@@ -29,7 +29,7 @@ abstract final class HabitoRealizacionSheet {
   static Future<void> _showMarcar(
     BuildContext context,
     WidgetRef ref, {
-    required HabitoDeVida habito,
+    required HabitoVida habito,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -49,7 +49,7 @@ abstract final class HabitoRealizacionSheet {
   static Future<void> _showOpciones(
     BuildContext context,
     WidgetRef ref, {
-    required HabitoDeVida habito,
+    required HabitoVida habito,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -68,7 +68,7 @@ abstract final class HabitoRealizacionSheet {
 
 class _MarcarRealizadoSheet extends ConsumerStatefulWidget {
   const _MarcarRealizadoSheet({required this.habito});
-  final HabitoDeVida habito;
+  final HabitoVida habito;
 
   @override
   ConsumerState<_MarcarRealizadoSheet> createState() =>
@@ -203,7 +203,7 @@ class _MarcarRealizadoSheetState extends ConsumerState<_MarcarRealizadoSheet> {
 
 class _OpcionesRealizacionSheet extends ConsumerWidget {
   const _OpcionesRealizacionSheet({required this.habito});
-  final HabitoDeVida habito;
+  final HabitoVida habito;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -295,8 +295,8 @@ class _EditarComentarioSheet extends ConsumerStatefulWidget {
     required this.habito,
     required this.realizacion,
   });
-  final HabitoDeVida habito;
-  final RealizacionHabito realizacion;
+  final HabitoVida habito;
+  final RealizacionHabitoVida realizacion;
 
   @override
   ConsumerState<_EditarComentarioSheet> createState() =>

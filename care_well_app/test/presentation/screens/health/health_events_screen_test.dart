@@ -22,7 +22,7 @@ final _personaAlicia = Persona(
 // inicio del día para que nunca sea futura (la pantalla filtra eventos futuros).
 final _hoy = DateTime.now();
 
-final _evento = EventoDeSalud(
+final _evento = EventoSalud(
   id: 1101,
   persona: refPersonaAlicia,
   tipo: tipoEventoSaludCitaMedica,
@@ -30,7 +30,7 @@ final _evento = EventoDeSalud(
   descripcion: 'Control cardiológico',
 );
 
-Widget _wrap({List<EventoDeSalud>? eventos, bool puedeRegistrar = true}) {
+Widget _wrap({List<EventoSalud>? eventos, bool puedeRegistrar = true}) {
   return ProviderScope(
     overrides: [
       eventosSaludDelMesProvider.overrideWith(
@@ -81,33 +81,16 @@ void main() {
       expect(find.text('Sin eventos en este mes.'), findsOneWidget);
     });
 
-    testWidgets('estado inicial: muestra lista, no timeline', (tester) async {
+    testWidgets('muestra la lista mensual (única vista)', (tester) async {
       await tester.pumpWidget(_wrap());
       await tester.pump();
       expect(find.byType(HealthEventsMonthList), findsOneWidget);
-      expect(find.byType(HealthEventsTimelineView), findsNothing);
     });
 
-    testWidgets('toggle: cambia de lista a línea de tiempo', (tester) async {
+    testWidgets('no expone toggle de línea de tiempo', (tester) async {
       await tester.pumpWidget(_wrap());
       await tester.pump();
-
-      await tester.tap(find.byTooltip('Ver como línea de tiempo'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(HealthEventsTimelineView), findsOneWidget);
-      expect(find.byType(HealthEventsMonthList), findsNothing);
-    });
-
-    testWidgets('FAB sigue visible en vista línea de tiempo', (tester) async {
-      await tester.pumpWidget(_wrap(puedeRegistrar: true));
-      await tester.pump();
-
-      await tester.tap(find.byTooltip('Ver como línea de tiempo'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(HealthEventsTimelineView), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byTooltip('Ver como línea de tiempo'), findsNothing);
     });
   });
 }

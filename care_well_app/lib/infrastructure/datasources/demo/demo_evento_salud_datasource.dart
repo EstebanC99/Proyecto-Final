@@ -7,7 +7,7 @@ import 'demo_seed.dart';
 /// Mantiene los eventos de salud con sus notas embebidas. Los mutadores
 /// modifican la lista en memoria (no hay persistencia entre reinicios).
 class DemoEventoSaludDatasource implements EventoSaludDatasource {
-  final List<EventoDeSalud> _eventos = List.of([
+  final List<EventoSalud> _eventos = List.of([
     ...DemoSeed.eventosSaludAlicia,
     ...DemoSeed.eventosSaludMaria,
   ]);
@@ -39,7 +39,7 @@ class DemoEventoSaludDatasource implements EventoSaludDatasource {
   );
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludDelMes({
+  Future<List<EventoSalud>> getEventosSaludDelMes({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
@@ -64,7 +64,7 @@ class DemoEventoSaludDatasource implements EventoSaludDatasource {
   }) async {
     await Future.delayed(Duration.zero);
     _eventos.add(
-      EventoDeSalud(
+      EventoSalud(
         id: _nextEventoId++,
         persona: EntidadBasica(
           id: personaId,
@@ -94,7 +94,7 @@ class DemoEventoSaludDatasource implements EventoSaludDatasource {
     await Future.delayed(Duration.zero);
     final idx = _indexEvento(eventoSaludId);
     final evento = _eventos[idx];
-    final nota = NotaEvento(
+    final nota = NotaEventoSalud(
       id: _nextNotaId++,
       eventoSaludId: eventoSaludId,
       autor: _autorDemo,

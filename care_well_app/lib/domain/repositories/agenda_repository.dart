@@ -1,15 +1,12 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 
-/// Contrato de repositorio para la agenda.
 abstract class AgendaRepository {
-  /// Retorna las ocurrencias de eventos de [personaId] dentro del rango.
   Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
   });
 
-  /// Crea un evento de agenda (opcionalmente recurrente).
   Future<void> crearEvento({
     required int personaId,
     required String titulo,
@@ -24,7 +21,6 @@ abstract class AgendaRepository {
     DateTime? fechaFinRecurrencia,
   });
 
-  /// Modifica un evento existente (sin alterar su recurrencia).
   Future<void> modificarEvento({
     required int eventoAgendaId,
     required String titulo,
@@ -36,10 +32,8 @@ abstract class AgendaRepository {
     int? minutosAnticipacionRecordatorio,
   });
 
-  /// Elimina el evento con [eventoAgendaId].
   Future<void> eliminarEvento(int eventoAgendaId);
 
-  /// Cancela una ocurrencia puntual de un evento recurrente.
   Future<void> cancelarOcurrencia({
     required int eventoAgendaId,
     required DateTime fechaOcurrencia,

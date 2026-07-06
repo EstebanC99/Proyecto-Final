@@ -102,7 +102,10 @@ AsignacionCuidado _asignacionDesde(Persona persona) => AsignacionCuidado(
 
 /// Construye el widget con los providers sobrescritos directamente
 /// para evitar el estado de carga y los timers del skeleton en tests.
-Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
+Widget _wrap({
+  required List<AsignacionCuidado> asignaciones,
+  Override? animoOverride,
+}) {
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(
@@ -122,8 +125,8 @@ Widget _wrap({required List<AsignacionCuidado> asignaciones}) {
       asignacionesActivasComoCuidadorProvider.overrideWith(
         (ref) async => <AsignacionCuidado>[],
       ),
-      // Sin ánimo de hoy en tests: el badge muestra '?' (neutro).
-      animoHoyProvider.overrideWith((ref) async => null),
+      // Sin ánimo de hoy en tests (por defecto): el badge muestra '?' (neutro).
+      animoOverride ?? animoHoyProvider.overrideWith((ref) async => null),
     ],
     child: const MaterialApp(home: HomeScreen()),
   );
@@ -226,5 +229,24 @@ void main() {
       // Con animoHoy == null el badge del NavTile de Salud muestra '?'.
       expect(find.text('?'), findsOneWidget);
     });
+
+    testWidgets(
+      'badge de ánimo muestra "?" cuando la consulta falla (no queda pegado)',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            asignaciones: [_asignacionDesde(_testDependiente)],
+            // Simula que la consulta del ánimo de la nueva persona termina en
+            // error: el badge no debe conservar un emoji previo, debe mostrar '?'.
+            animoOverride: animoHoyProvider.overrideWith(
+              (ref) async => throw Exception('sin datos'),
+            ),
+          ),
+        );
+        await _settleAnimations(tester);
+
+        expect(find.text('?'), findsOneWidget);
+      },
+    );
   });
 }

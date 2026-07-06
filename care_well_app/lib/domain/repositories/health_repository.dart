@@ -1,4 +1,4 @@
-import '../entities/entities.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
 /// Contrato de repositorio para el módulo Mi Salud.
 abstract class HealthRepository {

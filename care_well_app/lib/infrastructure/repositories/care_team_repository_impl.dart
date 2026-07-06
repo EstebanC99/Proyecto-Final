@@ -1,8 +1,7 @@
-import '../../domain/datasources/datasources.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [CareTeamRepository] que delega al [CareTeamDatasource] inyectado.
 class CareTeamRepositoryImpl implements CareTeamRepository {
   final CareTeamDatasource _datasource;
 

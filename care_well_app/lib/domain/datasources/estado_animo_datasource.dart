@@ -1,24 +1,14 @@
-import '../entities/entities.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
-/// Interfaz de datasource para estados de ánimo de una persona.
-///
-/// Separada de [HealthDatasource] (ficha, recomendaciones) siguiendo el patrón
-/// de [HabitoVidaDatasource]: esta cara del módulo salud tiene su propia
-/// implementación contra la API.
 abstract class EstadoAnimoDatasource {
-  /// Retorna el estado de ánimo registrado hoy para [persona], o `null` si no hay.
-  Future<EstadoDeAnimo?> obtenerAnimoHoy(Persona persona);
+  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona);
 
-  /// Retorna los estados de ánimo de [persona] en el rango [desde, hasta).
-  Future<List<EstadoDeAnimo>> obtenerPorFechas({
+  Future<List<PersonaEstadoAnimo>> obtenerPorFechas({
     required Persona persona,
     required DateTime desde,
     required DateTime hasta,
   });
 
-  /// Registra un estado de ánimo para la persona [personaId].
-  ///
-  /// La fecha/hora la fija el servidor. Pueden existir varios registros por día.
   Future<void> registrar({
     required int personaId,
     required int estadoAnimoId,

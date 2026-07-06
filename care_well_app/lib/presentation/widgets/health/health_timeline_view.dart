@@ -4,28 +4,25 @@ import 'package:intl/intl.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
-import 'timeline_tile.dart';
+import 'health_timeline_tile.dart';
 
-/// Vista de línea de tiempo de eventos de salud en orden cronológico ascendente.
+/// Vista de línea de tiempo de salud en orden cronológico ascendente.
 ///
-/// Renderiza los eventos como una secuencia de [TimelineTile] con separadores
-/// de día discretos cuando cambia la fecha respecto del elemento anterior.
-class HealthEventsTimelineView extends StatelessWidget {
-  const HealthEventsTimelineView({
+/// Renderiza los [EventoBase] (hábitos realizados, eventos de salud y estados
+/// de ánimo mezclados) como una secuencia de [HealthTimelineTile] con
+/// separadores de día discretos cuando cambia la fecha respecto del anterior.
+class HealthTimelineView extends StatelessWidget {
+  const HealthTimelineView({
     super.key,
     required this.eventos,
     required this.onRefresh,
-    this.onEventoTap,
   });
 
   /// Eventos del mes ya cargados (se ordenan por fecha internamente).
-  final List<EventoDeSalud> eventos;
+  final List<EventoBase> eventos;
 
   /// Callback del [RefreshIndicator].
   final Future<void> Function() onRefresh;
-
-  /// Callback opcional al tocar un evento.
-  final void Function(EventoDeSalud)? onEventoTap;
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +66,9 @@ class HealthEventsTimelineView extends StatelessWidget {
                     ),
                   ),
                 ),
-              TimelineTile(
+              HealthTimelineTile(
                 evento: evento,
                 isLast: i == ordenados.length - 1,
-                onTap: () => onEventoTap?.call(evento),
               ),
             ],
           );

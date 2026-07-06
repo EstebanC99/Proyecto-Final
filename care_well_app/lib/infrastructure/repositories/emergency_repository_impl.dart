@@ -1,8 +1,7 @@
-import '../../domain/datasources/datasources.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [EmergencyRepository] que delega al [EmergencyDatasource] inyectado.
 class EmergencyRepositoryImpl implements EmergencyRepository {
   final EmergencyDatasource _datasource;
 

@@ -1,10 +1,5 @@
 import '../base_entity.dart';
 
-/// Tipo de rol dentro del equipo de cuidado (catálogo persistido).
-///
-/// - id 1: Responsable — gestiona la información de la persona a cargo y
-///   administra el equipo.
-/// - id 2: Cuidador — realiza tareas de cuidado; accede según permisos.
 class RolCuidado extends BaseEntity {
   final String descripcion;
 

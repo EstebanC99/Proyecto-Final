@@ -1,12 +1,7 @@
-import '../../domain/datasources/datasources.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/repositories.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [HealthRepository] que delega al [HealthDatasource] inyectado.
-///
-/// Solo gestiona ficha de salud y recomendaciones médicas. Los hábitos de vida
-/// se gestionan en [HabitoVidaRepositoryImpl] y los estados de ánimo en
-/// [EstadoAnimoRepositoryImpl].
 class HealthRepositoryImpl implements HealthRepository {
   final HealthDatasource _datasource;
 

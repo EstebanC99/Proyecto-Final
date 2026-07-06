@@ -61,8 +61,8 @@ void main() {
     });
   });
 
-  group('HabitoDeVidaMapper', () {
-    final model = HabitoDeVidaModel(
+  group('HabitoVidaMapper', () {
+    final model = HabitoVidaModel(
       id: 901,
       persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
       tipo: EntidadBasicaModel(
@@ -75,7 +75,7 @@ void main() {
     );
 
     test('model → entity mapea correctamente todos los campos', () {
-      final entity = HabitoDeVidaMapper.fromModel(model);
+      final entity = HabitoVidaMapper.fromModel(model);
       expect(entity.id, 901);
       expect(entity.persona.id, 1);
       expect(entity.persona.descripcion, 'Alicia Rodríguez');
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('model con realizacion → entidad con realizacion', () {
-      final modelConRealizacion = HabitoDeVidaModel(
+      final modelConRealizacion = HabitoVidaModel(
         id: 901,
         persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
         tipo: EntidadBasicaModel(
@@ -100,7 +100,7 @@ void main() {
           fechaHoraRealizacion: '2026-07-03T08:30:00.000',
         ),
       );
-      final entity = HabitoDeVidaMapper.fromModel(modelConRealizacion);
+      final entity = HabitoVidaMapper.fromModel(modelConRealizacion);
       expect(entity.realizacion, isNotNull);
       expect(entity.realizacion!.id, 9010);
       expect(entity.realizacion!.habitoId, 901);
@@ -159,7 +159,7 @@ void main() {
       descripcion: 'Síntoma',
     );
 
-    final evento = EventoDeSalud(
+    final evento = EventoSalud(
       id: 1101,
       persona: refPersona,
       tipo: tipoSintoma,
@@ -167,7 +167,7 @@ void main() {
       descripcion: 'Episodio de mareos.',
     );
 
-    final model = EventoDeSaludModel(
+    final model = EventoSaludModel(
       id: 1101,
       persona: EntidadBasicaModel(id: 1, descripcion: 'Alicia Rodríguez'),
       tipo: TipoEventoSaludModel(
@@ -179,8 +179,8 @@ void main() {
     );
 
     test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = EventoDeSaludMapper.fromModel(
-        EventoDeSaludMapper.toModel(evento),
+      final roundTrip = EventoSaludMapper.fromModel(
+        EventoSaludMapper.toModel(evento),
       );
       expect(roundTrip.id, evento.id);
       expect(roundTrip.tipo.id, evento.tipo.id);
@@ -189,9 +189,9 @@ void main() {
 
     test('json → model → entity → model → json produce el mismo JSON', () {
       final json = model.toJson();
-      final modelFromJson = EventoDeSaludModel.fromJson(json);
-      final entity = EventoDeSaludMapper.fromModel(modelFromJson);
-      final modelBack = EventoDeSaludMapper.toModel(entity);
+      final modelFromJson = EventoSaludModel.fromJson(json);
+      final entity = EventoSaludMapper.fromModel(modelFromJson);
+      final modelBack = EventoSaludMapper.toModel(entity);
       expect(modelBack.toJson(), json);
     });
   });
@@ -215,11 +215,6 @@ void main() {
       expect(entity.fecha, DateTime.parse('2026-07-03T10:15:00'));
       expect(entity.observaciones, 'Estuvo tranquila.');
       expect(entity.persona.id, persona.id);
-    });
-
-    test('eventoDeSalud siempre es null (los DataViews no lo traen)', () {
-      final entity = PersonaEstadoAnimoMapper.fromModel(model, persona);
-      expect(entity.eventoDeSalud, isNull);
     });
 
     test('observaciones nulas se preservan', () {

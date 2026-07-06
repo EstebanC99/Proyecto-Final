@@ -1,21 +1,12 @@
-import '../base_entity.dart';
-import '../shared/entidad_basica.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
-/// Nota colaborativa registrada por un miembro del equipo sobre un [EventoDeSalud].
-class NotaEvento extends BaseEntity {
-  /// ID del evento de salud al que pertenece esta nota.
+class NotaEventoSalud extends BaseEntity {
   final int eventoSaludId;
-
-  /// Autor de la nota (referencia embebida `{id, descripcion}`).
   final EntidadBasica autor;
-
-  /// Fecha y hora en que se registró la nota.
   final DateTime fechaHora;
-
-  /// Contenido de texto libre de la nota.
   final String contenido;
 
-  const NotaEvento({
+  const NotaEventoSalud({
     required super.id,
     required this.eventoSaludId,
     required this.autor,
@@ -24,14 +15,14 @@ class NotaEvento extends BaseEntity {
   });
 
   @override
-  NotaEvento copyWith({
+  NotaEventoSalud copyWith({
     int? id,
     int? eventoSaludId,
     EntidadBasica? autor,
     DateTime? fechaHora,
     String? contenido,
   }) {
-    return NotaEvento(
+    return NotaEventoSalud(
       id: id ?? this.id,
       eventoSaludId: eventoSaludId ?? this.eventoSaludId,
       autor: autor ?? this.autor,

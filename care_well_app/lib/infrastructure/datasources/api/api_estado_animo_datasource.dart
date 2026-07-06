@@ -1,11 +1,9 @@
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/infrastructure/http/http_configs.dart';
+import 'package:care_well_app/infrastructure/mappers/mappers.dart';
+import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:dio/dio.dart';
-
-import '../../../domain/datasources/estado_animo_datasource.dart';
-import '../../../domain/entities/entities.dart';
-import '../../http/api_config.dart';
-import '../../http/api_exception_mapper.dart';
-import '../../mappers/health_mapper.dart';
-import '../../models/health/health_models.dart';
 
 /// Implementación de [EstadoAnimoDatasource] contra la API REST del backend.
 class ApiEstadoAnimoDatasource implements EstadoAnimoDatasource {
@@ -14,18 +12,22 @@ class ApiEstadoAnimoDatasource implements EstadoAnimoDatasource {
   ApiEstadoAnimoDatasource(this._dio);
 
   @override
-  Future<EstadoDeAnimo?> obtenerAnimoHoy(Persona persona) async {
+  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona) async {
     try {
       final response = await _dio.post(
         ApiConfig.obtenerAnimoHoyPath,
         data: {'personaID': persona.id},
       );
 
-      // El backend responde HTTP 200 con body null si no hay registro hoy.
-      if (response.data == null) return null;
+      // Cuando no hay ánimo registrado hoy, el backend responde "sin contenido".
+      // Según el status (200 con body null, 204, o body vacío) Dio puede entregar
+      // `null`, un String vacío/blanco u otro tipo que no sea Map. En todos esos
+      // casos se interpreta como "sin ánimo" y se devuelve null (no es un error).
+      final data = response.data;
+      if (data is! Map<String, dynamic>) return null;
 
       return PersonaEstadoAnimoMapper.fromModel(
-        PersonaEstadoAnimoModel.fromJson(response.data as Map<String, dynamic>),
+        PersonaEstadoAnimoModel.fromJson(data),
         persona,
       );
     } on DioException catch (e) {
@@ -34,7 +36,7 @@ class ApiEstadoAnimoDatasource implements EstadoAnimoDatasource {
   }
 
   @override
-  Future<List<EstadoDeAnimo>> obtenerPorFechas({
+  Future<List<PersonaEstadoAnimo>> obtenerPorFechas({
     required Persona persona,
     required DateTime desde,
     required DateTime hasta,

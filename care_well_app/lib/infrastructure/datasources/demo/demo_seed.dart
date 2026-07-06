@@ -286,8 +286,8 @@ class DemoSeed {
   );
 
   /// Eventos de salud propios de María (usuario demo, contexto "Yo").
-  static final List<EventoDeSalud> eventosSaludMaria = [
-    EventoDeSalud(
+  static final List<EventoSalud> eventosSaludMaria = [
+    EventoSalud(
       id: 1101,
       persona: _refMaria,
       tipo: TipoEventoSalud(
@@ -297,7 +297,7 @@ class DemoSeed {
       fechaHora: DateTime(2026, 5, 20, 9, 0),
       descripcion: 'Control anual con médico clínico — Dr. Alejandro Torres.',
       notas: [
-        NotaEvento(
+        NotaEventoSalud(
           id: 1305,
           eventoSaludId: 1101,
           autor: _refMaria,
@@ -309,7 +309,7 @@ class DemoSeed {
     ),
   ];
 
-  static final EventoDeSalud eventoSaludMareos = EventoDeSalud(
+  static final EventoSalud eventoSaludMareos = EventoSalud(
     id: 1102,
     persona: _refAlicia,
     tipo: TipoEventoSalud(
@@ -319,14 +319,14 @@ class DemoSeed {
     fechaHora: DateTime(2026, 5, 28, 8, 15),
     descripcion: 'Episodio de mareos al levantarse. Duración aprox. 5 minutos.',
     notas: [
-      NotaEvento(
+      NotaEventoSalud(
         id: 1304,
         eventoSaludId: 1102,
         autor: _refMaria,
         fechaHora: DateTime(2026, 5, 28, 10, 5),
         contenido: 'Presión al momento: 90/60. Se la acostó y pasó solo.',
       ),
-      NotaEvento(
+      NotaEventoSalud(
         id: 1303,
         eventoSaludId: 1102,
         autor: _refMaria,
@@ -338,7 +338,7 @@ class DemoSeed {
   );
 
   /// Evento generado desde una ocurrencia de agenda (badge "Desde agenda").
-  static final EventoDeSalud eventoSaludControlCardiologico = EventoDeSalud(
+  static final EventoSalud eventoSaludControlCardiologico = EventoSalud(
     id: 1103,
     persona: _refAlicia,
     tipo: TipoEventoSalud(
@@ -349,7 +349,7 @@ class DemoSeed {
     descripcion: 'Control cardiológico — Dr. Martín Sosa · Hospital Italiano.',
     fechaOcurrenciaEventoAgenda: DateTime(2026, 6, 2, 10, 30),
     notas: [
-      NotaEvento(
+      NotaEventoSalud(
         id: 1301,
         eventoSaludId: 1103,
         autor: _refMaria,
@@ -357,7 +357,7 @@ class DemoSeed {
         contenido:
             'El médico indicó repetir análisis en 3 meses. Solicitar turno a fin de mes.',
       ),
-      NotaEvento(
+      NotaEventoSalud(
         id: 1302,
         eventoSaludId: 1103,
         autor: _refLaura,
@@ -367,10 +367,10 @@ class DemoSeed {
     ],
   );
 
-  static final List<EventoDeSalud> eventosSaludAlicia = [
+  static final List<EventoSalud> eventosSaludAlicia = [
     eventoSaludControlCardiologico,
     eventoSaludMareos,
-    EventoDeSalud(
+    EventoSalud(
       id: 1104,
       persona: _refAlicia,
       tipo: TipoEventoSalud(

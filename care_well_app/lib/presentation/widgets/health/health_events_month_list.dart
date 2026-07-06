@@ -24,7 +24,7 @@ class HealthEventsMonthList extends ConsumerStatefulWidget {
   });
 
   /// Eventos del mes ya cargados (se agrupan por día internamente).
-  final List<EventoDeSalud> eventos;
+  final List<EventoSalud> eventos;
 
   /// Callback del [RefreshIndicator].
   final Future<void> Function() onRefresh;
@@ -33,7 +33,7 @@ class HealthEventsMonthList extends ConsumerStatefulWidget {
   final bool puedeRegistrar;
 
   /// Callback opcional al tocar una card de evento.
-  final void Function(EventoDeSalud evento)? onEventoTap;
+  final void Function(EventoSalud evento)? onEventoTap;
 
   @override
   ConsumerState<HealthEventsMonthList> createState() =>
@@ -58,10 +58,10 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
   }
 
   /// Agrupa los eventos por día (fecha truncada a año-mes-día).
-  Map<DateTime, List<EventoDeSalud>> _agruparPorDia(
-    List<EventoDeSalud> eventos,
+  Map<DateTime, List<EventoSalud>> _agruparPorDia(
+    List<EventoSalud> eventos,
   ) {
-    final Map<DateTime, List<EventoDeSalud>> grupos = {};
+    final Map<DateTime, List<EventoSalud>> grupos = {};
     for (final e in eventos) {
       final dt = e.fechaHora.toLocal();
       final dia = DateTime(dt.year, dt.month, dt.day);

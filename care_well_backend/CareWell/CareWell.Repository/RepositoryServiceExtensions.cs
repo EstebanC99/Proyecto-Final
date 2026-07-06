@@ -22,14 +22,15 @@ namespace CareWell.Repository
 
             #region Business Repos
 
-            services.AddScoped<IPersonaRepository, PersonaRepository>();
-            services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             services.AddScoped<IAsignacionCuidadoRepository, AsignacionCuidadoRepository>();
             services.AddScoped<IEventoAgendaRepository, EventoAgendaRepository>();
             services.AddScoped<IEventoSaludRepository, EventoSaludRepository>();
-            services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
             services.AddScoped<IHabitoVidaRepository, HabitoVidaRepository>();
+            services.AddScoped<ILineaTiempoSaludRepository, LineaTiempoSaludRepository>();
             services.AddScoped<IPersonaEstadoAnimoRepository, PersonaEstadoAnimoRepository>();
+            services.AddScoped<IPersonaRepository, PersonaRepository>();
+            services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
+            services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
             #endregion
 

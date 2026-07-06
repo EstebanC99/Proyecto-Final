@@ -33,7 +33,13 @@ class HomeScreen extends ConsumerWidget {
 
     final dependentsAsync = ref.watch(asignacionesActivasProvider);
     final animoHoyAsync = ref.watch(animoHoyProvider);
-    final animoHoy = animoHoyAsync.valueOrNull;
+    // Solo se toma el ánimo de un estado recién resuelto (AsyncData). Durante
+    // loading/error se trata como "sin dato" para evitar que el badge quede
+    // pegado con el emoji de la persona anterior al cambiar el contexto.
+    final animoHoy = switch (animoHoyAsync) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
 
     // Badge de estado de ánimo para el NavTile de Salud.
     // Siempre visible: muestra el emoji si hay ánimo registrado hoy, o '?' si no.

@@ -7,7 +7,7 @@ import '../../../domain/entities/entities.dart';
 import '../shared/avatar_initial.dart';
 import '../shared/confirm_dialog.dart';
 
-/// Tarjeta que muestra una [NotaEvento] con avatar del autor, autoría y
+/// Tarjeta que muestra una [NotaEventoSalud] con avatar del autor, autoría y
 /// contenido.
 ///
 /// Acciones opcionales (solo se muestran cuando el usuario tiene permiso):
@@ -20,7 +20,7 @@ import '../shared/confirm_dialog.dart';
 class NoteCard extends StatelessWidget {
   const NoteCard({super.key, required this.nota, this.onEdit, this.onDelete});
 
-  final NotaEvento nota;
+  final NotaEventoSalud nota;
 
   /// Callback de edición: recibe el nuevo contenido validado (no vacío).
   /// Si es null, el botón "Editar" no se muestra.

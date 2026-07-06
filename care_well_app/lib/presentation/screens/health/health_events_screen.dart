@@ -9,43 +9,14 @@ import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// Modo de visualización de los eventos de salud.
-enum _HealthEventsViewMode { lista, timeline }
-
 /// Lista mensual de eventos de salud agrupada por día (US-30).
 ///
 /// Muestra los eventos del mes seleccionado para la persona de contexto,
-/// agrupados por día en orden ascendente. Permite navegar entre meses,
-/// alternar entre vista de lista y línea de tiempo, y —para usuarios con
-/// permiso [PermisosCuidadoConst.registrarEventosSalud]— registrar nuevos
-/// eventos mediante el FAB.
-class HealthEventsScreen extends ConsumerStatefulWidget {
+/// agrupados por día en orden ascendente. Permite navegar entre meses y —para
+/// usuarios con permiso [PermisosCuidadoConst.registrarEventosSalud]—
+/// registrar nuevos eventos mediante el FAB.
+class HealthEventsScreen extends ConsumerWidget {
   const HealthEventsScreen({super.key});
-
-  @override
-  ConsumerState<HealthEventsScreen> createState() => _HealthEventsScreenState();
-}
-
-class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
-  _HealthEventsViewMode _vista = _HealthEventsViewMode.lista;
-
-  void _irMesAnterior() {
-    final mes = ref.read(mesEventosSaludProvider);
-    ref.read(mesEventosSaludProvider.notifier).state = DateTime(
-      mes.year,
-      mes.month - 1,
-      1,
-    );
-  }
-
-  void _irMesSiguiente() {
-    final mes = ref.read(mesEventosSaludProvider);
-    ref.read(mesEventosSaludProvider.notifier).state = DateTime(
-      mes.year,
-      mes.month + 1,
-      1,
-    );
-  }
 
   /// `true` si [mes] es el mes actual (no hay meses futuros que mostrar).
   bool _esUltimoMes(DateTime mes) {
@@ -54,12 +25,28 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final eventosAsync = ref.watch(eventosSaludDelMesProvider);
     final puede =
         ref.watch(puedeRegistrarEventosSaludProvider).valueOrNull ?? false;
     final personaAsync = ref.watch(healthPersonaContextProvider);
     final mes = ref.watch(mesEventosSaludProvider);
+
+    void irMesAnterior() {
+      ref.read(mesEventosSaludProvider.notifier).state = DateTime(
+        mes.year,
+        mes.month - 1,
+        1,
+      );
+    }
+
+    void irMesSiguiente() {
+      ref.read(mesEventosSaludProvider.notifier).state = DateTime(
+        mes.year,
+        mes.month + 1,
+        1,
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -68,23 +55,6 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        actions: [
-          IconButton(
-            tooltip: _vista == _HealthEventsViewMode.lista
-                ? 'Ver como línea de tiempo'
-                : 'Ver como lista',
-            icon: Icon(
-              _vista == _HealthEventsViewMode.lista
-                  ? Icons.timeline
-                  : Icons.view_agenda_outlined,
-            ),
-            onPressed: () => setState(() {
-              _vista = _vista == _HealthEventsViewMode.lista
-                  ? _HealthEventsViewMode.timeline
-                  : _HealthEventsViewMode.lista;
-            }),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,8 +79,8 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
           // Navegación mensual — no se permite avanzar a meses futuros.
           MonthNavHeader(
             mes: mes,
-            onPrevious: _irMesAnterior,
-            onNext: _esUltimoMes(mes) ? null : _irMesSiguiente,
+            onPrevious: irMesAnterior,
+            onNext: _esUltimoMes(mes) ? null : irMesSiguiente,
           ),
 
           Expanded(
@@ -152,7 +122,7 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
                   return _EmptyMonthState(puede: puede);
                 }
 
-                onTap(EventoDeSalud e) => context.pushNamed(
+                onTap(EventoSalud e) => context.pushNamed(
                   AppRoutes.healthEventDetailName,
                   pathParameters: {'id': e.id.toString()},
                 );
@@ -161,19 +131,12 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
                   await ref.read(eventosSaludDelMesProvider.future);
                 }
 
-                return switch (_vista) {
-                  _HealthEventsViewMode.lista => HealthEventsMonthList(
-                    eventos: eventosFiltrados,
-                    puedeRegistrar: puede,
-                    onRefresh: onRefresh,
-                    onEventoTap: onTap,
-                  ),
-                  _HealthEventsViewMode.timeline => HealthEventsTimelineView(
-                    eventos: eventosFiltrados,
-                    onRefresh: onRefresh,
-                    onEventoTap: onTap,
-                  ),
-                };
+                return HealthEventsMonthList(
+                  eventos: eventosFiltrados,
+                  puedeRegistrar: puede,
+                  onRefresh: onRefresh,
+                  onEventoTap: onTap,
+                );
               },
             ),
           ),

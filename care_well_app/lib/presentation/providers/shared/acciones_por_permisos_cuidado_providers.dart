@@ -135,3 +135,23 @@ final puedeRegistrarHabitosProvider = FutureProvider.autoDispose<bool>((
     (p) => p.id == PermisosCuidadoConst.registrarHabitos,
   );
 });
+
+/// Indica si el usuario autenticado es un miembro activo del equipo de cuidado
+/// de la persona de contexto, sin exigir ningún permiso puntual.
+///
+/// Retorna `true` cuando el usuario visualiza su propio contexto o cuando tiene
+/// una asignación de cuidado activa sobre la persona seleccionada.
+///
+/// Reproduce la semántica del backend (`ValidarVisualizacion`): cualquier
+/// asignación activa alcanza. Se usa para acciones disponibles a todo el equipo
+/// —como el registro de cumplimiento diario de hábitos (marcar realizado y
+/// comentar)— que no dependen del permiso [PermisosCuidadoConst.registrarHabitos].
+final esMiembroEquipoActivoProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  return asignacion != null;
+});

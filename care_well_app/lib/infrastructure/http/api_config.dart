@@ -71,4 +71,7 @@ class ApiConfig {
       '/api/AdministrarPersonaEstadoAnimo/obtener-por-fechas';
   static const registrarAnimoPath =
       '/api/AdministrarPersonaEstadoAnimo/registrar';
+
+  static const obteneLineaTiempoSaludPath =
+      '/api/LineaTiempoSalud/obtener-por-fechas';
 }

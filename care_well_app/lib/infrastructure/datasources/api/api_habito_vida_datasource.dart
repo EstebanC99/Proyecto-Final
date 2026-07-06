@@ -1,11 +1,9 @@
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/infrastructure/http/http_configs.dart';
+import 'package:care_well_app/infrastructure/mappers/mappers.dart';
+import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:dio/dio.dart';
-
-import '../../../domain/datasources/habito_vida_datasource.dart';
-import '../../../domain/entities/entities.dart';
-import '../../http/api_config.dart';
-import '../../http/api_exception_mapper.dart';
-import '../../mappers/health_mapper.dart';
-import '../../models/health/health_models.dart';
 
 /// Implementación de [HabitoVidaDatasource] contra la API REST del backend.
 class ApiHabitoVidaDatasource implements HabitoVidaDatasource {
@@ -14,7 +12,7 @@ class ApiHabitoVidaDatasource implements HabitoVidaDatasource {
   ApiHabitoVidaDatasource(this._dio);
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) async {
+  Future<List<HabitoVida>> getHabitosByPersona(int personaId) async {
     try {
       final hoy = DateTime.now();
       final desde = DateTime(hoy.year, hoy.month, hoy.day);
@@ -31,8 +29,8 @@ class ApiHabitoVidaDatasource implements HabitoVidaDatasource {
 
       return (response.data as List<dynamic>)
           .map(
-            (e) => HabitoDeVidaMapper.fromModel(
-              HabitoDeVidaModel.fromJson(e as Map<String, dynamic>),
+            (e) => HabitoVidaMapper.fromModel(
+              HabitoVidaModel.fromJson(e as Map<String, dynamic>),
             ),
           )
           .toList();

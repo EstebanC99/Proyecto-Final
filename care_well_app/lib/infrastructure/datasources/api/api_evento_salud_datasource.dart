@@ -1,9 +1,9 @@
-import 'package:care_well_app/domain/datasources/evento_salud_datasource.dart';
-import 'package:care_well_app/domain/entities/health/evento_de_salud.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/infrastructure/http/api_config.dart';
 import 'package:care_well_app/infrastructure/http/api_exception_mapper.dart';
-import 'package:care_well_app/infrastructure/mappers/health_mapper.dart';
-import 'package:care_well_app/infrastructure/models/health/health_models.dart';
+import 'package:care_well_app/infrastructure/mappers/mappers.dart';
+import 'package:care_well_app/infrastructure/models/models.dart';
 import 'package:dio/dio.dart';
 
 /// Implementación de [EventoSaludDatasource] contra la API REST del backend.
@@ -13,7 +13,7 @@ class ApiEventoSaludDatasource implements EventoSaludDatasource {
   ApiEventoSaludDatasource(this._dio);
 
   @override
-  Future<List<EventoDeSalud>> getEventosSaludDelMes({
+  Future<List<EventoSalud>> getEventosSaludDelMes({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
@@ -30,8 +30,8 @@ class ApiEventoSaludDatasource implements EventoSaludDatasource {
 
       return (response.data as List<dynamic>)
           .map(
-            (e) => EventoDeSaludMapper.fromModel(
-              EventoDeSaludModel.fromJson(e as Map<String, dynamic>),
+            (e) => EventoSaludMapper.fromModel(
+              EventoSaludModel.fromJson(e as Map<String, dynamic>),
             ),
           )
           .toList();

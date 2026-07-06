@@ -79,6 +79,25 @@ peligro (eso es `error`).
 | Media | `strengthMedium` | `#E0A100` (= `warning`) |
 | Fuerte | `strengthStrong` | `#2E9E5B` (= `success`) |
 
+### 2.6.1 Escala de estado de ánimo (dedicada, US-31)
+
+Escala de 5 tonos roja→ámbar→verde para el selector tipo carrusel de "Estado de ánimo". Son
+tokens propios (no se reutilizan `error`/`warning`/`success` sueltos) para no acoplar la
+semántica de otros módulos a esta escala de sentimiento.
+
+| Nivel | Token | HEX |
+|---|---|---|
+| Muy mal | `moodScaleVeryBad` | `#D14343` |
+| Mal | `moodScaleBad` | `#C85A2E` |
+| Regular (default) | `moodScaleNeutral` | `#E0A100` |
+| Bien | `moodScaleGood` | `#8CAA22` |
+| Muy bien | `moodScaleVeryGood` | `#2E9E5B` |
+
+**Regla de uso:** estos tokens solo se aplican a elementos decorativos (fondo a alpha ~0.16,
+anillo a alpha 1.0, puntos de indicador). **Nunca como color de texto sobre `surface`/blanco**:
+`moodScaleNeutral` da ~2.3:1 de contraste, por debajo del mínimo WCAG. El texto asociado
+(nombre del estado) siempre va en `textPrimary`.
+
 ### 2.6 Verificación de contraste (WCAG)
 
 - `textPrimary` sobre `surface`/`background`: ratio ~14:1 (AAA).
@@ -207,6 +226,22 @@ Estilo **plano con sombras suaves** (no Material clásico pesado).
 - Scrim del fondo: negro @ 40%.
 
 ---
+
+### 5.10 Selector de ánimo tipo carrusel (`MoodDialSelector`)
+- Row centrada: flecha `‹` (56×56 dp) — blob circular (156×156 dp) — flecha `›` (56×56 dp).
+- Blob: fondo del color de escala (§ 2.6.1) a alpha 0.16, anillo 3 dp al mismo color a alpha 1.0,
+  emoji centrado a 64 px.
+- Debajo del blob: label del estado (`titleLarge`-like, 20 px / 700, `textPrimary`) + 5 puntos
+  de posición (8 dp, activo 10 dp coloreado con el tono de escala).
+- Flechas: se deshabilitan visualmente (`textDisabled`, sin ripple) en los extremos del rango
+  (Muy mal / Muy bien). Objetivo táctil 56 dp (por encima del mínimo de 48 dp, pensado para
+  usuarios mayores).
+- Interacción: tap de flecha o swipe horizontal sobre el blob; ambos disparan el mismo cambio
+  de nivel. Transición 250 ms (slide + fade del emoji, interpolación de color del blob, fade
+  del label). Feedback háptico (`HapticFeedback.selectionClick()`) en cada cambio.
+- El color de la escala **no** determina el estilo del CTA de guardar: el botón de acción
+  primaria de esa pantalla mantiene su color de marca fijo (ver 5.1), independiente del nivel
+  seleccionado, para no mezclar semánticas ("botón rojo" ≠ "error").
 
 ## 6. Iconografía y motion
 

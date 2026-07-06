@@ -32,6 +32,7 @@ export 'health/habit_form_screen.dart';
 export 'health/habit_detail_screen.dart';
 export 'health/recommendations_screen.dart';
 export 'health/health_events_screen.dart';
+export 'health/health_timeline_screen.dart';
 export 'health/health_event_form_screen.dart';
 export 'health/health_event_detail_screen.dart';
 export 'health/health_event_note_form_screen.dart';

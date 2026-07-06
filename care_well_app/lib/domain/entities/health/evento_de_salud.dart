@@ -1,45 +1,14 @@
-import '../base_entity.dart';
-import '../shared/entidad_basica.dart';
-import 'nota_evento.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
-/// Tipo de evento de salud (catálogo persistido).
-///
-/// Los ids provienen del catálogo compartido de tipos de evento
-/// ([TiposEventoAgendaConst]).
-class TipoEventoSalud extends BaseEntity {
-  final String descripcion;
-
-  const TipoEventoSalud({required super.id, required this.descripcion});
-
-  @override
-  TipoEventoSalud copyWith({int? id, String? descripcion}) {
-    return TipoEventoSalud(
-      id: id ?? this.id,
-      descripcion: descripcion ?? this.descripcion,
-    );
-  }
-}
-
-/// Evento clínico registrado para una persona.
-///
-/// Las notas del equipo vienen embebidas en [notas]. Cuando el evento fue
-/// generado automáticamente a partir de una ocurrencia de agenda,
-/// [fechaOcurrenciaEventoAgenda] indica la fecha/hora de esa ocurrencia.
-class EventoDeSalud extends BaseEntity {
-  /// Persona a la que corresponde este evento (referencia embebida).
+class EventoSalud extends BaseEntity {
   final EntidadBasica persona;
-
   final TipoEventoSalud tipo;
   final DateTime fechaHora;
   final String descripcion;
-
-  /// Notas colaborativas asociadas al evento.
-  final List<NotaEvento> notas;
-
-  /// Fecha/hora de la ocurrencia de agenda que originó este evento, si aplica.
+  final List<NotaEventoSalud> notas;
   final DateTime? fechaOcurrenciaEventoAgenda;
 
-  const EventoDeSalud({
+  const EventoSalud({
     required super.id,
     required this.persona,
     required this.tipo,
@@ -49,23 +18,20 @@ class EventoDeSalud extends BaseEntity {
     this.fechaOcurrenciaEventoAgenda,
   });
 
-  /// `true` si el evento tiene al menos una nota asociada.
   bool get tieneNotas => notas.isNotEmpty;
-
-  /// Cantidad de notas asociadas al evento.
   int get cantidadNotas => notas.length;
 
   @override
-  EventoDeSalud copyWith({
+  EventoSalud copyWith({
     int? id,
     EntidadBasica? persona,
     TipoEventoSalud? tipo,
     DateTime? fechaHora,
     String? descripcion,
-    List<NotaEvento>? notas,
+    List<NotaEventoSalud>? notas,
     DateTime? fechaOcurrenciaEventoAgenda,
   }) {
-    return EventoDeSalud(
+    return EventoSalud(
       id: id ?? this.id,
       persona: persona ?? this.persona,
       tipo: tipo ?? this.tipo,

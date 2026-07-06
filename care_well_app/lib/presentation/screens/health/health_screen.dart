@@ -71,49 +71,68 @@ class HealthScreen extends ConsumerWidget {
                     ),
                   );
                 }
-                return GridView.count(
-                  crossAxisCount: 2,
+                return SingleChildScrollView(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  crossAxisSpacing: AppSpacing.md,
-                  mainAxisSpacing: AppSpacing.md,
-                  childAspectRatio: 0.9,
-                  children: [
-                    HealthCategoryCard(
-                      icon: Icons.self_improvement,
-                      accentColor: AppColors.habitsAccent,
-                      label: 'Hábitos de vida',
-                      description:
-                          'Rutinas diarias aconsejables para el bienestar de la persona.',
-                      onTap: () =>
-                          context.pushNamed(AppRoutes.healthHabitsName),
-                    ),
-                    HealthCategoryCard(
-                      icon: Icons.medical_services_outlined,
-                      accentColor: AppColors.healthAccent,
-                      label: 'Recomendaciones',
-                      description: 'Pautas personalizadas del equipo médico',
-                      onTap: () => context.pushNamed(
-                        AppRoutes.healthRecommendationsName,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: AppSpacing.md,
+                        mainAxisSpacing: AppSpacing.md,
+                        childAspectRatio: 0.9,
+                        children: [
+                          HealthCategoryCard(
+                            icon: Icons.self_improvement,
+                            accentColor: AppColors.habitsAccent,
+                            label: 'Hábitos de vida',
+                            description:
+                                'Rutinas diarias aconsejables para el bienestar de la persona.',
+                            onTap: () =>
+                                context.pushNamed(AppRoutes.healthHabitsName),
+                          ),
+                          HealthCategoryCard(
+                            icon: Icons.medical_services_outlined,
+                            accentColor: AppColors.healthAccent,
+                            label: 'Recomendaciones',
+                            description:
+                                'Pautas personalizadas del equipo médico',
+                            onTap: () => context.pushNamed(
+                              AppRoutes.healthRecommendationsName,
+                            ),
+                          ),
+                          HealthCategoryCard(
+                            icon: Icons.event_note_outlined,
+                            accentColor: const Color(0xFF0284C7),
+                            label: 'Eventos de salud',
+                            description:
+                                'Eventos esporádicos que ocurrieron sin anticipación y deben registrarse.',
+                            onTap: () =>
+                                context.pushNamed(AppRoutes.healthEventsName),
+                          ),
+                          HealthCategoryCard(
+                            icon: Icons.mood,
+                            accentColor: AppColors.moodAccent,
+                            label: 'Estado de ánimo',
+                            description:
+                                'Registro periódico del bienestar emocional',
+                            onTap: () =>
+                                context.pushNamed(AppRoutes.healthMoodNewName),
+                          ),
+                        ],
                       ),
-                    ),
-                    HealthCategoryCard(
-                      icon: Icons.event_note_outlined,
-                      accentColor: const Color(0xFF0284C7),
-                      label: 'Eventos de salud',
-                      description:
-                          'Eventos esporádicos que ocurrieron sin anticipación y deben registrarse.',
-                      onTap: () =>
-                          context.pushNamed(AppRoutes.healthEventsName),
-                    ),
-                    HealthCategoryCard(
-                      icon: Icons.mood,
-                      accentColor: AppColors.moodAccent,
-                      label: 'Estado de ánimo',
-                      description: 'Registro periódico del bienestar emocional',
-                      onTap: () =>
-                          context.pushNamed(AppRoutes.healthMoodNewName),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.lg),
+                      FullWidthActionTile(
+                        icon: Icons.timeline,
+                        label: 'Línea de tiempo',
+                        color: AppColors.healthAccent,
+                        onTap: () =>
+                            context.pushNamed(AppRoutes.healthTimelineName),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),

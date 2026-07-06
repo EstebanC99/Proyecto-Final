@@ -24,17 +24,17 @@ class HabitFormScreen extends ConsumerStatefulWidget {
 class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   // Lista estática de tipos de hábito disponibles (reemplaza TipoHabito.values).
   static final _tiposHabito = [
-    TipoHabito(
+    TipoHabitoVida(
       id: TiposHabitoConst.actividadFisica,
       descripcion: 'Actividad física',
     ),
-    TipoHabito(id: TiposHabitoConst.alimentacion, descripcion: 'Alimentación'),
-    TipoHabito(id: TiposHabitoConst.sueno, descripcion: 'Sueño'),
-    TipoHabito(id: TiposHabitoConst.hidratacion, descripcion: 'Hidratación'),
-    TipoHabito(id: TiposHabitoConst.otro, descripcion: 'Bienestar'),
+    TipoHabitoVida(id: TiposHabitoConst.alimentacion, descripcion: 'Alimentación'),
+    TipoHabitoVida(id: TiposHabitoConst.sueno, descripcion: 'Sueño'),
+    TipoHabitoVida(id: TiposHabitoConst.hidratacion, descripcion: 'Hidratación'),
+    TipoHabitoVida(id: TiposHabitoConst.otro, descripcion: 'Bienestar'),
   ];
 
-  TipoHabito _tipo = TipoHabito(
+  TipoHabitoVida _tipo = TipoHabitoVida(
     id: TiposHabitoConst.alimentacion,
     descripcion: 'Alimentación',
   );
@@ -244,7 +244,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     );
   }
 
-  static String _labelTipo(TipoHabito tipo) => tipo.descripcion;
+  static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
 }
 
 class _SectionLabel extends StatelessWidget {

@@ -52,7 +52,7 @@ void main() {
   group('HealthScreen', () {
     testWidgets('smoke: renderiza sin errores', (tester) async {
       await tester.pumpWidget(_wrap());
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byType(HealthScreen), findsOneWidget);
     });
 
@@ -67,7 +67,7 @@ void main() {
 
     testWidgets('muestra tiles de categorías', (tester) async {
       await tester.pumpWidget(_wrap());
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byType(HealthCategoryCard), findsWidgets);
       expect(find.text('Hábitos de vida'), findsOneWidget);
       expect(find.text('Eventos de salud'), findsOneWidget);

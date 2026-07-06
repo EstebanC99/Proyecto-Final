@@ -257,6 +257,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 ],
               ),
               GoRoute(
+                path: 'timeline',
+                name: AppRoutes.healthTimelineName,
+                builder: (_, _) => const HealthTimelineScreen(),
+              ),
+              GoRoute(
                 path: 'mood/new',
                 name: AppRoutes.healthMoodNewName,
                 builder: (_, _) => const MoodFormScreen(),

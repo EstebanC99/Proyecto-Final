@@ -1,15 +1,14 @@
-import '../../domain/datasources/habito_vida_datasource.dart';
-import '../../domain/entities/entities.dart';
-import '../../domain/repositories/habito_vida_repository.dart';
+import 'package:care_well_app/domain/datasources/datasources.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/repositories/repositories.dart';
 
-/// Implementación de [HabitoVidaRepository] que delega al [HabitoVidaDatasource] inyectado.
 class HabitoVidaRepositoryImpl implements HabitoVidaRepository {
   final HabitoVidaDatasource _datasource;
 
   const HabitoVidaRepositoryImpl(this._datasource);
 
   @override
-  Future<List<HabitoDeVida>> getHabitosByPersona(int personaId) =>
+  Future<List<HabitoVida>> getHabitosByPersona(int personaId) =>
       _datasource.getHabitosByPersona(personaId);
 
   @override

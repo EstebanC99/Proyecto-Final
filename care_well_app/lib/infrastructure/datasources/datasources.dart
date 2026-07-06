@@ -17,3 +17,4 @@ export 'api/api_estado_animo_datasource.dart';
 export 'api/api_evento_salud_datasource.dart';
 export 'api/api_habito_vida_datasource.dart';
 export 'api/api_tipo_evento_datasource.dart';
+export 'api/api_linea_tiempo_salud_datasource.dart';

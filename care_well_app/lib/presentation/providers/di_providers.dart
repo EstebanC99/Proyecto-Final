@@ -101,6 +101,12 @@ final tipoEventoDatasourceProvider = Provider<TipoEventoDatasource>(
   (ref) => ApiTipoEventoDatasource(ref.watch(dioClientProvider)),
 );
 
+final lineaTiempoSaludDatasourceProvider = Provider<LineaTiempoSaludDatasource>(
+  (ref) {
+    return ApiLineaTiempoSaludDatasource(ref.watch(dioClientProvider));
+  },
+);
+
 //endregion
 
 //region Repositories Providers
@@ -154,6 +160,12 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 
 final tipoEventoRepositoryProvider = Provider<TipoEventoRepository>(
   (ref) => TipoEventoRepositoryImpl(ref.watch(tipoEventoDatasourceProvider)),
+);
+
+final lineaTiempoSaludRepositoryProvider = Provider<LineaTiempoSaludRepository>(
+  (ref) => LineaTiempoSaludRepositoryImpl(
+    ref.watch(lineaTiempoSaludDatasourceProvider),
+  ),
 );
 
 //endregion

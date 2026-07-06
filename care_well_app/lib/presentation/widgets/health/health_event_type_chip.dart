@@ -8,8 +8,7 @@ import 'health_event_card.dart';
 ///
 /// Muestra ícono + etiqueta con el color semántico del tipo.
 /// Reutiliza [healthEventColor], [healthEventLabel] y [healthEventIcon]
-/// del módulo para mantener coherencia con la [HealthEventCard] y el
-/// [TimelineTile].
+/// del módulo para mantener coherencia con la [HealthEventCard].
 ///
 /// Uso principal: header del [HealthEventDetailScreen].
 class HealthEventTypeChip extends StatelessWidget {

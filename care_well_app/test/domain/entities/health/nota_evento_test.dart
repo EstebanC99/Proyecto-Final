@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final autor = EntidadBasica(id: 1, descripcion: 'María García');
 
-  final nota = NotaEvento(
+  final nota = NotaEventoSalud(
     id: 1301,
     eventoSaludId: 1101,
     autor: autor,
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('igualdad por id y runtimeType', () {
-      final otra = NotaEvento(
+      final otra = NotaEventoSalud(
         id: 1301,
         eventoSaludId: 1102, // distinto eventoId
         autor: autor,
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('hashCode consistente con ==', () {
-      final otra = NotaEvento(
+      final otra = NotaEventoSalud(
         id: 1301,
         eventoSaludId: 1101,
         autor: autor,
