@@ -43,6 +43,16 @@ namespace CareWell.Domain.Validadores
             this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.RegistrarHabitos);
         }
 
+        public void ValidarPuedeAdministrarFichaSalud(Persona personaCuidada, Persona colaborador)
+        {
+            this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.EditarFichaSalud);
+        }
+
+        public void ValidarPuedeVerFichaSalud(Persona personaCuidada, Persona colaborador)
+        {
+            this.ValidarAccionSobrePersona(personaCuidada, colaborador, PermisosCuidado.VerFichaSalud);
+        }
+
         public void ValidarVisualizacion(Persona personaCuidada, Persona colaborador)
         {
             if (personaCuidada.ID == colaborador.ID)

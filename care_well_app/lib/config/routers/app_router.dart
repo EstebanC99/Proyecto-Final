@@ -224,9 +224,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 ],
               ),
               GoRoute(
-                path: 'recommendations',
-                name: AppRoutes.healthRecommendationsName,
-                builder: (_, _) => const RecommendationsScreen(),
+                path: 'record',
+                name: AppRoutes.healthRecordName,
+                builder: (_, _) => const FichaSaludScreen(),
+              ),
+              GoRoute(
+                path: 'record-saved',
+                name: AppRoutes.healthRecordSavedName,
+                builder: (_, _) => const FichaSaludSuccessScreen(),
               ),
               GoRoute(
                 path: 'events',

@@ -19,7 +19,7 @@ class ApiLineaTiempoSaludDatasource implements LineaTiempoSaludDatasource {
   }) async {
     try {
       final response = await _dio.post(
-        ApiConfig.obteneLineaTiempoSaludPath,
+        ApiConfig.obtenerLineaTiempoSaludPath,
         data: {
           'personaID': personaId,
           'fechaDesde': desde.toIso8601String(),

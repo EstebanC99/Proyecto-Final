@@ -11,7 +11,10 @@ class HabitoVidaMapper {
     return HabitoVida(
       id: model.id,
       persona: EntidadBasicaMapper.fromModel(model.persona),
-      tipo: TipoHabitoVida(id: model.tipo.id, descripcion: model.tipo.descripcion),
+      tipo: TipoHabitoVida(
+        id: model.tipo.id,
+        descripcion: model.tipo.descripcion,
+      ),
       descripcion: model.descripcion,
       realizacion: model.realizacion != null
           ? RealizacionHabitoMapper.fromModel(

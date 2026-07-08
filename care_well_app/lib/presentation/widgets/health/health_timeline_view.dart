@@ -11,7 +11,11 @@ import 'health_timeline_tile.dart';
 /// Renderiza los [EventoBase] (hábitos realizados, eventos de salud y estados
 /// de ánimo mezclados) como una secuencia de [HealthTimelineTile] con
 /// separadores de día discretos cuando cambia la fecha respecto del anterior.
-class HealthTimelineView extends StatelessWidget {
+///
+/// Al montarse y cada vez que cambian los eventos (cambio de mes o refresh),
+/// desplaza la lista hasta el fondo para mostrar el registro más reciente, que
+/// es el último por estar ordenados ascendentemente.
+class HealthTimelineView extends StatefulWidget {
   const HealthTimelineView({
     super.key,
     required this.eventos,
@@ -25,14 +29,53 @@ class HealthTimelineView extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   @override
+  State<HealthTimelineView> createState() => _HealthTimelineViewState();
+}
+
+class _HealthTimelineViewState extends State<HealthTimelineView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _programarScrollAlFondo();
+  }
+
+  @override
+  void didUpdateWidget(covariant HealthTimelineView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Al recargar por cambio de mes o refresh (incluido el manual) volvemos al
+    // fondo para priorizar el registro más reciente.
+    if (!identical(oldWidget.eventos, widget.eventos)) {
+      _programarScrollAlFondo();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Programa un salto al final de la lista tras el primer frame, cuando el
+  /// [ScrollController] ya tiene dimensiones válidas.
+  void _programarScrollAlFondo() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ordenados = [...eventos]
+    final ordenados = [...widget.eventos]
       ..sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
 
     return RefreshIndicator(
       color: AppColors.healthAccent,
-      onRefresh: onRefresh,
+      onRefresh: widget.onRefresh,
       child: ListView.builder(
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,

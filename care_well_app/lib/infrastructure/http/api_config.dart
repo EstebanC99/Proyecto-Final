@@ -72,6 +72,12 @@ class ApiConfig {
   static const registrarAnimoPath =
       '/api/AdministrarPersonaEstadoAnimo/registrar';
 
-  static const obteneLineaTiempoSaludPath =
+  static const obtenerLineaTiempoSaludPath =
       '/api/LineaTiempoSalud/obtener-por-fechas';
+
+  static const obtenerAlertasBienestarPath = '/api/AlertaBienestar/obtener';
+
+  static const obtenerFichaSaludPath = '/api/AdministrarFichaSalud/obtener';
+  static const crearFichaSaludPath = '/api/AdministrarFichaSalud/crear';
+  static const modificarFichaSaludPath = '/api/AdministrarFichaSalud/modificar';
 }

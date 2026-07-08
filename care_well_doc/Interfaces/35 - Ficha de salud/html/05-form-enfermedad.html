@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8; color: #16201F;
+  }
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; position: relative; z-index: 3;
+  }
+
+  .bg-screen { padding: 0; }
+  .bg-appbar {
+    height: 56px; background: #FFFFFF; border-bottom: 1px solid #EDF1F1;
+    display: flex; align-items: center; padding: 0 8px;
+  }
+  .bg-appbar-title { font-size: 18px; font-weight: 700; margin-left: 4px; color: #16201F; }
+  .bg-content { padding: 16px; }
+  .bg-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FFF1F2; color: #E11D48; border-radius: 20px; padding: 6px 14px;
+    font-size: 13px; font-weight: 600; margin-bottom: 16px;
+  }
+  .bg-card { background: #FFFFFF; border-radius: 16px; height: 120px; margin-bottom: 12px; }
+
+  .scrim {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.40); z-index: 1;
+  }
+
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 600px;
+    background: #FFFFFF;
+    border-top-left-radius: 28px; border-top-right-radius: 28px;
+    box-shadow: 0 -8px 24px rgba(22,32,31,0.12);
+    z-index: 2; display: flex; flex-direction: column;
+  }
+  .grabber { width: 40px; height: 4px; border-radius: 999px; background: #C5CECE; margin: 12px auto 0; }
+
+  .sheet-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px 12px;
+  }
+  .sheet-header h2 { font-size: 18px; font-weight: 700; color: #16201F; }
+  .close-btn {
+    width: 40px; height: 40px; border-radius: 999px; display: flex;
+    align-items: center; justify-content: center; color: #566060;
+  }
+  .hr { height: 1px; background: #EDF1F1; }
+
+  .sheet-body { flex: 1; overflow-y: auto; padding: 16px 20px 8px; }
+  .field-group { margin-bottom: 18px; }
+  .field-label { font-size: 13px; font-weight: 600; color: #566060; margin-bottom: 6px; }
+  .field-label--optional { color: #9AA5A5; }
+  .input-wrap {
+    background: #FFFFFF; border: 1px solid #C5CECE; border-radius: 12px;
+    display: flex; align-items: center; padding: 14px 16px; min-height: 52px;
+  }
+  .input-wrap--textarea { align-items: flex-start; min-height: 64px; }
+  .input-value { font-size: 15px; color: #16201F; line-height: 1.4; }
+
+  /* Vigente switch row */
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #FFFFFF; border: 1px solid #C5CECE; border-radius: 12px;
+    padding: 12px 16px; min-height: 52px;
+  }
+  .switch-labels { display: flex; align-items: center; gap: 8px; }
+  .switch-status-chip {
+    font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px;
+    background: #FBF0CF; color: #8A6400;
+  }
+
+  .sheet-footer { padding: 12px 20px 20px; }
+  .btn-primary {
+    height: 56px; background: #1A8C82; color: #FFFFFF; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; margin-bottom: 10px;
+  }
+  .btn-destructive-text {
+    text-align: center; color: #D14343; font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 130px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="bg-screen">
+    <div class="bg-appbar">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      <span class="bg-appbar-title">Ficha de salud</span>
+    </div>
+    <div class="bg-content">
+      <div class="bg-chip">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Alicia Rodr&iacute;guez
+      </div>
+      <div class="bg-card"></div>
+      <div class="bg-card" style="height:80px;"></div>
+    </div>
+  </div>
+
+  <div class="scrim"></div>
+
+  <!-- Bottom sheet: Editar enfermedad -->
+  <div class="sheet">
+    <div class="grabber"></div>
+    <div class="sheet-header">
+      <h2>Editar enfermedad</h2>
+      <div class="close-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </div>
+    </div>
+    <div class="hr"></div>
+
+    <div class="sheet-body">
+      <div class="field-group">
+        <div class="field-label">Nombre *</div>
+        <div class="input-wrap">
+          <span class="input-value">Hipotiroidismo</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Vigente</div>
+        <div class="switch-row">
+          <div class="switch-labels">
+            <span style="font-size:15px; color:#16201F; font-weight:600;">Activa</span>
+            <span class="switch-status-chip">En curso</span>
+          </div>
+          <!-- Toggle ON (activa) -->
+          <div style="width:44px;height:24px;background:#E0A100;border-radius:999px;display:flex;align-items:center;padding:0 3px;justify-content:flex-end;flex-shrink:0;">
+            <div style="width:18px;height:18px;background:#FFF;border-radius:50%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label field-label--optional">Observaci&oacute;n (opcional)</div>
+        <div class="input-wrap input-wrap--textarea">
+          <span class="input-value">Controlada con Levotiroxina 50mcg</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-footer">
+      <div class="hr" style="margin-bottom:12px;"></div>
+      <div class="btn-primary">Guardar cambios</div>
+      <div class="btn-destructive-text">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H4v2h15V4z"/></svg>
+        Eliminar enfermedad
+      </div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div class="annotation" style="top:130px; right:6px;">Switch "Vigente" siempre tiene valor · arranca en Activa al crear</div>
+  <div class="annotation" style="top:420px; left:6px;">Toggle ON usa el &aacute;mbar de la secci&oacute;n Enfermedades (no el teal de marca)</div>
+  <div class="annotation" style="top:520px; right:6px;">Observaci&oacute;n es el &uacute;nico campo opcional de esta lista</div>
+  <div class="annotation" style="top:700px; left:6px;">Al tocar "Resuelta" el chip cambia a verde success + toggle gris apagado</div>
+
+</body>
+</html>

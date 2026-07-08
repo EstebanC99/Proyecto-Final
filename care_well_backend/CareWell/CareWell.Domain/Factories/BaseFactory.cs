@@ -2,9 +2,9 @@
 {
     public class BaseFactory : IBaseFactory
     {
-        public TBaseEntity Crear<TBaseEntity>() where TBaseEntity : BaseEntity, new()
+        public TEntity Crear<TEntity>() where TEntity : class, new()
         {
-            return new TBaseEntity();
+            return new TEntity();
         }
     }
 }

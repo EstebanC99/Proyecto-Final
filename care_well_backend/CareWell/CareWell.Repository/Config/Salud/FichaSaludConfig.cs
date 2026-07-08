@@ -13,8 +13,14 @@ namespace CareWell.Repository.Config.Salud
             builder.Property(e => e.ID).HasColumnName("ID_FichaSalud").ValueGeneratedOnAdd();
 
             builder.HasOne(e => e.Persona).WithMany().HasForeignKey("ID_Persona").OnDelete(DeleteBehavior.Restrict);
-            builder.Property(e => e.Antecedentes);
-            builder.Property(e => e.Estudios);
+            
+            builder.Property(e => e.FactorSanguineo).IsRequired();
+            builder.Property(e => e.ObraSocial).IsRequired(false);
+            builder.Property(e => e.Observaciones).IsRequired(false);
+
+            builder.HasMany(e => e.Antecedentes).WithOne(a => a.FichaSalud).HasForeignKey("ID_FichaSalud").OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(e => e.Alergias).WithOne(a => a.FichaSalud).HasForeignKey("ID_FichaSalud").OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(e => e.Enfermedades).WithOne(a => a.FichaSalud).HasForeignKey("ID_FichaSalud").OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

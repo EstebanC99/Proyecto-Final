@@ -29,10 +29,11 @@ OcurrenciaEventoAgenda _ocurrencia({
   required int eventoAgendaId,
   required DateTime inicio,
   int? minutosAnticipacion,
+  int? personaId,
 }) => OcurrenciaEventoAgenda(
   id: eventoAgendaId,
   eventoAgendaId: eventoAgendaId,
-  personaId: _persona.id,
+  personaId: personaId ?? _persona.id,
   titulo: 'Evento $eventoAgendaId',
   tipo: _tipoCita,
   fechaHoraInicio: inicio,
@@ -48,16 +49,23 @@ class _FakeAgendaRepository implements AgendaRepository {
   List<OcurrenciaEventoAgenda> ocurrencias;
   List<TipoEvento> tipos;
 
+  /// Ocurrencias segmentadas por `personaId`. Cuando está presente, tiene
+  /// prioridad sobre [ocurrencias] (usado en los tests multi-persona).
+  final Map<int, List<OcurrenciaEventoAgenda>> ocurrenciasPorPersona;
+
   int obtenerOcurrenciasCount = 0;
   DateTime? ultimoDesde;
   DateTime? ultimoHasta;
+  final List<int> personaIdsConsultados = [];
   int? eliminadoId;
 
   _FakeAgendaRepository({
     List<OcurrenciaEventoAgenda>? ocurrencias,
     List<TipoEvento>? tipos,
+    Map<int, List<OcurrenciaEventoAgenda>>? ocurrenciasPorPersona,
   }) : ocurrencias = ocurrencias ?? [],
-       tipos = tipos ?? [];
+       tipos = tipos ?? [],
+       ocurrenciasPorPersona = ocurrenciasPorPersona ?? {};
 
   @override
   Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
@@ -66,9 +74,13 @@ class _FakeAgendaRepository implements AgendaRepository {
     required DateTime hasta,
   }) async {
     obtenerOcurrenciasCount++;
+    personaIdsConsultados.add(personaId);
     ultimoDesde = desde;
     ultimoHasta = hasta;
     // Copia defensiva: el provider ordena la lista in-place.
+    if (ocurrenciasPorPersona.isNotEmpty) {
+      return List.of(ocurrenciasPorPersona[personaId] ?? const []);
+    }
     return List.of(ocurrencias);
   }
 
@@ -117,13 +129,32 @@ ProviderContainer _makeContainer({
   required _FakeAgendaRepository repo,
   required FakeNotificationScheduler scheduler,
   Persona? persona,
+  List<PersonaContextOption>? seleccionables,
+  AgendaSyncThrottle? throttle,
 }) {
+  // Por defecto, el universo de personas seleccionables lo compone la persona
+  // de contexto (si existe), para mantener el comportamiento de los tests
+  // preexistentes que solo pasaban `persona`.
+  final opciones =
+      seleccionables ??
+      (persona == null
+          ? const <PersonaContextOption>[]
+          : [
+              PersonaContextOption(
+                persona: persona,
+                rol: PersonaContextRol.propio,
+              ),
+            ]);
+
   return ProviderContainer(
     overrides: [
       agendaPersonaContextProvider.overrideWith((ref) async => persona),
+      personasSeleccionablesProvider.overrideWith((ref) async => opciones),
       agendaRepositoryProvider.overrideWithValue(repo),
       notificationSchedulerProvider.overrideWithValue(scheduler),
       tiposEventoProvider.overrideWith((ref) async => repo.tipos),
+      if (throttle != null)
+        agendaSyncThrottleProvider.overrideWithValue(throttle),
     ],
   );
 }
@@ -318,7 +349,9 @@ void main() {
           );
           addTearDown(container.dispose);
 
-          await container.read(sincronizarNotificacionesAgendaProvider)();
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.ingreso,
+          );
 
           // cancelAll se invocó exactamente una vez, antes de programar.
           expect(scheduler.cancelAllCount, 1);
@@ -332,7 +365,7 @@ void main() {
         },
       );
 
-      test('no programa nada cuando no hay persona de contexto', () async {
+      test('no programa nada cuando no hay personas seleccionables', () async {
         final scheduler = FakeNotificationScheduler();
         final repo = _FakeAgendaRepository(
           ocurrencias: [
@@ -347,14 +380,187 @@ void main() {
           repo: repo,
           scheduler: scheduler,
           persona: null,
+          seleccionables: const [],
         );
         addTearDown(container.dispose);
 
-        await container.read(sincronizarNotificacionesAgendaProvider)();
+        await container.read(sincronizarNotificacionesAgendaProvider)(
+          motivo: SyncMotivo.ingreso,
+        );
 
         expect(scheduler.cancelAllCount, 0);
         expect(scheduler.scheduled, isEmpty);
         expect(repo.obtenerOcurrenciasCount, 0);
+      });
+
+      test(
+        'programa los recordatorios de TODAS las personas seleccionables',
+        () async {
+          final ahora = DateTime.now();
+          final otraPersona = Persona(
+            id: 99,
+            nombre: 'Bruno',
+            apellido: 'Pérez',
+            documento: '4010203',
+            fechaNacimiento: DateTime(1950, 3, 1),
+          );
+
+          final ocuAlicia = _ocurrencia(
+            eventoAgendaId: 10,
+            inicio: ahora.add(const Duration(days: 2)),
+            minutosAnticipacion: 30,
+            personaId: _persona.id,
+          );
+          final ocuBruno = _ocurrencia(
+            eventoAgendaId: 20,
+            inicio: ahora.add(const Duration(days: 3)),
+            minutosAnticipacion: 15,
+            personaId: otraPersona.id,
+          );
+
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository(
+            ocurrenciasPorPersona: {
+              _persona.id: [ocuAlicia],
+              otraPersona.id: [ocuBruno],
+            },
+          );
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            seleccionables: [
+              PersonaContextOption(
+                persona: _persona,
+                rol: PersonaContextRol.propio,
+              ),
+              PersonaContextOption(
+                persona: otraPersona,
+                rol: PersonaContextRol.responsable,
+              ),
+            ],
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.ingreso,
+          );
+
+          // cancelAll una sola vez, aunque haya varias personas.
+          expect(scheduler.cancelAllCount, 1);
+          // Se consultó a ambas personas.
+          expect(repo.personaIdsConsultados, containsAll([_persona.id, 99]));
+          // Se programaron los recordatorios de ambas.
+          expect(scheduler.scheduled, [
+            NotificationId.forOcurrencia(
+              ocuAlicia.eventoAgendaId,
+              ocuAlicia.fechaHoraInicio,
+            ),
+            NotificationId.forOcurrencia(
+              ocuBruno.eventoAgendaId,
+              ocuBruno.fechaHoraInicio,
+            ),
+          ]);
+        },
+      );
+
+      group('throttle del motivo resume', () {
+        test('resume se saltea si la última corrida fue reciente', () async {
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository(
+            ocurrencias: [
+              _ocurrencia(
+                eventoAgendaId: 10,
+                inicio: DateTime.now().add(const Duration(days: 2)),
+                minutosAnticipacion: 30,
+              ),
+            ],
+          );
+          // Reloj fijo: la última corrida fue hace 5 min (< ventana de 15).
+          final ahora = DateTime(2026, 7, 8, 10, 0);
+          final throttle = AgendaSyncThrottle(clock: () => ahora)
+            ..marcarCorrida();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+            throttle: throttle,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.resume,
+          );
+
+          // No corrió: ni cancelAll ni consultas al repo.
+          expect(scheduler.cancelAllCount, 0);
+          expect(scheduler.scheduled, isEmpty);
+          expect(repo.obtenerOcurrenciasCount, 0);
+        });
+
+        test('resume corre pasada la ventana del throttle', () async {
+          final scheduler = FakeNotificationScheduler();
+          final ocu = _ocurrencia(
+            eventoAgendaId: 10,
+            inicio: DateTime.now().add(const Duration(days: 2)),
+            minutosAnticipacion: 30,
+          );
+          final repo = _FakeAgendaRepository(ocurrencias: [ocu]);
+          // Reloj que avanza 20 min entre la marca y la evaluación.
+          var t = DateTime(2026, 7, 8, 10, 0);
+          final throttle = AgendaSyncThrottle(clock: () => t)..marcarCorrida();
+          t = DateTime(2026, 7, 8, 10, 20);
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+            throttle: throttle,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.resume,
+          );
+
+          expect(scheduler.cancelAllCount, 1);
+          expect(scheduler.scheduled, [
+            NotificationId.forOcurrencia(
+              ocu.eventoAgendaId,
+              ocu.fechaHoraInicio,
+            ),
+          ]);
+        });
+
+        test('ingreso corre siempre, aunque el throttle esté fresco', () async {
+          final scheduler = FakeNotificationScheduler();
+          final ocu = _ocurrencia(
+            eventoAgendaId: 10,
+            inicio: DateTime.now().add(const Duration(days: 2)),
+            minutosAnticipacion: 30,
+          );
+          final repo = _FakeAgendaRepository(ocurrencias: [ocu]);
+          final ahora = DateTime(2026, 7, 8, 10, 0);
+          final throttle = AgendaSyncThrottle(clock: () => ahora)
+            ..marcarCorrida();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+            throttle: throttle,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.ingreso,
+          );
+
+          expect(scheduler.cancelAllCount, 1);
+          expect(scheduler.scheduled, [
+            NotificationId.forOcurrencia(
+              ocu.eventoAgendaId,
+              ocu.fechaHoraInicio,
+            ),
+          ]);
+        });
       });
     });
   });

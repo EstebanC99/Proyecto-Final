@@ -447,20 +447,116 @@ namespace CareWell.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("Antecedentes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Estudios")
+                    b.Property<string>("FactorSanguineo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ID_Persona")
                         .HasColumnType("int");
+
+                    b.Property<string>("ObraSocial")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("ID_Persona");
 
                     b.ToTable("t_FichaSalud", (string)null);
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludAlergia", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_FichaSaludAlergia");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("ID_FichaSalud")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Medicamento")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reaccion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_FichaSalud");
+
+                    b.ToTable("t_FichaSaludAlergia", (string)null);
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludAntecedente", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_FichaSaludAntecedente");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ID_FichaSalud")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VinculoFamiliar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_FichaSalud");
+
+                    b.ToTable("t_FichaSaludAntecedente", (string)null);
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludEnfermedad", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_FichaSaludEnfermedad");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("ID_FichaSalud")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Vigente")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_FichaSalud");
+
+                    b.ToTable("t_FichaSaludEnfermedad", (string)null);
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.HabitoVida", b =>
@@ -480,6 +576,11 @@ namespace CareWell.Repository.Migrations
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
                     b.Property<int>("ID_Persona")
                         .HasColumnType("int");
@@ -787,6 +888,39 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("Persona");
                 });
 
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludAlergia", b =>
+                {
+                    b.HasOne("CareWell.Domain.Salud.FichaSalud", "FichaSalud")
+                        .WithMany("Alergias")
+                        .HasForeignKey("ID_FichaSalud")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FichaSalud");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludAntecedente", b =>
+                {
+                    b.HasOne("CareWell.Domain.Salud.FichaSalud", "FichaSalud")
+                        .WithMany("Antecedentes")
+                        .HasForeignKey("ID_FichaSalud")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FichaSalud");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSaludEnfermedad", b =>
+                {
+                    b.HasOne("CareWell.Domain.Salud.FichaSalud", "FichaSalud")
+                        .WithMany("Enfermedades")
+                        .HasForeignKey("ID_FichaSalud")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FichaSalud");
+                });
+
             modelBuilder.Entity("CareWell.Domain.Salud.HabitoVida", b =>
                 {
                     b.HasOne("CareWell.Domain.General.Persona", "Persona")
@@ -869,6 +1003,15 @@ namespace CareWell.Repository.Migrations
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>
                 {
                     b.Navigation("Notas");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Salud.FichaSalud", b =>
+                {
+                    b.Navigation("Alergias");
+
+                    b.Navigation("Antecedentes");
+
+                    b.Navigation("Enfermedades");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.HabitoVida", b =>

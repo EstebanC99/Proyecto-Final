@@ -39,7 +39,9 @@ Widget _wrap({List<EventoSalud>? eventos, bool puedeRegistrar = true}) {
       puedeRegistrarEventosSaludProvider.overrideWith(
         (ref) async => puedeRegistrar,
       ),
-      healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),
+      personaVisualizacionSeleccionadaProvider.overrideWith(
+        (ref) async => _personaAlicia,
+      ),
     ],
     child: const MaterialApp(home: HealthEventsScreen()),
   );

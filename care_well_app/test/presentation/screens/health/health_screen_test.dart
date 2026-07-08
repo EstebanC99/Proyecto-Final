@@ -26,7 +26,6 @@ Widget _wrap({Persona? persona}) {
   final personaEfectiva = persona ?? _personaAlicia;
   return ProviderScope(
     overrides: [
-      healthPersonaContextProvider.overrideWith((ref) async => personaEfectiva),
       // ContextSelector necesita estos providers.
       personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => personaEfectiva,
@@ -77,7 +76,6 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            healthPersonaContextProvider.overrideWith((ref) async => null),
             personaVisualizacionSeleccionadaProvider.overrideWith(
               (ref) async => null,
             ),

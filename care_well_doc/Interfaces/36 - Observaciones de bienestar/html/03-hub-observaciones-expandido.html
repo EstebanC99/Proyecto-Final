@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+
+  /* AppBar */
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: flex; align-items: center;
+    padding: 0 4px 0 4px; gap: 4px; flex-shrink: 0;
+  }
+  .app-bar-back {
+    width: 48px; height: 48px; display: flex; align-items: center;
+    justify-content: center; color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    flex: 1; font-size: 18px; font-weight: 700; color: #16201F;
+    letter-spacing: -0.3px;
+  }
+
+  /* ContextSelector real (fuera del scroll) — fiel a context_selector.dart */
+  .context-fixed-wrap {
+    padding: 8px 16px 0; flex-shrink: 0;
+  }
+  .context-banner {
+    width: 100%; background: #C9EDE8; border-radius: 12px;
+    padding: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .context-banner-texts { flex: 1; min-width: 0; }
+  .context-banner-subtitle { font-size: 11px; color: #566060; line-height: 1.2; }
+  .context-banner-name { font-size: 16px; font-weight: 700; color: #16201F; line-height: 1.3; }
+
+  /* Scroll area */
+  .scroll-area {
+    overflow-y: auto; height: calc(844px - 28px - 56px - 74px);
+    padding: 16px 16px 24px;
+  }
+
+  /* ===== Wellbeing Observations Card — EXPANDIDO ===== */
+  .wellbeing-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(22,32,31,0.06);
+    margin-bottom: 24px; /* SizedBox(height: AppSpacing.xl) antes del grid */
+  }
+  .wellbeing-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .wellbeing-icon {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: #C9EDE8;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wellbeing-title {
+    flex: 1; font-size: 16px; font-weight: 700; color: #16201F;
+  }
+  .wellbeing-count-badge {
+    background: #EDF1F1; color: #566060; font-size: 11px; font-weight: 700;
+    border-radius: 999px; padding: 2px 9px;
+  }
+  .wellbeing-chevron { color: #566060; }
+  .wellbeing-subtitle {
+    font-size: 12px; color: #566060; line-height: 1.4; margin-bottom: 14px;
+  }
+
+  .wb-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    border-radius: 12px; padding: 12px; margin-bottom: 10px;
+    border-left: 3px solid;
+  }
+  .wb-row:last-child { margin-bottom: 0; }
+  .wb-row--atencion {
+    background: #FBF0CF; border-left-color: #E0A100;
+  }
+  .wb-row--informativa {
+    background: #FFFFFF; border: 1px solid #C5CECE; border-left: 3px solid #2E77C2;
+  }
+
+  .wb-row-icon {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .wb-row-icon--mood   { background: #EDE9FE; }
+  .wb-row-icon--habit  { background: #FFEDD5; }
+
+  .wb-row-content { flex: 1; min-width: 0; }
+  .wb-severity-label {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .wb-severity-label--atencion { color: #8A6400; }
+  .wb-severity-label--informativa { color: #2E77C2; }
+
+  .wb-message {
+    font-size: 14px; color: #16201F; line-height: 1.45;
+  }
+
+  .wb-chevron {
+    color: #566060; flex-shrink: 0; margin-top: 3px;
+  }
+
+  /* Tile grid 2x2 */
+  .tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .nav-tile {
+    border-radius: 20px;
+    height: 148px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: pointer;
+  }
+
+  .nav-tile--events    { background: #FFF1F2; }
+  .nav-tile--habits    { background: #FFF7ED; }
+  .nav-tile--mood      { background: #F5F3FF; }
+  .nav-tile--recs      { background: #F0FDF4; }
+
+  .tile-icon-wrap {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .tile-icon-wrap--events  { background: #E11D48; }
+  .tile-icon-wrap--habits  { background: #EA580C; }
+  .tile-icon-wrap--mood    { background: #7C3AED; }
+  .tile-icon-wrap--recs    { background: #16A34A; }
+
+  .nav-tile-label {
+    font-size: 14px; font-weight: 700; color: #16201F;
+    text-align: center; line-height: 1.2; padding: 0 8px;
+  }
+
+  /* Timeline tile full-width */
+  .timeline-tile {
+    margin-top: 12px;
+    background: #EFF6FF;
+    border-radius: 20px;
+    height: 72px;
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: pointer;
+  }
+  .tile-icon-wrap--timeline-sm {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background: #2563EB;
+  }
+  .timeline-label {
+    font-size: 16px; font-weight: 700; color: #16201F;
+  }
+
+  /* Annotations */
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 160px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <!-- AppBar -->
+  <div class="app-bar">
+    <div class="app-bar-back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Salud</span>
+  </div>
+
+  <!-- ContextSelector (FIJO, fuera del scroll — no se toca) -->
+  <div class="context-fixed-wrap">
+    <div class="context-banner">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#1A8C82"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <div class="context-banner-texts">
+        <div class="context-banner-subtitle">Visualizando a</div>
+        <div class="context-banner-name">Alicia Rodr&iacute;guez</div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#1A8C82"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+    </div>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area">
+
+    <!-- ===== Wellbeing Observations Card — EXPANDIDO ===== -->
+    <div class="wellbeing-card">
+      <div class="wellbeing-header">
+        <div class="wellbeing-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#1A8C82"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        </div>
+        <span class="wellbeing-title">Observaciones de bienestar</span>
+        <span class="wellbeing-count-badge">3</span>
+        <span class="wellbeing-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+        </span>
+      </div>
+      <div class="wellbeing-subtitle">
+        Generadas autom&aacute;ticamente a partir de tus registros recientes. No reemplazan una consulta profesional.
+      </div>
+
+      <!-- Fila 1: Atención / Ánimo -->
+      <div class="wb-row wb-row--atencion">
+        <div class="wb-row-icon wb-row-icon--mood">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#7C3AED"><path d="M13 8.57c-.79 0-1.43.64-1.43 1.43s.64 1.43 1.43 1.43 1.43-.64 1.43-1.43-.64-1.43-1.43-1.43zM13 3C9.25 3 6.2 5.94 6.02 9.64L4.1 12.2C3.85 12.53 4.09 13 4.5 13H6v3c0 1.1.9 2 2 2h1v3h7v-4.68c1.79-1.01 3-2.93 3-5.12C19 6.13 16.31 3 13 3zm3 10h-1v1c0 .55-.45 1-1 1h-2v-1h-1c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1h2v-1h2v1h1v3z"/></svg>
+        </div>
+        <div class="wb-row-content">
+          <div class="wb-severity-label wb-severity-label--atencion">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="#8A6400"><path d="M11 15h2v2h-2zm0-8h2v6h-2z"/></svg>
+            Atenci&oacute;n
+          </div>
+          <div class="wb-message">El &aacute;nimo de Alicia se registr&oacute; como bajo en los &uacute;ltimos 3 registros. Podr&iacute;a ser un buen momento para estar m&aacute;s atento o consultar con un profesional.</div>
+        </div>
+        <div class="wb-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </div>
+      </div>
+
+      <!-- Fila 2: Atención / Hábito -->
+      <div class="wb-row wb-row--atencion">
+        <div class="wb-row-icon wb-row-icon--habit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#EA580C"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+        </div>
+        <div class="wb-row-content">
+          <div class="wb-severity-label wb-severity-label--atencion">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="#8A6400"><path d="M11 15h2v2h-2zm0-8h2v6h-2z"/></svg>
+            Atenci&oacute;n
+          </div>
+          <div class="wb-message">Hace 9 d&iacute;as que no se registra el h&aacute;bito &ldquo;Caminata matutina&rdquo;, que antes se realizaba con regularidad.</div>
+        </div>
+        <div class="wb-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </div>
+      </div>
+
+      <!-- Fila 3: Informativa / Hábito -->
+      <div class="wb-row wb-row--informativa">
+        <div class="wb-row-icon wb-row-icon--habit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#EA580C"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+        </div>
+        <div class="wb-row-content">
+          <div class="wb-severity-label wb-severity-label--informativa">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="#2E77C2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Informativa
+          </div>
+          <div class="wb-message">El h&aacute;bito &ldquo;Toma de medicaci&oacute;n&rdquo; se est&aacute; registrando con menos frecuencia que lo habitual.</div>
+        </div>
+        <div class="wb-chevron">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- ===== /Wellbeing Observations Card ===== -->
+
+    <!-- Grid 2x2 -->
+    <div class="tile-grid">
+
+      <!-- Eventos de salud -->
+      <div class="nav-tile nav-tile--events">
+        <div class="tile-icon-wrap tile-icon-wrap--events">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <span class="nav-tile-label">Eventos de salud</span>
+      </div>
+
+      <!-- Hábitos de vida -->
+      <div class="nav-tile nav-tile--habits">
+        <div class="tile-icon-wrap tile-icon-wrap--habits">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+        </div>
+        <span class="nav-tile-label">H&aacute;bitos de vida</span>
+      </div>
+
+      <!-- Estado de ánimo -->
+      <div class="nav-tile nav-tile--mood">
+        <div class="tile-icon-wrap tile-icon-wrap--mood">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M13 8.57c-.79 0-1.43.64-1.43 1.43s.64 1.43 1.43 1.43 1.43-.64 1.43-1.43-.64-1.43-1.43-1.43zM13 3C9.25 3 6.2 5.94 6.02 9.64L4.1 12.2C3.85 12.53 4.09 13 4.5 13H6v3c0 1.1.9 2 2 2h1v3h7v-4.68c1.79-1.01 3-2.93 3-5.12C19 6.13 16.31 3 13 3zm3 10h-1v1c0 .55-.45 1-1 1h-2v-1h-1c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1h2v-1h2v1h1v3z"/></svg>
+        </div>
+        <span class="nav-tile-label">Estado de &aacute;nimo</span>
+      </div>
+
+      <!-- Ficha de salud -->
+      <div class="nav-tile nav-tile--recs">
+        <div class="tile-icon-wrap tile-icon-wrap--recs">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+        </div>
+        <span class="nav-tile-label">Ficha de salud</span>
+      </div>
+
+    </div>
+
+    <!-- Timeline tile full-width -->
+    <div class="timeline-tile">
+      <div class="tile-icon-wrap--timeline-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2z"/></svg>
+      </div>
+      <span class="timeline-label">L&iacute;nea de tiempo</span>
+    </div>
+
+  </div>
+
+  <!-- Annotations -->
+  <div class="annotation" style="top: 168px; right: 4px;">Tap en el header ➜ vuelve a colapsarse (mismo tap target). &Iacute;cono expand_more indica &ldquo;expandido&rdquo;.</div>
+  <div class="annotation" style="top: 168px; left: 4px;">Header vuelve al tratamiento neutro (teal de marca) porque la severidad ya se comunica por fila, abajo.</div>
+  <div class="annotation" style="top: 470px; right: 4px;">Filas sin cambios respecto a la spec original: container tenue + &iacute;cono coloreado por categor&iacute;a, borde por severidad.</div>
+  <div class="annotation" style="top: 600px; left: 4px;">El grid se desplaza hacia abajo (mismo scroll del hub) &mdash; no hay overlay ni recorte.</div>
+
+</body>
+</html>

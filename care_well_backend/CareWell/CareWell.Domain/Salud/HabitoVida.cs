@@ -17,6 +17,8 @@ namespace CareWell.Domain.Salud
 
         public virtual bool Activo { get; private set; }
 
+        public virtual DateTime FechaCreacion { get; private set; }
+
         public virtual List<HabitoVidaRealizacion> Realizaciones { get; private set; }
 
         public HabitoVida()
@@ -42,6 +44,7 @@ namespace CareWell.Domain.Salud
             this.Tipo = crearHabitoVida.TipoHabito;
             this.Descripcion = crearHabitoVida.Descripcion;
             this.Activo = true;
+            this.FechaCreacion = DateTime.Now;
         }
 
         public virtual void Modificar(ModificarHabitoVida modificarHabitoVida,

@@ -1,39 +1,46 @@
-import '../base_entity.dart';
-import '../shared/persona.dart';
+import 'package:care_well_app/domain/entities/entities.dart';
 
-/// Ficha de salud de una persona a cargo.
-///
-/// Contiene antecedentes clínicos y estudios realizados.
-/// La relación es 1-a-0..1 con [Persona].
 class FichaSalud extends BaseEntity {
-  /// Persona a la que pertenece esta ficha de salud.
   final Persona persona;
+  final String factorSanguineo;
+  final String? obraSocial;
+  final String? observaciones;
 
-  /// Antecedentes clínicos relevantes (texto libre).
-  final String? antecedentes;
-
-  /// Estudios médicos realizados (texto libre o lista serializada).
-  final String? estudios;
+  final List<FichaSaludAntecedente> antecedentes;
+  final List<FichaSaludAlergia> alergias;
+  final List<FichaSaludEnfermedad> enfermedades;
 
   const FichaSalud({
-    required super.id,
+    super.id = 0,
     required this.persona,
-    this.antecedentes,
-    this.estudios,
+    required this.factorSanguineo,
+    this.obraSocial,
+    this.observaciones,
+    this.antecedentes = const [],
+    this.alergias = const [],
+    this.enfermedades = const [],
   });
 
   @override
   FichaSalud copyWith({
     int? id,
     Persona? persona,
-    String? antecedentes,
-    String? estudios,
+    String? factorSanguineo,
+    String? obraSocial,
+    String? observaciones,
+    List<FichaSaludAntecedente>? antecedentes,
+    List<FichaSaludAlergia>? alergias,
+    List<FichaSaludEnfermedad>? enfermedades,
   }) {
     return FichaSalud(
       id: id ?? this.id,
       persona: persona ?? this.persona,
+      factorSanguineo: factorSanguineo ?? this.factorSanguineo,
+      obraSocial: obraSocial,
+      observaciones: observaciones,
       antecedentes: antecedentes ?? this.antecedentes,
-      estudios: estudios ?? this.estudios,
+      alergias: alergias ?? this.alergias,
+      enfermedades: enfermedades ?? this.enfermedades,
     );
   }
 }

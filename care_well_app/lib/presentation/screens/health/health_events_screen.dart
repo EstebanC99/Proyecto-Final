@@ -29,7 +29,7 @@ class HealthEventsScreen extends ConsumerWidget {
     final eventosAsync = ref.watch(eventosSaludDelMesProvider);
     final puede =
         ref.watch(puedeRegistrarEventosSaludProvider).valueOrNull ?? false;
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final mes = ref.watch(mesEventosSaludProvider);
 
     void irMesAnterior() {

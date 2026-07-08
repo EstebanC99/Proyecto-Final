@@ -9,9 +9,9 @@ import '../../../domain/entities/entities.dart';
 ///
 /// Esquema de rangos de IDs:
 /// Personas: 1–99 | Usuarios: 101–199 | Permisos: 301–399
-/// Asignaciones: 401–499 | Fichas salud: 501–599 | Configuraciones: 601–699
+/// Asignaciones: 401–499 | Fichas salud y sus ítems: 501–599 | Configuraciones: 601–699
 /// Eventos agenda: 701–799 | Recordatorios: 801–899 | Hábitos: 901–999
-/// Recomendaciones: 1001–1099 | Eventos salud: 1101–1199
+/// Eventos salud: 1101–1199
 /// Estados ánimo: 1201–1299 | Notas evento: 1301–1399 | Aceptaciones: 1401–1499
 class DemoSeed {
   DemoSeed._();
@@ -239,35 +239,42 @@ class DemoSeed {
   static final FichaSalud fichaSaludAlicia = FichaSalud(
     id: fichaSaludAliciaId,
     persona: personaAlicia,
-    antecedentes:
-        'Hipertensión arterial (diagnosticada 2010). '
-        'Diabetes tipo 2 (diagnosticada 2015). '
-        'Artrosis de rodilla bilateral.',
-    estudios:
-        'ECG (abril 2026): ritmo sinusal normal. '
-        'Laboratorio (mayo 2026): glucemia 130 mg/dL, HbA1c 7.2%.',
+    factorSanguineo: 'O+',
+    obraSocial: 'PAMI',
+    observaciones:
+        'Controlar presión arterial dos veces al día. '
+        'Evitar esfuerzos físicos prolongados.',
+    antecedentes: [
+      FichaSaludAntecedente(
+        id: 511,
+        nombre: 'Hipertensión',
+        descripcion: 'Diagnosticada en 2015, controlada con medicación.',
+        vinculoFamiliar: 'Madre',
+      ),
+      FichaSaludAntecedente(
+        id: 512,
+        nombre: 'Diabetes tipo 2',
+        descripcion: 'Diagnosticada en 2019.',
+        vinculoFamiliar: 'Propio',
+      ),
+    ],
+    alergias: [
+      FichaSaludAlergia(
+        id: 521,
+        nombre: 'Penicilina',
+        reaccion: 'Erupción cutánea y dificultad para respirar.',
+        medicamento: 'Amoxicilina',
+      ),
+    ],
+    enfermedades: [
+      FichaSaludEnfermedad(
+        id: 531,
+        nombre: 'Hipotiroidismo',
+        vigente: true,
+        observacion: 'Controlada con Levotiroxina 50mcg.',
+      ),
+    ],
   );
-
-  // ─── Recomendaciones médicas ─────────────────────────────────────────────────
-
-  static final List<RecomendacionMedica> recomendacionesAlicia = [
-    RecomendacionMedica(
-      id: 1001,
-      persona: personaAlicia,
-      descripcion:
-          'Controlar la presión arterial dos veces al día. Registrar valores.',
-      fecha: DateTime(2026, 5, 15),
-      profesional: 'Dr. Hernández (Cardiología)',
-    ),
-    RecomendacionMedica(
-      id: 1002,
-      persona: personaAlicia,
-      descripcion:
-          'Evitar esfuerzos físicos prolongados. Descanso obligatorio a las 16 hs.',
-      fecha: DateTime(2026, 4, 10),
-      profesional: 'Dra. Romero (Clínica médica)',
-    ),
-  ];
 
   // ─── Eventos de salud ────────────────────────────────────────────────────────
 

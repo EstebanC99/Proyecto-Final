@@ -100,6 +100,24 @@ final puedeVerSaludProvider = FutureProvider.autoDispose<bool>((ref) async {
   );
 });
 
+/// Indica si el usuario autenticado puede administrar (crear/modificar) la ficha
+/// de salud de la persona de contexto.
+///
+/// Retorna `true` automáticamente cuando el usuario visualiza su propio contexto.
+/// Para personas a cargo, requiere asignación activa con [PermisosCuidadoConst.editarFichaSalud].
+final puedeAdministrarFichaSaludProvider = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final esPropio = await ref.watch(esContextoPropioProvider.future);
+  if (esPropio) return true;
+
+  final asignacion = await _asignacionActivaParaContexto(ref);
+  if (asignacion == null) return false;
+  return asignacion.permisos.any(
+    (p) => p.id == PermisosCuidadoConst.editarFichaSalud,
+  );
+});
+
 /// Indica si el usuario autenticado puede registrar eventos de salud de la persona
 /// de contexto (alta, edición y eliminación de eventos).
 ///

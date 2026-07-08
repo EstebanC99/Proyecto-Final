@@ -28,9 +28,15 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
       id: TiposHabitoConst.actividadFisica,
       descripcion: 'Actividad física',
     ),
-    TipoHabitoVida(id: TiposHabitoConst.alimentacion, descripcion: 'Alimentación'),
+    TipoHabitoVida(
+      id: TiposHabitoConst.alimentacion,
+      descripcion: 'Alimentación',
+    ),
     TipoHabitoVida(id: TiposHabitoConst.sueno, descripcion: 'Sueño'),
-    TipoHabitoVida(id: TiposHabitoConst.hidratacion, descripcion: 'Hidratación'),
+    TipoHabitoVida(
+      id: TiposHabitoConst.hidratacion,
+      descripcion: 'Hidratación',
+    ),
     TipoHabitoVida(id: TiposHabitoConst.otro, descripcion: 'Bienestar'),
   ];
 

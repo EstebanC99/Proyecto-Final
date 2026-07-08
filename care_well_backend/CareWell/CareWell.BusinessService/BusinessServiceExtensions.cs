@@ -11,7 +11,9 @@ using CareWell.BusinessService.Salud;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Agenda;
 using CareWell.Domain.DomainServices.Auth;
+using CareWell.Domain.DomainServices.Salud;
 using CareWell.Domain.Factories;
+using CareWell.Domain.Salud.AlertasBienestar;
 using CareWell.Domain.Validadores;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,20 +40,31 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
             services.AddScoped<IAdministrarEventoAgendaBusinessService, AdministrarEventoAgendaBusinessService>();
             services.AddScoped<IAdministrarEventoSaludBusinessService, AdministrarEventoSaludBusinessService>();
+            services.AddScoped<IAdministrarFichaSaludBusinessService, AdministrarFichaSaludBusinessService>();
             services.AddScoped<IAdministrarHabitoVidaBusinessService, AdministrarHabitoVidaBusinessService>();
             services.AddScoped<IAdministrarPersonaEstadoAnimoBusinessService, AdministrarPersonaEstadoAnimoBusinessService>();
             services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
             services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
+            services.AddScoped<IAlertaBienestarBusinessService, AlertaBienestarBusinessService>();
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
 
             #endregion
 
-            #region Domain
+            #region Domain Services
 
+            services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
             services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
+
+            #endregion
+
+            #region Domain
+
+            services.AddScoped<IDetectorAlertaHabito, DetectorAlertaHabito>();
+            services.AddScoped<IDetectorAnimoBajoSostenido, DetectorAnimoBajoSostenido>();
+            services.AddScoped<IDetectorDeterioroAnimo, DetectorDeterioroAnimo>();
             services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
             services.AddScoped<IValidarExistenciaAsignacionCuidado, ValidarExistenciaAsignacionCuidado>();
 

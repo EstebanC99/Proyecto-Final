@@ -22,9 +22,11 @@ namespace CareWell.Repository
 
             #region Business Repos
 
+            services.AddScoped<IAlertaBienestarRepository, AlertaBienestarRepository>();
             services.AddScoped<IAsignacionCuidadoRepository, AsignacionCuidadoRepository>();
             services.AddScoped<IEventoAgendaRepository, EventoAgendaRepository>();
             services.AddScoped<IEventoSaludRepository, EventoSaludRepository>();
+            services.AddScoped<IFichaSaludRepository, FichaSaludRepository>();
             services.AddScoped<IHabitoVidaRepository, HabitoVidaRepository>();
             services.AddScoped<ILineaTiempoSaludRepository, LineaTiempoSaludRepository>();
             services.AddScoped<IPersonaEstadoAnimoRepository, PersonaEstadoAnimoRepository>();

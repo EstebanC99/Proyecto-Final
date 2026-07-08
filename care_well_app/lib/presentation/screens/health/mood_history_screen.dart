@@ -15,7 +15,7 @@ class MoodHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final estadosAsync = ref.watch(estadosAnimoProvider);
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final nombrePersona =
         personaAsync.valueOrNull?.nombre ?? 'la persona a cargo';
 

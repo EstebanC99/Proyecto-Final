@@ -34,7 +34,8 @@ abstract final class AppRoutes {
   static const health = '/health';
   static const healthHabits = '/health/habits';
   static const healthHabitsNew = '/health/habits/new';
-  static const healthRecommendations = '/health/recommendations';
+  static const healthRecord = '/health/record';
+  static const healthRecordSaved = '/health/record-saved';
   static const healthEvents = '/health/events';
   static const healthEventsNew = '/health/events/new';
   static const healthEventDetail = '/health/events/:id';
@@ -72,7 +73,8 @@ abstract final class AppRoutes {
   static const healthName = 'health';
   static const healthHabitsName = 'health-habits';
   static const healthHabitsNewName = 'health-habits-new';
-  static const healthRecommendationsName = 'health-recommendations';
+  static const healthRecordName = 'health-record';
+  static const healthRecordSavedName = 'health-record-saved';
   static const healthEventsName = 'health-events';
   static const healthEventsNewName = 'health-events-new';
   static const healthEventDetailName = 'health-event-detail';

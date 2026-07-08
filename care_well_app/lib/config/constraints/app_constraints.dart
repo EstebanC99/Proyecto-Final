@@ -4,3 +4,4 @@ export '../theme/app_spacing.dart';
 export 'business_rules.dart';
 export 'validators.dart';
 export 'terms_content.dart';
+export 'health_catalogs.dart';

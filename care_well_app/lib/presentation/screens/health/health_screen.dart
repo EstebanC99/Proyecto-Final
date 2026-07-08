@@ -11,13 +11,14 @@ import '../../widgets/widgets.dart';
 /// Hub principal del módulo Mi salud (US-28 a US-33).
 ///
 /// Muestra tarjetas de acceso rápido a cada sub-módulo de salud:
-/// Hábitos, Recomendaciones, Eventos y Estado de ánimo.
+/// Hábitos, Ficha de salud, Eventos y Estado de ánimo.
 class HealthScreen extends ConsumerWidget {
   const HealthScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
+    final puedeVerFichaAsync = ref.watch(puedeVerSaludProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -76,6 +77,9 @@ class HealthScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Observaciones de bienestar (US-36): autocontenido,
+                      // no ocupa espacio (ni gap) cuando no hay alertas.
+                      const WellbeingObservationsBanner(),
                       GridView.count(
                         crossAxisCount: 2,
                         shrinkWrap: true,
@@ -96,12 +100,13 @@ class HealthScreen extends ConsumerWidget {
                           HealthCategoryCard(
                             icon: Icons.medical_services_outlined,
                             accentColor: AppColors.healthAccent,
-                            label: 'Recomendaciones',
+                            label: 'Ficha de salud',
                             description:
-                                'Pautas personalizadas del equipo médico',
-                            onTap: () => context.pushNamed(
-                              AppRoutes.healthRecommendationsName,
-                            ),
+                                'Datos clínicos: factor sanguíneo, antecedentes, alergias y enfermedades.',
+                            enabled: puedeVerFichaAsync.valueOrNull ?? false,
+                            loading: puedeVerFichaAsync.isLoading,
+                            onTap: () =>
+                                context.pushNamed(AppRoutes.healthRecordName),
                           ),
                           HealthCategoryCard(
                             icon: Icons.event_note_outlined,

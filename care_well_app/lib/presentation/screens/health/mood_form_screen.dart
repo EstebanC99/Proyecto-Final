@@ -77,7 +77,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final nombrePersona =
         personaAsync.valueOrNull?.nombre ?? 'la persona a cargo';
 

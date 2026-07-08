@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 390px; height: 844px; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #F6F8F8;
+    color: #16201F;
+  }
+
+  .status-bar {
+    height: 28px; background: #16201F; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+
+  .app-bar {
+    height: 56px; background: #FFFFFF;
+    border-bottom: 1px solid #EDF1F1;
+    display: flex; align-items: center;
+    padding: 0 8px 0 4px; gap: 4px; flex-shrink: 0;
+  }
+  .app-bar-back {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: #16201F; flex-shrink: 0;
+  }
+  .app-bar-title {
+    font-size: 18px; font-weight: 700; color: #16201F; flex: 1;
+    letter-spacing: -0.3px;
+  }
+
+  .scroll-area {
+    height: calc(844px - 28px - 56px - 84px);
+    overflow-y: auto;
+    padding: 12px 16px 24px;
+  }
+
+  .context-row { padding: 0 0 12px; }
+  .chip-context {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FFF1F2; color: #E11D48;
+    border-radius: 20px; padding: 6px 14px;
+    font-size: 13px; font-weight: 600;
+  }
+
+  /* Persona header card */
+  .persona-card {
+    background: #FFFFFF; border: 1px solid #EDF1F1; border-radius: 16px;
+    padding: 16px; margin-bottom: 20px;
+  }
+  .persona-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .persona-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #C9EDE8; color: #0A3D38;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; flex-shrink: 0;
+  }
+  .persona-name { font-size: 16px; font-weight: 700; color: #16201F; }
+  .persona-sub {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #566060; margin-top: 6px; padding-left: 60px;
+  }
+  .persona-sub svg { flex-shrink: 0; }
+
+  .section-label {
+    font-size: 13px; font-weight: 700; color: #566060;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    margin: 4px 0 12px;
+  }
+  .field-label {
+    font-size: 13px; font-weight: 600; color: #566060; margin-bottom: 6px;
+  }
+  .field-group { margin-bottom: 20px; }
+
+  /* Blood type grid */
+  .blood-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .blood-chip {
+    height: 44px; border-radius: 12px; border: 1.5px solid #C5CECE;
+    background: #FFFFFF; color: #16201F;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+  }
+
+  .input-wrap {
+    background: #FFFFFF; border: 1px solid #C5CECE; border-radius: 12px;
+    display: flex; align-items: center; padding: 14px 16px; min-height: 52px;
+  }
+  .input-wrap--textarea { align-items: flex-start; min-height: 80px; }
+  .input-placeholder { font-size: 15px; color: #9AA5A5; line-height: 1.4; }
+
+  /* Health list section */
+  .health-section {
+    background: #FFFFFF; border-radius: 16px; padding: 16px; margin-bottom: 20px;
+  }
+  .health-section-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  .health-section-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .health-section-title { font-size: 15px; font-weight: 700; color: #16201F; flex: 1; }
+  .health-section-badge {
+    background: #EDF1F1; color: #566060; font-size: 11px; font-weight: 700;
+    border-radius: 999px; padding: 2px 8px; margin-right: 6px;
+  }
+  .add-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+    border: 1.5px solid; flex-shrink: 0;
+  }
+
+  .empty-list {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 8px 8px; text-align: center;
+  }
+  .empty-list-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+  }
+  .empty-list-text { font-size: 13px; color: #566060; margin-bottom: 8px; line-height: 1.4; }
+  .empty-list-cta { font-size: 13px; font-weight: 700; }
+
+  /* Sticky footer */
+  .footer {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 84px;
+    background: #FFFFFF; border-top: 1px solid #EDF1F1;
+    display: flex; align-items: center; padding: 0 16px;
+  }
+  .btn-primary--disabled {
+    width: 100%; height: 56px; background: #C5CECE; color: rgba(255,255,255,0.7);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+
+  .annotation {
+    position: absolute;
+    background: #FFE082; border: 1px solid #F9A825; border-radius: 6px;
+    padding: 4px 8px; font-size: 10px; color: #333; font-style: italic;
+    max-width: 140px; line-height: 1.3; z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>5G&nbsp;&nbsp;100%</span>
+  </div>
+
+  <div class="app-bar">
+    <div class="app-bar-back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </div>
+    <span class="app-bar-title">Ficha de salud</span>
+  </div>
+
+  <div class="scroll-area">
+
+    <div class="context-row">
+      <div class="chip-context">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Alicia Rodr&iacute;guez
+      </div>
+    </div>
+
+    <!-- Persona header (solo lectura) -->
+    <div class="persona-card">
+      <div class="persona-row">
+        <div class="persona-avatar">A</div>
+        <div class="persona-name">Alicia Rodr&iacute;guez</div>
+      </div>
+      <div class="persona-sub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#566060"><path d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h2v3H9V4zm4 10h-2v2H9v-2H7v-2h2v-2h2v2h2v2z"/></svg>
+        DNI 23.456.789
+      </div>
+      <div class="persona-sub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#566060"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+        Nacida el 15/03/1942
+      </div>
+    </div>
+
+    <div class="section-label">Datos generales</div>
+
+    <div class="field-group">
+      <div class="field-label">Factor sangu&iacute;neo *</div>
+      <div class="blood-grid">
+        <div class="blood-chip">A+</div>
+        <div class="blood-chip">A-</div>
+        <div class="blood-chip">B+</div>
+        <div class="blood-chip">B-</div>
+        <div class="blood-chip">AB+</div>
+        <div class="blood-chip">AB-</div>
+        <div class="blood-chip">O+</div>
+        <div class="blood-chip">O-</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Obra social (opcional)</div>
+      <div class="input-wrap">
+        <span class="input-placeholder">Ej. OSDE, PAMI, Swiss Medical...</span>
+      </div>
+    </div>
+
+    <!-- Antecedentes -->
+    <div class="health-section">
+      <div class="health-section-header">
+        <div class="health-section-icon" style="background:#FFF1F2;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#E11D48"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        </div>
+        <span class="health-section-title">Antecedentes</span>
+        <span class="health-section-badge">0</span>
+        <div class="add-chip" style="border-color:#E11D48; color:#E11D48;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Agregar
+        </div>
+      </div>
+      <div class="empty-list">
+        <div class="empty-list-icon" style="background:#FFF1F2;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#E11D48"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        </div>
+        <div class="empty-list-text">Todav&iacute;a no registraste antecedentes.</div>
+        <div class="empty-list-cta" style="color:#E11D48;">+ Agregar el primero</div>
+      </div>
+    </div>
+
+    <!-- Alergias -->
+    <div class="health-section">
+      <div class="health-section-header">
+        <div class="health-section-icon" style="background:#FBF0CF;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#8A6400"><path d="M17.73 12.02l3.98-3.98c.39-.39.39-1.02 0-1.41l-4.34-4.34c-.39-.39-1.02-.39-1.41 0l-3.98 3.98L8 2.29C7.8 2.1 7.55 2 7.29 2c-.25 0-.51.1-.7.29L2.25 6.63c-.39.39-.39 1.02 0 1.41l3.98 3.98L2.25 16c-.39.39-.39 1.02 0 1.41l4.34 4.34c.39.39 1.02.39 1.41 0l3.98-3.98 3.98 3.98c.2.2.45.29.71.29.26 0 .51-.1.71-.29l4.34-4.34c.39-.39.39-1.02 0-1.41l-3.99-3.98z"/></svg>
+        </div>
+        <span class="health-section-title">Alergias</span>
+        <span class="health-section-badge">0</span>
+        <div class="add-chip" style="border-color:#E0A100; color:#8A6400;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Agregar
+        </div>
+      </div>
+      <div class="empty-list">
+        <div class="empty-list-icon" style="background:#FBF0CF;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#8A6400"><path d="M17.73 12.02l3.98-3.98c.39-.39.39-1.02 0-1.41l-4.34-4.34c-.39-.39-1.02-.39-1.41 0l-3.98 3.98L8 2.29C7.8 2.1 7.55 2 7.29 2c-.25 0-.51.1-.7.29L2.25 6.63c-.39.39-.39 1.02 0 1.41l3.98 3.98L2.25 16c-.39.39-.39 1.02 0 1.41l4.34 4.34c.39.39 1.02.39 1.41 0l3.98-3.98 3.98 3.98c.2.2.45.29.71.29.26 0 .51-.1.71-.29l4.34-4.34c.39-.39.39-1.02 0-1.41l-3.99-3.98z"/></svg>
+        </div>
+        <div class="empty-list-text">Todav&iacute;a no registraste alergias.</div>
+        <div class="empty-list-cta" style="color:#8A6400;">+ Agregar el primero</div>
+      </div>
+    </div>
+
+    <!-- Enfermedades -->
+    <div class="health-section">
+      <div class="health-section-header">
+        <div class="health-section-icon" style="background:#DBE9FB;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="#2E77C2"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+        </div>
+        <span class="health-section-title">Enfermedades</span>
+        <span class="health-section-badge">0</span>
+        <div class="add-chip" style="border-color:#2E77C2; color:#2E77C2;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Agregar
+        </div>
+      </div>
+      <div class="empty-list">
+        <div class="empty-list-icon" style="background:#DBE9FB;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#2E77C2"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+        </div>
+        <div class="empty-list-text">Todav&iacute;a no registraste enfermedades.</div>
+        <div class="empty-list-cta" style="color:#2E77C2;">+ Agregar el primero</div>
+      </div>
+    </div>
+
+    <div class="field-group" style="margin-bottom: 4px;">
+      <div class="field-label">Observaciones (opcional)</div>
+      <div class="input-wrap input-wrap--textarea">
+        <span class="input-placeholder">Ej. Usa bast&oacute;n para caminar, controla la presi&oacute;n cada semana...</span>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+
+  <!-- Footer sticky -->
+  <div class="footer">
+    <div class="btn-primary--disabled">Guardar ficha</div>
+  </div>
+
+  <!-- Annotations -->
+  <div class="annotation" style="top: 44px; right: 4px;">Chip contexto rojo #FFF1F2/#E11D48 &mdash; mismo acento de la card del hub</div>
+  <div class="annotation" style="top: 170px; left: 4px;">Encabezado 100% solo lectura · sin botones EDIT · datos vienen de Personas a cargo</div>
+  <div class="annotation" style="top: 330px; right: 4px;">Factor sangu&iacute;neo obligatorio · grid 4x2 · ning&uacute;n chip seleccionado a&uacute;n</div>
+  <div class="annotation" style="top: 480px; left: 4px;">3 secciones en tarjetas separadas · color propio por lista (rojo/&aacute;mbar/azul)</div>
+  <div class="annotation" style="top: 760px; right: 4px;">Bot&oacute;n sticky deshabilitado hasta elegir Factor sangu&iacute;neo</div>
+
+</body>
+</html>

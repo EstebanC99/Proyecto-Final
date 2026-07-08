@@ -64,7 +64,9 @@ final crearEventoSaludProvider =
         required descripcion,
         required fechaHora,
       }) async {
-        final persona = await ref.read(healthPersonaContextProvider.future);
+        final persona = await ref.read(
+          personaVisualizacionSeleccionadaProvider.future,
+        );
         if (persona == null) throw Exception('Sin persona de contexto');
 
         await ref

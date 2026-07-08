@@ -5,6 +5,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
+import '../../screens/shared/initial_day_scroll_mixin.dart';
 import 'health_event_card.dart';
 import 'health_event_day_group_header.dart';
 
@@ -40,7 +41,8 @@ class HealthEventsMonthList extends ConsumerStatefulWidget {
       _HealthEventsMonthListState();
 }
 
-class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
+class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList>
+    with InitialDayScrollMixin {
   /// Días actualmente expandidos (fecha truncada a año-mes-día).
   late Set<DateTime> _expandedDias;
 
@@ -48,6 +50,16 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
   void initState() {
     super.initState();
     _expandedDias = _diasExpandidosPorDefecto();
+  }
+
+  @override
+  void didUpdateWidget(covariant HealthEventsMonthList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Al recargar los eventos (refresco o cambio de datos) se habilita
+    // nuevamente el scroll inicial al día objetivo.
+    if (!identical(oldWidget.eventos, widget.eventos)) {
+      reiniciarScrollInicial();
+    }
   }
 
   /// Hoy y mañana (si pertenecen al mes visible se expandirán por defecto).
@@ -58,9 +70,7 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
   }
 
   /// Agrupa los eventos por día (fecha truncada a año-mes-día).
-  Map<DateTime, List<EventoSalud>> _agruparPorDia(
-    List<EventoSalud> eventos,
-  ) {
+  Map<DateTime, List<EventoSalud>> _agruparPorDia(List<EventoSalud> eventos) {
     final Map<DateTime, List<EventoSalud>> grupos = {};
     for (final e in eventos) {
       final dt = e.fechaHora.toLocal();
@@ -72,13 +82,21 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
 
   @override
   Widget build(BuildContext context) {
-    // Al cambiar de mes, reinicia la expansión (hoy/mañana por defecto).
+    // Al cambiar de mes, reinicia la expansión (hoy/mañana por defecto) y
+    // rehabilita el scroll inicial al día objetivo.
     ref.listen(mesEventosSaludProvider, (_, _) {
+      reiniciarScrollInicial();
       setState(() => _expandedDias = _diasExpandidosPorDefecto());
     });
 
+    final mes = ref.watch(mesEventosSaludProvider);
     final grupos = _agruparPorDia(widget.eventos);
     final dias = grupos.keys.toList()..sort();
+
+    // Scroll automático (una sola vez por carga) al día objetivo del mes
+    // actual, alineándolo arriba del viewport.
+    final diaObjetivo = calcularDiaObjetivo(dias, mes);
+    scrollAlDiaObjetivoUnaVez(diaObjetivo);
 
     return RefreshIndicator(
       color: AppColors.healthAccent,
@@ -97,6 +115,7 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList> {
           final eventosDelDia = grupos[dia]!;
           final expandido = _expandedDias.contains(dia);
           return Column(
+            key: dia == diaObjetivo ? diaObjetivoKey : null,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               HealthEventDayGroupHeader(

@@ -2,6 +2,6 @@
 {
     public interface IBaseFactory
     {
-        TBaseEntity Crear<TBaseEntity>() where TBaseEntity : BaseEntity, new();
+        TEntity Crear<TEntity>() where TEntity : class, new();
     }
 }

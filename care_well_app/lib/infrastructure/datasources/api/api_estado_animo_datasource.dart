@@ -19,10 +19,6 @@ class ApiEstadoAnimoDatasource implements EstadoAnimoDatasource {
         data: {'personaID': persona.id},
       );
 
-      // Cuando no hay ánimo registrado hoy, el backend responde "sin contenido".
-      // Según el status (200 con body null, 204, o body vacío) Dio puede entregar
-      // `null`, un String vacío/blanco u otro tipo que no sea Map. En todos esos
-      // casos se interpreta como "sin ánimo" y se devuelve null (no es un error).
       final data = response.data;
       if (data is! Map<String, dynamic>) return null;
 

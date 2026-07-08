@@ -25,7 +25,7 @@ class HealthTimelineScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventosAsync = ref.watch(lineaTiempoDelMesProvider);
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final mes = ref.watch(mesLineaTiempoProvider);
 
     void irMesAnterior() {

@@ -27,9 +27,7 @@ Widget _wrap({
   bool esMiembroEquipo = true,
   int habitId = 901,
 }) {
-  final habitoResuelto = habito == _sinHabito
-      ? _habito
-      : habito as HabitoVida?;
+  final habitoResuelto = habito == _sinHabito ? _habito : habito as HabitoVida?;
   return ProviderScope(
     overrides: [
       habitoByIdProvider(habitId).overrideWith((ref) async => habitoResuelto),

@@ -23,7 +23,7 @@ class HabitsScreen extends ConsumerWidget {
     // permiso de ABM de hábitos.
     final esMiembroEquipo =
         ref.watch(esMiembroEquipoActivoProvider).valueOrNull ?? false;
-    final personaAsync = ref.watch(healthPersonaContextProvider);
+    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,

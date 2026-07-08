@@ -64,7 +64,9 @@ final crearHabitoProvider =
       Future<void> Function({required int tipoId, required String descripcion})
     >((ref) {
       return ({required tipoId, required descripcion}) async {
-        final persona = await ref.read(healthPersonaContextProvider.future);
+        final persona = await ref.read(
+          personaVisualizacionSeleccionadaProvider.future,
+        );
         if (persona == null) throw Exception('Sin persona de contexto');
         await ref
             .read(habitoVidaRepositoryProvider)

@@ -8,6 +8,7 @@ import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../shared/initial_day_scroll_mixin.dart';
 
 /// Pantalla principal de la agenda (US-23 / US-27).
 ///
@@ -22,7 +23,8 @@ class AgendaScreen extends ConsumerStatefulWidget {
   ConsumerState<AgendaScreen> createState() => _AgendaScreenState();
 }
 
-class _AgendaScreenState extends ConsumerState<AgendaScreen> {
+class _AgendaScreenState extends ConsumerState<AgendaScreen>
+    with InitialDayScrollMixin {
   /// Días actualmente expandidos (fecha truncada a año-mes-día).
   late Set<DateTime> _expandedDias;
 
@@ -132,6 +134,14 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
     final personaAsync = ref.watch(agendaPersonaContextProvider);
     final ocurrenciasAsync = ref.watch(ocurrenciasDelMesProvider);
     final mes = ref.watch(mesSeleccionadoProvider);
+
+    // Cada vez que se recargan las ocurrencias (entrar, cambiar de mes o de
+    // persona, refrescar) se habilita nuevamente el scroll inicial.
+    ref.listen(ocurrenciasDelMesProvider, (previous, next) {
+      if (next.hasValue) {
+        reiniciarScrollInicial();
+      }
+    });
     final puedeGestionar =
         ref.watch(puedeGestionarAgendaProvider).valueOrNull ?? false;
 
@@ -211,6 +221,11 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                 final grupos = _agruparPorDia(ocurrencias);
                 final dias = grupos.keys.toList()..sort();
 
+                // Scroll automático (una sola vez por carga) al día objetivo
+                // del mes actual, alineándolo arriba del viewport.
+                final diaObjetivo = calcularDiaObjetivo(dias, mes);
+                scrollAlDiaObjetivoUnaVez(diaObjetivo);
+
                 return RefreshIndicator(
                   color: AppColors.primary,
                   onRefresh: () async {
@@ -231,6 +246,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                       final ocurrenciasDelDia = grupos[dia]!;
                       final expandido = _expandedDias.contains(dia);
                       return Column(
+                        key: dia == diaObjetivo ? diaObjetivoKey : null,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _DayGroupHeader(

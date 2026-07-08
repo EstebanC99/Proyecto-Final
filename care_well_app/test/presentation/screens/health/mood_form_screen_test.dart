@@ -12,7 +12,9 @@ Widget _wrap({_RegistrarAnimo? onRegistrar}) {
   return ProviderScope(
     overrides: [
       // Sin persona de contexto: evita renderizar el ContextSelector.
-      healthPersonaContextProvider.overrideWith((ref) async => null),
+      personaVisualizacionSeleccionadaProvider.overrideWith(
+        (ref) async => null,
+      ),
       registrarAnimoProvider.overrideWithValue(
         onRegistrar ?? (({required estadoAnimoId, observaciones}) async {}),
       ),

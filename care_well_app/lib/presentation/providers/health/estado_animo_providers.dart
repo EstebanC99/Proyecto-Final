@@ -36,7 +36,9 @@ final registrarAnimoProvider =
       Future<void> Function({required int estadoAnimoId, String? observaciones})
     >((ref) {
       return ({required estadoAnimoId, observaciones}) async {
-        final persona = await ref.read(healthPersonaContextProvider.future);
+        final persona = await ref.read(
+          personaVisualizacionSeleccionadaProvider.future,
+        );
         if (persona == null) throw Exception('No hay persona de contexto');
 
         await ref

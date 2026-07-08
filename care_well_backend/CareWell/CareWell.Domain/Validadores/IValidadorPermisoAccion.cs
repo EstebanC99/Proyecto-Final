@@ -11,6 +11,8 @@ namespace CareWell.Domain.Validadores
         void ValidarPuedeAdministrarAgenda(Persona personaCuidada, Persona colaborador);
         void ValidarPuedeAdministrarEventosSalud(Persona personaCuidada, Persona colaborador);
         void ValidarPuedeRegistrarHabitos(Persona personaCuidada, Persona colaborador);
+        void ValidarPuedeAdministrarFichaSalud(Persona personaCuidada, Persona colaborador);
+        void ValidarPuedeVerFichaSalud(Persona personaCuidada, Persona colaborador);
         void ValidarVisualizacion(Persona personaCuidada, Persona colaborador);
     }
 }

@@ -41,8 +41,10 @@ final _eventos = <EventoBase>[
 Widget _wrap({List<EventoBase>? eventos, Persona? persona}) {
   return ProviderScope(
     overrides: [
-      lineaTiempoDelMesProvider.overrideWith((ref) async => eventos ?? _eventos),
-      healthPersonaContextProvider.overrideWith(
+      lineaTiempoDelMesProvider.overrideWith(
+        (ref) async => eventos ?? _eventos,
+      ),
+      personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => persona ?? _personaAlicia,
       ),
     ],

@@ -124,33 +124,6 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
       throw UnimplementedError();
 }
 
-class _FakeHealthRepository implements HealthRepository {
-  @override
-  Future<FichaSalud> getFichaSalud(int personaId) async =>
-      throw UnimplementedError();
-
-  @override
-  Future<FichaSalud> guardarFichaSalud(FichaSalud ficha) async =>
-      throw UnimplementedError();
-
-  @override
-  Future<List<RecomendacionMedica>> getRecomendacionesByPersona(
-    int personaId,
-  ) async => [];
-
-  @override
-  Future<RecomendacionMedica> crearRecomendacion(RecomendacionMedica r) async =>
-      r;
-
-  @override
-  Future<RecomendacionMedica> actualizarRecomendacion(
-    RecomendacionMedica r,
-  ) async => r;
-
-  @override
-  Future<void> eliminarRecomendacion(int id) async {}
-}
-
 class _FakeEstadoAnimoRepository implements EstadoAnimoRepository {
   final List<PersonaEstadoAnimo> _estadosAnimo;
 
@@ -158,12 +131,13 @@ class _FakeEstadoAnimoRepository implements EstadoAnimoRepository {
     : _estadosAnimo = estadosAnimo != null ? List.of(estadosAnimo) : [];
 
   @override
-  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona) async => _estadosAnimo
-      .where((e) => e.persona.id == persona.id)
-      .fold<PersonaEstadoAnimo?>(
-        null,
-        (mas, e) => mas == null || e.fecha.isAfter(mas.fecha) ? e : mas,
-      );
+  Future<PersonaEstadoAnimo?> obtenerAnimoHoy(Persona persona) async =>
+      _estadosAnimo
+          .where((e) => e.persona.id == persona.id)
+          .fold<PersonaEstadoAnimo?>(
+            null,
+            (mas, e) => mas == null || e.fecha.isAfter(mas.fecha) ? e : mas,
+          );
 
   @override
   Future<List<PersonaEstadoAnimo>> obtenerPorFechas({
@@ -297,11 +271,9 @@ ProviderContainer _makeContainer({
       personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
-      healthPersonaContextProvider.overrideWith((ref) async => _personaAlicia),
       asignacionCuidadoRepositoryProvider.overrideWithValue(
         _FakeAsignacionCuidadoRepository(asignaciones),
       ),
-      healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
       estadoAnimoRepositoryProvider.overrideWithValue(
         _FakeEstadoAnimoRepository(estadosAnimo: estadosAnimo),
       ),
@@ -332,11 +304,9 @@ ProviderContainer _makeContainerContextPropio({
       personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaMaria,
       ),
-      healthPersonaContextProvider.overrideWith((ref) async => _personaMaria),
       asignacionCuidadoRepositoryProvider.overrideWithValue(
         _FakeAsignacionCuidadoRepository(const []),
       ),
-      healthRepositoryProvider.overrideWithValue(_FakeHealthRepository()),
       estadoAnimoRepositoryProvider.overrideWithValue(
         _FakeEstadoAnimoRepository(estadosAnimo: estadosAnimo),
       ),

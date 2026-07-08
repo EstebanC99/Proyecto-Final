@@ -135,6 +135,18 @@ namespace CareWell.Domain.Test.Salud
                 // Assert
                 Assert.True(this.Target.Activo);
             }
+
+            [Fact]
+            public void Setea_la_propiedad_FechaCreacion_con_la_fecha_actual()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equal(DateTime.Today, this.Target.FechaCreacion.Date);
+            }
         }
 
         public class ElMetodo_Modificar : HabitoVidaTest

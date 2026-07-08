@@ -16,15 +16,65 @@ void main() {
     final ficha = FichaSalud(
       id: 501,
       persona: persona,
-      antecedentes: 'Hipertensión arterial.',
-      estudios: 'ECG normal.',
+      factorSanguineo: 'O+',
+      obraSocial: 'PAMI',
+      observaciones: 'Controlar presión.',
+      antecedentes: const [
+        FichaSaludAntecedente(
+          id: 511,
+          nombre: 'Hipertensión',
+          descripcion: 'Diagnosticada en 2015.',
+          vinculoFamiliar: 'Madre',
+        ),
+      ],
+      alergias: const [
+        FichaSaludAlergia(
+          id: 521,
+          nombre: 'Penicilina',
+          reaccion: 'Erupción cutánea.',
+          medicamento: 'Amoxicilina',
+        ),
+      ],
+      enfermedades: const [
+        FichaSaludEnfermedad(
+          id: 531,
+          nombre: 'Hipotiroidismo',
+          vigente: true,
+          observacion: 'Controlada.',
+        ),
+      ],
     );
 
     final model = FichaSaludModel(
       id: 501,
       personaId: 1,
-      antecedentes: 'Hipertensión arterial.',
-      estudios: 'ECG normal.',
+      factorSanguineo: 'O+',
+      obraSocial: 'PAMI',
+      observaciones: 'Controlar presión.',
+      antecedentes: const [
+        FichaSaludAntecedenteModel(
+          id: 511,
+          nombre: 'Hipertensión',
+          descripcion: 'Diagnosticada en 2015.',
+          vinculoFamiliar: 'Madre',
+        ),
+      ],
+      alergias: const [
+        FichaSaludAlergiaModel(
+          id: 521,
+          nombre: 'Penicilina',
+          reaccion: 'Erupción cutánea.',
+          medicamento: 'Amoxicilina',
+        ),
+      ],
+      enfermedades: const [
+        FichaSaludEnfermedadModel(
+          id: 531,
+          nombre: 'Hipotiroidismo',
+          vigente: true,
+          observacion: 'Controlada.',
+        ),
+      ],
     );
 
     test('entity → model → entity produce entidad equivalente', () {
@@ -33,8 +83,13 @@ void main() {
         persona,
       );
       expect(roundTrip.id, ficha.id);
-      expect(roundTrip.antecedentes, ficha.antecedentes);
-      expect(roundTrip.estudios, ficha.estudios);
+      expect(roundTrip.factorSanguineo, ficha.factorSanguineo);
+      expect(roundTrip.obraSocial, ficha.obraSocial);
+      expect(roundTrip.observaciones, ficha.observaciones);
+      expect(roundTrip.antecedentes.single.nombre, 'Hipertensión');
+      expect(roundTrip.antecedentes.single.vinculoFamiliar, 'Madre');
+      expect(roundTrip.alergias.single.medicamento, 'Amoxicilina');
+      expect(roundTrip.enfermedades.single.vigente, isTrue);
     });
 
     test('json → model → entity → model → json produce el mismo JSON', () {
@@ -49,15 +104,17 @@ void main() {
       final sinCampos = FichaSalud(
         id: 502,
         persona: persona,
-        antecedentes: null,
-        estudios: null,
+        factorSanguineo: 'A+',
       );
       final roundTrip = FichaSaludMapper.fromModel(
         FichaSaludMapper.toModel(sinCampos),
         persona,
       );
-      expect(roundTrip.antecedentes, isNull);
-      expect(roundTrip.estudios, isNull);
+      expect(roundTrip.obraSocial, isNull);
+      expect(roundTrip.observaciones, isNull);
+      expect(roundTrip.antecedentes, isEmpty);
+      expect(roundTrip.alergias, isEmpty);
+      expect(roundTrip.enfermedades, isEmpty);
     });
   });
 
@@ -105,49 +162,6 @@ void main() {
       expect(entity.realizacion!.id, 9010);
       expect(entity.realizacion!.habitoId, 901);
       expect(entity.realizacion!.comentarios, 'Completada.');
-    });
-  });
-
-  group('RecomendacionMedicaMapper', () {
-    final recomendacion = RecomendacionMedica(
-      id: 1001,
-      persona: persona,
-      descripcion: 'Controlar presión arterial.',
-      fecha: DateTime(2026, 5, 15),
-      profesional: 'Dr. Hernández',
-    );
-
-    final model = RecomendacionMedicaModel(
-      id: 1001,
-      personaId: 1,
-      descripcion: 'Controlar presión arterial.',
-      fecha: '2026-05-15T00:00:00.000',
-      profesional: 'Dr. Hernández',
-    );
-
-    test('entity → model → entity produce entidad equivalente', () {
-      final roundTrip = RecomendacionMedicaMapper.fromModel(
-        RecomendacionMedicaMapper.toModel(recomendacion),
-        persona,
-      );
-      expect(roundTrip.id, recomendacion.id);
-      expect(roundTrip.descripcion, recomendacion.descripcion);
-      expect(roundTrip.profesional, recomendacion.profesional);
-      expect(
-        roundTrip.fecha.toIso8601String(),
-        recomendacion.fecha.toIso8601String(),
-      );
-    });
-
-    test('json → model → entity → model → json produce el mismo JSON', () {
-      final json = model.toJson();
-      final modelFromJson = RecomendacionMedicaModel.fromJson(json);
-      final entity = RecomendacionMedicaMapper.fromModel(
-        modelFromJson,
-        persona,
-      );
-      final modelBack = RecomendacionMedicaMapper.toModel(entity);
-      expect(modelBack.toJson(), json);
     });
   });
 
