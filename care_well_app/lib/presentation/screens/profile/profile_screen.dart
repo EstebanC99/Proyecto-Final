@@ -53,7 +53,11 @@ class ProfileScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
-                      ProfileAvatar(nombre: persona.nombre),
+                      Avatar(
+                        nombre: persona.nombre,
+                        imagen: imageProviderFromBase64(persona.imagen),
+                        size: 80,
+                      ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         persona.nombreCompleto,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
-import '../shared/avatar_initial.dart';
+import '../shared/avatar.dart';
 
 /// Tarjeta de miembro del equipo de cuidado (US-16).
 ///
@@ -71,8 +71,9 @@ class MemberCard extends StatelessWidget {
           child: Row(
             children: [
               // Avatar
-              AvatarInitial(
+              Avatar(
                 nombre: colaborador.nombre,
+                imagen: imageProviderFromBase64(colaborador.imagen),
                 size: 44,
                 backgroundColor: avatarBg,
               ),

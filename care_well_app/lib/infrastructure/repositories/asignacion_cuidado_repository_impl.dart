@@ -24,6 +24,7 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
+    String? imagen,
   }) => _datasource.crearPersonaCargo(
     nombre: nombre,
     apellido: apellido,
@@ -31,6 +32,7 @@ class AsignacionCuidadoRepositoryImpl implements AsignacionCuidadoRepository {
     fechaNacimiento: fechaNacimiento,
     email: email,
     telefono: telefono,
+    imagen: imagen,
   );
 
   @override

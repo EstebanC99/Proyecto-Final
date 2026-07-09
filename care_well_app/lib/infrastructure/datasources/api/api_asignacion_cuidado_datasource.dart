@@ -68,6 +68,7 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
+    String? imagen,
   }) async {
     try {
       await _dio.post(
@@ -79,6 +80,8 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
           'fechaNacimiento': fechaNacimiento.toIso8601String(),
           'email': email ?? '',
           'telefono': telefono ?? '',
+          // Imagen de perfil en base64 estándar (sin prefijo data-URI).
+          'imagen': ?imagen,
         },
       );
     } on DioException catch (e) {
@@ -142,6 +145,8 @@ class ApiAsignacionCuidadoDatasource implements AsignacionCuidadoDatasource {
           'fechaNacimiento': persona.fechaNacimiento.toIso8601String(),
           'email': persona.email ?? '',
           'telefono': persona.telefono ?? '',
+          // Imagen de perfil en base64 estándar (sin prefijo data-URI).
+          'imagen': ?persona.imagen,
         },
       );
       return persona;

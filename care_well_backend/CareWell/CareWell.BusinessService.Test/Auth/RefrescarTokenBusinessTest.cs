@@ -280,7 +280,7 @@ namespace CareWell.BusinessService.Test.Auth
                 var respuesta = this.Action();
 
                 // Assert
-                Assert.Equal(this.refreshToken.Object.Usuario.Persona.ImagenPath, respuesta.Usuario.Persona.ImagenPath);
+                Assert.Equal(this.refreshToken.Object.Usuario.Persona.Imagen, respuesta.Usuario.Persona.Imagen);
             }
 
             [Fact]

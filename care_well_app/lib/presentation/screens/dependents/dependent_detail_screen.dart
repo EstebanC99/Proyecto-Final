@@ -46,6 +46,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
   // ── Referencia al estado original (para detectar cambios) ─────────────────
   Persona? _personaOriginal;
 
+  /// Nueva imagen elegida (base64), o null si no se cambió la foto.
+  String? _imagenNueva;
+
   bool _isLoading = false;
 
   // ── Inicialización ─────────────────────────────────────────────────────────
@@ -80,7 +83,8 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
         _documentoController.text.trim() != (original.documento) ||
         _emailController.text.trim() != (original.email ?? '') ||
         _telefonoController.text.trim() != (original.telefono ?? '') ||
-        _fechaNacimiento != original.fechaNacimiento;
+        _fechaNacimiento != original.fechaNacimiento ||
+        _imagenNueva != null;
   }
 
   // ── Validación ─────────────────────────────────────────────────────────────
@@ -138,6 +142,8 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
         telefono: _telefonoController.text.trim().isEmpty
             ? null
             : _telefonoController.text.trim(),
+        // Si no se eligió nueva imagen, copyWith preserva la original.
+        imagen: _imagenNueva,
       );
 
       final actualizar = ref.read(actualizarPersonaCargoProvider);
@@ -155,6 +161,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
         _documentoController.text = resultado.documento;
         _emailController.text = resultado.email ?? '';
         _telefonoController.text = resultado.telefono ?? '';
+        _imagenNueva = null;
         _isLoading = false;
       });
 
@@ -193,6 +200,12 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
     if (picked != null) {
       setState(() => _fechaNacimiento = picked);
     }
+  }
+
+  Future<void> _seleccionarImagen() async {
+    final base64 = await pickImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    setState(() => _imagenNueva = base64);
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -426,7 +439,13 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
-                      AvatarInitial(nombre: persona.nombre, size: 80),
+                      EditableAvatar(
+                        nombre: persona.nombre,
+                        imagen: imageProviderFromBase64(
+                          _imagenNueva ?? persona.imagen,
+                        ),
+                        onTap: _seleccionarImagen,
+                      ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         persona.nombreCompleto,

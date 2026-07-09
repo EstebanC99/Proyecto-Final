@@ -14,6 +14,53 @@ namespace CareWell.Domain.Test.General
             this.Target = new Persona();
         }
 
+        public class ElMetodo_CrearDesdeCuenta : PersonaTest
+        {
+            private CrearModificarPersona crearPersona;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.crearPersona = new CrearModificarPersona(
+                    Nombre: "Usuario",
+                    Apellido: "Prueba",
+                    Documento: "1234",
+                    FechaNacimiento: DateTime.Today,
+                    Telefono: "3364562256",
+                    Email: "persona@mail.com",
+                    Imagen: "ImagenX"
+                );
+            }
+
+            private void Action()
+            {
+                this.Target.CrearDesdeCuenta(this.crearPersona);
+            }
+
+            [Fact]
+            public void Si_Email_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.crearPersona = this.crearPersona with { Email = null };
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.EmailRequerido, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_Telefono_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.crearPersona = this.crearPersona with { Telefono = null };
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.TelefonoRequerido, excepcionEsperada.Message);
+            }
+        }
+
         public class ElMetodo_CrearModificar : PersonaTest
         {
             private CrearModificarPersona crearPersona;
@@ -22,12 +69,15 @@ namespace CareWell.Domain.Test.General
             {
                 base.InitializeTest();
 
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                     "Prueba",
-                                                     "1234",
-                                                     DateTime.Today,
-                                                     "email@example.com",
-                                                     "3364562256");
+                this.crearPersona = new CrearModificarPersona(
+                    Nombre: "Usuario",
+                    Apellido: "Prueba",
+                    Documento: "1234",
+                    FechaNacimiento: DateTime.Today,
+                    Telefono: "3364562256",
+                    Email: "persona@mail.com",
+                    Imagen: "ImagenX"
+                );
             }
 
             private void Action()
@@ -35,16 +85,48 @@ namespace CareWell.Domain.Test.General
                 this.Target.CrearModificar(this.crearPersona);
             }
 
+
+            [Fact]
+            public void Setea_la_propiedad_Email()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equal(this.crearPersona.Email, this.Target.Email);
+            }
+        }
+
+        public class ElMetodo_ModificarPerfil : PersonaTest
+        {
+            private ModificarPerfil modificarPerfil;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.modificarPerfil = new ModificarPerfil(
+                    Nombre: "Usuario",
+                    Apellido: "Prueba",
+                    Documento: "1234",
+                    FechaNacimiento: DateTime.Today,
+                    Telefono: "3364562256",
+                    Imagen: "ImagenX"
+                );
+            }
+
+            private void Action()
+            {
+                this.Target.ModificarPerfil(this.modificarPerfil);
+            }
+
             [Fact]
             public void Si_Nombre_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearModificarPersona(null,
-                                                   "Prueba",
-                                                   "1234",
-                                                   DateTime.Today,
-                                                   "email@example.com",
-                                                   "3364562256");
+                this.modificarPerfil = this.modificarPerfil with { Nombre = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -55,12 +137,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Apellido_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   null,
-                                                   "1234",
-                                                   DateTime.Today,
-                                                   "email@example.com",
-                                                   "3364562256");
+                this.modificarPerfil = this.modificarPerfil with { Apellido = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -71,12 +148,7 @@ namespace CareWell.Domain.Test.General
             public void Si_Documento_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   "Prueba",
-                                                   null,
-                                                   DateTime.Today,
-                                                   "email@example.com",
-                                                   "3364562256");
+                this.modificarPerfil = this.modificarPerfil with { Documento = null };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -87,12 +159,7 @@ namespace CareWell.Domain.Test.General
             public void Si_FechaNacimiento_no_fue_especificada_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   "Prueba",
-                                                   "1234",
-                                                   default,
-                                                   "email@example.com",
-                                                   "3364562256");
+                this.modificarPerfil = this.modificarPerfil with { FechaNacimiento = default };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -108,7 +175,7 @@ namespace CareWell.Domain.Test.General
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.crearPersona.Nombre, this.Target.Nombre);
+                Assert.Equal(this.modificarPerfil.Nombre, this.Target.Nombre);
             }
 
             [Fact]
@@ -120,7 +187,7 @@ namespace CareWell.Domain.Test.General
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.crearPersona.Apellido, this.Target.Apellido);
+                Assert.Equal(this.modificarPerfil.Apellido, this.Target.Apellido);
             }
 
             [Fact]
@@ -132,7 +199,7 @@ namespace CareWell.Domain.Test.General
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.crearPersona.Documento, this.Target.Documento);
+                Assert.Equal(this.modificarPerfil.Documento, this.Target.Documento);
             }
 
             [Fact]
@@ -144,19 +211,7 @@ namespace CareWell.Domain.Test.General
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.crearPersona.FechaNacimiento, this.Target.FechaNacimiento);
-            }
-
-            [Fact]
-            public void Setea_la_propiedad_Email()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.crearPersona.Email, this.Target.Email);
+                Assert.Equal(this.modificarPerfil.FechaNacimiento, this.Target.FechaNacimiento);
             }
 
             [Fact]
@@ -168,61 +223,19 @@ namespace CareWell.Domain.Test.General
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.crearPersona.Telefono, this.Target.Telefono);
-            }
-        }
-
-        public class ElMetodo_CrearDesdeCuenta : PersonaTest
-        {
-            private CrearModificarPersona crearPersona;
-
-            protected override void InitializeTest()
-            {
-                base.InitializeTest();
-
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   "Prueba",
-                                                   "1234",
-                                                   DateTime.Today,
-                                                   "email@example.com",
-                                                   "3364562256");
-            }
-
-            private void Action()
-            {
-                this.Target.CrearDesdeCuenta(this.crearPersona);
+                Assert.Equal(this.modificarPerfil.Telefono, this.Target.Telefono);
             }
 
             [Fact]
-            public void Si_Email_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Setea_la_propiedad_Imagen()
             {
                 // Arrange
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   "Prueba",
-                                                   "1234",
-                                                   DateTime.Today,
-                                                   null,
-                                                   "3364562256");
 
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.EmailRequerido, excepcionEsperada.Message);
-            }
+                // Action
+                this.Action();
 
-            [Fact]
-            public void Si_Telefono_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
-            {
-                // Arrange
-                this.crearPersona = new CrearModificarPersona("Usuario",
-                                                   "Prueba",
-                                                   "1234",
-                                                   DateTime.Today,
-                                                   "email@example.com",
-                                                   null);
-
-                // Action & Assert
-                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.TelefonoRequerido, excepcionEsperada.Message);
+                // Assert
+                Assert.Equal(this.modificarPerfil.Imagen, this.Target.Imagen);
             }
         }
     }

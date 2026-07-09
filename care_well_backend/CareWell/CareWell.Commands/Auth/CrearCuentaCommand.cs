@@ -15,5 +15,7 @@
         public virtual string Telefono { get; set; }
 
         public virtual string Contrasena { get; set; }
+
+        public virtual string? Imagen { get; set; }
     }
 }

@@ -37,12 +37,15 @@ namespace CareWell.BusinessService.Auth
 
         public void Crear(CrearCuentaCommand command)
         {
-            var crearPersona = new CrearModificarPersona(command.Nombre,
-                                                command.Apellido,
-                                                command.Documento,
-                                                command.FechaNacimiento,
-                                                command.Email,
-                                                command.Telefono);
+            var crearPersona = new CrearModificarPersona(
+                Nombre: command.Nombre,
+                Apellido: command.Apellido,
+                Documento: command.Documento,
+                FechaNacimiento: command.FechaNacimiento,
+                Telefono: command.Telefono,
+                Imagen: command.Imagen,
+                Email: command.Email
+            );
 
             var persona = this.Factory.Crear<Persona>();
 

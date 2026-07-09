@@ -14,6 +14,7 @@ abstract class AsignacionCuidadoDatasource {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
+    String? imagen,
   });
 
   Future<Persona> modificarPersonaCargo(int asignacionId, Persona persona);

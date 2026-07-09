@@ -1,8 +1,5 @@
 ﻿using CareWell.Domain.Auth;
 using CareWell.Domain.ValueObjects.General;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CareWell.Domain.ValueObjects.EquipoCuidado
 {
@@ -13,13 +10,15 @@ namespace CareWell.Domain.ValueObjects.EquipoCuidado
         DateTime FechaNacimiento,
         string? Email,
         string? Telefono,
+        string? Imagen,
         Usuario UsuarioModificador
-        ) 
+        )
         : CrearModificarPersona(
         Nombre,
         Apellido,
         Documento,
         FechaNacimiento,
         Email,
-        Telefono);
+        Telefono,
+        Imagen);
 }

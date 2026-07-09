@@ -14,6 +14,6 @@
 
         public string? Telefono { get; set; }
 
-        public string? ImagenPath { get; set; }
+        public string? Imagen { get; set; }
     }
 }

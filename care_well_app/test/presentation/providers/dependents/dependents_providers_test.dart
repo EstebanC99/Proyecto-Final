@@ -117,6 +117,7 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
     required DateTime fechaNacimiento,
     String? email,
     String? telefono,
+    String? imagen,
   }) async {
     _asignaciones.add(
       AsignacionCuidado(

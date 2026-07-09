@@ -54,12 +54,13 @@ namespace CareWell.BusinessService.EquipoCuidado
 
             var personaCargo = this.Factory.Crear<Persona>();
             personaCargo.CrearModificar(new Domain.ValueObjects.General.CrearModificarPersona(
-                command.Nombre,
-                command.Apellido,
-                command.Documento,
-                command.FechaNacimiento,
-                command.Email,
-                command.Telefono
+                Nombre: command.Nombre,
+                Apellido: command.Apellido,
+                Documento: command.Documento,
+                FechaNacimiento: command.FechaNacimiento,
+                Telefono: command.Telefono,
+                Imagen: command.Imagen,
+                Email: command.Email
             ));
             this.PersonaRepository.Add(personaCargo);
 
@@ -83,12 +84,13 @@ namespace CareWell.BusinessService.EquipoCuidado
             var asignacionCuidado = this.AsignacionCuidadoRepository.GetByID(command.AsignacionCuidadoID);
 
             var modificarAsignacionResponsable = new ModificarInformacionPersona(
-                command.Nombre,
-                command.Apellido,
-                command.Documento,
-                command.FechaNacimiento,
-                command.Email,
-                command.Telefono,
+                Nombre: command.Nombre,
+                Apellido: command.Apellido,
+                Documento: command.Documento,
+                FechaNacimiento: command.FechaNacimiento,
+                Email: command.Email,
+                Telefono: command.Telefono,
+                Imagen: command.Imagen,
                 this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID));
 
             asignacionCuidado.ModificarInformacionPersona(modificarAsignacionResponsable,

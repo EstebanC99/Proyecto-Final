@@ -5,7 +5,16 @@
         string Apellido,
         string Documento,
         DateTime FechaNacimiento,
-        string? Email,
-        string? Telefono
+        string? Telefono,
+        string? Imagen,
+        string? Email
+    ) :
+    ModificarPerfil(
+        Nombre: Nombre,
+        Apellido: Apellido,
+        Documento: Documento,
+        FechaNacimiento: FechaNacimiento,
+        Telefono: Telefono,
+        Imagen: Imagen
     );
 }

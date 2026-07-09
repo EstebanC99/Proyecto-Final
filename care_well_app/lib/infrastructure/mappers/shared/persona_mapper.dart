@@ -11,7 +11,7 @@ class PersonaMapper {
       fechaNacimiento: model.fechaNacimiento,
       email: model.email,
       telefono: model.telefono,
-      imagen: null,
+      imagen: model.imagen,
     );
   }
 }

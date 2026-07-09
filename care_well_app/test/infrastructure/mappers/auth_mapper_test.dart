@@ -42,7 +42,7 @@ void main() {
       telefono: '',
       documento: '',
       fechaNacimiento: DateTime(1990, 1, 1),
-      imagenPath: null,
+      imagen: null,
     );
 
     final estadoModel = EstadoUsuarioModel(

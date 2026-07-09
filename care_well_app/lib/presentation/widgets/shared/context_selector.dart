@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
+import 'avatar.dart';
 
 /// Selector de persona de contexto global.
 ///
@@ -211,20 +212,12 @@ class _PersonaSelectorSheet extends StatelessWidget {
             PersonaContextRol.responsable => 'Responsable',
             PersonaContextRol.cuidador => 'Cuidador/a',
           };
-          final inicial = opcion.persona.nombre.isNotEmpty
-              ? opcion.persona.nombre[0].toUpperCase()
-              : '?';
 
           return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: AppColors.primaryContainer,
-              child: Text(
-                inicial,
-                style: const TextStyle(
-                  color: AppColors.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            leading: Avatar(
+              nombre: opcion.persona.nombre,
+              imagen: imageProviderFromBase64(opcion.persona.imagen),
+              size: 40,
             ),
             title: Text('${opcion.persona.nombre} ${opcion.persona.apellido}'),
             subtitle: Text(rolLabel),

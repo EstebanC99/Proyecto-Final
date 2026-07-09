@@ -12,7 +12,7 @@ void main() {
       fechaNacimiento: DateTime(1990, 5, 20),
       email: 'ana@example.com',
       telefono: '+54 9 11 9876-5432',
-      imagenPath: null,
+      imagen: null,
     );
 
     test('fromModel produce entidad con campos correctos', () {
@@ -39,12 +39,48 @@ void main() {
         'fechaNacimiento': '1985-03-10T00:00:00.000',
         'email': 'juan@example.com',
         'telefono': '',
-        'imagenPath': null,
+        'imagen': null,
       };
       final modelFromJson = PersonaModel.fromJson(json);
       final entity = PersonaMapper.fromModel(modelFromJson);
       expect(entity.id, 2);
       expect(entity.nombre, 'Juan');
+    });
+
+    test(
+      'fromJson admite email y telefono nulos (persona sin credenciales)',
+      () {
+        final json = {
+          'id': 4,
+          'nombre': 'Rosa',
+          'apellido': 'Gómez',
+          'documento': '99887766',
+          'fechaNacimiento': '1940-07-15T00:00:00.000',
+          'email': null,
+          'telefono': null,
+          'imagen': null,
+        };
+        final modelFromJson = PersonaModel.fromJson(json);
+        final entity = PersonaMapper.fromModel(modelFromJson);
+        expect(entity.email, isNull);
+        expect(entity.telefono, isNull);
+        expect(entity.nombre, 'Rosa');
+      },
+    );
+
+    test('fromModel propaga la imagen base64 a la entidad', () {
+      final modelConImagen = PersonaModel(
+        id: 3,
+        nombre: 'Eva',
+        apellido: 'Ruiz',
+        documento: '11222333',
+        fechaNacimiento: DateTime(1988, 2, 2),
+        email: 'eva@example.com',
+        telefono: '',
+        imagen: 'iVBORw0KGgo=',
+      );
+      final entity = PersonaMapper.fromModel(modelConImagen);
+      expect(entity.imagen, 'iVBORw0KGgo=');
     });
   });
 }

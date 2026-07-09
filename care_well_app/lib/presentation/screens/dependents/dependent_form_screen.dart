@@ -39,6 +39,9 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
   bool _tcAceptado = false;
   bool _isLoading = false;
 
+  /// Imagen de perfil elegida, codificada en base64 (null si no se eligió).
+  String? _imagenBase64;
+
   // Estado de éxito
   bool _exitoso = false;
   String _nombreCreado = '';
@@ -72,6 +75,12 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
     if (picked != null) {
       setState(() => _fechaNacimiento = picked);
     }
+  }
+
+  Future<void> _seleccionarImagen() async {
+    final base64 = await pickImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    setState(() => _imagenBase64 = base64);
   }
 
   bool _validar() {
@@ -125,6 +134,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
         telefono: _telefonoController.text.trim().isEmpty
             ? null
             : _telefonoController.text.trim(),
+        imagen: _imagenBase64,
       );
 
       if (!mounted) return;
@@ -158,6 +168,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
       _telefonoController.clear();
       _fechaNacimiento = null;
       _tcAceptado = false;
+      _imagenBase64 = null;
       _nombreError = null;
       _apellidoError = null;
       _dniError = null;
@@ -215,46 +226,18 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Bloque de foto (placeholder)
+              // Bloque de foto
               Center(
                 child: Column(
                   children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusFull,
-                      ),
-                      onTap: () {
-                        // TODO(MVP): integrar image_picker
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Funcionalidad disponible próximamente.',
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.outline,
-                            width: 2,
-                            strokeAlign: BorderSide.strokeAlignOutside,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 24,
-                          color: AppColors.textDisabled,
-                        ),
-                      ),
+                    EditableAvatar(
+                      nombre: _nombreController.text,
+                      imagen: imageProviderFromBase64(_imagenBase64),
+                      onTap: _seleccionarImagen,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Agregar foto',
+                      _imagenBase64 == null ? 'Agregar foto' : 'Cambiar foto',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

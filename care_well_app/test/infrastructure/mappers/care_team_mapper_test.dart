@@ -14,7 +14,7 @@ void main() {
     'fechaNacimiento': '1940-03-15T00:00:00',
     'email': 'alicia@mail.com',
     'telefono': '2994001122',
-    'imagenPath': null,
+    'imagen': null,
   };
 
   final colaboradorJson = {
@@ -25,7 +25,7 @@ void main() {
     'fechaNacimiento': '1985-03-14T00:00:00',
     'email': 'maria@mail.com',
     'telefono': '2994000000',
-    'imagenPath': null,
+    'imagen': null,
   };
 
   // Construimos el AsignacionCuidadoModel directamente para aislar el test del

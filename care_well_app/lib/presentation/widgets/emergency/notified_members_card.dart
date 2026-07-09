@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
-import '../shared/avatar_initial.dart';
+import '../shared/avatar.dart';
 
 /// Card de un miembro notificado en la pantalla de emergencia enviada.
 ///
@@ -30,7 +30,11 @@ class NotifiedMembersCard extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 40),
         child: Row(
           children: [
-            AvatarInitial(nombre: persona.nombre, size: 36),
+            Avatar(
+              nombre: persona.nombre,
+              imagen: imageProviderFromBase64(persona.imagen),
+              size: 36,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

@@ -18,29 +18,7 @@ namespace CareWell.Domain.General
 
         public virtual string? Telefono { get; private set; }
 
-        public virtual string? ImagenPath { get; private set; }
-
-        public virtual void CrearModificar(CrearModificarPersona crearModificarPersona)
-        {
-            if (string.IsNullOrEmpty(crearModificarPersona.Nombre))
-                throw new ValidacionDominioException(Mensajes.NombreRequerido);
-
-            if (string.IsNullOrEmpty(crearModificarPersona.Apellido))
-                throw new ValidacionDominioException(Mensajes.ApellidoRequerido);
-
-            if (string.IsNullOrEmpty(crearModificarPersona.Documento))
-                throw new ValidacionDominioException(Mensajes.DocumentoRequerido);
-
-            if (crearModificarPersona.FechaNacimiento == default)
-                throw new ValidacionDominioException(Mensajes.FechaNacimientoRequerida);
-
-            this.Nombre = crearModificarPersona.Nombre;
-            this.Apellido = crearModificarPersona.Apellido;
-            this.Documento = crearModificarPersona.Documento;
-            this.FechaNacimiento = crearModificarPersona.FechaNacimiento;
-            this.Email = crearModificarPersona.Email;
-            this.Telefono = crearModificarPersona.Telefono;
-        }
+        public virtual string? Imagen { get; private set; }
 
         public virtual void CrearDesdeCuenta(CrearModificarPersona crearPersona)
         {
@@ -51,6 +29,35 @@ namespace CareWell.Domain.General
                 throw new ValidacionDominioException(Mensajes.TelefonoRequerido);
 
             this.CrearModificar(crearPersona);
+        }
+
+        public virtual void CrearModificar(CrearModificarPersona crearModificarPersona)
+        {
+            this.ModificarPerfil(crearModificarPersona);
+
+            this.Email = crearModificarPersona.Email;
+        }
+
+        public virtual void ModificarPerfil(ModificarPerfil modificarPerfil)
+        {
+            if (string.IsNullOrEmpty(modificarPerfil.Nombre))
+                throw new ValidacionDominioException(Mensajes.NombreRequerido);
+
+            if (string.IsNullOrEmpty(modificarPerfil.Apellido))
+                throw new ValidacionDominioException(Mensajes.ApellidoRequerido);
+
+            if (string.IsNullOrEmpty(modificarPerfil.Documento))
+                throw new ValidacionDominioException(Mensajes.DocumentoRequerido);
+
+            if (modificarPerfil.FechaNacimiento == default)
+                throw new ValidacionDominioException(Mensajes.FechaNacimientoRequerida);
+
+            this.Nombre = modificarPerfil.Nombre;
+            this.Apellido = modificarPerfil.Apellido;
+            this.Documento = modificarPerfil.Documento;
+            this.FechaNacimiento = modificarPerfil.FechaNacimiento;
+            this.Telefono = modificarPerfil.Telefono;
+            this.Imagen = modificarPerfil.Imagen;
         }
     }
 }

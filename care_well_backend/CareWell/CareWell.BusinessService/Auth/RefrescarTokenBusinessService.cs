@@ -1,7 +1,6 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.DataViews.Auth;
 using CareWell.DataViews.General;
-using CareWell.Domain.Auth;
 using CareWell.Queries.Auth;
 using CareWell.Repository.Auth;
 
@@ -52,7 +51,7 @@ namespace CareWell.BusinessService.Auth
                         FechaNacimiento = refreshToken.Usuario.Persona.FechaNacimiento,
                         Email = refreshToken.Usuario.Persona.Email,
                         Telefono = refreshToken.Usuario.Persona.Telefono,
-                        ImagenPath = refreshToken.Usuario.Persona.ImagenPath
+                        Imagen = refreshToken.Usuario.Persona.Imagen
                     },
                     Estado = new EstadoUsuarioDataView
                     {

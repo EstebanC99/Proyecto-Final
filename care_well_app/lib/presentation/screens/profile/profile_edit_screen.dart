@@ -21,6 +21,20 @@ class ProfileEditScreen extends ConsumerStatefulWidget {
 class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   bool _isLoading = false;
 
+  /// Preview local de la foto elegida (base64). No se persiste todavía: el
+  /// endpoint de actualización de perfil aún no existe en el backend, así que
+  /// la imagen solo se refleja en la UI durante la sesión. Intencional hasta
+  /// que exista el endpoint correspondiente (ver `actualizarPerfil`).
+  String? _imagenPreview;
+
+  Future<void> _seleccionarImagen() async {
+    final base64 = await pickImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    // TODO(backend): persistir la foto cuando exista el endpoint de
+    // actualización de perfil. Por ahora solo se actualiza el preview local.
+    setState(() => _imagenPreview = base64);
+  }
+
   Future<void> _guardarEmail(String nuevoEmail) async {
     setState(() => _isLoading = true);
     try {
@@ -103,7 +117,13 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Column(
                       children: [
-                        ProfileAvatar(nombre: persona.nombre),
+                        EditableAvatar(
+                          nombre: persona.nombre,
+                          imagen: imageProviderFromBase64(
+                            _imagenPreview ?? persona.imagen,
+                          ),
+                          onTap: _seleccionarImagen,
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           persona.nombreCompleto,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
-import '../shared/avatar_initial.dart';
+import '../shared/avatar.dart';
 
 /// Encabezado de solo lectura que ubica al usuario sobre a quién pertenece la
 /// ficha de salud. No es interactivo: estos datos se editan desde
@@ -27,7 +27,11 @@ class PersonaContextHeaderCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              AvatarInitial(nombre: persona.nombre, size: 48),
+              Avatar(
+                nombre: persona.nombre,
+                imagen: imageProviderFromBase64(persona.imagen),
+                size: 48,
+              ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(

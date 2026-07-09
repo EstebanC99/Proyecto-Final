@@ -4,7 +4,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../profile/role_badge.dart';
-import '../shared/avatar_initial.dart';
+import '../shared/avatar.dart';
 import '../shared/deleted_assignment_chip.dart';
 
 /// Calcula la edad en años a partir de [fechaNacimiento].
@@ -68,7 +68,11 @@ class PersonCard extends StatelessWidget {
           child: Row(
             children: [
               // Avatar
-              AvatarInitial(nombre: persona.nombre, size: 52),
+              Avatar(
+                nombre: persona.nombre,
+                imagen: imageProviderFromBase64(persona.imagen),
+                size: 52,
+              ),
               const SizedBox(width: AppSpacing.md),
               // Datos
               Expanded(

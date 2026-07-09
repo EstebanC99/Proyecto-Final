@@ -57,7 +57,7 @@ namespace CareWell.BusinessService.Auth
                         FechaNacimiento = usuario.Persona.FechaNacimiento,
                         Email = usuario.Persona.Email,
                         Telefono = usuario.Persona.Telefono,
-                        ImagenPath = usuario.Persona.ImagenPath
+                        Imagen = usuario.Persona.Imagen
                     },
                     Estado = new EstadoUsuarioDataView
                     {

@@ -518,7 +518,11 @@ class _PendingRequestCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              AvatarInitial(nombre: colaborador.nombre, size: 44),
+              Avatar(
+                nombre: colaborador.nombre,
+                imagen: imageProviderFromBase64(colaborador.imagen),
+                size: 44,
+              ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -629,7 +633,11 @@ class _ReactivableCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              AvatarInitial(nombre: colaborador.nombre, size: 44),
+              Avatar(
+                nombre: colaborador.nombre,
+                imagen: imageProviderFromBase64(colaborador.imagen),
+                size: 44,
+              ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(

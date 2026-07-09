@@ -37,6 +37,9 @@ dependencies:
 
   flutter_secure_storage: ^9.2.2
 
+  # Selección/captura de imágenes (foto de perfil de personas y usuario)
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

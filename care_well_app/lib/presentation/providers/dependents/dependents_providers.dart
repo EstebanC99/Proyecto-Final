@@ -37,6 +37,7 @@ final crearPersonaCargoProvider =
           fechaNacimiento: fechaNacimiento,
           email: email,
           telefono: telefono,
+          imagen: imagen,
         );
 
         ref.invalidate(misAsignacionesProvider);

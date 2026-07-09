@@ -39,9 +39,9 @@ class Persona extends BaseEntity {
       apellido: apellido ?? this.apellido,
       documento: documento ?? this.documento,
       fechaNacimiento: fechaNacimiento ?? this.fechaNacimiento,
-      email: email,
-      telefono: telefono,
-      imagen: imagen,
+      email: email ?? this.email,
+      telefono: telefono ?? this.telefono,
+      imagen: imagen ?? this.imagen,
     );
   }
 }

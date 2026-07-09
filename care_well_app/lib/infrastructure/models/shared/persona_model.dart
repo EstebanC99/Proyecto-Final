@@ -3,9 +3,9 @@ class PersonaModel {
   final String apellido;
   final String documento;
   final DateTime fechaNacimiento;
-  final String email;
-  final String telefono;
-  final dynamic imagenPath;
+  final String? email;
+  final String? telefono;
+  final String? imagen;
   final int id;
 
   PersonaModel({
@@ -15,7 +15,7 @@ class PersonaModel {
     required this.fechaNacimiento,
     required this.email,
     required this.telefono,
-    required this.imagenPath,
+    required this.imagen,
     required this.id,
   });
 
@@ -24,9 +24,9 @@ class PersonaModel {
     apellido: json["apellido"],
     documento: json["documento"],
     fechaNacimiento: DateTime.parse(json["fechaNacimiento"]),
-    email: json["email"],
-    telefono: json["telefono"],
-    imagenPath: json["imagenPath"],
+    email: json["email"] as String?,
+    telefono: json["telefono"] as String?,
+    imagen: json["imagen"] as String?,
     id: json["id"],
   );
 
@@ -37,7 +37,7 @@ class PersonaModel {
     "fechaNacimiento": fechaNacimiento.toIso8601String(),
     "email": email,
     "telefono": telefono,
-    "imagenPath": imagenPath,
+    "imagen": imagen,
     "id": id,
   };
 }

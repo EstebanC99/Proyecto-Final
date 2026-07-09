@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../shared/avatar.dart';
 
 /// Barra de identidad y saludo del menú principal.
 ///
@@ -19,8 +20,6 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = userName.isNotEmpty ? userName[0].toUpperCase() : '?';
-
     return FadeIn(
       duration: const Duration(milliseconds: 400),
       child: Container(
@@ -82,24 +81,7 @@ class HomeHeader extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Avatar circular con inicial
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryContainer,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              initial,
-                              style: const TextStyle(
-                                color: AppColors.onPrimaryContainer,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        Avatar(nombre: userName, size: 40),
                         const SizedBox(width: AppSpacing.sm),
                         // Saludo
                         Text(
