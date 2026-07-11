@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:care_well_app/domain/datasources/datasources.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
@@ -9,6 +11,9 @@ class PersonaRepositoryImpl implements PersonaRepository {
 
   @override
   Future<Persona> getById(int id) => _datasource.getById(id);
+
+  @override
+  Future<Uint8List?> getImagen(int id) => _datasource.getImagen(id);
 
   @override
   Future<List<Persona>> getDependientesByUsuario(int usuarioId) =>

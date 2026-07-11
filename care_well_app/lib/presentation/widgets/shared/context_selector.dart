@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
-import 'avatar.dart';
+import 'persona_avatar.dart';
 
 /// Selector de persona de contexto global.
 ///
@@ -33,7 +33,7 @@ class ContextSelector extends ConsumerWidget {
       data: (persona) {
         if (persona == null) return const SizedBox.shrink();
 
-        final opciones = opcionesAsync.valueOrNull ?? [];
+        final opciones = opcionesAsync.value ?? [];
         final soloUnaOpcion = opciones.length <= 1;
 
         // Determinar si la persona actual es el propio usuario.
@@ -214,9 +214,9 @@ class _PersonaSelectorSheet extends StatelessWidget {
           };
 
           return ListTile(
-            leading: Avatar(
+            leading: PersonaAvatar(
+              personaId: opcion.persona.id,
               nombre: opcion.persona.nombre,
-              imagen: imageProviderFromBase64(opcion.persona.imagen),
               size: 40,
             ),
             title: Text('${opcion.persona.nombre} ${opcion.persona.apellido}'),

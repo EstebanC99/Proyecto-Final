@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Todas las asignaciones del usuario logueado (activas, pendientes e inactivas).
 final misAsignacionesProvider =
     FutureProvider.autoDispose<List<AsignacionCuidado>>((ref) async {
-      final usuario = ref.watch(authStateProvider).valueOrNull;
+      final usuario = ref.watch(authStateProvider).value;
       if (usuario == null) return [];
       final repo = ref.watch(asignacionCuidadoRepositoryProvider);
       return repo.obtenerAsignacionesUsuarioLogueado();
@@ -91,7 +91,7 @@ final asignacionesPorPersonaCuidadaProvider = FutureProvider.autoDispose
 
 final esResponsablePersonaSeleccionadaProvider =
     FutureProvider.autoDispose<bool>((ref) async {
-      final usuario = ref.watch(authStateProvider).valueOrNull;
+      final usuario = ref.watch(authStateProvider).value;
       if (usuario == null) return false;
 
       final esPropio = await ref.watch(esContextoPropioProvider.future);

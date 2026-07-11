@@ -38,12 +38,12 @@ class HabitDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitoAsync = ref.watch(habitoByIdProvider(habitId));
-    final puede = ref.watch(puedeRegistrarHabitosProvider).valueOrNull ?? false;
+    final puede = ref.watch(puedeRegistrarHabitosProvider).value ?? false;
     // El registro de cumplimiento diario (marcar realizado / comentar) está
     // disponible para cualquier miembro activo del equipo, sin exigir el
     // permiso de ABM de hábitos.
     final esMiembroEquipo =
-        ref.watch(esMiembroEquipoActivoProvider).valueOrNull ?? false;
+        ref.watch(esMiembroEquipoActivoProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,

@@ -28,7 +28,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final usuario = authState.valueOrNull;
+    final usuario = authState.value;
     final userName = usuario?.persona.nombre ?? '';
 
     final dependentsAsync = ref.watch(asignacionesActivasProvider);

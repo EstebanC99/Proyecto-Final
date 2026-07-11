@@ -27,8 +27,7 @@ class HealthEventsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventosAsync = ref.watch(eventosSaludDelMesProvider);
-    final puede =
-        ref.watch(puedeRegistrarEventosSaludProvider).valueOrNull ?? false;
+    final puede = ref.watch(puedeRegistrarEventosSaludProvider).value ?? false;
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final mes = ref.watch(mesEventosSaludProvider);
 
@@ -95,7 +94,7 @@ class HealthEventsScreen extends ConsumerWidget {
                 ),
               ),
               data: (eventos) {
-                if (personaAsync.valueOrNull == null) {
+                if (personaAsync.value == null) {
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),

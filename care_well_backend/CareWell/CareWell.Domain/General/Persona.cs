@@ -18,7 +18,7 @@ namespace CareWell.Domain.General
 
         public virtual string? Telefono { get; private set; }
 
-        public virtual string? Imagen { get; private set; }
+        public virtual byte[]? Imagen { get; private set; }
 
         public virtual void CrearDesdeCuenta(CrearModificarPersona crearPersona)
         {

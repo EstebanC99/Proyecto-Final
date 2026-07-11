@@ -19,6 +19,7 @@
         public const string ElEventoAgendaEsRequeridoParaElEventoSalud = "El evento de agenda correspondiente es requerido para el evento de salud.";
         public const string ElEventoAgendaNoGeneraEventoSalud = "El evento de agenda elegido, no genera un evento de salud.";
         public const string ElEventoNoEsRecurrente = "El evento seleccionado no es recurrente.";
+        public const string ElPerfilSeleccionadoNoCorrespondeAlPropio = "El perfil seleccionado para modificar no corresponde al suyo propio.";
         public const string EmailRequerido = "El email es requerido.";
         public const string EstadoAnimoRequerido = "El estado de ánimo es requerido.";
         public const string EstadoAsignacionNoPermiteEjecutarAccion = "El estado de la asignación no permite ejecutar la acción.";
@@ -28,6 +29,7 @@
         public const string FechaHoraInicioEventoRequerida = "La fecha y hora de inicio del evento es requerida.";
         public const string FechaNacimientoRequerida = "La fecha de nacimiento es requerida.";
         public const string LaDescripcionEsRequerida = "La descripción es requerida.";
+        public const string LaImagenNoPudoRecuperarse = "La imagen no pudo recuperarse correctamente, por favor reintente.";
         public const string NombreAlergiaRequerido = "El nombre de la alergia es requerido.";
         public const string NombreAntecedenteRequerido = "El nombre de la enfermedad del antecedente es requerido.";
         public const string NombreEnfermedadRequerido = "El nombre de la enfermedad es requerido.";

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../../domain/datasources/datasources.dart';
 import '../../../domain/entities/entities.dart';
 import 'demo_seed.dart';
@@ -25,6 +27,14 @@ class DemoPersonaDatasource implements PersonaDatasource {
     final persona = _personas.where((p) => p.id == id).firstOrNull;
     if (persona == null) throw Exception('Persona no encontrada: $id');
     return persona;
+  }
+
+  @override
+  Future<Uint8List?> getImagen(int id) async {
+    // El modo demo no simula imágenes de perfil: siempre cae al fallback de
+    // iniciales del avatar.
+    await Future.delayed(Duration.zero);
+    return null;
   }
 
   @override

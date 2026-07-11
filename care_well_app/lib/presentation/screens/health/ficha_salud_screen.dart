@@ -131,7 +131,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final puedeVerAsync = ref.watch(puedeVerSaludProvider);
     final puedeEditar =
-        ref.watch(puedeAdministrarFichaSaludProvider).valueOrNull ?? false;
+        ref.watch(puedeAdministrarFichaSaludProvider).value ?? false;
 
     // Siembra el borrador cuando llega la ficha (o su ausencia).
     ref.listen<AsyncValue<FichaSalud?>>(fichaSaludProvider, (prev, next) {
@@ -204,7 +204,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
 
             // Defensa en profundidad: sin permiso de ver ficha no se muestra el
             // contenido (la card del hub ya aparece deshabilitada).
-            final puedeVer = puedeVerAsync.valueOrNull;
+            final puedeVer = puedeVerAsync.value;
             if (puedeVerAsync.isLoading && puedeVer == null) {
               return const _LoadingSkeleton();
             }

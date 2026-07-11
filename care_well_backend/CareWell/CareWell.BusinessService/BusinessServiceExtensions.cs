@@ -42,6 +42,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarEventoSaludBusinessService, AdministrarEventoSaludBusinessService>();
             services.AddScoped<IAdministrarFichaSaludBusinessService, AdministrarFichaSaludBusinessService>();
             services.AddScoped<IAdministrarHabitoVidaBusinessService, AdministrarHabitoVidaBusinessService>();
+            services.AddScoped<IAdministrarPersonaBusinessService, AdministrarPersonaBusinessService>();
             services.AddScoped<IAdministrarPersonaEstadoAnimoBusinessService, AdministrarPersonaEstadoAnimoBusinessService>();
             services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
             services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();

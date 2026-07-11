@@ -44,14 +44,14 @@ class _WellbeingObservationsBannerState
   Widget build(BuildContext context) {
     // Reinicia a colapsado al cambiar de persona de contexto (comparando id).
     ref.listen(personaVisualizacionSeleccionadaProvider, (prev, next) {
-      final cambioPersona = prev?.valueOrNull?.id != next.valueOrNull?.id;
+      final cambioPersona = prev?.value?.id != next.value?.id;
       if (cambioPersona && _expanded) {
         setState(() => _expanded = false);
       }
     });
 
     final alertas =
-        ref.watch(alertasBienestarOrdenadasProvider).valueOrNull ?? const [];
+        ref.watch(alertasBienestarOrdenadasProvider).value ?? const [];
     if (alertas.isEmpty) return const SizedBox.shrink();
 
     // Fundido en el lugar (sin desplazamiento): suaviza la aparición cuando el

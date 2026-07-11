@@ -116,8 +116,8 @@ void main() {
 
         final state = container.read(authStateProvider);
         expect(state.hasValue, isTrue);
-        expect(state.valueOrNull, isNotNull);
-        expect(state.valueOrNull?.persona.email, 'test@example.com');
+        expect(state.value, isNotNull);
+        expect(state.value?.persona.email, 'test@example.com');
       },
     );
 
@@ -169,7 +169,7 @@ void main() {
           );
 
       final sessionState = container.read(authStateProvider);
-      expect(sessionState.valueOrNull, isNull);
+      expect(sessionState.value, isNull);
     });
 
     test(
@@ -186,7 +186,7 @@ void main() {
             );
 
         expect(result.hasValue, isTrue);
-        expect(result.valueOrNull?.id, 101);
+        expect(result.value?.id, 101);
       },
     );
 
@@ -202,7 +202,7 @@ void main() {
           );
 
       final sessionState = container.read(authStateProvider);
-      expect(sessionState.valueOrNull, isNull);
+      expect(sessionState.value, isNull);
     });
 
     test('solicitarRecuperacionContrasenaProvider es callable', () async {
@@ -230,7 +230,7 @@ void main() {
 
         final state = container.read(authStateProvider);
         expect(state.hasValue, isTrue);
-        expect(state.valueOrNull?.persona.email, 'nuevo@example.com');
+        expect(state.value?.persona.email, 'nuevo@example.com');
       },
     );
 
@@ -244,7 +244,7 @@ void main() {
           .actualizarPerfil(email: 'test@example.com');
 
       final state = container.read(authStateProvider);
-      expect(state.valueOrNull, isNull);
+      expect(state.value, isNull);
     });
 
     test(
@@ -269,8 +269,8 @@ void main() {
 
         // La sesión sigue activa.
         final state = container.read(authStateProvider);
-        expect(state.valueOrNull, isNotNull);
-        expect(state.valueOrNull?.id, 101);
+        expect(state.value, isNotNull);
+        expect(state.value?.id, 101);
       },
     );
 
@@ -306,7 +306,7 @@ void main() {
             .read(authStateProvider.notifier)
             .login('test@example.com', '1234');
 
-        expect(container.read(authStateProvider).valueOrNull, isNotNull);
+        expect(container.read(authStateProvider).value, isNotNull);
 
         await container.read(authStateProvider.notifier).eliminarCuenta();
 

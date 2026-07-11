@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../domain/entities/entities.dart';
 import '../../../domain/repositories/repositories.dart';
@@ -66,7 +67,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
     state = const AsyncValue.data(null);
   }
 
+  /// Refleja en la sesión activa los cambios de datos de la persona propia.
+  void actualizarPersonaEnSesion(Persona persona) {
+    final usuario = state.value;
+    if (usuario == null) return;
+    state = AsyncValue.data(usuario.copyWith(persona: persona));
+  }
+
   /// Actualiza el perfil del usuario en sesión y refresca el estado.
+  // Reservado para el futuro endpoint de credenciales/email; no cableado a la UI.
   Future<void> actualizarPerfil({
     String? email,
     String? telefono,

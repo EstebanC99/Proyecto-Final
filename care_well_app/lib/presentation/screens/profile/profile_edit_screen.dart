@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -21,67 +24,67 @@ class ProfileEditScreen extends ConsumerStatefulWidget {
 class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   bool _isLoading = false;
 
-  /// Preview local de la foto elegida (base64). No se persiste todavía: el
-  /// endpoint de actualización de perfil aún no existe en el backend, así que
-  /// la imagen solo se refleja en la UI durante la sesión. Intencional hasta
-  /// que exista el endpoint correspondiente (ver `actualizarPerfil`).
+  /// Preview local de la foto recién elegida (base64), para reflejarla al
+  /// instante en el avatar de esta pantalla mientras se persiste y se recarga
+  /// `personaImagenProvider`.
   String? _imagenPreview;
 
-  Future<void> _seleccionarImagen() async {
+  /// Persiste los cambios de la persona propia contra el backend.
+  ///
+  /// El backend reemplaza `Imagen` incondicionalmente, así que si no se eligió
+  /// una foto nueva hay que reenviar la existente para no borrarla. La imagen
+  /// actual se resuelve desde `personaImagenProvider(...).future` (no `.value`,
+  /// para no capturar `null` mientras está en loading).
+  Future<void> _guardarPersona(
+    Persona actual, {
+    String? telefono,
+    String? documento,
+    String? nuevaImagenBase64,
+  }) async {
+    setState(() => _isLoading = true);
+    try {
+      // Preserva la foto existente si no se eligió una nueva (el backend
+      // reemplaza Imagen incondicionalmente: null borraría la foto).
+      String? imagenB64 = nuevaImagenBase64;
+      if (imagenB64 == null) {
+        final bytes = await ref.read(personaImagenProvider(actual.id).future);
+        if (bytes != null) imagenB64 = base64Encode(bytes);
+      }
+      final actualizada = actual.copyWith(
+        telefono: telefono,
+        documento: documento,
+        imagen: imagenB64,
+      );
+      final guardada = await ref
+          .read(personaRepositoryProvider)
+          .actualizar(actualizada);
+      ref.read(authStateProvider.notifier).actualizarPersonaEnSesion(guardada);
+      if (nuevaImagenBase64 != null) {
+        ref.invalidate(personaImagenProvider(actual.id));
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Datos actualizados correctamente.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _seleccionarImagen(Persona persona) async {
     final base64 = await pickImageAsBase64(context);
     if (base64 == null || !mounted) return;
-    // TODO(backend): persistir la foto cuando exista el endpoint de
-    // actualización de perfil. Por ahora solo se actualiza el preview local.
+    // Muestra la nueva foto al instante y la persiste contra el backend.
     setState(() => _imagenPreview = base64);
+    await _guardarPersona(persona, nuevaImagenBase64: base64);
   }
 
-  Future<void> _guardarEmail(String nuevoEmail) async {
-    setState(() => _isLoading = true);
-    try {
-      await ref
-          .read(authStateProvider.notifier)
-          .actualizarPerfil(email: nuevoEmail);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Datos actualizados correctamente.')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  Future<void> _guardarTelefono(Persona persona, String nuevoTelefono) =>
+      _guardarPersona(persona, telefono: nuevoTelefono);
 
-  Future<void> _guardarTelefono(String nuevoTelefono) async {
-    setState(() => _isLoading = true);
-    try {
-      await ref
-          .read(authStateProvider.notifier)
-          .actualizarPerfil(telefono: nuevoTelefono);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Datos actualizados correctamente.')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _guardarDocumento(String nuevoDocumento) async {
-    setState(() => _isLoading = true);
-    try {
-      await ref
-          .read(authStateProvider.notifier)
-          .actualizarPerfil(documento: nuevoDocumento);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Datos actualizados correctamente.')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  Future<void> _guardarDocumento(Persona persona, String nuevoDocumento) =>
+      _guardarPersona(persona, documento: nuevoDocumento);
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +110,15 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
             final persona = usuario.persona;
 
+            // Preview local recién elegido; si no hay, la foto actual desde
+            // el backend.
+            final imagenRed = ref
+                .watch(personaImagenProvider(persona.id))
+                .value;
+            final imagenAvatar =
+                imageProviderFromBase64(_imagenPreview) ??
+                (imagenRed != null ? MemoryImage(imagenRed) : null);
+
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -119,10 +131,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                       children: [
                         EditableAvatar(
                           nombre: persona.nombre,
-                          imagen: imageProviderFromBase64(
-                            _imagenPreview ?? persona.imagen,
-                          ),
-                          onTap: _seleccionarImagen,
+                          imagen: imagenAvatar,
+                          onTap: () => _seleccionarImagen(persona),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
@@ -144,15 +154,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     color: AppColors.outline,
                   ),
 
-                  // Email — editable
+                  // Email — solo lectura. Es concern de credenciales/Usuario y
+                  // aún no tiene endpoint de modificación en el backend.
                   ProfileDataRow(
                     icon: Icons.email_outlined,
                     label: 'Email',
                     value: persona.email ?? '',
-                    editable: true,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: validateEmail,
-                    onSave: _guardarEmail,
                   ),
 
                   // Teléfono — editable
@@ -163,7 +170,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     editable: true,
                     keyboardType: TextInputType.phone,
                     validator: validateTelefono,
-                    onSave: _guardarTelefono,
+                    onSave: (v) => _guardarTelefono(persona, v),
                   ),
 
                   // DNI — editable
@@ -173,7 +180,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     value: persona.documento,
                     editable: true,
                     keyboardType: TextInputType.number,
-                    onSave: _guardarDocumento,
+                    onSave: (v) => _guardarDocumento(persona, v),
                   ),
 
                   // Rol — solo lectura (sin lápiz)

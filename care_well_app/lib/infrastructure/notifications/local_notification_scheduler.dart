@@ -39,7 +39,7 @@ class LocalNotificationScheduler implements NotificationScheduler {
     const settings = InitializationSettings(android: android);
 
     await _plugin.initialize(
-      settings,
+      settings: settings,
       onDidReceiveNotificationResponse: (details) {
         // TODO(deeplink): navegar al evento vía payload (details.payload = eventId).
       },
@@ -80,11 +80,11 @@ class LocalNotificationScheduler implements NotificationScheduler {
 
     final tzDateTime = tz.TZDateTime.from(fechaHora, tz.local);
     await _plugin.zonedSchedule(
-      notificationId,
-      titulo,
-      cuerpo,
-      tzDateTime,
-      NotificationDetails(
+      id: notificationId,
+      title: titulo,
+      body: cuerpo,
+      scheduledDate: tzDateTime,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -93,15 +93,13 @@ class LocalNotificationScheduler implements NotificationScheduler {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
   }
 
   @override
   Future<void> cancelEventReminder(int notificationId) async {
-    await _plugin.cancel(notificationId);
+    await _plugin.cancel(id: notificationId);
   }
 
   @override
@@ -117,10 +115,10 @@ class LocalNotificationScheduler implements NotificationScheduler {
     String? payload,
   }) async {
     await _plugin.show(
-      notificationId,
-      titulo,
-      cuerpo,
-      NotificationDetails(
+      id: notificationId,
+      title: titulo,
+      body: cuerpo,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,

@@ -1,6 +1,28 @@
+import 'dart:typed_data';
+
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+
+// ─── Imagen de perfil por persona ─────────────────────────────────────────────
+
+/// Bytes de la imagen de perfil de una persona, indexados por `personaId`.
+///
+/// Devuelve `null` cuando la persona no tiene imagen cargada (el backend
+/// responde 404), lo que hace caer al fallback de iniciales del avatar.
+///
+/// No es `autoDispose`: cachea los bytes por `personaId` durante la sesión, ya
+/// que el mismo avatar se repite en listas y pantallas. Tras modificar la foto
+/// de una persona hay que invalidar `personaImagenProvider(personaId)` para
+/// forzar la recarga.
+final personaImagenProvider = FutureProvider.family<Uint8List?, int>((
+  ref,
+  personaId,
+) async {
+  final repository = ref.watch(personaRepositoryProvider);
+  return repository.getImagen(personaId);
+});
 
 // ─── Selector de persona de contexto global ───────────────────────────────────
 
@@ -21,7 +43,7 @@ class PersonaContextOption {
 /// 3. Personas donde es Cuidador.
 final personasSeleccionablesProvider =
     FutureProvider.autoDispose<List<PersonaContextOption>>((ref) async {
-      final usuario = ref.watch(authStateProvider).valueOrNull;
+      final usuario = ref.watch(authStateProvider).value;
       if (usuario == null) return [];
 
       final asignacionesActivasComoResponsable = await ref.watch(

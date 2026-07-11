@@ -91,7 +91,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                 ),
               ),
               data: (eventos) {
-                if (personaAsync.valueOrNull == null) {
+                if (personaAsync.value == null) {
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),

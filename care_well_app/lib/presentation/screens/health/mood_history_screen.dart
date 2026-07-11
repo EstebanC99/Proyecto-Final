@@ -16,8 +16,7 @@ class MoodHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final estadosAsync = ref.watch(estadosAnimoProvider);
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
-    final nombrePersona =
-        personaAsync.valueOrNull?.nombre ?? 'la persona a cargo';
+    final nombrePersona = personaAsync.value?.nombre ?? 'la persona a cargo';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -27,7 +26,7 @@ class MoodHistoryScreen extends ConsumerWidget {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         actions: [
-          if (personaAsync.valueOrNull != null)
+          if (personaAsync.value != null)
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Chip(

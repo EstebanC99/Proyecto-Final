@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// visualiza su propio contexto ("Yo"), tiene acceso completo sin necesidad de
 /// una [AsignacionCuidado].
 final esContextoPropioProvider = FutureProvider.autoDispose<bool>((ref) async {
-  final usuario = ref.watch(authStateProvider).valueOrNull;
+  final usuario = ref.watch(authStateProvider).value;
   if (usuario == null) return false;
 
   final persona = await ref.watch(
@@ -25,7 +25,7 @@ final esContextoPropioProvider = FutureProvider.autoDispose<bool>((ref) async {
 /// Retorna `null` si no hay usuario, si no hay persona de contexto o si el
 /// usuario no tiene una asignación activa sobre ella.
 Future<AsignacionCuidado?> _asignacionActivaParaContexto(Ref ref) async {
-  final usuario = ref.watch(authStateProvider).valueOrNull;
+  final usuario = ref.watch(authStateProvider).value;
   if (usuario == null) return null;
 
   final persona = await ref.watch(

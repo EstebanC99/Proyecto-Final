@@ -71,7 +71,7 @@ class CareTeamScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final personaCtxAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final puedeAdministrarAsync = ref.watch(puedeAdministrarEquipoProvider);
-    final usuario = ref.watch(authStateProvider).valueOrNull;
+    final usuario = ref.watch(authStateProvider).value;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -155,10 +155,9 @@ class _TeamBody extends ConsumerWidget {
       asignacionesPorPersonaCuidadaProvider(personaCtx.id),
     );
     final puedeAdministrar =
-        ref.watch(puedeAdministrarEquipoProvider).valueOrNull ?? false;
+        ref.watch(puedeAdministrarEquipoProvider).value ?? false;
     final esResponsable =
-        ref.watch(esResponsablePersonaSeleccionadaProvider).valueOrNull ??
-        false;
+        ref.watch(esResponsablePersonaSeleccionadaProvider).value ?? false;
 
     return asignacionesAsync.when(
       loading: () => const _SkeletonTeam(),
@@ -518,9 +517,9 @@ class _PendingRequestCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Avatar(
+              PersonaAvatar(
+                personaId: colaborador.id,
                 nombre: colaborador.nombre,
-                imagen: imageProviderFromBase64(colaborador.imagen),
                 size: 44,
               ),
               const SizedBox(width: AppSpacing.md),
@@ -633,9 +632,9 @@ class _ReactivableCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Avatar(
+              PersonaAvatar(
+                personaId: colaborador.id,
                 nombre: colaborador.nombre,
-                imagen: imageProviderFromBase64(colaborador.imagen),
                 size: 44,
               ),
               const SizedBox(width: AppSpacing.md),

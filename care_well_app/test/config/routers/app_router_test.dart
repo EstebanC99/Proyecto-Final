@@ -19,7 +19,7 @@ void main() {
       addTearDown(container.dispose);
 
       final state = container.read(authStateProvider);
-      expect(state.valueOrNull, isNull);
+      expect(state.value, isNull);
     });
 
     test('AppRoutes define los paths correctos', () {

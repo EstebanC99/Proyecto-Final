@@ -408,9 +408,9 @@ class _PendingCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Avatar(
+                PersonaAvatar(
+                  personaId: persona.id,
                   nombre: persona.nombre,
-                  imagen: imageProviderFromBase64(persona.imagen),
                   size: 52,
                 ),
                 const SizedBox(width: AppSpacing.md),

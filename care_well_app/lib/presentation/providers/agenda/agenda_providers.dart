@@ -1,5 +1,6 @@
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../domain/entities/entities.dart';
 import '../../../domain/notifications/notifications.dart';

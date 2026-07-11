@@ -7,6 +7,7 @@ export 'shared/password_strength_meter.dart';
 export 'shared/terms_bottom_sheet.dart';
 export 'shared/avatar.dart';
 export 'shared/editable_avatar.dart';
+export 'shared/persona_avatar.dart';
 export 'shared/image_source_sheet.dart';
 export 'shared/confirm_dialog.dart';
 export 'shared/success_view.dart';

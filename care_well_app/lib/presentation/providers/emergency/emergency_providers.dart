@@ -34,7 +34,7 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
   final esPropio = await ref.watch(esContextoPropioProvider.future);
   if (esPropio) return true;
 
-  final usuario = ref.watch(authStateProvider).valueOrNull;
+  final usuario = ref.watch(authStateProvider).value;
   if (usuario == null) return false;
 
   final persona = await ref.watch(
@@ -73,7 +73,7 @@ final activarEmergenciaProvider = Provider<Future<Emergencia> Function()>((
   ref,
 ) {
   return () async {
-    final usuario = ref.read(authStateProvider).valueOrNull;
+    final usuario = ref.read(authStateProvider).value;
     if (usuario == null) throw Exception('Sin sesión activa');
 
     final persona = await ref.read(

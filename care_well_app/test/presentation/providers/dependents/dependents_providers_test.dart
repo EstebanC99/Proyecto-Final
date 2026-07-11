@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
@@ -70,6 +72,9 @@ class _FakePersonaRepository implements PersonaRepository {
       orElse: () => throw Exception('Persona no encontrada: $id'),
     );
   }
+
+  @override
+  Future<Uint8List?> getImagen(int id) async => null;
 
   @override
   Future<List<Persona>> getDependientesByUsuario(int usuarioId) async =>

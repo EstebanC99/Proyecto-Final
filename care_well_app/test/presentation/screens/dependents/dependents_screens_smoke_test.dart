@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
@@ -47,6 +49,9 @@ final _asignacionActiva = AsignacionCuidado(
 class _FakePersonaRepository implements PersonaRepository {
   @override
   Future<Persona> getById(int id) async => _personaAlicia;
+
+  @override
+  Future<Uint8List?> getImagen(int id) async => null;
 
   @override
   Future<List<Persona>> getDependientesByUsuario(int usuarioId) async => [

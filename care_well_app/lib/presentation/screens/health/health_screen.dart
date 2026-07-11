@@ -103,7 +103,7 @@ class HealthScreen extends ConsumerWidget {
                             label: 'Ficha de salud',
                             description:
                                 'Datos clínicos: factor sanguíneo, antecedentes, alergias y enfermedades.',
-                            enabled: puedeVerFichaAsync.valueOrNull ?? false,
+                            enabled: puedeVerFichaAsync.value ?? false,
                             loading: puedeVerFichaAsync.isLoading,
                             onTap: () =>
                                 context.pushNamed(AppRoutes.healthRecordName),

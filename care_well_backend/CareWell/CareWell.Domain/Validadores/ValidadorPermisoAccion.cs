@@ -64,6 +64,12 @@ namespace CareWell.Domain.Validadores
                 throw new ValidacionDominioException(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion);
         }
 
+        public void ValidarPuedeModificarPerfil(Persona personaCuidada, Persona colaborador)
+        {
+            if (personaCuidada.ID != colaborador.ID)
+                throw new ValidacionDominioException(Mensajes.ElPerfilSeleccionadoNoCorrespondeAlPropio);
+        }
+
         #region Metodos Privados
 
         private void ValidarAccionSobrePersona(Persona personaSeleccionada, Persona colaborador, int permisoCuidadoID)

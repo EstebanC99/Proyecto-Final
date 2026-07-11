@@ -143,7 +143,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
       }
     });
     final puedeGestionar =
-        ref.watch(puedeGestionarAgendaProvider).valueOrNull ?? false;
+        ref.watch(puedeGestionarAgendaProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -192,7 +192,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
                 ),
               ),
               data: (ocurrencias) {
-                if (personaAsync.valueOrNull == null) {
+                if (personaAsync.value == null) {
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),

@@ -164,7 +164,7 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
 
     // Precarga de datos en edición (una sola vez, al disponer de las ocurrencias).
     if (_esEdicion && !_prefilled) {
-      final ocurrencias = ref.watch(ocurrenciasDelMesProvider).valueOrNull;
+      final ocurrencias = ref.watch(ocurrenciasDelMesProvider).value;
       final ocu = ocurrencias
           ?.where((o) => o.eventoAgendaId == widget.eventId)
           .firstOrNull;

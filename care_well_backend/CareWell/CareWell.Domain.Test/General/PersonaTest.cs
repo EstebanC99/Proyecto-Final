@@ -113,7 +113,7 @@ namespace CareWell.Domain.Test.General
                     Documento: "1234",
                     FechaNacimiento: DateTime.Today,
                     Telefono: "3364562256",
-                    Imagen: "ImagenX"
+                    Imagen: new byte[8]
                 );
             }
 

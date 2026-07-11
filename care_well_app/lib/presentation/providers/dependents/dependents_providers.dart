@@ -25,7 +25,7 @@ final crearPersonaCargoProvider =
         telefono,
         imagen,
       }) async {
-        final usuario = ref.read(authStateProvider).valueOrNull;
+        final usuario = ref.read(authStateProvider).value;
         if (usuario == null) throw Exception('No hay sesión activa.');
 
         final asignacionRepo = ref.read(asignacionCuidadoRepositoryProvider);

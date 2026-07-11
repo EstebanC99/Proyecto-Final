@@ -272,18 +272,6 @@ namespace CareWell.BusinessService.Test.Auth
             }
 
             [Fact]
-            public void Setea_la_imagen_de_la_persona_en_la_respuesta()
-            {
-                // Arrange
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.Equal(this.refreshToken.Object.Usuario.Persona.Imagen, respuesta.Usuario.Persona.Imagen);
-            }
-
-            [Fact]
             public void Setea_el_ID_del_estado_de_usuario_en_la_respuesta()
             {
                 // Arrange

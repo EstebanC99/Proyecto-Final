@@ -24,8 +24,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final eventoAsync = ref.watch(eventoSaludByIdProvider(eventId));
     final notas = ref.watch(notasByEventoProvider(eventId));
-    final puede =
-        ref.watch(puedeRegistrarEventosSaludProvider).valueOrNull ?? false;
+    final puede = ref.watch(puedeRegistrarEventosSaludProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.background,

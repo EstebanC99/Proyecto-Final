@@ -12,6 +12,10 @@ class ApiConfig {
 
   static const cuentaPath = '/api/Cuenta/crear';
 
+  static const modificarPerfil = '/api/AdministrarPersona/modificar-perfil';
+  static String imagenPersonaPath(int personaId) =>
+      '/api/AdministrarPersona/$personaId/imagen';
+
   static const crearPersonaCargoPath =
       '/api/AdministrarPersonasCargo/crear-persona-cargo';
   static const modificarPersonaCargoPath =

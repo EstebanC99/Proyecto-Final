@@ -158,7 +158,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     }
 
     final personaCtxAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
-    final personaNombre = personaCtxAsync.valueOrNull?.nombreCompleto ?? '...';
+    final personaNombre = personaCtxAsync.value?.nombreCompleto ?? '...';
 
     final title = _esResponsable ? 'Agregar responsable' : 'Agregar cuidador';
     final headerBody = _esResponsable

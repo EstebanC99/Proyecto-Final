@@ -22,8 +22,8 @@ class EmergencyScreen extends ConsumerWidget {
     final puedeAsync = ref.watch(puedeActivarEmergenciaProvider);
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
-    final puede = puedeAsync.valueOrNull ?? false;
-    final persona = personaAsync.valueOrNull;
+    final puede = puedeAsync.value ?? false;
+    final persona = personaAsync.value;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -162,8 +162,7 @@ class EmergencyScreen extends ConsumerWidget {
                     ? ''
                     : 'No tenés permiso para activar emergencias',
                 child: EmergencyButton(
-                  enabled:
-                      puede && (equipoAsync.valueOrNull?.isNotEmpty ?? false),
+                  enabled: puede && (equipoAsync.value?.isNotEmpty ?? false),
                   onTap: () => _handleTap(context, ref),
                 ),
               ),
@@ -181,10 +180,8 @@ class EmergencyScreen extends ConsumerWidget {
   }
 
   Future<void> _handleTap(BuildContext context, WidgetRef ref) async {
-    final equipo = ref.read(equipoEmergenciaProvider).valueOrNull ?? [];
-    final persona = ref
-        .read(personaVisualizacionSeleccionadaProvider)
-        .valueOrNull;
+    final equipo = ref.read(equipoEmergenciaProvider).value ?? [];
+    final persona = ref.read(personaVisualizacionSeleccionadaProvider).value;
     if (persona == null) return;
 
     final confirmo = await EmergencyConfirmDialog.show(

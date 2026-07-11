@@ -1,11 +1,16 @@
 import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/widgets/care_team/member_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../_fakes/test_fixtures.dart';
 
-Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+Widget _wrap(Widget child) => ProviderScope(
+  overrides: [personaImagenProvider.overrideWith((ref, id) async => null)],
+  child: MaterialApp(home: Scaffold(body: child)),
+);
 
 final _personaCuidada = Persona(
   id: 1,

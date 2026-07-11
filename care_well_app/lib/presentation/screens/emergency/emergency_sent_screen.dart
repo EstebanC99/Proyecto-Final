@@ -20,7 +20,7 @@ class EmergencySentScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final equipoAsync = ref.watch(equipoEmergenciaProvider);
-    final miembros = equipoAsync.valueOrNull ?? [];
+    final miembros = equipoAsync.value ?? [];
     final ahora = DateFormat('HH:mm:ss').format(DateTime.now());
 
     return PopScope(

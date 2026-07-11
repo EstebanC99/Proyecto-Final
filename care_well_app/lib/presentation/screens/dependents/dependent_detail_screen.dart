@@ -426,6 +426,12 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
   Widget _buildBody(Persona persona) {
     final fechaCambiada = _fechaNacimiento != _personaOriginal?.fechaNacimiento;
 
+    // Preview local recién elegido; si no hay, la foto actual desde el backend.
+    final imagenRed = ref.watch(personaImagenProvider(persona.id)).value;
+    final imagenAvatar =
+        imageProviderFromBase64(_imagenNueva) ??
+        (imagenRed != null ? MemoryImage(imagenRed) : null);
+
     return Column(
       children: [
         Expanded(
@@ -441,9 +447,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                     children: [
                       EditableAvatar(
                         nombre: persona.nombre,
-                        imagen: imageProviderFromBase64(
-                          _imagenNueva ?? persona.imagen,
-                        ),
+                        imagen: imagenAvatar,
                         onTap: _seleccionarImagen,
                       ),
                       const SizedBox(height: AppSpacing.md),

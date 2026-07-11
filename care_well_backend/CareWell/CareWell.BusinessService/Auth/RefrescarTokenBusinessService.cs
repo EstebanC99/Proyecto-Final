@@ -51,7 +51,6 @@ namespace CareWell.BusinessService.Auth
                         FechaNacimiento = refreshToken.Usuario.Persona.FechaNacimiento,
                         Email = refreshToken.Usuario.Persona.Email,
                         Telefono = refreshToken.Usuario.Persona.Telefono,
-                        Imagen = refreshToken.Usuario.Persona.Imagen
                     },
                     Estado = new EstadoUsuarioDataView
                     {
