@@ -37,8 +37,6 @@ namespace CareWell.BusinessService.General
             var usuario = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
             var persona = this.PersonaRepository.GetByID(command.ID);
 
-            this.ValidadorPermisoAccion.ValidarPuedeModificarPerfil(persona, usuario.Persona);
-
             var modificarPerfil = new ModificarPerfil(
                 Nombre: command.Nombre,
                 Apellido: command.Apellido,
@@ -48,7 +46,9 @@ namespace CareWell.BusinessService.General
                 Imagen: ImageProcessorHelper.GetImage(command.Imagen)
             );
 
-            persona.ModificarPerfil(modificarPerfil);
+            persona.ModificarPerfil(modificarPerfil, 
+                                    usuario.Persona, 
+                                    this.ValidadorPermisoAccion);
 
             this.UnitOfWork.SaveChanges();
         }

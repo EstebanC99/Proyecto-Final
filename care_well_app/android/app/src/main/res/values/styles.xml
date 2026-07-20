@@ -15,4 +15,17 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+
+    <!-- Tema de la pantalla de recorte (UCropActivity de image_cropper).
+         Bajo edge-to-edge forzado (targetSdk 35+), el layout de uCrop 2.2.10 no
+         maneja los insets y su toolbar queda detrás de la status bar.
+         `fitsSystemWindows=true` fuerza a la Activity a aplicar el inset superior
+         como padding, empujando el toolbar debajo de la status bar. Problema
+         conocido/abierto de image_cropper/uCrop con Android 15+; si upstream lo
+         corrige, este workaround podría retirarse. -->
+    <style name="Theme.CareWell.UCrop" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">@color/careWellPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

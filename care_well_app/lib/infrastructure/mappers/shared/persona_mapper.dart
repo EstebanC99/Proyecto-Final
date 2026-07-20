@@ -14,4 +14,17 @@ class PersonaMapper {
       imagen: model.imagen,
     );
   }
+
+  static PersonaModel toModel(Persona entity) {
+    return PersonaModel(
+      id: entity.id,
+      nombre: entity.nombre,
+      apellido: entity.apellido,
+      documento: entity.documento,
+      fechaNacimiento: entity.fechaNacimiento,
+      email: entity.email,
+      telefono: entity.telefono,
+      imagen: entity.imagen,
+    );
+  }
 }

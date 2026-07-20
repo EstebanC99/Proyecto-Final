@@ -430,7 +430,7 @@ namespace CareWell.Domain.Test.EquipoCuidado
                     It.IsAny<string>(),
                     It.IsAny<DateTime>(),
                     It.IsAny<string>(),
-                    It.IsAny<string>(),
+                    It.IsAny<byte[]>(),
                     It.IsAny<string>(),
                     Mock.Of<Usuario>()
                 );

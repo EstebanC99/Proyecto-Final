@@ -1,4 +1,5 @@
 ﻿using CareWell.BusinessService.Abstractions.Auth;
+using CareWell.BusinessService.Helpers;
 using CareWell.Commands.Auth;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
@@ -43,7 +44,7 @@ namespace CareWell.BusinessService.Auth
                 Documento: command.Documento,
                 FechaNacimiento: command.FechaNacimiento,
                 Telefono: command.Telefono,
-                Imagen: command.Imagen,
+                Imagen: ImageProcessorHelper.GetImage(command.Imagen),
                 Email: command.Email
             );
 

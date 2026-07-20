@@ -40,6 +40,9 @@ dependencies:
   # Selección/captura de imágenes (foto de perfil de personas y usuario)
   image_picker: ^1.1.2
 
+  # Recorte/encuadre de imágenes (crop 1:1 al elegir foto de perfil)
+  image_cropper: ^9.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

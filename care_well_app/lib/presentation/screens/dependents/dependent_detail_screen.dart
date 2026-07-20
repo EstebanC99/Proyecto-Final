@@ -127,6 +127,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
     if (!_validar()) return;
     setState(() => _isLoading = true);
 
+    // Se captura antes del setState de éxito, que resetea _imagenNueva a null.
+    final cambioImagen = _imagenNueva != null;
+
     try {
       final personaActualizada = _personaOriginal!.copyWith(
         nombre: _nombreController.text.trim(),
@@ -164,6 +167,12 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
         _imagenNueva = null;
         _isLoading = false;
       });
+
+      // Si cambió la foto, invalidar el provider (family, no autoDispose) para
+      // refrescar en cascada todos los PersonaAvatar de esta persona.
+      if (cambioImagen) {
+        ref.invalidate(personaImagenProvider(resultado.id));
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

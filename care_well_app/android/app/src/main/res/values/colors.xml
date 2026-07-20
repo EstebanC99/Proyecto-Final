@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#F0F4F4</color>
+    <!-- Espejo de AppColors.primary (Dart: Color(0xFF1A8C82)); usado por el
+         tema de la pantalla de recorte (UCropActivity). -->
+    <color name="careWellPrimary">#FF1A8C82</color>
 </resources>

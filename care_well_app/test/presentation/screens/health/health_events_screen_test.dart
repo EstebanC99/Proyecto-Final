@@ -42,6 +42,9 @@ Widget _wrap({List<EventoSalud>? eventos, bool puedeRegistrar = true}) {
       personaVisualizacionSeleccionadaProvider.overrideWith(
         (ref) async => _personaAlicia,
       ),
+      // El banner del ContextSelector renderiza un PersonaAvatar; se evita que
+      // golpee el repositorio real cayendo al fallback de iniciales.
+      personaImagenProvider.overrideWith((ref, id) async => null),
     ],
     child: const MaterialApp(home: HealthEventsScreen()),
   );

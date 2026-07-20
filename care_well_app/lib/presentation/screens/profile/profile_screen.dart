@@ -53,10 +53,20 @@ class ProfileScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
-                      PersonaAvatar(
-                        personaId: persona.id,
-                        nombre: persona.nombre,
-                        size: 80,
+                      GestureDetector(
+                        onTap: () {
+                          final bytes = ref
+                              .read(personaImagenProvider(persona.id))
+                              .value;
+                          if (bytes != null) {
+                            ImageViewerDialog.show(context, MemoryImage(bytes));
+                          }
+                        },
+                        child: PersonaAvatar(
+                          personaId: persona.id,
+                          nombre: persona.nombre,
+                          size: 80,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(

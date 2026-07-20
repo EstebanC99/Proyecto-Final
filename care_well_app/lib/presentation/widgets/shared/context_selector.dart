@@ -50,6 +50,7 @@ class ContextSelector extends ConsumerWidget {
               ? null
               : () => _showPersonaSelector(context, ref, opciones, selectedId),
           child: _ContextBanner(
+            personaId: persona.id,
             nombreCompleto: nombreCompleto,
             subtitulo: subtitulo,
             interactivo: !soloUnaOpcion,
@@ -91,10 +92,14 @@ class ContextSelector extends ConsumerWidget {
 /// La lógica de tap vive en el widget padre [ContextSelector].
 class _ContextBanner extends StatelessWidget {
   const _ContextBanner({
+    required this.personaId,
     required this.nombreCompleto,
     required this.subtitulo,
     required this.interactivo,
   });
+
+  /// Id de la persona de contexto, para resolver su foto de perfil.
+  final int personaId;
 
   final String nombreCompleto;
 
@@ -118,8 +123,8 @@ class _ContextBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Ícono de persona
-          const Icon(Icons.person, size: 24, color: AppColors.primary),
+          // Avatar de la persona de contexto: foto real o iniciales.
+          PersonaAvatar(personaId: personaId, nombre: nombreCompleto, size: 36),
           const SizedBox(width: AppSpacing.sm),
 
           // Textos: subtítulo + nombre

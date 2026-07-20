@@ -37,6 +37,12 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- Activity de recorte de imágenes requerida por image_cropper (uCrop) -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CareWell.UCrop"/>
+
         <!-- Receivers requeridos por flutter_local_notifications v18 -->
         <receiver android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>

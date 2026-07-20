@@ -28,9 +28,16 @@ final _personaAlicia = Persona(
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /// Envuelve [child] con [ProviderScope] y [MaterialApp].
+///
+/// Incluye por defecto un override de [personaImagenProvider] a `null`, para
+/// que los [PersonaAvatar] del banner caigan al fallback de iniciales sin
+/// golpear el repositorio real.
 Widget _wrap(Widget child, {List<Override> overrides = const []}) {
   return ProviderScope(
-    overrides: overrides,
+    overrides: [
+      personaImagenProvider.overrideWith((ref, id) async => null),
+      ...overrides,
+    ],
     child: MaterialApp(home: Scaffold(body: child)),
   );
 }
@@ -156,7 +163,10 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: _variosOpciones(),
+            overrides: [
+              personaImagenProvider.overrideWith((ref, id) async => null),
+              ..._variosOpciones(),
+            ],
             child: Consumer(
               builder: (context, ref, _) {
                 // Capturamos el container a través del Consumer.

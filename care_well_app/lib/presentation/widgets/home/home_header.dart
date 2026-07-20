@@ -1,25 +1,36 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/avatar.dart';
+import '../shared/persona_avatar.dart';
 
 /// Barra de identidad y saludo del menú principal.
 ///
 /// Lado izquierdo: ícono de marca + wordmark bicolor "CareWell".
 /// Lado derecho tappable — navega a Configuración vía [onTapProfile].
-class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key, required this.userName, this.onTapProfile});
+class HomeHeader extends ConsumerWidget {
+  const HomeHeader({
+    super.key,
+    required this.userName,
+    this.personaId,
+    this.onTapProfile,
+  });
 
   /// Nombre del usuario para el saludo y la inicial del avatar.
   final String userName;
+
+  /// Id de la persona autenticada para resolver su foto de perfil. Si es
+  /// `null` (aún sin sesión), el avatar cae al fallback de inicial.
+  final int? personaId;
 
   /// Callback invocado al tocar el área derecha (avatar + saludo).
   final VoidCallback? onTapProfile;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FadeIn(
       duration: const Duration(milliseconds: 400),
       child: Container(
@@ -80,8 +91,15 @@ class HomeHeader extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Avatar circular con inicial
-                        Avatar(nombre: userName, size: 40),
+                        // Avatar circular: foto de perfil (por personaId) con
+                        // fallback a inicial.
+                        personaId != null
+                            ? PersonaAvatar(
+                                personaId: personaId!,
+                                nombre: userName,
+                                size: 40,
+                              )
+                            : Avatar(nombre: userName, size: 40),
                         const SizedBox(width: AppSpacing.sm),
                         // Saludo
                         Text(

@@ -705,5 +705,51 @@ namespace CareWell.Domain.Test.Validadores
                 Assert.Null(exception);
             }
         }
+
+        public class ElMetodo_ValidarPuedeModificarPerfil : ValidadorPermisoAccionTest
+        {
+            private Mock<Persona> personaCuidada;
+            private Mock<Persona> colaborador;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.personaCuidada = new Mock<Persona>();
+                this.personaCuidada.Setup(s => s.ID).Returns(1);
+
+                this.colaborador = new Mock<Persona>();
+                this.colaborador.Setup(s => s.ID).Returns(2);
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarPuedeModificarPerfil(this.personaCuidada.Object,
+                                                        this.colaborador.Object);
+            }
+
+            [Fact]
+            public void Si_la_persona_cuidada_es_igual_al_colaborador_permite_modificar_perfil()
+            {
+                // Arrange
+                this.colaborador.Setup(s => s.ID).Returns(this.personaCuidada.Object.ID);
+
+                // Action
+                var exception = Record.Exception(() => this.Action());
+
+                // Assert
+                Assert.Null(exception);
+            }
+
+            [Fact]
+            public void Si_la_persona_cuidada_es_distinta_al_colaborador_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+
+                // Action & Assert
+                var exception = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ElPerfilSeleccionadoNoCorrespondeAlPropio, exception.Message);
+            }
+        }
     }
 }

@@ -8,9 +8,9 @@ namespace CareWell.Domain.ValueObjects.EquipoCuidado
         string Apellido,
         string Documento,
         DateTime FechaNacimiento,
-        string? Email,
         string? Telefono,
-        string? Imagen,
+        byte[]? Imagen,
+        string? Email,
         Usuario UsuarioModificador
         )
         : CrearModificarPersona(
@@ -18,7 +18,7 @@ namespace CareWell.Domain.ValueObjects.EquipoCuidado
         Apellido,
         Documento,
         FechaNacimiento,
-        Email,
         Telefono,
-        Imagen);
+        Imagen,
+        Email);
 }

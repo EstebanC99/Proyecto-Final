@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -71,11 +72,13 @@ abstract final class ImageSourceSheet {
   }
 }
 
-/// Muestra la hoja de selección de origen, abre el selector/cámara y devuelve
-/// la imagen elegida codificada en base64 estándar (sin prefijo data-URI).
+/// Muestra la hoja de selección de origen, abre el selector/cámara, permite
+/// recortar la imagen en formato cuadrado (1:1, con overlay circular) y la
+/// devuelve codificada en base64 estándar (sin prefijo data-URI).
 ///
-/// Devuelve `null` si el usuario cancela en cualquier paso. La imagen se
-/// redimensiona a 1024px máximo y se comprime a calidad 75 antes de codificar.
+/// Devuelve `null` si el usuario cancela en cualquier paso (elección de origen,
+/// selección de imagen o recorte). La imagen se redimensiona a 1024px máximo y
+/// se comprime a calidad 75 antes de codificar.
 Future<String?> pickImageAsBase64(BuildContext context) async {
   final source = await ImageSourceSheet.show(context);
   if (source == null) return null;
@@ -88,7 +91,34 @@ Future<String?> pickImageAsBase64(BuildContext context) async {
   );
   if (xfile == null) return null;
 
-  final bytes = await xfile.readAsBytes();
+  // Recorte cuadrado (1:1) con overlay circular, coherente con el avatar.
+  final cropped = await ImageCropper().cropImage(
+    sourcePath: xfile.path,
+    aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+    compressFormat: ImageCompressFormat.jpg,
+    compressQuality: 75,
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Recortar foto',
+        toolbarColor: AppColors.primary,
+        toolbarWidgetColor: AppColors.surface,
+        activeControlsWidgetColor: AppColors.primary,
+        cropStyle: CropStyle.circle,
+        lockAspectRatio: true,
+        hideBottomControls: true,
+        aspectRatioPresets: const [CropAspectRatioPreset.square],
+      ),
+      IOSUiSettings(
+        title: 'Recortar foto',
+        cropStyle: CropStyle.circle,
+        aspectRatioLockEnabled: true,
+        aspectRatioPresets: const [CropAspectRatioPreset.square],
+      ),
+    ],
+  );
+  if (cropped == null) return null;
+
+  final bytes = await cropped.readAsBytes();
   return base64Encode(bytes);
 }
 

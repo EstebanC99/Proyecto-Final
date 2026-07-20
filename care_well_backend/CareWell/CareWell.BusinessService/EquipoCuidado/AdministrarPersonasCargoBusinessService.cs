@@ -1,4 +1,5 @@
 ﻿using CareWell.BusinessService.Abstractions.EquipoCuidado;
+using CareWell.BusinessService.Helpers;
 using CareWell.Commands.EquipoCuidado;
 using CareWell.DataViews.EquipoCuidado;
 using CareWell.Domain.Auth;
@@ -59,7 +60,7 @@ namespace CareWell.BusinessService.EquipoCuidado
                 Documento: command.Documento,
                 FechaNacimiento: command.FechaNacimiento,
                 Telefono: command.Telefono,
-                Imagen: command.Imagen,
+                Imagen: ImageProcessorHelper.GetImage(command.Imagen),
                 Email: command.Email
             ));
             this.PersonaRepository.Add(personaCargo);
@@ -88,9 +89,9 @@ namespace CareWell.BusinessService.EquipoCuidado
                 Apellido: command.Apellido,
                 Documento: command.Documento,
                 FechaNacimiento: command.FechaNacimiento,
-                Email: command.Email,
                 Telefono: command.Telefono,
-                Imagen: command.Imagen,
+                Imagen: ImageProcessorHelper.GetImage(command.Imagen),
+                Email: command.Email,
                 this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID));
 
             asignacionCuidado.ModificarInformacionPersona(modificarAsignacionResponsable,

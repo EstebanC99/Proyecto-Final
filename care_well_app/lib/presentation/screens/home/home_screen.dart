@@ -85,6 +85,7 @@ class HomeScreen extends ConsumerWidget {
                 // Header
                 HomeHeader(
                   userName: userName,
+                  personaId: usuario?.persona.id,
                   onTapProfile: () => context.pushNamed(AppRoutes.settingsName),
                 ),
                 const SizedBox(height: AppSpacing.md),

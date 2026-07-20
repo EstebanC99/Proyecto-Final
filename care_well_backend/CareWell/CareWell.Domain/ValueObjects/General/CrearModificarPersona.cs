@@ -6,7 +6,7 @@
         string Documento,
         DateTime FechaNacimiento,
         string? Telefono,
-        string? Imagen,
+        byte[]? Imagen,
         string? Email
     ) :
     ModificarPerfil(

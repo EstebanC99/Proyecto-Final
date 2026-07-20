@@ -1,4 +1,5 @@
-﻿using CareWell.Domain.ValueObjects.General;
+﻿using CareWell.Domain.Validadores;
+using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 
@@ -33,12 +34,21 @@ namespace CareWell.Domain.General
 
         public virtual void CrearModificar(CrearModificarPersona crearModificarPersona)
         {
-            this.ModificarPerfil(crearModificarPersona);
+            this.SetearCamposPerfil(crearModificarPersona);
 
             this.Email = crearModificarPersona.Email;
         }
 
-        public virtual void ModificarPerfil(ModificarPerfil modificarPerfil)
+        public virtual void ModificarPerfil(ModificarPerfil modificarPerfil,
+                                            Persona colaborador,
+                                            IValidadorPermisoAccion validadorPermisoAccion)
+        {
+            validadorPermisoAccion.ValidarPuedeModificarPerfil(this, colaborador);
+
+            this.SetearCamposPerfil(modificarPerfil);
+        }
+
+        private void SetearCamposPerfil(ModificarPerfil modificarPerfil)
         {
             if (string.IsNullOrEmpty(modificarPerfil.Nombre))
                 throw new ValidacionDominioException(Mensajes.NombreRequerido);

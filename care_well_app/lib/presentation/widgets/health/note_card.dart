@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
-import '../shared/avatar.dart';
 import '../shared/confirm_dialog.dart';
+import '../shared/persona_avatar.dart';
 
 /// Tarjeta que muestra una [NotaEventoSalud] con avatar del autor, autoría y
 /// contenido.
@@ -87,7 +87,11 @@ class NoteCard extends StatelessWidget {
             // Fila de autoría
             Row(
               children: [
-                Avatar(nombre: nota.autor.descripcion, size: 28),
+                PersonaAvatar(
+                  personaId: nota.autor.id,
+                  nombre: nota.autor.descripcion,
+                  size: 28,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(

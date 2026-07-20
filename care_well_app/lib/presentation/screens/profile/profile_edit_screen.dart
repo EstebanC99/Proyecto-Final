@@ -37,8 +37,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   /// para no capturar `null` mientras está en loading).
   Future<void> _guardarPersona(
     Persona actual, {
+    String? nombre,
+    String? apellido,
     String? telefono,
     String? documento,
+    DateTime? fechaNacimiento,
     String? nuevaImagenBase64,
   }) async {
     setState(() => _isLoading = true);
@@ -51,8 +54,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         if (bytes != null) imagenB64 = base64Encode(bytes);
       }
       final actualizada = actual.copyWith(
+        nombre: nombre,
+        apellido: apellido,
         telefono: telefono,
         documento: documento,
+        fechaNacimiento: fechaNacimiento,
         imagen: imagenB64,
       );
       final guardada = await ref
@@ -80,11 +86,20 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     await _guardarPersona(persona, nuevaImagenBase64: base64);
   }
 
+  Future<void> _guardarNombre(Persona persona, String nuevoNombre) =>
+      _guardarPersona(persona, nombre: nuevoNombre);
+
+  Future<void> _guardarApellido(Persona persona, String nuevoApellido) =>
+      _guardarPersona(persona, apellido: nuevoApellido);
+
   Future<void> _guardarTelefono(Persona persona, String nuevoTelefono) =>
       _guardarPersona(persona, telefono: nuevoTelefono);
 
   Future<void> _guardarDocumento(Persona persona, String nuevoDocumento) =>
       _guardarPersona(persona, documento: nuevoDocumento);
+
+  Future<void> _guardarFechaNacimiento(Persona persona, DateTime nuevaFecha) =>
+      _guardarPersona(persona, fechaNacimiento: nuevaFecha);
 
   @override
   Widget build(BuildContext context) {
@@ -154,12 +169,42 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     color: AppColors.outline,
                   ),
 
+                  // Nombre — editable
+                  ProfileDataRow(
+                    icon: Icons.person_outline,
+                    label: 'Nombre',
+                    value: persona.nombre,
+                    editable: true,
+                    keyboardType: TextInputType.name,
+                    validator: validateNombre,
+                    onSave: (v) => _guardarNombre(persona, v),
+                  ),
+
+                  // Apellido — editable
+                  ProfileDataRow(
+                    icon: Icons.person_outline,
+                    label: 'Apellido',
+                    value: persona.apellido,
+                    editable: true,
+                    keyboardType: TextInputType.name,
+                    validator: validateApellido,
+                    onSave: (v) => _guardarApellido(persona, v),
+                  ),
+
                   // Email — solo lectura. Es concern de credenciales/Usuario y
                   // aún no tiene endpoint de modificación en el backend.
                   ProfileDataRow(
                     icon: Icons.email_outlined,
                     label: 'Email',
                     value: persona.email ?? '',
+                  ),
+
+                  // Fecha de nacimiento — editable (selector de fecha)
+                  ProfileDateRow(
+                    icon: Icons.cake_outlined,
+                    label: 'Fecha de nacimiento',
+                    value: persona.fechaNacimiento,
+                    onSave: (v) => _guardarFechaNacimiento(persona, v),
                   ),
 
                   // Teléfono — editable

@@ -253,7 +253,9 @@ void main() {
         );
         await tester.pump();
 
-        // Activar edición del teléfono.
+        // Activar edición del teléfono (la fila puede quedar fuera del
+        // viewport de test: se asegura su visibilidad antes de tocar).
+        await tester.ensureVisible(find.byTooltip('Editar Teléfono'));
         await tester.tap(find.byTooltip('Editar Teléfono'));
         await tester.pump();
 
@@ -262,6 +264,7 @@ void main() {
         await tester.pump();
 
         // Confirmar el guardado.
+        await tester.ensureVisible(find.byTooltip('Guardar'));
         await tester.tap(find.byTooltip('Guardar'));
         await tester.pumpAndSettle();
 
