@@ -1,4 +1,5 @@
-﻿using CareWell.BusinessService.Auth;
+﻿using CareWell.BusinessService.Abstractions.Auth;
+using CareWell.BusinessService.Auth;
 using CareWell.Commands.Auth;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
@@ -8,6 +9,7 @@ using CareWell.Domain.General;
 using CareWell.Domain.ValueObjects.General;
 using CareWell.Repository.Auth;
 using CareWell.Repository.General;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CareWell.BusinessService.Test.Auth
@@ -19,6 +21,8 @@ namespace CareWell.BusinessService.Test.Auth
         private Mock<IBaseFactory> baseFactory;
         private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
         private Mock<IPasswordHasherDomainService> passwordHasherDomainService;
+        private Mock<IVerificacionEmailBusinessService> verificacionEmailBusinessService;
+        private Mock<ILogger<CrearCuentaBusinessService>> logger;
 
         protected override void InitializeTest()
         {
@@ -29,13 +33,17 @@ namespace CareWell.BusinessService.Test.Auth
             this.baseFactory = new Mock<IBaseFactory>();
             this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
             this.passwordHasherDomainService = new Mock<IPasswordHasherDomainService>();
+            this.verificacionEmailBusinessService = new Mock<IVerificacionEmailBusinessService>();
+            this.logger = new Mock<ILogger<CrearCuentaBusinessService>>();
 
             this.Target = new CrearCuentaBusinessService(this.unitOfWork.Object,
                                                          this.personaRepository.Object,
                                                          this.usuarioRepository.Object,
                                                          this.baseFactory.Object,
                                                          this.entityLoaderDomainService.Object,
-                                                         this.passwordHasherDomainService.Object);
+                                                         this.passwordHasherDomainService.Object,
+                                                         this.verificacionEmailBusinessService.Object,
+                                                         this.logger.Object);
         }
 
         public class ElMetodo_Crear : CrearCuentaBusinessTest
@@ -48,7 +56,7 @@ namespace CareWell.BusinessService.Test.Auth
             {
                 base.InitializeTest();
 
-                this.command = Mock.Of<CrearCuentaCommand>();
+                this.command = Mock.Of<CrearCuentaCommand>(c => c.Email == "mail@algo.com");
 
                 this.persona = new Mock<Persona>();
                 this.usuario = new Mock<Usuario>();
@@ -148,6 +156,31 @@ namespace CareWell.BusinessService.Test.Auth
 
                 // Assert
                 this.unitOfWork.Verify(v => v.SaveChanges(), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_EnviarCodigo_del_VerificacionEmailBusinessService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.verificacionEmailBusinessService.Verify(v => v.EnviarCodigo(It.Is<EnviarCodigoVerificacionEmailCommand>(c => c.Email == this.command.Email)), Times.Once);
+            }
+
+            [Fact]
+            public void Si_se_produce_un_error_al_enviar_el_codigo_no_lo_arroja()
+            {
+                // Arrange
+                this.verificacionEmailBusinessService.Setup(v => v.EnviarCodigo(It.IsAny<EnviarCodigoVerificacionEmailCommand>())).Throws(new Exception());
+
+                // Action
+                var exception = Record.Exception(() => this.Action());
+
+                // Assert
+                Assert.Null(exception);
             }
         }
     }

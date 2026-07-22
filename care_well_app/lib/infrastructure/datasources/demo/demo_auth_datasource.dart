@@ -82,6 +82,21 @@ class DemoAuthDatasource implements AuthDatasource {
     // En demo simplemente simula que el correo fue enviado sin validar.
   }
 
+  // Verificación de email por OTP: no soportada en demo (feature solo-API).
+  @override
+  Future<void> reenviarCodigoVerificacion(String email) async {
+    throw UnimplementedError(
+      'Verificación de email por OTP no soportada en modo demo.',
+    );
+  }
+
+  @override
+  Future<void> verificarEmail(String email, String codigo) async {
+    throw UnimplementedError(
+      'Verificación de email por OTP no soportada en modo demo.',
+    );
+  }
+
   @override
   Future<void> logout() async {
     await Future.delayed(Duration.zero);

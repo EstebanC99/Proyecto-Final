@@ -10,6 +10,7 @@ using CareWell.Domain.ValueObjects.General;
 using CareWell.Repository;
 using CareWell.Repository.Auth;
 using CareWell.Repository.General;
+using Microsoft.Extensions.Logging;
 
 namespace CareWell.BusinessService.Auth
 {
@@ -20,13 +21,17 @@ namespace CareWell.BusinessService.Auth
         private IBaseFactory Factory { get; set; }
         private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
         private IPasswordHasherDomainService PasswordHasherDomainService { get; set; }
+        private IVerificacionEmailBusinessService VerificacionEmailBusinessService { get; set; }
+        private ILogger<CrearCuentaBusinessService> Logger { get; set; }
 
         public CrearCuentaBusinessService(IUnitOfWork unitOfWork,
                                           IPersonaRepository personaRepository,
                                           IUsuarioRepository usuarioRepository,
                                           IBaseFactory baseFactory,
                                           IEntityLoaderDomainService entityLoaderDomainService,
-                                          IPasswordHasherDomainService passwordHasherDomainService)
+                                          IPasswordHasherDomainService passwordHasherDomainService,
+                                          IVerificacionEmailBusinessService verificacionEmailBusinessService,
+                                          ILogger<CrearCuentaBusinessService> logger)
             : base(unitOfWork)
         {
             this.PersonaRepository = personaRepository;
@@ -34,6 +39,8 @@ namespace CareWell.BusinessService.Auth
             this.Factory = baseFactory;
             this.EntityLoaderDomainService = entityLoaderDomainService;
             this.PasswordHasherDomainService = passwordHasherDomainService;
+            this.VerificacionEmailBusinessService = verificacionEmailBusinessService;
+            this.Logger = logger;
         }
 
         public void Crear(CrearCuentaCommand command)
@@ -65,6 +72,15 @@ namespace CareWell.BusinessService.Auth
             this.UsuarioRepository.Add(usuario);
 
             this.UnitOfWork.SaveChanges();
+
+            try
+            {
+                this.VerificacionEmailBusinessService.EnviarCodigo(new EnviarCodigoVerificacionEmailCommand { Email = command.Email, });
+            }
+            catch (Exception ex)
+            {
+                this.Logger.LogError(ex, "No se pudo enviar el código de verificación al crear la cuenta {Email}", command.Email);
+            }
         }
     }
 }

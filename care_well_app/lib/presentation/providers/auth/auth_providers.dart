@@ -132,3 +132,25 @@ final solicitarRecuperacionContrasenaProvider =
       final repo = ref.watch(authRepositoryProvider);
       return (String email) => repo.solicitarRecuperacionContrasena(email);
     });
+
+/// Provider autoDispose para reenviar (o enviar) el código de verificación.
+///
+/// No toca la sesión activa. La pantalla maneja loading/error en su State.
+final reenviarCodigoVerificacionProvider =
+    Provider.autoDispose<Future<void> Function(String email)>((ref) {
+      final repo = ref.watch(authRepositoryProvider);
+      return (String email) => repo.reenviarCodigoVerificacion(email);
+    });
+
+/// Provider autoDispose para verificar el email con el código OTP.
+///
+/// No toca la sesión activa (el backend no auto-loguea): tras verificar OK,
+/// el usuario debe iniciar sesión normalmente.
+final verificarEmailProvider =
+    Provider.autoDispose<Future<void> Function(String email, String codigo)>((
+      ref,
+    ) {
+      final repo = ref.watch(authRepositoryProvider);
+      return (String email, String codigo) =>
+          repo.verificarEmail(email, codigo);
+    });

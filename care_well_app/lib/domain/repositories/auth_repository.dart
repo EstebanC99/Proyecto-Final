@@ -15,6 +15,12 @@ abstract class AuthRepository {
 
   Future<void> solicitarRecuperacionContrasena(String email);
 
+  /// Reenvía (o envía manualmente) el código de verificación de email.
+  Future<void> reenviarCodigoVerificacion(String email);
+
+  /// Verifica el email de la cuenta con el código OTP recibido.
+  Future<void> verificarEmail(String email, String codigo);
+
   Future<void> logout();
 
   Future<void> eliminarCuenta(int usuarioId);

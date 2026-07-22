@@ -1,17 +1,17 @@
 # Fdb version 4
-["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1783469921.53843 0
-  "CuidadoPersonas.bcf" 1783469920 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
+["biber CuidadoPersonas"] 1780518336.66203 "CuidadoPersonas.bcf" "CuidadoPersonas.bbl" "CuidadoPersonas" 1784732019.02711 0
+  "CuidadoPersonas.bcf" 1784732018 109248 de833d15d49adda5c069e81f7ffdf59a "pdflatex"
   "Recursos/Bibliografia.bib" 1780344302 2322 98b7398011f3cca573e23d5f73ba9047 ""
   (generated)
   "CuidadoPersonas.bbl"
   "CuidadoPersonas.blg"
   (rewritten before read)
-["pdflatex"] 1783469915.45821 "CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1783469921.53986 0
-  "CuidadoPersonas.aux" 1783469920 13570 a4e6a30c3af9a0e87da7d9634faa3eb2 "pdflatex"
+["pdflatex"] 1784732011.90949 "CuidadoPersonas.tex" "CuidadoPersonas.pdf" "CuidadoPersonas" 1784732019.02819 0
+  "CuidadoPersonas.aux" 1784732018 13701 8cf5e018092351cbe218b04c0602d644 "pdflatex"
   "CuidadoPersonas.bbl" 1780518397 14026 fbaeb0e5fc79189b15fe5b18eafe3f0a "biber CuidadoPersonas"
-  "CuidadoPersonas.run.xml" 1783469920 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
-  "CuidadoPersonas.tex" 1783469897 158662 932f940852e76a84b88c7fdcaf480e6c ""
-  "CuidadoPersonas.toc" 1783469920 7685 bd3afddcdbd512f26e046cf00c95f2e2 "pdflatex"
+  "CuidadoPersonas.run.xml" 1784732018 2393 dc2190f808dabe4ddaa07b49abded064 "pdflatex"
+  "CuidadoPersonas.tex" 1784732005 164941 7781879da4f72dd4ee8b953bb3741ac7 ""
+  "CuidadoPersonas.toc" 1784732018 7775 194552dea06c1c126ca5e2f2417230b7 "pdflatex"
   "Imagenes/DER.png" 1780344302 105674 e9b3cb90b504b9ac7e078a0d543487f2 ""
   "Imagenes/IterativoIncremental.png" 1780344302 35584 87e45a5672097f8cbadbba62b405a6a9 ""
   "Imagenes/LogoUTN.png" 1780344302 12626 e66b0cd860fb45faa188f715304b8a98 ""

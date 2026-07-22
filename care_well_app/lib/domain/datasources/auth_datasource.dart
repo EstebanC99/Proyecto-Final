@@ -15,6 +15,19 @@ abstract class AuthDatasource {
 
   Future<void> solicitarRecuperacionContrasena(String email);
 
+  /// Reenvía (o envía manualmente) el código de verificación de email.
+  ///
+  /// El backend aplica cooldown y tope de envíos; si se excede responde con
+  /// error de validación. Si el email no existe, responde OK igualmente
+  /// (anti-enumeración).
+  Future<void> reenviarCodigoVerificacion(String email);
+
+  /// Verifica el email de la cuenta con el código OTP recibido.
+  ///
+  /// En caso de éxito la cuenta pasa a estado activo, pero NO se inicia sesión:
+  /// el usuario debe loguearse normalmente después.
+  Future<void> verificarEmail(String email, String codigo);
+
   Future<void> logout();
 
   Future<void> eliminarCuenta(int usuarioId);

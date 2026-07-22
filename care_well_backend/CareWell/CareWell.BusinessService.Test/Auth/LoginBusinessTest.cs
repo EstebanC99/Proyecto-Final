@@ -106,6 +106,18 @@ namespace CareWell.BusinessService.Test.Auth
             }
 
             [Fact]
+            public void Llama_una_vez_al_metodo_ValidarHabilitadoLogin_del_Usuario()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.usuario.Verify(v => v.ValidarHabilitadoLogin(), Times.Once);
+            }
+
+            [Fact]
             public void Llama_una_vez_al_metodo_GenerarTokenAcceso_del_TokenAutorizacionBusinessService()
             {
                 // Arrange

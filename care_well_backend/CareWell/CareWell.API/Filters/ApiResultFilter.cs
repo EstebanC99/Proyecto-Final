@@ -34,6 +34,7 @@ namespace CareWell.API.Filters
             {
                 ValidacionDominioException ex => (StatusCodes.Status400BadRequest, ex.Message),
                 RecursoNoEncontradoException ex => (StatusCodes.Status404NotFound, ex.Message),
+                EmailNoVerificadoException ex => (StatusCodes.Status403Forbidden, ex.Message),
                 UnauthorizedAccessException ex => (StatusCodes.Status401Unauthorized, ex.Message),
                 _ => (StatusCodes.Status500InternalServerError, "Ocurrió un error inesperado.")
             };

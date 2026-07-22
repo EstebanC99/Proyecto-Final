@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -22,6 +23,7 @@ class AppTextField extends StatelessWidget {
     this.autocorrect = true,
     this.autofillHints,
     this.onSubmitted,
+    this.inputFormatters,
   });
 
   final String label;
@@ -55,6 +57,9 @@ class AppTextField extends StatelessWidget {
   /// Callback al presionar "enviar/siguiente" en el teclado.
   final ValueChanged<String>? onSubmitted;
 
+  /// Formateadores de entrada opcionales (p. ej. solo dígitos, longitud máxima).
+  final List<TextInputFormatter>? inputFormatters;
+
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +77,7 @@ class AppTextField extends StatelessWidget {
         focusNode: focusNode,
         autocorrect: autocorrect,
         autofillHints: autofillHints,
+        inputFormatters: inputFormatters,
         onChanged: onChanged,
         onEditingComplete: onEditingComplete,
         onSubmitted: onSubmitted,

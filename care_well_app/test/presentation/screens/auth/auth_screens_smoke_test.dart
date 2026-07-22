@@ -6,6 +6,7 @@ import 'package:care_well_app/presentation/screens/auth/create_credentials_scree
 import 'package:care_well_app/presentation/screens/auth/login_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/recover_password_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/register_screen.dart';
+import 'package:care_well_app/presentation/screens/auth/verify_email_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +46,12 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
+
+  @override
+  Future<void> reenviarCodigoVerificacion(String email) async {}
+
+  @override
+  Future<void> verificarEmail(String email, String codigo) async {}
 
   @override
   Future<void> logout() async {}
@@ -194,13 +201,13 @@ void main() {
       expect(find.byType(AccountCreatedScreen), findsOneWidget);
     });
 
-    testWidgets('AccountCreatedScreen muestra texto "Cuenta creada"', (
+    testWidgets('AccountCreatedScreen muestra texto "Email verificado"', (
       tester,
     ) async {
       await tester.pumpWidget(_wrap(const AccountCreatedScreen()));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
-      expect(find.text('Cuenta creada'), findsOneWidget);
+      expect(find.text('Email verificado'), findsOneWidget);
     });
 
     testWidgets('AccountCreatedScreen muestra botón "Ir al login"', (
@@ -210,6 +217,35 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('Ir al login'), findsOneWidget);
+    });
+
+    testWidgets('VerifyEmailScreen monta sin errores', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const VerifyEmailScreen(email: 'test@example.com')),
+      );
+      await tester.pump();
+      expect(find.byType(VerifyEmailScreen), findsOneWidget);
+    });
+
+    testWidgets('VerifyEmailScreen muestra el email y el botón Verificar', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(const VerifyEmailScreen(email: 'test@example.com')),
+      );
+      await tester.pump();
+      expect(find.textContaining('test@example.com'), findsOneWidget);
+      expect(find.text('Verificar'), findsOneWidget);
+    });
+
+    testWidgets('VerifyEmailScreen muestra "Reenviar" habilitado al entrar', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(const VerifyEmailScreen(email: 'test@example.com')),
+      );
+      await tester.pump();
+      expect(find.textContaining('Reenviar código'), findsOneWidget);
     });
   });
 }

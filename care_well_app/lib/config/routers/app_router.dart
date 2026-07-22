@@ -58,6 +58,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const CreateCredentialsScreen(),
       ),
       GoRoute(
+        path: AppRoutes.verifyEmail,
+        name: AppRoutes.verifyEmailName,
+        // Guarda: la pantalla necesita el email por `extra`. Ante acceso
+        // directo sin email (deep link, refresh), se vuelve al login.
+        redirect: (_, state) => state.extra is String ? null : AppRoutes.login,
+        builder: (_, state) => VerifyEmailScreen(email: state.extra as String),
+      ),
+      GoRoute(
         path: AppRoutes.accountCreated,
         name: AppRoutes.accountCreatedName,
         builder: (_, _) => const AccountCreatedScreen(),

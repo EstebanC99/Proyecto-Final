@@ -227,7 +227,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     result.when(
       data: (_) {
-        context.goNamed(AppRoutes.accountCreatedName);
+        // El backend crea la cuenta en estado pendiente de validación y envía
+        // el primer código OTP por email. Se continúa a la verificación.
+        context.goNamed(
+          AppRoutes.verifyEmailName,
+          extra: _emailController.text.trim(),
+        );
       },
       error: (error, _) {
         // Si es error de email duplicado, volver a paso 1 y mostrar en campo.

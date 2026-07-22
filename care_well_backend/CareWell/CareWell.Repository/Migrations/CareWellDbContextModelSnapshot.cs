@@ -102,6 +102,42 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_EventoAgenda", (string)null);
                 });
 
+            modelBuilder.Entity("CareWell.Domain.Auth.CodigoVerificacionEmail", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_CodigoVerificacionEmail");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("CodigoHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("Consumido")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Expiracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ID_Usuario")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IntentosFallidos")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_Usuario");
+
+                    b.ToTable("t_CodigoVerificacionEmail", (string)null);
+                });
+
             modelBuilder.Entity("CareWell.Domain.Auth.EstadoUsuario", b =>
                 {
                     b.Property<int>("ID")
@@ -772,6 +808,17 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("Persona");
 
                     b.Navigation("Tipo");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.Auth.CodigoVerificacionEmail", b =>
+                {
+                    b.HasOne("CareWell.Domain.Auth.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Auth.RefreshToken", b =>

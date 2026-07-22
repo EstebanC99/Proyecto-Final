@@ -67,6 +67,31 @@ class ApiAuthDatasource implements AuthDatasource {
     }
   }
 
+  // ── reenviarCodigoVerificacion ───────────────────────────────────────────────
+
+  @override
+  Future<void> reenviarCodigoVerificacion(String email) async {
+    try {
+      await _dio.post(ApiConfig.reenviarCodigoPath, data: {'email': email});
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  // ── verificarEmail ───────────────────────────────────────────────────────────
+
+  @override
+  Future<void> verificarEmail(String email, String codigo) async {
+    try {
+      await _dio.post(
+        ApiConfig.verificarEmailPath,
+        data: {'email': email, 'codigo': codigo},
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
   @override
   Future<void> logout() async {
     await _tokenStorage.clear();

@@ -5,6 +5,7 @@ abstract final class AppRoutes {
   static const register = '/auth/register';
   static const recoverPassword = '/auth/recover-password';
   static const createCredentials = '/auth/create-credentials';
+  static const verifyEmail = '/auth/verify-email';
   static const accountCreated = '/auth/account-created';
 
   // Shell
@@ -52,6 +53,7 @@ abstract final class AppRoutes {
   static const registerName = 'register';
   static const recoverPasswordName = 'recover-password';
   static const createCredentialsName = 'create-credentials';
+  static const verifyEmailName = 'verify-email';
   static const accountCreatedName = 'account-created';
   static const homeName = 'home';
   static const profileName = 'profile';

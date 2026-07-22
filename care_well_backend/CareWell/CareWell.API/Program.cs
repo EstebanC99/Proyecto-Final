@@ -1,5 +1,7 @@
 using CareWell.API.Filters;
 using CareWell.BusinessService;
+using CareWell.Notifications;
+using CareWell.Notifications.Email;
 using CareWell.Repository;
 using CareWell.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,8 +28,11 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddRepositories();
 builder.Services.AddBusinessServices();
+builder.Services.AddNotifications();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

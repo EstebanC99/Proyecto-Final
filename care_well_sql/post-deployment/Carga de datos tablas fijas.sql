@@ -28,7 +28,8 @@ SET IDENTITY_INSERT t_EstadoUsuario ON;
 INSERT INTO t_EstadoUsuario (ID_EstadoUsuario, Descripcion) VALUES
 (1, 'Activo'),
 (2, 'Suspendido'),
-(3, 'Eliminado');
+(3, 'Eliminado'),
+(4, 'Pendiente de validacion de email');
 SET IDENTITY_INSERT t_EstadoUsuario OFF;
 GO
 --------------------------------------------------------------------------

@@ -17,6 +17,9 @@ class ApiExceptionMapper {
       401 => CredencialesInvalidasException(
         mensaje ?? 'Credenciales inválidas.',
       ),
+      403 => EmailNoVerificadoException(
+        mensaje ?? 'Tu email aún no fue verificado.',
+      ),
       404 => RecursoNoEncontradoException(
         mensaje ?? 'El recurso solicitado no fue encontrado.',
       ),

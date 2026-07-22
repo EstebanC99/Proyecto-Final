@@ -38,7 +38,24 @@ namespace CareWell.Domain.Auth
             this.Persona = persona;
             this.NombreUsuario = nombreUsuario;
             this.ContrasenaHash = passwordHasherDomainService.Hashear(contrasena);
+            this.Estado = entityLoaderDomainService.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion);
+        }
+
+        public virtual void ConfirmarEmail(IEntityLoaderDomainService entityLoaderDomainService)
+        {
+            if (this.Estado.ID != EstadosUsuario.PendienteValidacion)
+                throw new ValidacionDominioException(Mensajes.ElEstadoDelUsuarioNoPermiteVerificacionEmail);
+
             this.Estado = entityLoaderDomainService.GetByID<EstadoUsuario>(EstadosUsuario.Activo);
+        }
+
+        public virtual void ValidarHabilitadoLogin()
+        {
+            if (this.Estado.ID == EstadosUsuario.PendienteValidacion)
+                throw new EmailNoVerificadoException(Mensajes.ElEmailNoFueVerificado);
+
+            if (this.Estado.ID != EstadosUsuario.Activo)
+                throw new UnauthorizedAccessException(Mensajes.LaCuentaIngresadaNoEstaHabilitadaParaIngresar);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace CareWell.Domain.Test.Auth
                 this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
                 this.passwordHasherDomainService = new Mock<IPasswordHasherDomainService>();
 
-                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo));
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion));
             }
 
             private void Action()
@@ -144,6 +144,77 @@ namespace CareWell.Domain.Test.Auth
             }
 
             [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_EstadoUsuario_con_estado_PendienteValidacion_del_servicio_EntityLoaderDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion), Times.Once);
+            }
+
+            [Fact]
+            public void Setea_la_propiedad_Estado_con_el_estado_retornado_por_el_servicio_EntityLoaderDomainService()
+            {
+                // Arrange
+                var estado = Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(estado);
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Same(estado, this.Target.Estado);
+            }
+        }
+
+        public class ElMetodo_ConfirmarEmail : UsuarioTest
+        {
+            private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+
+                #region Crear
+
+                var persona = Mock.Of<Persona>();
+                var email = "email@example.com";
+                var contrasena = "12345678";
+
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion));
+
+                this.Target.Crear(persona,
+                                  email,
+                                  contrasena,
+                                  this.entityLoaderDomainService.Object,
+                                  Mock.Of<IPasswordHasherDomainService>());
+
+                #endregion
+            }
+
+            private void Action()
+            {
+                this.Target.ConfirmarEmail(this.entityLoaderDomainService.Object);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_diferente_a_PendienteValidacion_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo));
+                this.Target.ConfirmarEmail(this.entityLoaderDomainService.Object);
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ElEstadoDelUsuarioNoPermiteVerificacionEmail, excepcionEsperada.Message);
+            }
+
+            [Fact]
             public void Llama_una_vez_al_metodo_GetByID_EstadoUsuario_con_estado_Activo_del_servicio_EntityLoaderDomainService()
             {
                 // Arrange
@@ -159,14 +230,87 @@ namespace CareWell.Domain.Test.Auth
             public void Setea_la_propiedad_Estado_con_el_estado_retornado_por_el_servicio_EntityLoaderDomainService()
             {
                 // Arrange
-                var estadoActivo = Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo);
-                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(estadoActivo);
+                var estado = Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(estado);
 
                 // Action
                 this.Action();
 
                 // Assert
-                Assert.Same(estadoActivo, this.Target.Estado);
+                Assert.Same(estado, this.Target.Estado);
+            }
+        }
+
+        public class ElMetodo_ValidarHabilitadoLogin : UsuarioTest
+        {
+            private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+
+                #region Crear
+
+                var persona = Mock.Of<Persona>();
+                var email = "email@example.com";
+                var contrasena = "12345678";
+
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion));
+
+                this.Target.Crear(persona,
+                                  email,
+                                  contrasena,
+                                  this.entityLoaderDomainService.Object,
+                                  Mock.Of<IPasswordHasherDomainService>());
+
+                #endregion
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarHabilitadoLogin();
+            }
+
+            private class UsuarioConEstadoInactivo : Usuario
+            {
+                public override EstadoUsuario Estado => Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Suspendido);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_PendienteValidacion_arroja_un_EmailNoVerificadoException_con_mensaje_informativo()
+            {
+                // Arrange
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<EmailNoVerificadoException>(() => this.Action());
+                Assert.Equal(Mensajes.ElEmailNoFueVerificado, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_diferente_a_Activo_arroja_un_UnauthorizedAccessException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.Target = new UsuarioConEstadoInactivo();
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<UnauthorizedAccessException>(() => this.Action());
+                Assert.Equal(Mensajes.LaCuentaIngresadaNoEstaHabilitadaParaIngresar, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_Activo_no_arroja_excepcion()
+            {
+                // Arrange
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo));
+                this.Target.ConfirmarEmail(this.entityLoaderDomainService.Object);
+
+                // Action
+                var excepcion = Record.Exception(() => this.Action());
+
+                // & Assert
+                Assert.Null(excepcion);
             }
         }
     }

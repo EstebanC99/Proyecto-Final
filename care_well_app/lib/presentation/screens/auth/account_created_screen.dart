@@ -7,10 +7,11 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../widgets/widgets.dart';
 
-/// Pantalla terminal de confirmación de cuenta creada (US-01).
+/// Pantalla terminal de confirmación de email verificado (US-01).
 ///
-/// Se accede tras un registro exitoso. El back del sistema no vuelve
-/// al formulario: redirige al login.
+/// Se accede tras verificar el email con el código OTP: la cuenta ya quedó
+/// activa. No inicia sesión automáticamente (el backend no auto-loguea): el
+/// back del sistema y el botón principal llevan al login.
 class AccountCreatedScreen extends StatelessWidget {
   const AccountCreatedScreen({super.key});
 
@@ -42,7 +43,7 @@ class AccountCreatedScreen extends StatelessWidget {
                       ZoomIn(
                         duration: const Duration(milliseconds: 400),
                         child: Semantics(
-                          label: 'Cuenta creada exitosamente',
+                          label: 'Email verificado exitosamente',
                           child: Container(
                             width: 88,
                             height: 88,
@@ -64,7 +65,7 @@ class AccountCreatedScreen extends StatelessWidget {
                       Semantics(
                         focusable: true,
                         child: Text(
-                          'Cuenta creada',
+                          'Email verificado',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             color: AppColors.textPrimary,
                             fontWeight: FontWeight.w700,
@@ -76,7 +77,7 @@ class AccountCreatedScreen extends StatelessWidget {
 
                       // Subtitulo
                       Text(
-                        'Tu cuenta se creó correctamente. '
+                        'Tu cuenta quedó activada. '
                         'Iniciá sesión para empezar a usar CareWell.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(

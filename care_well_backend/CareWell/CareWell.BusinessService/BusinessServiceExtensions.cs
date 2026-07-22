@@ -48,8 +48,10 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
             services.AddScoped<IAlertaBienestarBusinessService, AlertaBienestarBusinessService>();
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
+            services.AddScoped<IEnvioEmailBusinessService, EnvioEmailBusinessService>();
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
+            services.AddScoped<IVerificacionEmailBusinessService, VerificacionEmailBusinessService>();
 
             #endregion
 
@@ -57,6 +59,7 @@ namespace CareWell.BusinessService
 
             services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
+            services.AddScoped<IGeneradorCodigoOtpDomainService, GeneradorCodigoOtpBusinessService>();
             services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
 
             #endregion
@@ -66,6 +69,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IDetectorAlertaHabito, DetectorAlertaHabito>();
             services.AddScoped<IDetectorAnimoBajoSostenido, DetectorAnimoBajoSostenido>();
             services.AddScoped<IDetectorDeterioroAnimo, DetectorDeterioroAnimo>();
+            services.AddScoped<IValidadorLimiteEnvioEmail, ValidadorLimiteEnvioEmail>();
             services.AddScoped<IValidadorPermisoAccion, ValidadorPermisoAccion>();
             services.AddScoped<IValidarExistenciaAsignacionCuidado, ValidarExistenciaAsignacionCuidado>();
 

@@ -28,6 +28,10 @@ class _FakeAuthRepository implements AuthRepository {
 
   String _contrasenaActual = '1234';
 
+  // Registra las últimas llamadas para verificar delegación en los tests.
+  String? reenviarCodigoEmail;
+  ({String email, String codigo})? verificarEmailArgs;
+
   @override
   Future<Usuario> login(String email, String contrasena) async {
     if (email == 'test@example.com' && contrasena == _contrasenaActual) {
@@ -49,6 +53,16 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
+
+  @override
+  Future<void> reenviarCodigoVerificacion(String email) async {
+    reenviarCodigoEmail = email;
+  }
+
+  @override
+  Future<void> verificarEmail(String email, String codigo) async {
+    verificarEmailArgs = (email: email, codigo: codigo);
+  }
 
   @override
   Future<void> logout() async {}
@@ -212,6 +226,39 @@ void main() {
       final solicitar = container.read(solicitarRecuperacionContrasenaProvider);
       await expectLater(solicitar('test@example.com'), completes);
     });
+
+    test(
+      'reenviarCodigoVerificacionProvider delega el email en el repositorio',
+      () async {
+        final fake = _FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
+
+        final reenviar = container.read(reenviarCodigoVerificacionProvider);
+        await reenviar('test@example.com');
+
+        expect(fake.reenviarCodigoEmail, 'test@example.com');
+      },
+    );
+
+    test(
+      'verificarEmailProvider delega email y código en el repositorio',
+      () async {
+        final fake = _FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
+
+        final verificar = container.read(verificarEmailProvider);
+        await verificar('test@example.com', '123456');
+
+        expect(fake.verificarEmailArgs?.email, 'test@example.com');
+        expect(fake.verificarEmailArgs?.codigo, '123456');
+      },
+    );
 
     test(
       'actualizarPerfil actualiza email y refresca el estado de sesión',

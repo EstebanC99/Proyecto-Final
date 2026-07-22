@@ -3,4 +3,5 @@ abstract final class EstadosUsuarioConst {
   static const int activo = 1;
   static const int suspendido = 2;
   static const int eliminado = 3;
+  static const int pendienteValidacion = 4;
 }

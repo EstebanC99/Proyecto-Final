@@ -32,6 +32,12 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> solicitarRecuperacionContrasena(String email) async {}
 
   @override
+  Future<void> reenviarCodigoVerificacion(String email) async {}
+
+  @override
+  Future<void> verificarEmail(String email, String codigo) async {}
+
+  @override
   Future<void> logout() async {}
 
   @override

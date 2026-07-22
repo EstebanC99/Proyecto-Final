@@ -61,8 +61,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final authState = ref.read(authStateProvider);
     if (authState.hasError && mounted) {
+      final error = authState.error;
+      // Cuenta pendiente de validación (403): en vez de un error de credenciales
+      // se lleva al usuario a verificar su email.
+      if (error is EmailNoVerificadoException) {
+        context.goNamed(
+          AppRoutes.verifyEmailName,
+          extra: _emailController.text.trim(),
+        );
+        return;
+      }
       setState(() {
-        final error = authState.error;
         if (error is SinConexionException) {
           _loginError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
         } else {

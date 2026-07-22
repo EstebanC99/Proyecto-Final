@@ -27,7 +27,9 @@ PROYECTO-FINAL/                  # raíz del repo (Claude Code corre acá)
 │       ├── CareWell.Commands/
 │       ├── CareWell.Queries/
 │       ├── CareWell.DataViews/
-│       └── CareWell.Global/
+│       ├── CareWell.Global/
+│       ├── CareWell.Notifications/
+│       └── CareWell.Security/
 ├── care_well_doc/
 │   ├── Diagramas/               # diagramas (modelo de dominio .drawio, etc.)
 │   └── LATEX/                   # documentación en LaTeX
@@ -67,7 +69,13 @@ modifica la documentación en LaTeX.
   - `CareWell.Queries` — DTOs de lectura (input CQRS); sin dependencias.
   - `CareWell.DataViews` — DTOs de salida (read models); sin dependencias.
   - `CareWell.Global` — constantes y enumeraciones compartidas.
-- **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain`.
+  - `CareWell.Notifications` — infraestructura de envío de notificaciones (hoy: email por SMTP
+    con `IEmailFactory`/`IEmailSender`, `EmailOptions`); proyecto hoja, sin referencias a otros
+    proyectos de la solución.
+  - `CareWell.Security` — contexto del usuario autenticado (`IUserContext`/`IUserContextWriter`,
+    `UserContext`); proyecto hoja, poblado desde el JWT por un filtro de `API` y consumido por
+    `BusinessService` para resolver el usuario actual (p. ej. en chequeos de permisos).
+- **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain, Notifications, Security`.
 - **Convenciones:** nombres en español; un `*Config.cs` por entidad en `Repository/Config/`.
 
 ## 4b. Stack (frontend)
