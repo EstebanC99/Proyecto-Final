@@ -2,7 +2,7 @@
 
 namespace CareWell.Domain.Validadores
 {
-    public interface IValidadorLimiteEnvioEmail
+    public interface IValidadorLimiteEnvioCodigo
     {
         void ValidarCantidadEnviosUltimaHora(Usuario usuario);
     }

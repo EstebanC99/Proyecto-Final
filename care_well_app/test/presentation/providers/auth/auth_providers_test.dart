@@ -31,6 +31,8 @@ class _FakeAuthRepository implements AuthRepository {
   // Registra las últimas llamadas para verificar delegación en los tests.
   String? reenviarCodigoEmail;
   ({String email, String codigo})? verificarEmailArgs;
+  ({String email, String codigo, String contrasenaNueva})?
+  confirmarResetContrasenaArgs;
 
   @override
   Future<Usuario> login(String email, String contrasena) async {
@@ -53,6 +55,19 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
+
+  @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) async {
+    confirmarResetContrasenaArgs = (
+      email: email,
+      codigo: codigo,
+      contrasenaNueva: contrasenaNueva,
+    );
+  }
 
   @override
   Future<void> reenviarCodigoVerificacion(String email) async {
@@ -257,6 +272,28 @@ void main() {
 
         expect(fake.verificarEmailArgs?.email, 'test@example.com');
         expect(fake.verificarEmailArgs?.codigo, '123456');
+      },
+    );
+
+    test(
+      'confirmarResetContrasenaProvider delega email, código y contraseña en '
+      'el repositorio',
+      () async {
+        final fake = _FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
+
+        final confirmar = container.read(confirmarResetContrasenaProvider);
+        await confirmar('test@example.com', '123456', 'NuevaClave8');
+
+        expect(fake.confirmarResetContrasenaArgs?.email, 'test@example.com');
+        expect(fake.confirmarResetContrasenaArgs?.codigo, '123456');
+        expect(
+          fake.confirmarResetContrasenaArgs?.contrasenaNueva,
+          'NuevaClave8',
+        );
       },
     );
 

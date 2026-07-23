@@ -12,12 +12,15 @@ namespace CareWell.API.Controllers.Auth
     {
         private ICrearCuentaBusinessService CrearCuentaBusinessService { get; set; }
         private IVerificacionEmailBusinessService VerificacionEmailBusinessService { get; set; }
+        private IRecuperacionContrasenaBusinessService RecuperacionContrasenaBusinessService { get; set; }
 
         public CuentaController(ICrearCuentaBusinessService crearCuentaBusinessService,
-                                IVerificacionEmailBusinessService verificacionEmailBusinessService)
+                                IVerificacionEmailBusinessService verificacionEmailBusinessService,
+                                IRecuperacionContrasenaBusinessService recuperacionContrasenaBusinessService)
         {
             this.CrearCuentaBusinessService = crearCuentaBusinessService;
             this.VerificacionEmailBusinessService = verificacionEmailBusinessService;
+            this.RecuperacionContrasenaBusinessService = recuperacionContrasenaBusinessService;
         }
 
         [HttpPost("crear")]
@@ -27,7 +30,7 @@ namespace CareWell.API.Controllers.Auth
         }
 
         [HttpPost("reenviar-codigo")]
-        public void ReenviarCodigo([FromBody] EnviarCodigoVerificacionEmailCommand command)
+        public void ReenviarCodigo([FromBody] EnviarCodigoVerificacionCommand command)
         {
             this.VerificacionEmailBusinessService.EnviarCodigo(command);
         }
@@ -36,6 +39,18 @@ namespace CareWell.API.Controllers.Auth
         public void VerificarEmail([FromBody] VerificarEmailCommand command)
         {
             this.VerificacionEmailBusinessService.Verificar(command);
+        }
+
+        [HttpPost("solicitar-reset-contrasena")]
+        public void SolicitarResetContrasena([FromBody] SolicitarResetContrasenaCommand command)
+        {
+            this.RecuperacionContrasenaBusinessService.SolicitarReset(command);
+        }
+
+        [HttpPost("confirmar-reset-contrasena")]
+        public void ConfirmarResetContrasena([FromBody] ConfirmarResetContrasenaCommand command)
+        {
+            this.RecuperacionContrasenaBusinessService.ConfirmarReset(command);
         }
     }
 }

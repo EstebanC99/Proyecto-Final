@@ -82,6 +82,17 @@ namespace CareWell.Domain.Test.Auth
             }
 
             [Fact]
+            public void Si_el_largo_de_la_Contrasena_es_menor_al_requerido_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.contrasena = "1234567";
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ContrasenaLongitudMinima, excepcionEsperada.Message);
+            }
+
+            [Fact]
             public void Si_existe_un_usuario_con_mismo_email_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
@@ -241,6 +252,95 @@ namespace CareWell.Domain.Test.Auth
             }
         }
 
+        public class ElMetodo_RestablecerContrasena : UsuarioTest
+        {
+            private string contrasenaNueva;
+            private Mock<IPasswordHasherDomainService> passwordHasherDomainService;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.contrasenaNueva = "87654321";
+
+                this.passwordHasherDomainService = new Mock<IPasswordHasherDomainService>();
+
+                #region Crear
+
+                var persona = Mock.Of<Persona>();
+                var email = "email@example.com";
+                var contrasena = "12345678";
+
+                var entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+                entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion));
+                entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo));
+
+                this.Target.Crear(persona,
+                                  email,
+                                  contrasena,
+                                  entityLoaderDomainService.Object,
+                                  this.passwordHasherDomainService.Object);
+
+                this.Target.ConfirmarEmail(entityLoaderDomainService.Object);
+
+                #endregion
+            }
+
+            private void Action()
+            {
+                this.Target.RestablecerContrasena(this.contrasenaNueva,
+                                                  this.passwordHasherDomainService.Object);
+            }
+
+            [Fact]
+            public void Si_Contrasena_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.contrasenaNueva = null;
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ContrasenaRequerida, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_el_largo_de_la_Contrasena_es_menor_al_requerido_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.contrasenaNueva = "8765432";
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ContrasenaLongitudMinima, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Hashear_del_servicio_PasswordHasherDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.passwordHasherDomainService.Verify(v => v.Hashear(this.contrasenaNueva), Times.Once);
+            }
+
+            [Fact]
+            public void Setea_la_propiedad_ContrasenaHash_con_lo_retornado_por_el_servicio_PasswordHasherDomainService()
+            {
+                // Arrange
+                var contrasenaHash = "XXXXXX";
+                this.passwordHasherDomainService.Setup(s => s.Hashear(this.contrasenaNueva)).Returns(contrasenaHash);
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equal(contrasenaHash, this.Target.ContrasenaHash);
+            }
+        }
+
         public class ElMetodo_ValidarHabilitadoLogin : UsuarioTest
         {
             private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
@@ -310,6 +410,67 @@ namespace CareWell.Domain.Test.Auth
                 var excepcion = Record.Exception(() => this.Action());
 
                 // & Assert
+                Assert.Null(excepcion);
+            }
+        }
+
+        public class ElMetodo_ValidarHabilitadoParaRecuperarContrasena : UsuarioTest
+        {
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                #region Crear
+
+                var persona = Mock.Of<Persona>();
+                var email = "email@example.com";
+                var contrasena = "12345678";
+
+                var entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+                entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.PendienteValidacion)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.PendienteValidacion));
+                entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Activo)).Returns(Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Activo));
+
+                this.Target.Crear(persona,
+                                  email,
+                                  contrasena,
+                                  entityLoaderDomainService.Object,
+                                  Mock.Of<IPasswordHasherDomainService>());
+
+                this.Target.ConfirmarEmail(entityLoaderDomainService.Object);
+
+                #endregion
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarHabilitadoParaRecuperarContrasena();
+            }
+
+            private class UsuarioConEstadoInactivo : Usuario
+            {
+                public override EstadoUsuario Estado => Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Suspendido);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_diferente_a_Activo_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.Target = new UsuarioConEstadoInactivo();
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.LaCuentaNoEstaHabilitadaParaRestablecerContrasena, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_el_estado_del_Usuario_es_Activo_no_arroja_excepcion()
+            {
+                // Arrange
+
+                // Action
+                var excepcion = Record.Exception(() => this.Action());
+
+                // Assert
                 Assert.Null(excepcion);
             }
         }

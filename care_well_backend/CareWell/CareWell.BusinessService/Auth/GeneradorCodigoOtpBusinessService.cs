@@ -8,11 +8,11 @@ namespace CareWell.BusinessService.Auth
     {
         public string Generar()
         {
-            var maximoExclusivo = (int)Math.Pow(10, ParametrosVerificacionEmail.LongitudCodigo);
+            var maximoExclusivo = (int)Math.Pow(10, ParametrosVerificacionCodigo.LongitudCodigo);
 
             var numero = RandomNumberGenerator.GetInt32(0, maximoExclusivo);
 
-            return numero.ToString().PadLeft(ParametrosVerificacionEmail.LongitudCodigo, '0');
+            return numero.ToString().PadLeft(ParametrosVerificacionCodigo.LongitudCodigo, '0');
         }
     }
 }

@@ -1,8 +1,8 @@
 # US-03 Recuperación de contraseña — Flujo de navegación
 
-> Mapa de navegación del flujo de recuperación. Referencia los tokens de
+> **v2 (OTP).** Mapa de navegación del flujo de recuperación. Referencia los tokens de
 > `00-sistema-diseno.md` (que a su vez hereda `01 - Registro de usuario/00-identidad-visual.md`).
-> Ruta base en `go_router`: `/recover` (push desde `/login`).
+> Rutas en `go_router`: `/auth/recover-password` → `/auth/reset-password` → `/auth/reset-password/success`.
 
 ---
 
@@ -10,93 +10,103 @@
 
 ```
                                           ┌──────────────────────────────────────┐
-                        tap               │     SOLICITAR EMAIL  [01]            │
+                        tap               │  02 · SOLICITAR CÓDIGO                │
    Login ─────────────────────────────►  │  AppBar + ARROW_BACK                 │
-   "¿Olvidaste tu contraseña?"           │  Título: "Recuperar contraseña"      │
-   go_router push /recover               │  Email [ ________________________ ]  │
-                                          │  [      Enviar link               ]  │
+   "¿Olvidaste tu contraseña?"           │  StepProgressBar · Paso 1 de 2       │
+   go_router push /auth/recover-password │  Email [ ________________________ ]  │
+                                          │  [        Enviar código           ]  │
                                           │      Volver al inicio de sesión      │
                                           └──────────────┬───────────────────────┘
-                                                         │ tap "Enviar link"
+                                                         │ tap "Enviar código"
                                           ┌──────────────▼───────────────────────┐
-                                          │    ¿Email registrado en el sistema?   │
-                                          └──────┬──────────────────────┬─────────┘
-                                            sí   │                      │  no
-                                                 ▼                      ▼
-                              ┌──────────────────────────┐  ┌────────────────────────────────┐
-                              │   EMAIL ENVIADO  [02]    │  │  ERROR EMAIL NO REG.  [04]     │
-                              │ Ícono MARK_EMAIL_READ    │  │  Banner error + campo con      │
-                              │ "Revisá tu email"        │  │  valor no registrado           │
-                              │ email en negrita         │  │  "No encontramos una cuenta…"  │
-                              │ [Volver al inicio sesión]│  └──────────────┬────────────────┘
-                              │  ¿No recibiste? Reenviar │                 │ usuario corrige
-                              └───────────┬──────────────┘                 └──► [01]
-                                          │ tap "Reenviar"
-                                          └──► reenvía (mismo estado [02])
-
-   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ CORTE: el usuario va al email ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-
-   deep link desde email ──────────────►  ┌──────────────────────────────────────┐
-   (ruta: /recover/reset?token=...)        │   NUEVA CONTRASEÑA  [03]            │
-                                           │  Logo CareWell 64 dp                 │
-                                           │  "Nueva contraseña"                  │
-                                           │  Nueva pass [ ______________ ] 👁   │
-                                           │  PasswordStrengthMeter (2/3 media)  │
-                                           │  Confirmar  [ ______________ ] 👁   │
-                                           │  [     Guardar contraseña       ]   │
-                                           └──────────────┬───────────────────────┘
-                                                          │ tap "Guardar contraseña"
-                                                          │ servidor confirma
-                                                          ▼
-                                           ┌──────────────────────────────────────┐
-                                           │   CAMBIO EXITOSO  [05]               │
-                                           │  Logo CareWell 64 dp                 │
-                                           │  CHECK_CIRCLE 80dp (successContainer)│
-                                           │  "¡Contraseña actualizada!"          │
-                                           │  [   Ir al inicio de sesión      ]   │
-                                           └──────────────┬───────────────────────┘
-                                                          │ tap botón
-                                                          ▼ pushReplacement → /login
-                                                      LOGIN [01]
+                                          │       ¿Respuesta del backend?         │
+                                          └───┬──────────────┬───────────────┬────┘
+                                     200 (con  │   400 cuenta  │  400 límite / │
+                                  o sin cuenta)│   no activa   │  sin conexión │
+                                              ▼               ▼               ▼
+                        ┌──────────────────────────┐  ┌──────────────┐  ┌──────────────┐
+                        │ 03 · CONFIRMAR CÓDIGO    │  │ banner        │  │ banner        │
+                        │ AppBar + ARROW_BACK      │  │ warning +     │  │ error (mismo  │
+                        │ StepProgressBar 2 de 2   │  │ "Verificar mi │  │ mensaje del   │
+                        │ Código [ ______ ]        │  │  email" ──►   │  │ backend)      │
+                        │ (cooldown reenvío activo)│  │ VerifyEmail-  │  │ queda en [02] │
+                        │ Nueva contraseña         │  │ Screen        │  │               │
+                        │ [ ______________ ] 👁     │  └──────────────┘  └──────────────┘
+                        │ PasswordStrengthMeter    │
+                        │ Confirmar [ __________ ] │
+                        │ [   Restablecer contr.  ]│
+                        │  ¿No lo recibiste?       │
+                        │  Reenviar código (60s)   │
+                        └──────────────┬────────────┘
+                                       │ tap "Restablecer contraseña"
+                          ┌────────────▼─────────────┐
+                          │   ¿Código y datos OK?     │
+                          └───┬──────────────────┬────┘
+                        sí    │                  │ no
+                              ▼                  ▼
+              ┌──────────────────────┐   error en el campo correspondiente
+              │ 06 · CAMBIO EXITOSO  │   (código inválido/vencido/agotado,
+              │ SuccessView          │   o banner general) — permanece en [03]
+              │ "¡Contraseña         │
+              │  actualizada!"       │
+              │ [Ir al inicio de     │
+              │  sesión]             │
+              └──────────┬────────────┘
+                         │ tap botón / back del sistema
+                         ▼ goNamed → /auth/login
+                     LOGIN
 ```
 
 ---
 
 ## 2. Tabla de transiciones
 
-| Origen | Destino | Disparador | Animación / Mecanismo |
+| Origen | Destino | Disparador | Mecanismo |
 |---|---|---|---|
-| Login | Solicitar email [01] | tap "¿Olvidaste tu contraseña?" | `push`, slide-right + fade 250 ms |
-| Solicitar email [01] | Email enviado [02] | servidor confirma envío (200) | `push /recover/sent`, slide-right + fade 250 ms |
-| Solicitar email [01] | Error email no reg. [04] | servidor responde email no encontrado | banner fade + slide-down 150 ms (misma ruta, estado de la pantalla) |
-| Email enviado [02] | Login | tap "Volver al inicio de sesión" | `pop` hasta `/login`, slide-left + fade 250 ms |
-| Email enviado [02] | Email enviado [02] | tap "¿No recibiste? Reenviar" | reenvía petición; feedback "Reenviando…" 1 s (mismo estado) |
-| ARROW_BACK (AppBar) [01] | Login | tap flecha | `pop`, slide-left + fade 250 ms |
-| ARROW_BACK (AppBar) [02] | Solicitar email [01] | tap flecha | `pop`, slide-left + fade 250 ms |
-| Deep link email | Nueva contraseña [03] | apertura del link externo | app abre directamente en `/recover/reset?token=…` |
-| Nueva contraseña [03] | Cambio exitoso [05] | servidor confirma cambio (200) | `pushReplacement /recover/success`, fade 250 ms |
-| Cambio exitoso [05] | Login | tap "Ir al inicio de sesión" | `pushReplacement /login`, limpia stack de recuperación |
+| Login | `02-solicitar-email` | tap "¿Olvidaste tu contraseña?" | `pushNamed(recoverPasswordName)` |
+| `02-solicitar-email` | `03-confirmar-codigo` | servidor confirma envío (200, revela o no exista la cuenta) | `pushNamed(resetPasswordName, extra: email)` |
+| `02-solicitar-email` | (misma pantalla) | servidor: cuenta no habilitada (400) | banner `warning` + acción "Verificar mi email" |
+| `02-solicitar-email` | `VerifyEmailScreen` (US-01) | tap "Verificar mi email" en el banner | `pushNamed(verifyEmailName, extra: email)` |
+| `02-solicitar-email` | (misma pantalla) | servidor: límite de envíos / sin conexión | banner `error` con el mensaje del backend |
+| ARROW_BACK / "Volver al inicio de sesión" [02] | Login | tap | `context.pop()` |
+| `03-confirmar-codigo` | `06-cambio-exitoso` | servidor confirma el cambio (200) | `goNamed(resetPasswordSuccessName)` |
+| `03-confirmar-codigo` | (misma pantalla) | código inválido/vencido/agotado | error en el campo "Código de verificación" |
+| `03-confirmar-codigo` | (misma pantalla) | tap "Reenviar código" (cooldown vencido) | reenvía `solicitar-reset-contrasena`; reinicia cooldown 60 s |
+| ARROW_BACK [03] | `02-solicitar-email` | tap | `context.pop()` (vuelve con el email ya cargado) |
+| `06-cambio-exitoso` | Login | tap "Ir al inicio de sesión" o back del sistema | `goNamed(loginName)` |
 
 ---
 
 ## 3. Reglas de gobierno del flujo
 
-- **El botón "Enviar link" valida formato de email antes de llamar al servidor.** Si el campo
-  está vacío o el email tiene formato incorrecto, el error es inline en el campo (nunca llega
-  al servidor). Si el formato es correcto pero el email no existe, el error es un banner de pantalla.
+- **El botón "Enviar código" valida formato de email antes de llamar al servidor.** Si el campo
+  está vacío o el email tiene formato incorrecto, el error es inline en el campo (nunca llega al
+  servidor).
 
-- **No se revela si el email existe.** El banner de error [04] usa el mensaje
-  "No encontramos una cuenta con ese email" sin distinguir entre "email incorrecto" y
-  "email no registrado". Decisión de seguridad equivalente a la de US-02.
+- **No se revela si el email existe, salvo el caso de cuenta no activa.** Si el email no está
+  registrado, el backend responde 200 igual y la app avanza a `03-confirmar-codigo` como si el
+  código se hubiera enviado (el usuario simplemente no va a recibir nada y, si vuelve a intentar
+  con el código equivocado, va a ver el error de "código inválido" genérico — no se distingue de
+  un código realmente vencido). La única excepción deliberada es la cuenta existente pero no
+  activa (ver `00-sistema-diseno.md` §4.1): ahí sí se informa explícitamente, por decisión de
+  producto.
 
-- **El link de email es de uso único.** Una vez que el usuario establece la nueva contraseña
-  en [03], el token se invalida en el servidor. Si intenta usar el mismo link nuevamente,
-  la app muestra un error genérico (fuera del alcance de este mockup).
+- **El código es de un solo uso y expira a los 10 minutos.** Se muestra como `helperText` en el
+  campo de código en `03-confirmar-codigo`.
 
-- **No hay navegación interna entre [03] y [04] por back.** La pantalla [03] se abre desde un
-  deep link externo; el back del sistema en Android cierra la app o vuelve al estado previo del
-  sistema, no hay pantalla anterior dentro del flujo.
+- **Reenviar código y "cuenta no activa" comparten el límite de envíos por hora (5) con la
+  verificación de email del registro.** Ver nota para `dev-flutter` en `00-sistema-diseno.md` §4.3.
 
-- **Flujo compartido con US-09.** Las pantallas [03] y [05] son las mismas que usa el flujo
-  de cambio de contraseña desde Configuración. La diferencia es el contexto de navegación
-  (ver `00-sistema-diseno.md` §2).
+- **`goNamed` (no `push`) al llegar a `06-cambio-exitoso`.** Reemplaza el stack de navegación para
+  que el back del sistema no vuelva al formulario de `03-confirmar-codigo` (el código ya fue
+  consumido por el backend; no tiene sentido poder reintentar).
+
+- **Acceso directo a `/auth/reset-password` sin `extra` (email) redirige a `/auth/recover-password`.**
+  Guarda de router equivalente a la que ya usa `VerifyEmailScreen`, pero apuntando al paso 1 de
+  este flujo en particular (no a Login), porque el paso lógico anterior es "pedir el email", no
+  "iniciar sesión".
+
+- **Flujo compartido con US-09 solo en la pantalla de éxito.** A diferencia del v1 (que compartía
+  también la pantalla de "nueva contraseña"), en esta versión `03-confirmar-codigo` es exclusiva
+  de US-03 (incluye el campo de código, que US-09 no necesita porque el usuario ya está
+  autenticado). Solo `06-cambio-exitoso` (`SuccessView`) se comparte entre ambos flujos.

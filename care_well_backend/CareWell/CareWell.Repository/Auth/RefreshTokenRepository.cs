@@ -12,5 +12,14 @@ namespace CareWell.Repository.Auth
         {
             return this.DbSet.FirstOrDefault(t => t.Token == token);
         }
+
+        public List<RefreshToken> GetVigentesPorUsuario(Usuario usuario)
+        {
+            return this.DbSet
+                .Where(t => t.Usuario.ID == usuario.ID
+                         && !t.Revocado
+                         && t.Expiracion > DateTime.Now)
+                .ToList();
+        }
     }
 }

@@ -167,14 +167,14 @@ namespace CareWell.BusinessService.Test.Auth
                 this.Action();
 
                 // Assert
-                this.verificacionEmailBusinessService.Verify(v => v.EnviarCodigo(It.Is<EnviarCodigoVerificacionEmailCommand>(c => c.Email == this.command.Email)), Times.Once);
+                this.verificacionEmailBusinessService.Verify(v => v.EnviarCodigo(It.Is<EnviarCodigoVerificacionCommand>(c => c.Email == this.command.Email)), Times.Once);
             }
 
             [Fact]
             public void Si_se_produce_un_error_al_enviar_el_codigo_no_lo_arroja()
             {
                 // Arrange
-                this.verificacionEmailBusinessService.Setup(v => v.EnviarCodigo(It.IsAny<EnviarCodigoVerificacionEmailCommand>())).Throws(new Exception());
+                this.verificacionEmailBusinessService.Setup(v => v.EnviarCodigo(It.IsAny<EnviarCodigoVerificacionCommand>())).Throws(new Exception());
 
                 // Action
                 var exception = Record.Exception(() => this.Action());

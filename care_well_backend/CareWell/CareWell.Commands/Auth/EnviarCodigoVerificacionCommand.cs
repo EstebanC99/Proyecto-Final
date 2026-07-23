@@ -1,6 +1,6 @@
 ﻿namespace CareWell.Commands.Auth
 {
-    public class EnviarCodigoVerificacionEmailCommand
+    public class EnviarCodigoVerificacionCommand
     {
         public string Email { get; set; }
     }

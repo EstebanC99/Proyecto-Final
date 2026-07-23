@@ -75,7 +75,7 @@ namespace CareWell.BusinessService.Auth
 
             try
             {
-                this.VerificacionEmailBusinessService.EnviarCodigo(new EnviarCodigoVerificacionEmailCommand { Email = command.Email, });
+                this.VerificacionEmailBusinessService.EnviarCodigo(new EnviarCodigoVerificacionCommand { Email = command.Email, });
             }
             catch (Exception ex)
             {

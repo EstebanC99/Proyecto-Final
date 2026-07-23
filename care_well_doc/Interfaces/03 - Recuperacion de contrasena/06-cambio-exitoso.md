@@ -1,72 +1,52 @@
 # 06 · Cambio exitoso — contraseña actualizada
 
-> Pantalla final del flujo US-03. Reutilizada en US-09 (cambio de contraseña desde Configuracion).
-> Tokens en `00-sistema-diseno.md`. HTML: `html/05-cambio-exitoso.html`.
+> **v2 (OTP).** Pantalla final del flujo US-03. Reutilizada en US-09 (cambio de contraseña desde
+> Configuración) a través del widget compartido `SuccessView`.
+> Tokens en `00-sistema-diseno.md`.
+> Implementación: `care_well_app/lib/presentation/screens/auth/reset_password_success_screen.dart`
+> (envuelve `presentation/widgets/shared/success_view.dart`).
+> Ruta: `/auth/reset-password/success` (`resetPasswordSuccessName`).
 
-## Propósito
+## Objetivo
 
 Confirmar al usuario que su contraseña fue actualizada correctamente y guiarlo al inicio de
-sesión. Es una pantalla de cierre del flujo: celebratoria, clara, sin opciones superfluas.
-El foco está en el feedback positivo y en la acción única disponible.
+sesión. Pantalla de cierre del flujo: celebratoria, clara, sin opciones superfluas. Además informa
+un efecto colateral real del backend que el usuario debería conocer: se cerraron sus sesiones
+activas en otros dispositivos.
 
-## Wireframe (ASCII)
+## Layout — jerarquía de componentes
 
 ```
-┌──────────────────────────────────────────────┐  ← background (#F6F8F8)
-│ 9:41                                  5G 100% │   status bar (#16201F)
-│                                                │   sin AppBar
-│                                                │
-│                  ╭────────╮                    │   logo 64×64 dp
-│                  │  ◐ ●   │                    │
-│                  ╰────────╯                    │
-│                  CareWell                      │   wordmark bicolor
-│                                                │
-│                                                │   espacio vertical ~40 dp
-│                                                │
-│                  ╔════════╗                    │   contenedor circular 112 dp
-│                  ║  [✓]   ║                    │   fondo successContainer (#D8F0E1)
-│                  ╚════════╝                    │   CHECK_CIRCLE 80 dp (success #2E9E5B)
-│                                                │
-│          ¡Contraseña actualizada!              │   displaySmall · textPrimary · centrado
-│                                                │
-│   Tu nueva contraseña está activa.            │
-│   Ya podés iniciar sesión.                    │   bodyMedium · textSecondary · centrado
-│                                                │
-│   ┌────────────────────────────────────────┐  │
-│   │         Ir al inicio de sesión          │  │   PrimaryButton full-width 56 dp
-│   └────────────────────────────────────────┘  │
-└──────────────────────────────────────────────┘
+PopScope(canPop: false)  ← evita volver al formulario con el back del sistema
+└─ SuccessView
+   ├─ Ícono check_circle_outline, 80 dp, en contenedor circular 112 dp (successContainer)
+   ├─ Título "¡Contraseña actualizada!" (28 sp bold, centrado)
+   ├─ Subtítulo: "Ya podés iniciar sesión con tu nueva contraseña. Por seguridad,
+   │   cerramos tu sesión en otros dispositivos." (centrado, textSecondary)
+   └─ PrimaryButton "Ir al inicio de sesión" (full-width)
 ```
 
-## Componentes y especificaciones
+## Estados
 
-| # | Componente | Detalle |
-|---|---|---|
-| 1 | Logo + wordmark | Ícono 64×64 dp centrado. Wordmark "CareWell" ("Care" `textPrimary`, "Well" `primary`). Sin tagline. Margen superior 52 dp. |
-| 2 | Ícono de exito | Contenedor circular 112 dp, fondo `successContainer` (#D8F0E1). CHECK_CIRCLE 80 dp, color `success` (#2E9E5B). Centrado horizontalmente. Margen superior 40 dp. |
-| 3 | Título | `displaySmall` (28 sp bold) "¡Contraseña actualizada!". Centrado. `textPrimary`. Margen superior 24 dp. |
-| 4 | Cuerpo | `bodyMedium` (16 sp regular) `textSecondary`. "Tu nueva contraseña está activa. Ya podés iniciar sesión." Centrado. Margen superior 8 dp. |
-| 5 | Botón "Ir al inicio de sesión" | `PrimaryButton` full-width, 56 dp, radio 16, fondo `primary`. Margen superior 36 dp. |
+Pantalla de un solo estado (éxito). No tiene variantes de carga ni error: se llega acá únicamente
+cuando el servidor ya confirmó el cambio.
 
 ## Interacciones y comportamiento
 
-- **"Ir al inicio de sesión":** `pushReplacement /login`. Limpia el stack completo de recuperación
-  (pantallas `03-nueva-contrasena` y esta). El usuario no puede volver atrás con el back del sistema.
-- **Back del sistema (Android):** bloqueado o redirige a Login (misma lógica que `pushReplacement`).
-  El link del email ya fue consumido; no tiene sentido permitir navegar atrás.
-- **Sin AppBar:** la pantalla es un punto final del flujo. No hay navegación interna.
-- **Animacion de entrada:** el ícono CHECK_CIRCLE puede tener una animacion de escala (scale-in,
-  300 ms, curva `easeOutBack`) al aparecer para reforzar el feedback positivo.
+- **"Ir al inicio de sesión":** `goNamed('login')`.
+- **Back del sistema (Android):** interceptado por `PopScope(canPop: false)`; redirige a Login en
+  vez de volver al formulario de `03-confirmar-codigo` (el código ya fue consumido, no tiene
+  sentido permitir volver).
+- **Sin AppBar:** pantalla terminal, sin navegación interna adicional.
 
-## Reutilizacion en US-09
+## Reutilización en US-09
 
-Cuando esta pantalla se usa desde Configuración (US-09), la acción del botón cambia:
-en lugar de ir a Login, hace `pop` de vuelta a Configuración. El texto del botón puede
-cambiar a "Listo" o mantenerse genérico ("Volver"). El widget recibe el destino como
-parámetro de configuración.
+Cuando se usa desde Configuración (cambio de contraseña con sesión activa), el `PrimaryButton` y
+el subtítulo cambian de destino/copy (vuelve a Configuración en vez de a Login, y no aplica la
+mención a "cerramos tu sesión en otros dispositivos" salvo que el backend también invalide otras
+sesiones en ese flujo). Ver spec de US-09 para el detalle de esa variante.
 
-## Navegacion (de donde viene / a donde va)
+## Navegación
 
-- **Entrada en US-03:** `03-nueva-contrasena` → servidor confirma cambio → `pushReplacement /recover/success`.
-- **Entrada en US-09:** pantalla de cambio de contraseña → servidor confirma → `pushReplacement`.
-- **Salida:** Login (US-03) o Configuración (US-09) → `pushReplacement`.
+- **Entrada:** `03-confirmar-codigo` → servidor confirma el cambio → `goNamed(resetPasswordSuccessName)`.
+- **Salida:** Login → `goNamed(loginName)` (tap en el botón o back del sistema).

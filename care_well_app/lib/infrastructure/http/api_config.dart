@@ -13,6 +13,10 @@ class ApiConfig {
   static const cuentaPath = '/api/Cuenta/crear';
   static const reenviarCodigoPath = '/api/Cuenta/reenviar-codigo';
   static const verificarEmailPath = '/api/Cuenta/verificar-email';
+  static const solicitarResetContrasenaPath =
+      '/api/Cuenta/solicitar-reset-contrasena';
+  static const confirmarResetContrasenaPath =
+      '/api/Cuenta/confirmar-reset-contrasena';
 
   static const modificarPerfil = '/api/AdministrarPersona/modificar-perfil';
   static String imagenPersonaPath(int personaId) =>

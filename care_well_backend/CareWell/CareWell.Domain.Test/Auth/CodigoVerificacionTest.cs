@@ -2,31 +2,33 @@
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.ValueObjects.Auth;
 using CareWell.Global.Constantes.Auth;
+using CareWell.Global.Enumeraciones.Auth;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 using Moq;
 
 namespace CareWell.Domain.Test.Auth
 {
-    public class CodigoVerificacionEmailTest : TestClassBase<CodigoVerificacionEmail>
+    public class CodigoVerificacionTest : TestClassBase<CodigoVerificacion>
     {
         protected override void InitializeTest()
         {
             base.InitializeTest();
 
-            this.Target = new CodigoVerificacionEmail();
+            this.Target = new CodigoVerificacion();
         }
 
-        public class ElMetodo_Crear : CodigoVerificacionEmailTest
+        public class ElMetodo_Crear : CodigoVerificacionTest
         {
-            private CrearCodigoVerificacionEmail crearCodigo;
+            private CrearCodigoVerificacion crearCodigo;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
-                this.crearCodigo = new CrearCodigoVerificacionEmail(
+                this.crearCodigo = new CrearCodigoVerificacion(
                     Usuario: Mock.Of<Usuario>(),
+                    Tipo: Global.Enumeraciones.Auth.TipoCodigoVerificacionEnum.VerificacionEmail,
                     CodigoHash: "Codigo Hash",
                     Expiracion: DateTime.Now.AddHours(1)
                 );
@@ -47,6 +49,18 @@ namespace CareWell.Domain.Test.Auth
 
                 // Assert
                 Assert.Same(this.crearCodigo.Usuario, this.Target.Usuario);
+            }
+
+            [Fact]
+            public void Setea_la_propiedad_Tipo()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equal(this.crearCodigo.Tipo, this.Target.Tipo);
             }
 
             [Fact]
@@ -110,7 +124,7 @@ namespace CareWell.Domain.Test.Auth
             }
         }
 
-        public class ElMetodo_EstaVigente : CodigoVerificacionEmailTest
+        public class ElMetodo_EstaVigente : CodigoVerificacionTest
         {
             protected override void InitializeTest()
             {
@@ -118,8 +132,9 @@ namespace CareWell.Domain.Test.Auth
 
                 #region Crear
 
-                var crearCodigo = new CrearCodigoVerificacionEmail(
+                var crearCodigo = new CrearCodigoVerificacion(
                     Usuario: Mock.Of<Usuario>(),
+                    Tipo: TipoCodigoVerificacionEnum.VerificacionEmail,
                     CodigoHash: "Codigo Hash",
                     Expiracion: DateTime.Now.AddHours(1)
                 );
@@ -134,14 +149,14 @@ namespace CareWell.Domain.Test.Auth
                 return this.Target.EstaVigente();
             }
 
-            private class CodigoVerificacionEmailExpirado : CodigoVerificacionEmail
+            private class CodigoVerificacionExpirado : CodigoVerificacion
             {
                 public override DateTime Expiracion => DateTime.Now.AddMinutes(-1);
             }
 
-            private class CodigoVerificacionEmailAgotado : CodigoVerificacionEmail
+            private class CodigoVerificacionAgotado : CodigoVerificacion
             {
-                public override int IntentosFallidos => ParametrosVerificacionEmail.MaximoIntentosVerificacion + 1;
+                public override int IntentosFallidos => ParametrosVerificacionCodigo.MaximoIntentosVerificacion + 1;
             }
 
             [Fact]
@@ -161,7 +176,7 @@ namespace CareWell.Domain.Test.Auth
             public void Retorna_false_si_la_fecha_de_expiracion_es_menor_a_la_actual()
             {
                 // Arrange
-                this.Target = new CodigoVerificacionEmailExpirado();
+                this.Target = new CodigoVerificacionExpirado();
 
                 // Action
                 var resultado = this.Action();
@@ -174,7 +189,7 @@ namespace CareWell.Domain.Test.Auth
             public void Retorna_false_si_se_supero_la_cantidad_maxima_de_intentos_permitidos()
             {
                 // Arrange
-                this.Target = new CodigoVerificacionEmailAgotado();
+                this.Target = new CodigoVerificacionAgotado();
 
                 // Action
                 var resultado = this.Action();
@@ -196,7 +211,7 @@ namespace CareWell.Domain.Test.Auth
             }
         }
 
-        public class ElMetodo_Verificar : CodigoVerificacionEmailTest
+        public class ElMetodo_Verificar : CodigoVerificacionTest
         {
             private string codigoIngresado;
             private Mock<IPasswordHasherDomainService> passwordHasherDomainService;
@@ -209,8 +224,9 @@ namespace CareWell.Domain.Test.Auth
 
                 #region Crear
 
-                var crearCodigo = new CrearCodigoVerificacionEmail(
+                var crearCodigo = new CrearCodigoVerificacion(
                     Usuario: Mock.Of<Usuario>(),
+                    Tipo: TipoCodigoVerificacionEnum.VerificacionEmail,
                     CodigoHash: "Codigo Hash",
                     Expiracion: DateTime.Now.AddHours(1)
                 );
@@ -237,7 +253,7 @@ namespace CareWell.Domain.Test.Auth
 
                 // Action & Assert
                 var excepcion = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.CodigoVerificacionEmailInvalido, excepcion.Message);
+                Assert.Equal(Mensajes.CodigoVerificacionInvalido, excepcion.Message);
             }
 
             [Fact]
@@ -245,7 +261,7 @@ namespace CareWell.Domain.Test.Auth
             {
                 // Arrange
                 this.passwordHasherDomainService.Setup(s => s.Verificar(this.codigoIngresado, It.IsAny<string>())).Returns(false);
-                for (int i = 1; i < ParametrosVerificacionEmail.MaximoIntentosVerificacion; i++)
+                for (int i = 1; i < ParametrosVerificacionCodigo.MaximoIntentosVerificacion; i++)
                 {
                     try
                     {
@@ -267,7 +283,7 @@ namespace CareWell.Domain.Test.Auth
             {
                 // Arrange
                 this.passwordHasherDomainService.Setup(s => s.Verificar(this.codigoIngresado, It.IsAny<string>())).Returns(false);
-                for (int i = 1; i < ParametrosVerificacionEmail.MaximoIntentosVerificacion; i++)
+                for (int i = 1; i < ParametrosVerificacionCodigo.MaximoIntentosVerificacion; i++)
                 {
                     try
                     {
@@ -281,7 +297,7 @@ namespace CareWell.Domain.Test.Auth
 
                 // Action & Assert
                 var excepcion = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.CodigoVerificacionEmailVencido, excepcion.Message);
+                Assert.Equal(Mensajes.CodigoVerificacionVencido, excepcion.Message);
             }
 
             [Fact]
@@ -292,7 +308,7 @@ namespace CareWell.Domain.Test.Auth
 
                 // Action & Assert
                 var excepcion = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.CodigoVerificacionEmailInvalido, excepcion.Message);
+                Assert.Equal(Mensajes.CodigoVerificacionInvalido, excepcion.Message);
             }
 
             [Fact]
@@ -308,7 +324,7 @@ namespace CareWell.Domain.Test.Auth
             }
         }
 
-        public class ElMetodo_Consumir : CodigoVerificacionEmailTest
+        public class ElMetodo_Consumir : CodigoVerificacionTest
         {
             private void Action()
             {

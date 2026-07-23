@@ -4,6 +4,8 @@ abstract final class AppRoutes {
   static const login = '/auth/login';
   static const register = '/auth/register';
   static const recoverPassword = '/auth/recover-password';
+  static const resetPassword = '/auth/reset-password';
+  static const resetPasswordSuccess = '/auth/reset-password/success';
   static const createCredentials = '/auth/create-credentials';
   static const verifyEmail = '/auth/verify-email';
   static const accountCreated = '/auth/account-created';
@@ -52,6 +54,8 @@ abstract final class AppRoutes {
   static const loginName = 'login';
   static const registerName = 'register';
   static const recoverPasswordName = 'recover-password';
+  static const resetPasswordName = 'reset-password';
+  static const resetPasswordSuccessName = 'reset-password-success';
   static const createCredentialsName = 'create-credentials';
   static const verifyEmailName = 'verify-email';
   static const accountCreatedName = 'account-created';

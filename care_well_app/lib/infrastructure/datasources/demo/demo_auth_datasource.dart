@@ -82,6 +82,16 @@ class DemoAuthDatasource implements AuthDatasource {
     // En demo simplemente simula que el correo fue enviado sin validar.
   }
 
+  @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) async {
+    // Modo demo en desuso: devuelve éxito sin validar nada.
+    await Future.delayed(Duration.zero);
+  }
+
   // Verificación de email por OTP: no soportada en demo (feature solo-API).
   @override
   Future<void> reenviarCodigoVerificacion(String email) async {

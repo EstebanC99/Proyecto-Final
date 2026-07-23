@@ -3,6 +3,8 @@ export 'app_shell.dart';
 export 'auth/login_screen.dart';
 export 'auth/register_screen.dart';
 export 'auth/recover_password_screen.dart';
+export 'auth/reset_password_screen.dart';
+export 'auth/reset_password_success_screen.dart';
 export 'auth/create_credentials_screen.dart';
 export 'auth/verify_email_screen.dart';
 export 'auth/account_created_screen.dart';

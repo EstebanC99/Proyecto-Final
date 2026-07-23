@@ -8,12 +8,13 @@
         public const string ApellidoRequerido = "El apellido es requerido.";
         public const string AutorRequeridoParaNotaDeSalud = "El autor es requerido para agregar la nota en el evento de salud.";
         public const string CaidaCumplimientoHabito = "El cumplimiento del hábito '{0}' de {1} bajó respecto de las semanas anteriores.";
-        public const string CodigoVerificacionEmailInvalido = "El código de verificación de email ingresado es inválido.";
-        public const string CodigoVerificacionEmailVencido = "El código de verificación de email esta vencido.";
+        public const string CodigoVerificacionInvalido = "El código de verificación ingresado es inválido.";
+        public const string CodigoVerificacionVencido = "El código de verificación esta vencido.";
         public const string ColaboradorRequerido = "El usuario elegido no existe como colaborador.";
         public const string ContenidoRequeridoParaNotaDeSalud = "El contenido de la nota es requerido.";
+        public const string ContrasenaLongitudMinima = "La contraseña debe tener al menos 8 caracteres.";
         public const string ContrasenaRequerida = "La contraseña es requerida.";
-        public const string DebeEsperarXSegundosParaSolicitarOtroCodigoVerificacionEmail = "Debe esperar {0} segundos para solicitar el envío de un nuevo código.";
+        public const string DebeEsperarXSegundosParaSolicitarOtroCodigoVerificacion = "Debe esperar {0} segundos para solicitar el envío de un nuevo código.";
         public const string DebeSeleccionarUnoMasPermisos = "Debe seleccionar uno o más permisos.";
         public const string DescripcionAntecedenteRequerido = "La descripcion del antecedente es requerida.";
         public const string DeterioroAnimo = "El ánimo de {0} muestra un deterioro respecto de las últimas semanas.";
@@ -35,6 +36,7 @@
         public const string FechaHoraInicioEventoRequerida = "La fecha y hora de inicio del evento es requerida.";
         public const string FechaNacimientoRequerida = "La fecha de nacimiento es requerida.";
         public const string LaCuentaIngresadaNoEstaHabilitadaParaIngresar = "La cuenta ingresada no se encuentra habilitada para ingresar.";
+        public const string LaCuentaNoEstaHabilitadaParaRestablecerContrasena = "La cuenta no está habilitada para restablecer la contraseña.";
         public const string LaDescripcionEsRequerida = "La descripción es requerida.";
         public const string LaImagenNoPudoRecuperarse = "La imagen no pudo recuperarse correctamente, por favor reintente.";
         public const string NombreAlergiaRequerido = "El nombre de la alergia es requerido.";
@@ -56,7 +58,7 @@
         public const string ReaccionAlergiaRequerido = "La reacción que produce la alergia es requerida.";
         public const string ReglaRecurrenciaInvalida = "La regla de recurrencia elegida para el evento no es válida.";
         public const string RolCuidadoRequerido = "Debe especificar un rol para la persona a asignar.";
-        public const string SuperoElMaximoDeXEnviosDeCodigoVerificacionEmail = "Superó el máximo de {0} envíos del código de verificación de email.";
+        public const string SuperoElMaximoDeXEnviosDeCodigoVerificacion = "Superó el máximo de {0} envíos del código de verificación.";
         public const string TelefonoRequerido = "El teléfono es requerido.";
         public const string TipoEventoNoEsAgendable = "El tipo de evento elegido no es agendable.";
         public const string TipoEventoRequerido = "El tipo de evento es requerido.";

@@ -29,8 +29,7 @@ namespace CareWell.Domain.Auth
             if (string.IsNullOrEmpty(nombreUsuario))
                 throw new ValidacionDominioException(Mensajes.EmailRequerido);
 
-            if (string.IsNullOrEmpty(contrasena))
-                throw new ValidacionDominioException(Mensajes.ContrasenaRequerida);
+            ValidarContrasena(contrasena);
 
             if (entityLoaderDomainService.Query<Usuario>().Any(u => u.NombreUsuario == nombreUsuario))
                 throw new ValidacionDominioException(Mensajes.NombreUsuarioEnUso);
@@ -49,6 +48,16 @@ namespace CareWell.Domain.Auth
             this.Estado = entityLoaderDomainService.GetByID<EstadoUsuario>(EstadosUsuario.Activo);
         }
 
+        public virtual void RestablecerContrasena(string contrasenaNueva,
+                                                  IPasswordHasherDomainService passwordHasherDomainService)
+        {
+            this.ValidarHabilitadoParaRecuperarContrasena();
+
+            ValidarContrasena(contrasenaNueva);
+
+            this.ContrasenaHash = passwordHasherDomainService.Hashear(contrasenaNueva);
+        }
+
         public virtual void ValidarHabilitadoLogin()
         {
             if (this.Estado.ID == EstadosUsuario.PendienteValidacion)
@@ -57,5 +66,24 @@ namespace CareWell.Domain.Auth
             if (this.Estado.ID != EstadosUsuario.Activo)
                 throw new UnauthorizedAccessException(Mensajes.LaCuentaIngresadaNoEstaHabilitadaParaIngresar);
         }
+
+        public virtual void ValidarHabilitadoParaRecuperarContrasena()
+        {
+            if (this.Estado.ID != EstadosUsuario.Activo)
+                throw new ValidacionDominioException(Mensajes.LaCuentaNoEstaHabilitadaParaRestablecerContrasena);
+        }
+
+        #region Metodos Privados
+
+        private static void ValidarContrasena(string contrasena)
+        {
+            if (string.IsNullOrEmpty(contrasena))
+                throw new ValidacionDominioException(Mensajes.ContrasenaRequerida);
+
+            if (contrasena.Length < ParametrosContrasena.LongitudMinima)
+                throw new ValidacionDominioException(Mensajes.ContrasenaLongitudMinima);
+        }
+
+        #endregion
     }
 }

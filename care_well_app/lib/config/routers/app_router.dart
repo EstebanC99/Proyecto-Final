@@ -53,6 +53,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const RecoverPasswordScreen(),
       ),
       GoRoute(
+        path: AppRoutes.resetPassword,
+        name: AppRoutes.resetPasswordName,
+        // Guarda: la pantalla necesita el email por `extra`. Ante acceso
+        // directo sin email (deep link, refresh), se vuelve al paso 1.
+        redirect: (_, state) =>
+            state.extra is String ? null : AppRoutes.recoverPassword,
+        builder: (_, state) =>
+            ResetPasswordScreen(email: state.extra as String),
+      ),
+      GoRoute(
+        path: AppRoutes.resetPasswordSuccess,
+        name: AppRoutes.resetPasswordSuccessName,
+        builder: (_, _) => const ResetPasswordSuccessScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.createCredentials,
         name: AppRoutes.createCredentialsName,
         builder: (_, _) => const CreateCredentialsScreen(),

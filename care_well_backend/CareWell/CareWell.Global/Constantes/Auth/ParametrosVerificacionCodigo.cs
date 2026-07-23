@@ -1,6 +1,6 @@
 ﻿namespace CareWell.Global.Constantes.Auth
 {
-    public abstract class ParametrosVerificacionEmail
+    public abstract class ParametrosVerificacionCodigo
     {
         public const int LongitudCodigo = 6;
         public const int MinutosExpiracion = 10;

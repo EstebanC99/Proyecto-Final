@@ -15,6 +15,15 @@ abstract class AuthRepository {
 
   Future<void> solicitarRecuperacionContrasena(String email);
 
+  /// Confirma el restablecimiento de contraseña con el código OTP y establece
+  /// la nueva contraseña. Revoca sesiones activas en otros dispositivos; no
+  /// inicia sesión.
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  });
+
   /// Reenvía (o envía manualmente) el código de verificación de email.
   Future<void> reenviarCodigoVerificacion(String email);
 

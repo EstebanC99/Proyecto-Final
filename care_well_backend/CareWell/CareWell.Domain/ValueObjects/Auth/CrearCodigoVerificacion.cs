@@ -1,9 +1,11 @@
 ﻿using CareWell.Domain.Auth;
+using CareWell.Global.Enumeraciones.Auth;
 
 namespace CareWell.Domain.ValueObjects.Auth
 {
-    public record CrearCodigoVerificacionEmail(
+    public record CrearCodigoVerificacion(
         Usuario Usuario,
+        TipoCodigoVerificacionEnum Tipo,
         string CodigoHash,
         DateTime Expiracion
     );

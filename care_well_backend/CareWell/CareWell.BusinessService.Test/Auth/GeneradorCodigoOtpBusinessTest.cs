@@ -35,7 +35,7 @@ namespace CareWell.BusinessService.Test.Auth
             public void Retorna_un_numero_siempre_menor_al_maximo_exclusivo()
             {
                 // Arrange
-                var maximoExclusivo = (int)Math.Pow(10, ParametrosVerificacionEmail.LongitudCodigo);
+                var maximoExclusivo = (int)Math.Pow(10, ParametrosVerificacionCodigo.LongitudCodigo);
 
                 // Action
                 var resultado = this.Action();
@@ -53,7 +53,7 @@ namespace CareWell.BusinessService.Test.Auth
                 var resultado = this.Action();
 
                 // Assert
-                Assert.True(resultado.Length == ParametrosVerificacionEmail.LongitudCodigo);
+                Assert.True(resultado.Length == ParametrosVerificacionCodigo.LongitudCodigo);
             }
         }
     }

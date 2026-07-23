@@ -15,6 +15,18 @@ abstract class AuthDatasource {
 
   Future<void> solicitarRecuperacionContrasena(String email);
 
+  /// Confirma el restablecimiento de contraseña con el código OTP recibido y
+  /// establece la nueva contraseña.
+  ///
+  /// En caso de éxito el backend cambia la contraseña y revoca las sesiones
+  /// activas en otros dispositivos. NO inicia sesión: el usuario debe
+  /// loguearse normalmente después.
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  });
+
   /// Reenvía (o envía manualmente) el código de verificación de email.
   ///
   /// El backend aplica cooldown y tope de envíos; si se excede responde con

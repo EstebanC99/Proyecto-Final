@@ -3,19 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
+import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// Pantalla de recuperación de contraseña (US-03).
+/// Paso 1/2 de recuperación de contraseña (US-03): solicitar el código.
 ///
-/// Solicita el email y simula el envío del link. En éxito muestra
-/// confirmación inline sin cambiar de ruta.
+/// El backend envía un código OTP de 6 dígitos por email si la cuenta existe
+/// y está activa. Por seguridad, si el email no existe la respuesta es
+/// igualmente exitosa (no se revela si una cuenta existe o no).
 ///
-/// Las pantallas de "nueva contraseña" y "cambio exitoso" son stubs:
-/// requieren deep-link con token (futura iteración).
-// TODO(deep-link): implementar pantallas de reset cuando se tenga token de reset.
+/// Caso especial: si la cuenta existe pero no está activa (ej. pendiente de
+/// verificación de email), el backend sí lo informa explícitamente. Ese caso
+/// se muestra con un banner de advertencia (no de error) que orienta al
+/// usuario a verificar su email primero, con una acción directa para hacerlo.
 class RecoverPasswordScreen extends ConsumerStatefulWidget {
   const RecoverPasswordScreen({super.key});
 
@@ -29,8 +33,9 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
   final _emailFocus = FocusNode();
 
   String? _emailError;
+  String? _generalError;
+  BannerTone _generalErrorTone = BannerTone.error;
   bool _isLoading = false;
-  bool _enviado = false;
 
   @override
   void dispose() {
@@ -50,23 +55,45 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
 
     setState(() {
       _isLoading = true;
-      _emailError = null;
+      _generalError = null;
     });
 
+    final email = _emailController.text.trim();
     final solicitar = ref.read(solicitarRecuperacionContrasenaProvider);
     try {
-      await solicitar(_emailController.text.trim());
+      await solicitar(email);
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      // Éxito (o email inexistente, que el backend responde igual por
+      // seguridad): se avanza al paso 2 a ingresar el código.
+      context.pushNamed(AppRoutes.resetPasswordName, extra: email);
+    } catch (error) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _enviado = true;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      // Mensaje genérico: no revela si el email existe en el sistema.
-      setState(() {
-        _isLoading = false;
-        _enviado = true; // En demo siempre mostramos "enviado".
+        if (error is ValidacionException &&
+            error.mensaje.toLowerCase().contains('habilitada')) {
+          // Cuenta existente pero no activa (ej. email sin verificar).
+          // Decisión de producto: se informa explícitamente en vez de
+          // ocultarlo, con tono de advertencia (no de error) y una acción
+          // que orienta a resolverlo.
+          _generalErrorTone = BannerTone.warning;
+          _generalError =
+              'Todavía no pudimos habilitar el restablecimiento para esta '
+              'cuenta. Si te registraste hace poco, es posible que falte '
+              'verificar tu email.';
+        } else if (error is ValidacionException) {
+          // Otros casos de validación del backend (ej. límite de envíos por
+          // hora superado): se muestra el mensaje tal cual, ya es claro.
+          _generalErrorTone = BannerTone.error;
+          _generalError = error.mensaje;
+        } else if (error is SinConexionException) {
+          _generalErrorTone = BannerTone.error;
+          _generalError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
+        } else {
+          _generalErrorTone = BannerTone.error;
+          _generalError = 'No pudimos procesar tu pedido. Intentá de nuevo.';
+        }
       });
     }
   }
@@ -87,147 +114,89 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: _enviado ? _buildConfirmacion(theme) : _buildFormulario(theme),
-        ),
-      ),
-    );
-  }
-
-  // ── Vista de formulario ────────────────────────────────────────────────────
-
-  Widget _buildFormulario(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: AppSpacing.xxl),
-        Text(
-          'Recuperar contraseña',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          'Ingresá el email asociado a tu cuenta y te enviaremos un link para restablecer tu contraseña.',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xxl),
-
-        AppTextField(
-          label: 'Email',
-          hint: 'tucorreo@ejemplo.com',
-          controller: _emailController,
-          errorText: _emailError,
-          focusNode: _emailFocus,
-          keyboardType: TextInputType.emailAddress,
-          autocorrect: false,
-          autofillHints: const [AutofillHints.email],
-          prefixIcon: const Icon(Icons.mail_outline, size: 20),
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => _enviar(),
-          onChanged: (_) {
-            if (_emailError != null) setState(() => _emailError = null);
-          },
-        ),
-        const SizedBox(height: AppSpacing.xl),
-
-        PrimaryButton(
-          label: 'Enviar link de restablecimiento',
-          isLoading: _isLoading,
-          onPressed: _enviar,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-
-        Center(
-          child: SecondaryTextButton(
-            label: 'Volver al inicio de sesión',
-            onPressed: _isLoading ? null : () => context.pop(),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-      ],
-    );
-  }
-
-  // ── Vista de confirmación ──────────────────────────────────────────────────
-
-  Widget _buildConfirmacion(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: AppSpacing.xxxl),
-        Center(
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.successContainer,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.mark_email_read_outlined,
-              size: 40,
-              color: AppColors.success,
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        Text(
-          'Revisá tu email',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            color: AppColors.textPrimary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const TextSpan(text: 'Enviamos un link a '),
-              TextSpan(
-                text: _emailController.text.trim(),
-                style: theme.textTheme.bodyMedium?.copyWith(
+              const SizedBox(height: AppSpacing.lg),
+              StepProgressBar(currentStep: 1, totalSteps: 2),
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                'Recuperar contraseña',
+                style: theme.textTheme.headlineMedium?.copyWith(
                   color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const TextSpan(text: '. Revisá también la carpeta de spam.'),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Ingresá el email asociado a tu cuenta. Si está activa, te '
+                'vamos a enviar un código de 6 dígitos para restablecer tu '
+                'contraseña.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+
+              AppTextField(
+                label: 'Email',
+                hint: 'tucorreo@ejemplo.com',
+                controller: _emailController,
+                errorText: _emailError,
+                enabled: !_isLoading,
+                focusNode: _emailFocus,
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                autofillHints: const [AutofillHints.email],
+                prefixIcon: const Icon(Icons.mail_outline, size: 20),
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _enviar(),
+                onChanged: (_) {
+                  if (_emailError != null) setState(() => _emailError = null);
+                  if (_generalError != null) {
+                    setState(() => _generalError = null);
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              if (_generalError != null) ...[
+                InlineErrorBanner(
+                  message: _generalError!,
+                  tone: _generalErrorTone,
+                  icon: _generalErrorTone == BannerTone.warning
+                      ? Icons.mark_email_unread_outlined
+                      : null,
+                  actionLabel: _generalErrorTone == BannerTone.warning
+                      ? 'Verificar mi email'
+                      : null,
+                  onAction: _generalErrorTone == BannerTone.warning
+                      ? () => context.pushNamed(
+                          AppRoutes.verifyEmailName,
+                          extra: _emailController.text.trim(),
+                        )
+                      : null,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+
+              PrimaryButton(
+                label: 'Enviar código',
+                isLoading: _isLoading,
+                onPressed: _enviar,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+
+              Center(
+                child: SecondaryTextButton(
+                  label: 'Volver al inicio de sesión',
+                  onPressed: _isLoading ? null : () => context.pop(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.xxl),
-        PrimaryButton(
-          label: 'Volver al inicio de sesión',
-          onPressed: () => context.pop(),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Center(
-          child: SecondaryTextButton(
-            label: '¿No recibiste el email? Reenviar',
-            onPressed: () {
-              setState(() => _isLoading = true);
-              final solicitar = ref.read(
-                solicitarRecuperacionContrasenaProvider,
-              );
-              solicitar(_emailController.text.trim()).whenComplete(() {
-                if (mounted) {
-                  setState(() => _isLoading = false);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Link reenviado.')),
-                  );
-                }
-              });
-            },
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-      ],
+      ),
     );
   }
 }

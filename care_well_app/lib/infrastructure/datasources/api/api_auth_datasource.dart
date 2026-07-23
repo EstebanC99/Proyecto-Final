@@ -127,10 +127,36 @@ class ApiAuthDatasource implements AuthDatasource {
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {
-    // TODO: endpoint pendiente en el backend.
-    throw UnimplementedError(
-      'TODO: endpoint de recuperación de contraseña pendiente en el backend.',
-    );
+    try {
+      await _dio.post(
+        ApiConfig.solicitarResetContrasenaPath,
+        data: {'email': email},
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
+
+  // ── confirmarResetContrasena ─────────────────────────────────────────────────
+
+  @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) async {
+    try {
+      await _dio.post(
+        ApiConfig.confirmarResetContrasenaPath,
+        data: {
+          'email': email,
+          'codigo': codigo,
+          'contrasenaNueva': contrasenaNueva,
+        },
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
   }
 
   // ── crearCredenciales ────────────────────────────────────────────────────────

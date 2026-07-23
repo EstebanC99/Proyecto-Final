@@ -24,7 +24,7 @@ namespace CareWell.Repository
 
             services.AddScoped<IAlertaBienestarRepository, AlertaBienestarRepository>();
             services.AddScoped<IAsignacionCuidadoRepository, AsignacionCuidadoRepository>();
-            services.AddScoped<ICodigoVerificacionEmailRepository, CodigoVerificacionEmailRepository>();
+            services.AddScoped<ICodigoVerificacionRepository, CodigoVerificacionRepository>();
             services.AddScoped<IEventoAgendaRepository, EventoAgendaRepository>();
             services.AddScoped<IEventoSaludRepository, EventoSaludRepository>();
             services.AddScoped<IFichaSaludRepository, FichaSaludRepository>();

@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 class _FakeAuthDatasource implements AuthDatasource {
   String? reenviarCodigoEmail;
   ({String email, String codigo})? verificarEmailArgs;
+  ({String email, String codigo, String contrasenaNueva})?
+  confirmarResetContrasenaArgs;
 
   @override
   Future<void> reenviarCodigoVerificacion(String email) async {
@@ -17,6 +19,19 @@ class _FakeAuthDatasource implements AuthDatasource {
   @override
   Future<void> verificarEmail(String email, String codigo) async {
     verificarEmailArgs = (email: email, codigo: codigo);
+  }
+
+  @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) async {
+    confirmarResetContrasenaArgs = (
+      email: email,
+      codigo: codigo,
+      contrasenaNueva: contrasenaNueva,
+    );
   }
 
   // ── Resto de la interfaz: no usado en estos tests ──────────────────────────
@@ -89,6 +104,28 @@ void main() {
 
       expect(datasource.verificarEmailArgs?.email, 'test@example.com');
       expect(datasource.verificarEmailArgs?.codigo, '654321');
+    });
+
+    test('confirmarResetContrasena delega email, código y contraseña en el '
+        'datasource', () async {
+      final datasource = _FakeAuthDatasource();
+      final repository = AuthRepositoryImpl(datasource);
+
+      await repository.confirmarResetContrasena(
+        email: 'test@example.com',
+        codigo: '654321',
+        contrasenaNueva: 'NuevaClave8',
+      );
+
+      expect(
+        datasource.confirmarResetContrasenaArgs?.email,
+        'test@example.com',
+      );
+      expect(datasource.confirmarResetContrasenaArgs?.codigo, '654321');
+      expect(
+        datasource.confirmarResetContrasenaArgs?.contrasenaNueva,
+        'NuevaClave8',
+      );
     });
   });
 }

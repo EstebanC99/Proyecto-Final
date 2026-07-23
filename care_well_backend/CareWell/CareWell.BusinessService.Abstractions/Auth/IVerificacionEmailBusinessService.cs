@@ -4,7 +4,7 @@ namespace CareWell.BusinessService.Abstractions.Auth
 {
     public interface IVerificacionEmailBusinessService
     {
-        void EnviarCodigo(EnviarCodigoVerificacionEmailCommand command);
+        void EnviarCodigo(EnviarCodigoVerificacionCommand command);
         void Verificar(VerificarEmailCommand command);
     }
 }

@@ -35,6 +35,17 @@ class AuthRepositoryImpl implements AuthRepository {
       _datasource.solicitarRecuperacionContrasena(email);
 
   @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) => _datasource.confirmarResetContrasena(
+    email: email,
+    codigo: codigo,
+    contrasenaNueva: contrasenaNueva,
+  );
+
+  @override
   Future<void> reenviarCodigoVerificacion(String email) =>
       _datasource.reenviarCodigoVerificacion(email);
 

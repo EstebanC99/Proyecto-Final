@@ -154,3 +154,22 @@ final verificarEmailProvider =
       return (String email, String codigo) =>
           repo.verificarEmail(email, codigo);
     });
+
+/// Provider autoDispose para confirmar el restablecimiento de contraseña con
+/// el código OTP y la nueva contraseña.
+///
+/// No toca la sesión activa: el backend cambia la contraseña y revoca sesiones
+/// en otros dispositivos, pero NO auto-loguea. La pantalla maneja
+/// loading/error en su State.
+final confirmarResetContrasenaProvider =
+    Provider.autoDispose<
+      Future<void> Function(String email, String codigo, String contrasenaNueva)
+    >((ref) {
+      final repo = ref.watch(authRepositoryProvider);
+      return (String email, String codigo, String contrasenaNueva) =>
+          repo.confirmarResetContrasena(
+            email: email,
+            codigo: codigo,
+            contrasenaNueva: contrasenaNueva,
+          );
+    });

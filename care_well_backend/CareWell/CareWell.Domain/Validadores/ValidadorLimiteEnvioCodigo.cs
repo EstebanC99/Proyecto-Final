@@ -6,11 +6,11 @@ using CareWell.Global.Mensajes;
 
 namespace CareWell.Domain.Validadores
 {
-    public class ValidadorLimiteEnvioEmail : IValidadorLimiteEnvioEmail
+    public class ValidadorLimiteEnvioCodigo : IValidadorLimiteEnvioCodigo
     {
         private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
 
-        public ValidadorLimiteEnvioEmail(IEntityLoaderDomainService entityLoaderDomainService)
+        public ValidadorLimiteEnvioCodigo(IEntityLoaderDomainService entityLoaderDomainService)
         {
             this.EntityLoaderDomainService = entityLoaderDomainService;
         }
@@ -20,18 +20,18 @@ namespace CareWell.Domain.Validadores
             var fechaHoraActual = DateTime.Now;
 
             var codigosUltimaHora = this.EntityLoaderDomainService
-                .Query<CodigoVerificacionEmail>()
+                .Query<CodigoVerificacion>()
                 .Where(c => c.Usuario.ID == usuario.ID
                          && c.FechaCreacion >= fechaHoraActual.AddHours(-1))
                 .ToList();
 
-            if (codigosUltimaHora.Count >= ParametrosVerificacionEmail.MaximoEnviosPorHora)
-                throw new ValidacionDominioException(string.Format(Mensajes.SuperoElMaximoDeXEnviosDeCodigoVerificacionEmail, ParametrosVerificacionEmail.MaximoEnviosPorHora));
+            if (codigosUltimaHora.Count >= ParametrosVerificacionCodigo.MaximoEnviosPorHora)
+                throw new ValidacionDominioException(string.Format(Mensajes.SuperoElMaximoDeXEnviosDeCodigoVerificacion, ParametrosVerificacionCodigo.MaximoEnviosPorHora));
 
-            var tiempoLimiteEspera = fechaHoraActual.AddSeconds(-ParametrosVerificacionEmail.TiempoEsperaReenvioEnSegundos);
+            var tiempoLimiteEspera = fechaHoraActual.AddSeconds(-ParametrosVerificacionCodigo.TiempoEsperaReenvioEnSegundos);
 
             if (codigosUltimaHora.Any(c => c.FechaCreacion > tiempoLimiteEspera))
-                throw new ValidacionDominioException(string.Format(Mensajes.DebeEsperarXSegundosParaSolicitarOtroCodigoVerificacionEmail, ParametrosVerificacionEmail.TiempoEsperaReenvioEnSegundos));
+                throw new ValidacionDominioException(string.Format(Mensajes.DebeEsperarXSegundosParaSolicitarOtroCodigoVerificacion, ParametrosVerificacionCodigo.TiempoEsperaReenvioEnSegundos));
         }
     }
 }

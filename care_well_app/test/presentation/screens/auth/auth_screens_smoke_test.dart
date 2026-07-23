@@ -6,6 +6,8 @@ import 'package:care_well_app/presentation/screens/auth/create_credentials_scree
 import 'package:care_well_app/presentation/screens/auth/login_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/recover_password_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/register_screen.dart';
+import 'package:care_well_app/presentation/screens/auth/reset_password_screen.dart';
+import 'package:care_well_app/presentation/screens/auth/reset_password_success_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/verify_email_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,6 +48,13 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
+
+  @override
+  Future<void> confirmarResetContrasena({
+    required String email,
+    required String codigo,
+    required String contrasenaNueva,
+  }) async {}
 
   @override
   Future<void> reenviarCodigoVerificacion(String email) async {}
@@ -158,7 +167,60 @@ void main() {
     testWidgets('RecoverPasswordScreen muestra botón enviar', (tester) async {
       await tester.pumpWidget(_wrap(const RecoverPasswordScreen()));
       await tester.pump();
-      expect(find.text('Enviar link de restablecimiento'), findsOneWidget);
+      expect(find.text('Enviar código'), findsOneWidget);
+    });
+
+    // ResetPasswordScreen arranca un cooldown (Timer.periodic) en initState.
+    // Los tests deben drenarlo antes de terminar para no dejar timers
+    // pendientes (flutter_test falla si queda un Timer activo al finalizar).
+    testWidgets('ResetPasswordScreen monta sin errores', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const ResetPasswordScreen(email: 'test@example.com')),
+      );
+      await tester.pump();
+      expect(find.byType(ResetPasswordScreen), findsOneWidget);
+      await tester.pump(const Duration(seconds: 61));
+    });
+
+    testWidgets(
+      'ResetPasswordScreen muestra el email y los campos requeridos',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(const ResetPasswordScreen(email: 'test@example.com')),
+        );
+        await tester.pump();
+        expect(find.textContaining('test@example.com'), findsOneWidget);
+        expect(find.text('Código de verificación'), findsOneWidget);
+        expect(find.text('Nueva contraseña'), findsWidgets);
+        expect(find.text('Confirmar nueva contraseña'), findsOneWidget);
+        expect(find.text('Restablecer contraseña'), findsOneWidget);
+        await tester.pump(const Duration(seconds: 61));
+      },
+    );
+
+    testWidgets(
+      'ResetPasswordScreen muestra el cooldown de reenvío al entrar',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(const ResetPasswordScreen(email: 'test@example.com')),
+        );
+        await tester.pump();
+        // Al llegar recién se pidió un código: el link de reenvío arranca
+        // en cooldown (60s) en vez de habilitado.
+        expect(
+          find.textContaining('Podés reenviar el código en'),
+          findsOneWidget,
+        );
+        await tester.pump(const Duration(seconds: 61));
+      },
+    );
+
+    testWidgets('ResetPasswordSuccessScreen monta sin errores', (tester) async {
+      await tester.pumpWidget(_wrap(const ResetPasswordSuccessScreen()));
+      await tester.pump();
+      expect(find.byType(ResetPasswordSuccessScreen), findsOneWidget);
+      expect(find.text('¡Contraseña actualizada!'), findsOneWidget);
+      expect(find.text('Ir al inicio de sesión'), findsOneWidget);
     });
 
     testWidgets('CreateCredentialsScreen monta sin errores', (tester) async {
