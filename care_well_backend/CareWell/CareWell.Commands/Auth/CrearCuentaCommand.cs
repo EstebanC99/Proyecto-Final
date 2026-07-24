@@ -2,20 +2,22 @@
 {
     public class CrearCuentaCommand
     {
-        public virtual string Nombre { get; set; }
+        public string Nombre { get; set; }
 
-        public virtual string Apellido { get; set; }
+        public string Apellido { get; set; }
 
-        public virtual string Documento { get; set; }
+        public string Documento { get; set; }
 
-        public virtual DateTime FechaNacimiento { get; set; }
+        public DateTime FechaNacimiento { get; set; }
 
-        public virtual string Email { get; set; }
+        public string Email { get; set; }
 
-        public virtual string Telefono { get; set; }
+        public string Telefono { get; set; }
 
-        public virtual string Contrasena { get; set; }
+        public string Contrasena { get; set; }
 
-        public virtual string? Imagen { get; set; }
+        public string? Imagen { get; set; }
+
+        public string? ImagenDocumento { get; set; }
     }
 }

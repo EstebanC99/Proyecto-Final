@@ -67,5 +67,13 @@
         public const string UsuarioNoHabilitadoParaEjecutarAccion = "Usuario no habilitado para ejecutar la acción.";
         public const string VinculoAntecedenteRequerido = "El vínculo familiar del que proviene el antecedente es requerido.";
         public const string YaExisteUnaAsignacionRegistradaParaElColaboradorSeleccionado = "Ya existe una asignación registrada para el colaborador seleccionado.";
+
+        public const string DocumentoNoCoincideConIdentidad = "Los datos ingresados no coinciden con el documento. Verificá la foto e intentá nuevamente.";
+        public const string NoSePudoLeerDocumento = "No pudimos leer el documento. Sacá la foto con buena luz, sin reflejos y bien encuadrada.";
+        public const string ImagenDocumentoRequerida = "La imagen del documento es requerida.";
+        public const string PersonaYaTieneUsuario = "Esta persona ya tiene credenciales de acceso.";
+        public const string NoExistePersonaConEseEmail = "No encontramos ningún perfil con ese email.";
+        public const string IdentidadNoValidada = "No pudimos validar tu identidad con el documento. Verificá que la foto sea nítida y legible, y que los datos coincidan con tu DNI.";
+        public const string ServicioReconocimientoNoDisponible = "El servicio de validación de identidad no está disponible en este momento. Reintentá en unos minutos.";
     }
 }

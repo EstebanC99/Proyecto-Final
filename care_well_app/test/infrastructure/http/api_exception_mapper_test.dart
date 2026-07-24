@@ -60,5 +60,37 @@ void main() {
         'Código inválido o expirado.',
       );
     });
+
+    test(
+      '503 mapea a ServicioNoDisponibleException con el mensaje del backend',
+      () {
+        final result = ApiExceptionMapper.map(
+          _dioError(
+            statusCode: 503,
+            mensaje:
+                'El servicio de validación de identidad no está disponible '
+                'en este momento. Reintentá en unos minutos.',
+          ),
+        );
+
+        expect(result, isA<ServicioNoDisponibleException>());
+        expect(
+          (result as ServicioNoDisponibleException).mensaje,
+          'El servicio de validación de identidad no está disponible '
+          'en este momento. Reintentá en unos minutos.',
+        );
+      },
+    );
+
+    test('503 sin mensaje usa un texto por defecto', () {
+      final result = ApiExceptionMapper.map(_dioError(statusCode: 503));
+
+      expect(result, isA<ServicioNoDisponibleException>());
+      expect(
+        (result as ServicioNoDisponibleException).mensaje,
+        'El servicio no está disponible en este momento. '
+        'Reintentá en unos minutos.',
+      );
+    });
   });
 }

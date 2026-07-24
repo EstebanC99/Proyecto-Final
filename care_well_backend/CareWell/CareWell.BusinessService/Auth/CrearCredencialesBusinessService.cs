@@ -6,8 +6,6 @@ using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.Factories;
-using CareWell.Domain.General;
-using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 using CareWell.Repository;
@@ -17,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CareWell.BusinessService.Auth
 {
-    public class CrearCuentaBusinessService : BusinessService, ICrearCuentaBusinessService
+    public class CrearCredencialesBusinessService : BusinessService, ICrearCredencialesBusinessService
     {
         private IPersonaRepository PersonaRepository { get; set; }
         private IUsuarioRepository UsuarioRepository { get; set; }
@@ -26,17 +24,17 @@ namespace CareWell.BusinessService.Auth
         private IPasswordHasherDomainService PasswordHasherDomainService { get; set; }
         private IVerificacionEmailBusinessService VerificacionEmailBusinessService { get; set; }
         private IEvaluadorIdentidadPersonaDomainService EvaluadorIdentidadPersonaDomainService { get; set; }
-        private ILogger<CrearCuentaBusinessService> Logger { get; set; }
+        private ILogger<CrearCredencialesBusinessService> Logger { get; set; }
 
-        public CrearCuentaBusinessService(IUnitOfWork unitOfWork,
-                                          IPersonaRepository personaRepository,
-                                          IUsuarioRepository usuarioRepository,
-                                          IBaseFactory baseFactory,
-                                          IEntityLoaderDomainService entityLoaderDomainService,
-                                          IPasswordHasherDomainService passwordHasherDomainService,
-                                          IVerificacionEmailBusinessService verificacionEmailBusinessService,
-                                          IEvaluadorIdentidadPersonaDomainService evaluadorIdentidadPersonaDomainService,
-                                          ILogger<CrearCuentaBusinessService> logger)
+        public CrearCredencialesBusinessService(IUnitOfWork unitOfWork,
+                                                IPersonaRepository personaRepository,
+                                                IUsuarioRepository usuarioRepository,
+                                                IBaseFactory baseFactory,
+                                                IEntityLoaderDomainService entityLoaderDomainService,
+                                                IPasswordHasherDomainService passwordHasherDomainService,
+                                                IVerificacionEmailBusinessService verificacionEmailBusinessService,
+                                                IEvaluadorIdentidadPersonaDomainService evaluadorIdentidadPersonaDomainService,
+                                                ILogger<CrearCredencialesBusinessService> logger)
             : base(unitOfWork)
         {
             this.PersonaRepository = personaRepository;
@@ -49,28 +47,19 @@ namespace CareWell.BusinessService.Auth
             this.Logger = logger;
         }
 
-        public void Crear(CrearCuentaCommand command)
+        public void Crear(CrearCredencialesCommand command)
         {
-            var crearPersona = new CrearModificarPersona(
-                Nombre: command.Nombre,
-                Apellido: command.Apellido,
-                Documento: command.Documento,
-                FechaNacimiento: command.FechaNacimiento,
-                Telefono: command.Telefono,
-                Imagen: ImageProcessorHelper.GetImage(command.Imagen),
-                Email: command.Email
-            );
+            var persona = this.PersonaRepository.GetByEmail(command.Email);
 
-            var persona = this.Factory.Crear<Persona>();
+            if (persona is null)
+                throw new RecursoNoEncontradoException(Mensajes.NoExistePersonaConEseEmail);
 
-            persona.CrearModificar(crearPersona);
+            persona.ValidarCrearUsuario(this.EntityLoaderDomainService);
 
             var imagenDocumento = ImageProcessorHelper.GetImage(command.ImagenDocumento);
 
             if (!this.EvaluadorIdentidadPersonaDomainService.EsIdentidadCorrecta(persona, imagenDocumento))
                 throw new ValidacionDominioException(Mensajes.IdentidadNoValidada);
-
-            this.PersonaRepository.Add(persona);
 
             var usuario = this.Factory.Crear<Usuario>();
 
@@ -90,7 +79,7 @@ namespace CareWell.BusinessService.Auth
             }
             catch (Exception ex)
             {
-                this.Logger.LogError(ex, "No se pudo enviar el código de verificación al crear la cuenta {Email}", command.Email);
+                this.Logger.LogError(ex, "No se pudo enviar el código de verificación al crear las credenciales {Email}", command.Email);
             }
         }
     }

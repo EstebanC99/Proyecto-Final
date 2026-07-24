@@ -8,6 +8,7 @@
   <Project Path="CareWell.BusinessService/CareWell.BusinessService.csproj" />
   <Project Path="CareWell.Commands/CareWell.Commands.csproj" />
   <Project Path="CareWell.DataViews/CareWell.DataViews.csproj" />
+  <Project Path="CareWell.DocumentIntelligence/CareWell.DocumentIntelligence.csproj" Id="ce046d08-0b30-423a-ac16-275a8e95c71a" />
   <Project Path="CareWell.Domain.Test/CareWell.Domain.Test.csproj" Id="dacfa769-3e25-41d3-aca1-c28373f8dcd3" />
   <Project Path="CareWell.Domain/CareWell.Domain.csproj" />
   <Project Path="CareWell.Global/CareWell.Global.csproj" />

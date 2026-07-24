@@ -31,15 +31,7 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<Usuario> login(String email, String contrasena) async => _usuario;
   @override
-  Future<Usuario> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async => _usuario;
+  Future<void> register(RegistroData data) async {}
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
 
@@ -69,10 +61,11 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
-  }) async => _usuario;
+    required String imagenDocumento,
+  }) async {}
   @override
   Future<Usuario> actualizarPerfil({
     required int usuarioId,

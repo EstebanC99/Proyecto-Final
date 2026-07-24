@@ -1,4 +1,6 @@
-﻿using CareWell.Domain.General;
+﻿using CareWell.Domain.Auth;
+using CareWell.Domain.DomainServices;
+using CareWell.Domain.General;
 using CareWell.Domain.Validadores;
 using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
@@ -373,6 +375,151 @@ namespace CareWell.Domain.Test.General
 
                 // Assert
                 Assert.Equal(this.modificarPerfil.Imagen, this.Target.Imagen);
+            }
+        }
+
+        public class ElMetodo_ValidarIdentidad : PersonaTest
+        {
+            private TextoDocumentoReconocido textoDocumentoReconocido;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.textoDocumentoReconocido = new TextoDocumentoReconocido(
+                    NumeroDocumento: "41567829",
+                    Nombre: "Esteban",
+                    Apellido: "Robertiño"
+                );
+
+                #region Modificar Perfil
+
+                var modificarPerfil = new ModificarPerfil(
+                    Nombre: this.textoDocumentoReconocido.Nombre.ToLower(),
+                    Apellido: this.textoDocumentoReconocido.Apellido.ToLower(),
+                    Documento: this.textoDocumentoReconocido.NumeroDocumento,
+                    FechaNacimiento: DateTime.Today,
+                    Telefono: "3364562256",
+                    Imagen: new byte[8]
+                );
+
+                this.Target.ModificarPerfil(modificarPerfil,
+                                            Mock.Of<Persona>(),
+                                            Mock.Of<IValidadorPermisoAccion>());
+
+                #endregion
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarIdentidad(this.textoDocumentoReconocido);
+            }
+
+            [Fact]
+            public void Si_el_Documento_no_coincide_mantiene_IdentidadValidada_en_false_y_FechaValidacionIdentidad_en_null()
+            {
+                // Arrange
+                this.textoDocumentoReconocido = this.textoDocumentoReconocido with { NumeroDocumento = "12345678" };
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.False(this.Target.IdentidadValidada);
+                Assert.Null(this.Target.FechaValidacionIdentidad);
+            }
+
+            [Fact]
+            public void Si_el_Nombre_no_coincide_mantiene_IdentidadValidada_en_false_y_FechaValidacionIdentidad_en_null()
+            {
+                // Arrange
+                this.textoDocumentoReconocido = this.textoDocumentoReconocido with { Nombre = "Nombre X" };
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.False(this.Target.IdentidadValidada);
+                Assert.Null(this.Target.FechaValidacionIdentidad);
+            }
+
+            [Fact]
+            public void Si_el_Apellido_no_coincide_mantiene_IdentidadValidada_en_false_y_FechaValidacionIdentidad_en_null()
+            {
+                // Arrange
+                this.textoDocumentoReconocido = this.textoDocumentoReconocido with { Apellido = "Apellido X" };
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.False(this.Target.IdentidadValidada);
+                Assert.Null(this.Target.FechaValidacionIdentidad);
+            }
+
+            [Fact]
+            public void Si_el_Documento_y_el_Nombre_y_el_Apellido_coinciden_setea_la_propiedad_IdentidadValidada_en_true()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.True(this.Target.IdentidadValidada);
+            }
+
+            [Fact]
+            public void Si_el_Documento_y_el_Nombre_y_el_Apellido_coinciden_setea_la_propiedad_FechaValidacionIdentidad()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.NotNull(this.Target.FechaValidacionIdentidad);
+            }
+        }
+
+        public class ElMetodo_ValidarCrearUsuario : PersonaTest
+        {
+            private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+                this.entityLoaderDomainService.Setup(s => s.Query<Usuario>()).Returns(new List<Usuario>().AsQueryable);
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarCrearUsuario(this.entityLoaderDomainService.Object);
+            }
+
+            [Fact]
+            public void Si_existe_un_Usuario_para_la_persona_arroja_un_CuentaExistenteException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.entityLoaderDomainService.Setup(s => s.Query<Usuario>()).Returns(new List<Usuario> { Mock.Of<Usuario>(u => u.Persona == this.Target) }.AsQueryable);
+
+                // Action & Assert
+                var excepcion = Assert.Throws<CuentaExistenteException>(() => this.Action());
+                Assert.Equal(Mensajes.PersonaYaTieneUsuario, excepcion.Message);
+            }
+
+            [Fact]
+            public void Si_no_existe_un_Usuario_para_la_persona_no_arroja_excepcion()
+            {
+                // Arrange
+
+                // Action
+                var excepcion = Record.Exception(() => this.Action());
+
+                // Assert
+                Assert.Null(excepcion);
             }
         }
     }

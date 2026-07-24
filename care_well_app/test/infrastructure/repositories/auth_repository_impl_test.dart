@@ -40,15 +40,7 @@ class _FakeAuthDatasource implements AuthDatasource {
       throw UnimplementedError();
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) => throw UnimplementedError();
+  Future<void> register(RegistroData data) => throw UnimplementedError();
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) =>
@@ -68,9 +60,10 @@ class _FakeAuthDatasource implements AuthDatasource {
   }) => throw UnimplementedError();
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
+    required String imagenDocumento,
   }) => throw UnimplementedError();
 
   @override

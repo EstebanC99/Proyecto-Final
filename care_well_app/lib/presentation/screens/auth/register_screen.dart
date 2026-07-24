@@ -6,16 +6,19 @@ import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/entities/entities.dart';
 import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// Pantalla de registro en 2 pasos (US-01).
+/// Pantalla de registro en 3 pasos (US-01).
 ///
-/// Paso 1: datos personales (nombre, apellido, documento, fecha de nacimiento, email, teléfono).
-/// Paso 2: credenciales (contraseña, confirmación, T&C).
+/// Paso 1: datos personales (nombre, apellido, documento, fecha de nacimiento,
+///   email, teléfono) y foto de perfil opcional.
+/// Paso 2: verificación de identidad — foto del documento (obligatoria).
+/// Paso 3: credenciales (contraseña, confirmación, T&C).
 ///
-/// En éxito: navega al login con mensaje de confirmación.
+/// En éxito: continúa a la verificación de email.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -60,12 +63,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String? _confirmError;
   String? _tcError;
   String? _generalError;
+  BannerTone _generalErrorTone = BannerTone.error;
 
   bool _showPassword = false;
   bool _showConfirm = false;
   bool _tcAcepted = false;
 
+  // ── Fotos ───────────────────────────────────────────────────────────────────
+  /// Foto de perfil en base64 (opcional). Fallback a iniciales si es null.
+  String? _imagenPerfil;
+
+  /// Foto del documento en base64 (obligatoria). PII sensible: solo vive en
+  /// memoria durante el wizard y se limpia tras el submit.
+  String? _imagenDocumento;
+  String? _imagenDocumentoError;
+
   // ── Estado de paso ──────────────────────────────────────────────────────────
+  // Paso 1: datos personales · Paso 2: identidad (documento) · Paso 3: credenciales.
   int _currentStep = 1;
   bool _isLoading = false;
 
@@ -94,7 +108,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _documentoController.text.isNotEmpty ||
       _emailController.text.isNotEmpty ||
       _telefonoController.text.isNotEmpty ||
-      _fechaNacimiento != null;
+      _fechaNacimiento != null ||
+      _imagenPerfil != null ||
+      _imagenDocumento != null;
 
   // ── Validaciones ─────────────────────────────────────────────────────────────
 
@@ -173,7 +189,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  /// Avanza del paso de identidad (2) al de credenciales (3). Exige la foto del
+  /// documento (obligatoria).
+  void _onContinuarPaso2() {
+    if (_imagenDocumento == null) {
+      setState(() {
+        _imagenDocumentoError = 'Necesitamos la foto de tu documento.';
+      });
+      return;
+    }
+    setState(() => _currentStep = 3);
+  }
+
+  // ── Captura de fotos ──────────────────────────────────────────────────────────
+
+  Future<void> _pickImagenPerfil() async {
+    final base64 = await pickImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    setState(() => _imagenPerfil = base64);
+  }
+
+  Future<void> _pickImagenDocumento() async {
+    final base64 = await pickDocumentImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    setState(() {
+      _imagenDocumento = base64;
+      _imagenDocumentoError = null;
+      // Descarta un error de validación de identidad de un intento anterior.
+      _generalError = null;
+    });
+  }
+
   Future<bool> _onWillPop() async {
+    if (_currentStep == 3) {
+      setState(() => _currentStep = 2);
+      return false;
+    }
     if (_currentStep == 2) {
       setState(() => _currentStep = 1);
       return false;
@@ -206,20 +257,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _submit() async {
     if (!_validatePaso2()) return;
 
+    // Guardia defensiva: la foto del documento es obligatoria. Si faltara,
+    // volver al paso de identidad (no debería ocurrir por el gating de UI).
+    if (_imagenDocumento == null) {
+      setState(() {
+        _currentStep = 2;
+        _imagenDocumentoError = 'Necesitamos la foto de tu documento.';
+      });
+      return;
+    }
+
     setState(() => _isLoading = true);
 
+    final email = _emailController.text.trim();
     final result = await ref
         .read(authStateProvider.notifier)
         .register(
-          nombre: _nombreController.text.trim(),
-          apellido: _apellidoController.text.trim(),
-          documento: _documentoController.text.trim(),
-          fechaNacimiento: _fechaNacimiento!,
-          email: _emailController.text.trim(),
-          telefono: _telefonoController.text.trim().isEmpty
-              ? null
-              : _telefonoController.text.trim(),
-          contrasena: _passwordController.text,
+          RegistroData(
+            nombre: _nombreController.text.trim(),
+            apellido: _apellidoController.text.trim(),
+            documento: _documentoController.text.trim(),
+            fechaNacimiento: _fechaNacimiento!,
+            email: email,
+            telefono: _telefonoController.text.trim().isEmpty
+                ? null
+                : _telefonoController.text.trim(),
+            contrasena: _passwordController.text,
+            imagenDocumento: _imagenDocumento!,
+            imagen: _imagenPerfil,
+          ),
         );
 
     if (!mounted) return;
@@ -227,28 +293,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     result.when(
       data: (_) {
+        // La cuenta quedó creada. La foto del documento es PII: se limpia de
+        // memoria antes de continuar.
+        _imagenDocumento = null;
         // El backend crea la cuenta en estado pendiente de validación y envía
         // el primer código OTP por email. Se continúa a la verificación.
-        context.goNamed(
-          AppRoutes.verifyEmailName,
-          extra: _emailController.text.trim(),
-        );
+        context.goNamed(AppRoutes.verifyEmailName, extra: email);
       },
       error: (error, _) {
-        // Si es error de email duplicado, volver a paso 1 y mostrar en campo.
         if (error is CuentaExistenteException) {
+          // Email duplicado: volver al paso 1 y marcar el campo.
           setState(() {
             _currentStep = 1;
             _emailError =
                 'Este email ya está registrado. Intentá iniciar sesión.';
           });
+        } else if (error is ServicioNoDisponibleException) {
+          // Servicio de validación caído: no es error de datos del usuario.
+          // Permanece en el paso final; puede reintentar con el mismo botón.
+          setState(() {
+            _generalError = error.mensaje;
+            _generalErrorTone = BannerTone.warning;
+          });
+        } else if (error is ValidacionException) {
+          // Identidad no validada (no coincide o ilegible). Volver al paso de
+          // identidad para retomar la foto y limpiar la anterior (PII).
+          setState(() {
+            _currentStep = 2;
+            _imagenDocumento = null;
+            _imagenDocumentoError = null;
+            _generalError = error.mensaje;
+            _generalErrorTone = BannerTone.error;
+          });
         } else if (error is SinConexionException) {
           setState(() {
             _generalError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
+            _generalErrorTone = BannerTone.error;
           });
         } else {
           setState(() {
             _generalError = 'Error al crear la cuenta. Intentá de nuevo.';
+            _generalErrorTone = BannerTone.error;
           });
         }
       },
@@ -283,7 +368,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: _currentStep == 1 ? _buildPaso1() : _buildPaso2(),
+            child: switch (_currentStep) {
+              1 => _buildPaso1(),
+              2 => _buildPaso2Identidad(),
+              _ => _buildPaso3Credenciales(),
+            },
           ),
         ),
       ),
@@ -307,7 +396,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: AppSpacing.lg),
-        StepProgressBar(currentStep: 1, totalSteps: 2),
+        StepProgressBar(currentStep: 1, totalSteps: 3),
         const SizedBox(height: AppSpacing.xl),
         Text(
           'Creá tu cuenta',
@@ -320,6 +409,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           'Empecemos con tus datos personales.',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+
+        // Foto de perfil (opcional)
+        Center(
+          child: EditableAvatar(
+            nombre: _nombreController.text.isNotEmpty
+                ? _nombreController.text
+                : '?',
+            imagen: imageProviderFromBase64(_imagenPerfil),
+            onTap: _pickImagenPerfil,
+            size: 88,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Center(
+          child: Text(
+            'Foto de perfil (opcional)',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -501,14 +612,60 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  // ── Paso 2 ───────────────────────────────────────────────────────────────────
+  // ── Paso 2 · Identidad (foto del documento) ──────────────────────────────────
 
-  Widget _buildPaso2() {
+  Widget _buildPaso2Identidad() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: AppSpacing.lg),
-        StepProgressBar(currentStep: 2, totalSteps: 2),
+        StepProgressBar(currentStep: 2, totalSteps: 3),
+        const SizedBox(height: AppSpacing.xl),
+        Text(
+          'Verificá tu identidad',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Tomá una foto de tu DNI para confirmar que los datos coinciden con '
+          'los que ingresaste.',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+
+        DocumentCaptureField(
+          imagenBase64: _imagenDocumento,
+          onCapture: _pickImagenDocumento,
+          onRemove: () => setState(() => _imagenDocumento = null),
+          errorText: _imagenDocumentoError,
+        ),
+        const SizedBox(height: AppSpacing.xl),
+
+        // Error general (ej. identidad no validada tras el submit).
+        if (_generalError != null) ...[
+          InlineErrorBanner(message: _generalError!, tone: _generalErrorTone),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+
+        PrimaryButton(label: 'Continuar', onPressed: _onContinuarPaso2),
+        const SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
+
+  // ── Paso 3 · Credenciales ─────────────────────────────────────────────────────
+
+  Widget _buildPaso3Credenciales() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: AppSpacing.lg),
+        StepProgressBar(currentStep: 3, totalSteps: 3),
         const SizedBox(height: AppSpacing.xl),
         Text(
           'Creá tu contraseña',
@@ -611,7 +768,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
         // Error general
         if (_generalError != null) ...[
-          InlineErrorBanner(message: _generalError!),
+          InlineErrorBanner(message: _generalError!, tone: _generalErrorTone),
           const SizedBox(height: AppSpacing.lg),
         ],
 
@@ -620,6 +777,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           isLoading: _isLoading,
           onPressed: _submit,
         ),
+
+        // La validación del documento puede demorar: se avisa para que no
+        // parezca que la app se colgó.
+        if (_isLoading) ...[
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Estamos verificando tu documento… esto puede demorar hasta un '
+            'minuto.',
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ],
         const SizedBox(height: AppSpacing.xl),
       ],
     );

@@ -42,35 +42,30 @@ class DemoAuthDatasource implements AuthDatasource {
   }
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async {
+  Future<void> register(RegistroData data) async {
     await Future.delayed(Duration.zero);
-    final existeEmail = _usuarios.any((u) => u.persona.email == email);
+    final existeEmail = _usuarios.any((u) => u.persona.email == data.email);
     if (existeEmail) throw const CuentaExistenteException();
 
+    // La validación de identidad por foto del documento es solo-API: en demo
+    // se ignora `imagenDocumento` (no-op), igual que la verificación por OTP.
     final personaId = _nextId++;
     final persona = Persona(
       id: personaId,
-      nombre: nombre,
-      apellido: apellido,
-      documento: documento,
-      fechaNacimiento: fechaNacimiento,
-      email: email,
-      telefono: telefono,
+      nombre: data.nombre,
+      apellido: data.apellido,
+      documento: data.documento,
+      fechaNacimiento: data.fechaNacimiento,
+      email: data.email,
+      telefono: data.telefono,
+      imagen: data.imagen,
     );
     _personas.add(persona);
 
     final usuario = Usuario(
       id: _nextId++,
       persona: persona,
-      contrasena: contrasena,
+      contrasena: data.contrasena,
       estado: DemoSeed.estadoActivo,
     );
     _usuarios.add(usuario);
@@ -168,13 +163,16 @@ class DemoAuthDatasource implements AuthDatasource {
     return usuarioActualizado;
   }
 
-  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
+    required String imagenDocumento,
   }) async {
     await Future.delayed(Duration.zero);
+
+    // La validación de identidad por foto del documento es solo-API: en demo
+    // se ignora `imagenDocumento` (no-op), igual que en el registro.
 
     // Buscar persona preexistente sin credenciales.
     final persona = _personas.where((p) => p.email == email).firstOrNull;
@@ -193,6 +191,5 @@ class DemoAuthDatasource implements AuthDatasource {
       estado: DemoSeed.estadoActivo,
     );
     _usuarios.add(usuario);
-    return usuario;
   }
 }

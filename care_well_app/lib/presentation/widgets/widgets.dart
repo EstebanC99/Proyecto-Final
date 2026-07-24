@@ -9,6 +9,8 @@ export 'shared/avatar.dart';
 export 'shared/editable_avatar.dart';
 export 'shared/persona_avatar.dart';
 export 'shared/image_source_sheet.dart';
+export 'shared/document_capture.dart';
+export 'shared/document_capture_field.dart';
 export 'shared/image_viewer_dialog.dart';
 export 'shared/confirm_dialog.dart';
 export 'shared/success_view.dart';

@@ -13,7 +13,13 @@ import '../../../config/theme/app_spacing.dart';
 /// presentacional: retorna el [ImageSource] elegido (o `null` si se descarta).
 abstract final class ImageSourceSheet {
   /// Muestra la hoja de selección y retorna el origen elegido.
-  static Future<ImageSource?> show(BuildContext context) {
+  ///
+  /// [title] permite reutilizar la hoja para distintos propósitos (foto de
+  /// perfil, foto del documento, etc.).
+  static Future<ImageSource?> show(
+    BuildContext context, {
+    String title = 'Foto de perfil',
+  }) {
     return showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: AppColors.surface,
@@ -37,14 +43,14 @@ abstract final class ImageSourceSheet {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              const Padding(
-                padding: EdgeInsets.symmetric(
+              Padding(
+                padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.sm,
                 ),
                 child: Text(
-                  'Foto de perfil',
-                  style: TextStyle(
+                  title,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,

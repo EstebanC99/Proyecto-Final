@@ -1,4 +1,6 @@
-﻿using CareWell.Domain.Validadores;
+﻿using CareWell.Domain.Auth;
+using CareWell.Domain.DomainServices;
+using CareWell.Domain.Validadores;
 using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
@@ -20,6 +22,10 @@ namespace CareWell.Domain.General
         public virtual string? Telefono { get; private set; }
 
         public virtual byte[]? Imagen { get; private set; }
+
+        public virtual bool IdentidadValidada { get; private set; }
+
+        public virtual DateTime? FechaValidacionIdentidad { get; private set; }
 
         public virtual void CrearDesdeCuenta(CrearModificarPersona crearPersona)
         {
@@ -48,6 +54,30 @@ namespace CareWell.Domain.General
             this.SetearCamposPerfil(modificarPerfil);
         }
 
+        public virtual void ValidarIdentidad(TextoDocumentoReconocido textoDocumentoReconocido)
+        {
+            var esIdentidadCorrecta =
+                this.Documento == textoDocumentoReconocido.NumeroDocumento &&
+                this.Nombre.Equals(textoDocumentoReconocido.Nombre, StringComparison.CurrentCultureIgnoreCase) &&
+                this.Apellido.Equals(textoDocumentoReconocido.Apellido, StringComparison.CurrentCultureIgnoreCase);
+
+            if (esIdentidadCorrecta)
+            {
+                this.IdentidadValidada = true;
+                this.FechaValidacionIdentidad = DateTime.Now;
+            }
+        }
+
+        public virtual void ValidarCrearUsuario(IEntityLoaderDomainService entityLoaderDomainService)
+        {
+            var tieneUsuario = entityLoaderDomainService.Query<Usuario>().Any(u => u.Persona.ID == this.ID);
+
+            if (tieneUsuario)
+                throw new CuentaExistenteException(Mensajes.PersonaYaTieneUsuario);
+        }
+
+        #region Metodos Privados
+
         private void SetearCamposPerfil(ModificarPerfil modificarPerfil)
         {
             if (string.IsNullOrEmpty(modificarPerfil.Nombre))
@@ -69,5 +99,7 @@ namespace CareWell.Domain.General
             this.Telefono = modificarPerfil.Telefono;
             this.Imagen = modificarPerfil.Imagen;
         }
+
+        #endregion
     }
 }

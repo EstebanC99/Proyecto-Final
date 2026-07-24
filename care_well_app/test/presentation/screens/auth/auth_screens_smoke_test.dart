@@ -9,6 +9,7 @@ import 'package:care_well_app/presentation/screens/auth/register_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/reset_password_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/reset_password_success_screen.dart';
 import 'package:care_well_app/presentation/screens/auth/verify_email_screen.dart';
+import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,15 +37,7 @@ class _FakeAuthRepository implements AuthRepository {
   Future<Usuario> login(String email, String contrasena) async => _usuario;
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async {}
+  Future<void> register(RegistroData data) async {}
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
@@ -76,10 +69,11 @@ class _FakeAuthRepository implements AuthRepository {
   }) async {}
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
-  }) async => _usuario;
+    required String imagenDocumento,
+  }) async {}
 
   @override
   Future<Usuario> actualizarPerfil({
@@ -146,10 +140,10 @@ void main() {
       },
     );
 
-    testWidgets('RegisterScreen muestra "Paso 1 de 2"', (tester) async {
+    testWidgets('RegisterScreen muestra "Paso 1 de 3"', (tester) async {
       await tester.pumpWidget(_wrap(const RegisterScreen()));
       await tester.pump();
-      expect(find.text('Paso 1 de 2'), findsOneWidget);
+      expect(find.text('Paso 1 de 3'), findsOneWidget);
     });
 
     testWidgets('RecoverPasswordScreen monta sin errores', (tester) async {
@@ -254,6 +248,29 @@ void main() {
       await tester.pump();
       expect(find.text('Crear credenciales'), findsOneWidget);
     });
+
+    testWidgets(
+      'CreateCredentialsScreen muestra la sección de verificación de identidad',
+      (tester) async {
+        await tester.pumpWidget(_wrap(const CreateCredentialsScreen()));
+        await tester.pump();
+        expect(find.text('Verificá tu identidad'), findsOneWidget);
+        expect(find.byType(DocumentCaptureField), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'CreateCredentialsScreen deshabilita "Crear credenciales" sin foto de '
+      'documento',
+      (tester) async {
+        await tester.pumpWidget(_wrap(const CreateCredentialsScreen()));
+        await tester.pump();
+        final boton = tester.widget<PrimaryButton>(
+          find.widgetWithText(PrimaryButton, 'Crear credenciales'),
+        );
+        expect(boton.onPressed, isNull);
+      },
+    );
 
     testWidgets('AccountCreatedScreen monta sin errores', (tester) async {
       await tester.pumpWidget(_wrap(const AccountCreatedScreen()));

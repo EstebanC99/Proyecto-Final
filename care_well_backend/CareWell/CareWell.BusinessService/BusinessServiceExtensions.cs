@@ -11,6 +11,7 @@ using CareWell.BusinessService.Salud;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Agenda;
 using CareWell.Domain.DomainServices.Auth;
+using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.DomainServices.Salud;
 using CareWell.Domain.Factories;
 using CareWell.Domain.Salud.AlertasBienestar;
@@ -47,6 +48,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarPersonasCargoBusinessService, AdministrarPersonasCargoBusinessService>();
             services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
             services.AddScoped<IAlertaBienestarBusinessService, AlertaBienestarBusinessService>();
+            services.AddScoped<ICrearCredencialesBusinessService, CrearCredencialesBusinessService>();
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
             services.AddScoped<IEnvioEmailBusinessService, EnvioEmailBusinessService>();
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
@@ -59,6 +61,7 @@ namespace CareWell.BusinessService
             #region Domain Services
 
             services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
+            services.AddScoped<IEvaluadorIdentidadPersonaDomainService, EvaluadorIdentidadPersonaBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
             services.AddScoped<IGeneradorCodigoOtpDomainService, GeneradorCodigoOtpBusinessService>();
             services.AddScoped<IGestorCodigoVerificacionDomainService, GestorCodigoVerificacionBusinessService>();

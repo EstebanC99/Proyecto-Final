@@ -3,6 +3,7 @@ export 'agenda/frecuencia_recurrencia.dart';
 export 'agenda/ocurrencia_evento_agenda.dart';
 export 'agenda/tipo_evento.dart';
 export 'auth/estado_usuario.dart';
+export 'auth/registro_data.dart';
 export 'auth/usuario.dart';
 export 'base_entity.dart';
 export 'care_team/asignacion_cuidado.dart';

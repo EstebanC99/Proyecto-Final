@@ -20,6 +20,8 @@ namespace CareWell.Repository.Config.General
             builder.Property(p => p.Email).HasMaxLength(256);
             builder.Property(p => p.Telefono).HasMaxLength(30);
             builder.Property(p => p.Imagen).HasColumnType("VARBINARY(MAX)").IsRequired(false);
+            builder.Property(p => p.IdentidadValidada).HasDefaultValue(false).IsRequired();
+            builder.Property(p => p.FechaValidacionIdentidad).IsRequired(false);
         }
     }
 }

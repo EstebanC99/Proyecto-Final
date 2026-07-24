@@ -24,40 +24,25 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
   ///
   /// En caso de éxito NO inicia sesión automáticamente: el usuario debe
   /// dirigirse al login. No modifica el estado de sesión.
-  Future<AsyncValue<void>> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async {
-    return AsyncValue.guard(
-      () => _authRepository.register(
-        nombre: nombre,
-        apellido: apellido,
-        documento: documento,
-        fechaNacimiento: fechaNacimiento,
-        email: email,
-        telefono: telefono,
-        contrasena: contrasena,
-      ),
-    );
+  Future<AsyncValue<void>> register(RegistroData data) async {
+    return AsyncValue.guard(() => _authRepository.register(data));
   }
 
-  /// Crea credenciales para una persona preexistente sin acceso.
+  /// Crea credenciales para una persona preexistente sin acceso (US-04).
   ///
-  /// En caso de éxito NO inicia sesión: el usuario debe ir al login.
-  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
-  Future<AsyncValue<Usuario>> crearCredenciales({
+  /// [imagenDocumento] es la foto del documento en base64 para validar la
+  /// identidad. En caso de éxito NO inicia sesión: el Usuario queda pendiente
+  /// de validación de email y debe verificarlo antes de loguearse.
+  Future<AsyncValue<void>> crearCredenciales({
     required String email,
     required String contrasena,
+    required String imagenDocumento,
   }) async {
     return AsyncValue.guard(
       () => _authRepository.crearCredenciales(
         email: email,
         contrasena: contrasena,
+        imagenDocumento: imagenDocumento,
       ),
     );
   }

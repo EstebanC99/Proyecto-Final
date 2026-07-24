@@ -24,6 +24,11 @@ class ApiExceptionMapper {
         mensaje ?? 'El recurso solicitado no fue encontrado.',
       ),
       409 => const CuentaExistenteException(),
+      503 => ServicioNoDisponibleException(
+        mensaje ??
+            'El servicio no está disponible en este momento. '
+                'Reintentá en unos minutos.',
+      ),
       _ => const ServidorException(),
     };
   }

@@ -7,7 +7,6 @@ using CareWell.Domain.DomainServices.Auth;
 using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.Factories;
 using CareWell.Domain.General;
-using CareWell.Domain.ValueObjects.General;
 using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 using CareWell.Repository.Auth;
@@ -17,7 +16,7 @@ using Moq;
 
 namespace CareWell.BusinessService.Test.Auth
 {
-    public class CrearCuentaBusinessTest : BusinessTestClassBase<CrearCuentaBusinessService>
+    public class CrearCredencialesBusinessTest : BusinessTestClassBase<CrearCredencialesBusinessService>
     {
         private Mock<IPersonaRepository> personaRepository;
         private Mock<IUsuarioRepository> usuarioRepository;
@@ -26,7 +25,7 @@ namespace CareWell.BusinessService.Test.Auth
         private Mock<IPasswordHasherDomainService> passwordHasherDomainService;
         private Mock<IVerificacionEmailBusinessService> verificacionEmailBusinessService;
         private Mock<IEvaluadorIdentidadPersonaDomainService> evaluadorIdentidadPersonaDomainService;
-        private Mock<ILogger<CrearCuentaBusinessService>> logger;
+        private Mock<ILogger<CrearCredencialesBusinessService>> logger;
 
         protected override void InitializeTest()
         {
@@ -39,22 +38,24 @@ namespace CareWell.BusinessService.Test.Auth
             this.passwordHasherDomainService = new Mock<IPasswordHasherDomainService>();
             this.verificacionEmailBusinessService = new Mock<IVerificacionEmailBusinessService>();
             this.evaluadorIdentidadPersonaDomainService = new Mock<IEvaluadorIdentidadPersonaDomainService>();
-            this.logger = new Mock<ILogger<CrearCuentaBusinessService>>();
+            this.logger = new Mock<ILogger<CrearCredencialesBusinessService>>();
 
-            this.Target = new CrearCuentaBusinessService(this.unitOfWork.Object,
-                                                         this.personaRepository.Object,
-                                                         this.usuarioRepository.Object,
-                                                         this.baseFactory.Object,
-                                                         this.entityLoaderDomainService.Object,
-                                                         this.passwordHasherDomainService.Object,
-                                                         this.verificacionEmailBusinessService.Object,
-                                                         this.evaluadorIdentidadPersonaDomainService.Object,
-                                                         this.logger.Object);
+            this.Target = new CrearCredencialesBusinessService(
+                this.unitOfWork.Object,
+                this.personaRepository.Object,
+                this.usuarioRepository.Object,
+                this.baseFactory.Object,
+                this.entityLoaderDomainService.Object,
+                this.passwordHasherDomainService.Object,
+                this.verificacionEmailBusinessService.Object,
+                this.evaluadorIdentidadPersonaDomainService.Object,
+                this.logger.Object
+            );
         }
 
-        public class ElMetodo_Crear : CrearCuentaBusinessTest
+        public class ElMetodo_Crear : CrearCredencialesBusinessTest
         {
-            private CrearCuentaCommand command;
+            private CrearCredencialesCommand command;
             private Mock<Persona> persona;
             private Mock<Usuario> usuario;
 
@@ -62,12 +63,13 @@ namespace CareWell.BusinessService.Test.Auth
             {
                 base.InitializeTest();
 
-                this.command = Mock.Of<CrearCuentaCommand>(c => c.Email == "mail@algo.com");
+                this.command = Mock.Of<CrearCredencialesCommand>(c => c.Email == "mail@algo.com");
 
                 this.persona = new Mock<Persona>();
                 this.usuario = new Mock<Usuario>();
 
-                this.baseFactory.Setup(s => s.Crear<Persona>()).Returns(this.persona.Object);
+                this.personaRepository.Setup(s => s.GetByEmail(this.command.Email)).Returns(this.persona.Object);
+
                 this.baseFactory.Setup(s => s.Crear<Usuario>()).Returns(this.usuario.Object);
 
                 this.evaluadorIdentidadPersonaDomainService.Setup(s => s.EsIdentidadCorrecta(this.persona.Object, It.IsAny<byte[]>())).Returns(true);
@@ -79,7 +81,7 @@ namespace CareWell.BusinessService.Test.Auth
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Crear_Persona_de_la_BaseFactory()
+            public void Llama_una_vez_al_metodo_GetByEmail_de_PersonaRepository()
             {
                 // Arrange
 
@@ -87,11 +89,22 @@ namespace CareWell.BusinessService.Test.Auth
                 this.Action();
 
                 // Assert
-                this.baseFactory.Verify(v => v.Crear<Persona>(), Times.Once);
+                this.personaRepository.Verify(v => v.GetByEmail(this.command.Email), Times.Once);
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_CrearModificar_de_la_Persona()
+            public void Si_la_Persona_no_se_encuentra_arroja_un_RecursoNoEncontradoException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.personaRepository.Setup(s => s.GetByEmail(this.command.Email)).Returns((Persona?)null);
+
+                // Action & Assert
+                var excepcion = Assert.Throws<RecursoNoEncontradoException>(() => this.Action());
+                Assert.Equal(Mensajes.NoExistePersonaConEseEmail, excepcion.Message);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_ValidarCrearUsuario_de_la_Persona()
             {
                 // Arrange
 
@@ -99,7 +112,7 @@ namespace CareWell.BusinessService.Test.Auth
                 this.Action();
 
                 // Assert
-                this.persona.Verify(v => v.CrearModificar(It.IsAny<CrearModificarPersona>()), Times.Once);
+                this.persona.Verify(v => v.ValidarCrearUsuario(this.entityLoaderDomainService.Object), Times.Once);
             }
 
             [Fact]
@@ -123,18 +136,6 @@ namespace CareWell.BusinessService.Test.Auth
                 // Action & Assert
                 var excepcion = Assert.Throws<ValidacionDominioException>(() => this.Action());
                 Assert.Equal(Mensajes.IdentidadNoValidada, excepcion.Message);
-            }
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_Add_del_PersonaRepository()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.personaRepository.Verify(v => v.Add(this.persona.Object), Times.Once);
             }
 
             [Fact]

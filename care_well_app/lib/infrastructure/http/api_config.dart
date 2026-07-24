@@ -7,10 +7,19 @@ class ApiConfig {
   static const connectTimeout = Duration(seconds: 15);
   static const receiveTimeout = Duration(seconds: 20);
 
+  /// Timeout extendido para los endpoints que ejecutan validación de identidad
+  /// con OCR/IA en el backend (llamada síncrona a Ollama, puede tardar bastante
+  /// con un modelo de visión corriendo local).
+  ///
+  /// Se aplica por request (override de [receiveTimeout]) únicamente en
+  /// [cuentaPath] y [crearCredencialesPath].
+  static const receiveTimeoutValidacionIdentidad = Duration(minutes: 2);
+
   static const loginPath = '/api/Authorization/login';
   static const refreshPath = '/api/Authorization/refresh-token';
 
   static const cuentaPath = '/api/Cuenta/crear';
+  static const crearCredencialesPath = '/api/Cuenta/crear-credenciales';
   static const reenviarCodigoPath = '/api/Cuenta/reenviar-codigo';
   static const verificarEmailPath = '/api/Cuenta/verificar-email';
   static const solicitarResetContrasenaPath =

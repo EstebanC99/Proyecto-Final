@@ -38,6 +38,12 @@ class _CreateCredentialsScreenState
   String? _passwordError;
   String? _confirmError;
   String? _generalError;
+  BannerTone _generalErrorTone = BannerTone.error;
+
+  // Foto del documento (obligatoria). PII sensible: solo vive en memoria y se
+  // limpia tras el submit.
+  String? _imagenDocumento;
+  String? _imagenDocumentoError;
 
   bool _showPassword = false;
   bool _tcAcepted = false;
@@ -65,17 +71,33 @@ class _CreateCredentialsScreenState
     final tcErr = _tcAcepted
         ? null
         : 'Tenés que aceptar los Términos y Condiciones.';
+    final documentoErr = _imagenDocumento == null
+        ? 'Sacá la foto de tu documento para verificar tu identidad.'
+        : null;
     setState(() {
       _emailError = emailErr;
       _passwordError = passErr;
       _confirmError = confirmErr;
       _tcError = tcErr;
+      _imagenDocumentoError = documentoErr;
       _generalError = null;
     });
     return emailErr == null &&
         passErr == null &&
         confirmErr == null &&
-        tcErr == null;
+        tcErr == null &&
+        documentoErr == null;
+  }
+
+  Future<void> _pickImagenDocumento() async {
+    final base64 = await pickDocumentImageAsBase64(context);
+    if (base64 == null || !mounted) return;
+    setState(() {
+      _imagenDocumento = base64;
+      _imagenDocumentoError = null;
+      // Descarta un error de identidad de un intento anterior.
+      _generalError = null;
+    });
   }
 
   Future<void> _submit() async {
@@ -83,11 +105,13 @@ class _CreateCredentialsScreenState
 
     setState(() => _isLoading = true);
 
+    final email = _emailController.text.trim();
     final result = await ref
         .read(authStateProvider.notifier)
         .crearCredenciales(
-          email: _emailController.text.trim(),
+          email: email,
           contrasena: _passwordController.text,
+          imagenDocumento: _imagenDocumento!,
         );
 
     if (!mounted) return;
@@ -95,13 +119,11 @@ class _CreateCredentialsScreenState
 
     result.when(
       data: (_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Credenciales creadas! Ya podés iniciar sesión.'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        context.goNamed(AppRoutes.loginName);
+        // La foto del documento es PII: se limpia de memoria antes de continuar.
+        _imagenDocumento = null;
+        // El backend deja el Usuario en PendienteValidacion y dispara el OTP:
+        // hay que verificar el email antes de poder iniciar sesión.
+        context.goNamed(AppRoutes.verifyEmailName, extra: email);
       },
       error: (error, _) {
         // Acá sí se puede ser específico: no es un flujo de seguridad.
@@ -114,16 +136,33 @@ class _CreateCredentialsScreenState
             () => _emailError =
                 'Esta persona ya tiene credenciales. Podés ir al inicio de sesión.',
           );
+        } else if (error is ServicioNoDisponibleException) {
+          // Servicio de validación caído: no es error de datos del usuario.
+          // No se limpia la foto; puede reintentar con el mismo botón.
+          setState(() {
+            _generalError = error.mensaje;
+            _generalErrorTone = BannerTone.warning;
+          });
+        } else if (error is ValidacionException) {
+          // Identidad no validada (no coincide o ilegible). Al ser pantalla
+          // única, se limpia la foto para que el usuario la recapture acá mismo.
+          setState(() {
+            _imagenDocumento = null;
+            _imagenDocumentoError = null;
+            _generalError = error.mensaje;
+            _generalErrorTone = BannerTone.error;
+          });
         } else if (error is SinConexionException) {
-          setState(
-            () => _generalError =
-                'Sin conexión. Verificá tu red e intentá de nuevo.',
-          );
+          setState(() {
+            _generalError = 'Sin conexión. Verificá tu red e intentá de nuevo.';
+            _generalErrorTone = BannerTone.error;
+          });
         } else {
-          setState(
-            () => _generalError =
-                'Error al crear las credenciales. Intentá de nuevo.',
-          );
+          setState(() {
+            _generalError =
+                'Error al crear las credenciales. Intentá de nuevo.';
+            _generalErrorTone = BannerTone.error;
+          });
         }
       },
       loading: () {},
@@ -198,6 +237,30 @@ class _CreateCredentialsScreenState
                 onChanged: (_) {
                   if (_emailError != null) setState(() => _emailError = null);
                 },
+              ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Verificación de identidad (foto del documento, obligatoria)
+              Text(
+                'Verificá tu identidad',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Tomá una foto de tu DNI para confirmar que sos vos.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              DocumentCaptureField(
+                imagenBase64: _imagenDocumento,
+                onCapture: _pickImagenDocumento,
+                onRemove: () => setState(() => _imagenDocumento = null),
+                errorText: _imagenDocumentoError,
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -281,15 +344,34 @@ class _CreateCredentialsScreenState
 
               // Error general
               if (_generalError != null) ...[
-                InlineErrorBanner(message: _generalError!),
+                InlineErrorBanner(
+                  message: _generalError!,
+                  tone: _generalErrorTone,
+                ),
                 const SizedBox(height: AppSpacing.lg),
               ],
 
               PrimaryButton(
                 label: 'Crear credenciales',
                 isLoading: _isLoading,
-                onPressed: _tcAcepted ? _submit : null,
+                onPressed: (_tcAcepted && _imagenDocumento != null)
+                    ? _submit
+                    : null,
               ),
+
+              // La validación del documento puede demorar: se avisa para que
+              // no parezca que la app se colgó.
+              if (_isLoading) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Estamos verificando tu documento… esto puede demorar hasta '
+                  'un minuto.',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
 
               Center(

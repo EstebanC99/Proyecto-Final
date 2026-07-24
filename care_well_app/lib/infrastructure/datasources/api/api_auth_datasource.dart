@@ -40,27 +40,28 @@ class ApiAuthDatasource implements AuthDatasource {
   }
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async {
+  Future<void> register(RegistroData data) async {
     try {
       await _dio.post(
         ApiConfig.cuentaPath,
         data: {
-          'nombre': nombre,
-          'apellido': apellido,
-          'documento': documento,
-          'fechaNacimiento': fechaNacimiento.toIso8601String(),
-          'email': email,
-          'telefono': telefono ?? '',
-          'contrasena': contrasena,
+          'nombre': data.nombre,
+          'apellido': data.apellido,
+          'documento': data.documento,
+          'fechaNacimiento': data.fechaNacimiento.toIso8601String(),
+          'email': data.email,
+          'telefono': data.telefono ?? '',
+          'contrasena': data.contrasena,
+          // Foto del documento en base64 estándar (sin prefijo data-URI).
+          // Obligatoria: el backend valida identidad contra ella.
+          'imagenDocumento': data.imagenDocumento,
+          // Foto de perfil en base64 estándar (opcional): se omite si es null.
+          'imagen': ?data.imagen,
         },
+        // La validación de identidad con IA es síncrona y puede demorar.
+        options: Options(
+          receiveTimeout: ApiConfig.receiveTimeoutValidacionIdentidad,
+        ),
       );
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
@@ -162,15 +163,28 @@ class ApiAuthDatasource implements AuthDatasource {
   // ── crearCredenciales ────────────────────────────────────────────────────────
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
+    required String imagenDocumento,
   }) async {
-    // TODO: endpoint pendiente en el backend (activación de credenciales para
-    // una Persona preexistente cargada por un responsable/cuidador).
-    throw UnimplementedError(
-      'TODO: endpoint de creación de credenciales pendiente en el backend.',
-    );
+    try {
+      await _dio.post(
+        ApiConfig.crearCredencialesPath,
+        data: {
+          'email': email,
+          'contrasena': contrasena,
+          // Foto del documento en base64 estándar (sin prefijo data-URI).
+          'imagenDocumento': imagenDocumento,
+        },
+        // La validación de identidad con IA es síncrona y puede demorar.
+        options: Options(
+          receiveTimeout: ApiConfig.receiveTimeoutValidacionIdentidad,
+        ),
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
   }
 
   // ── actualizarPerfil ─────────────────────────────────────────────────────────

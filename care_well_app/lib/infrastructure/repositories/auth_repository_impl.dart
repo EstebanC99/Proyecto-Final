@@ -12,23 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _datasource.login(email, contrasena);
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) => _datasource.register(
-    nombre: nombre,
-    apellido: apellido,
-    documento: documento,
-    fechaNacimiento: fechaNacimiento,
-    email: email,
-    telefono: telefono,
-    contrasena: contrasena,
-  );
+  Future<void> register(RegistroData data) => _datasource.register(data);
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) =>
@@ -72,10 +56,15 @@ class AuthRepositoryImpl implements AuthRepository {
   );
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
-  }) => _datasource.crearCredenciales(email: email, contrasena: contrasena);
+    required String imagenDocumento,
+  }) => _datasource.crearCredenciales(
+    email: email,
+    contrasena: contrasena,
+    imagenDocumento: imagenDocumento,
+  );
 
   @override
   Future<Usuario> actualizarPerfil({

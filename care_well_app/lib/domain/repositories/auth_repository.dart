@@ -3,15 +3,7 @@ import 'package:care_well_app/domain/entities/entities.dart';
 abstract class AuthRepository {
   Future<Usuario> login(String email, String contrasena);
 
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  });
+  Future<void> register(RegistroData data);
 
   Future<void> solicitarRecuperacionContrasena(String email);
 
@@ -40,10 +32,15 @@ abstract class AuthRepository {
     required String contrasenaNueva,
   });
 
-  // TODO: reemplazar por ApiAuthDatasource cuando el backend tenga el endpoint de activación de credenciales
-  Future<Usuario> crearCredenciales({
+  /// Crea las credenciales de acceso de una Persona preexistente (US-04).
+  ///
+  /// [imagenDocumento] es la foto del documento en base64 estándar (sin prefijo
+  /// data-URI). El Usuario queda pendiente de validación de email; no inicia
+  /// sesión.
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
+    required String imagenDocumento,
   });
 
   Future<Usuario> actualizarPerfil({

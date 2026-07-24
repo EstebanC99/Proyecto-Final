@@ -1,5 +1,7 @@
 using CareWell.API.Filters;
 using CareWell.BusinessService;
+using CareWell.DocumentIntelligence;
+using CareWell.DocumentIntelligence.ReconocedorTexto;
 using CareWell.Notifications;
 using CareWell.Notifications.Email;
 using CareWell.Repository;
@@ -29,10 +31,12 @@ builder.Services.AddControllers(options =>
 builder.Services.AddRepositories();
 builder.Services.AddBusinessServices();
 builder.Services.AddNotifications();
+builder.Services.AddDocumentIntelligences();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<ReconocedorTextoDocumentoOptions>(builder.Configuration.GetSection("ReconocedorTexto"));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

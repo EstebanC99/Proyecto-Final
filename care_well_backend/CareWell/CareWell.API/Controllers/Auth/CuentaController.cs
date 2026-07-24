@@ -11,14 +11,17 @@ namespace CareWell.API.Controllers.Auth
     public class CuentaController : ControllerBase
     {
         private ICrearCuentaBusinessService CrearCuentaBusinessService { get; set; }
+        private ICrearCredencialesBusinessService CrearCredencialesBusinessService { get; set; }
         private IVerificacionEmailBusinessService VerificacionEmailBusinessService { get; set; }
         private IRecuperacionContrasenaBusinessService RecuperacionContrasenaBusinessService { get; set; }
 
         public CuentaController(ICrearCuentaBusinessService crearCuentaBusinessService,
+                                ICrearCredencialesBusinessService crearCredencialesBusinessService,
                                 IVerificacionEmailBusinessService verificacionEmailBusinessService,
                                 IRecuperacionContrasenaBusinessService recuperacionContrasenaBusinessService)
         {
             this.CrearCuentaBusinessService = crearCuentaBusinessService;
+            this.CrearCredencialesBusinessService = crearCredencialesBusinessService;
             this.VerificacionEmailBusinessService = verificacionEmailBusinessService;
             this.RecuperacionContrasenaBusinessService = recuperacionContrasenaBusinessService;
         }
@@ -27,6 +30,12 @@ namespace CareWell.API.Controllers.Auth
         public void Crear([FromBody] CrearCuentaCommand command)
         {
             this.CrearCuentaBusinessService.Crear(command);
+        }
+
+        [HttpPost("crear-credenciales")]
+        public void CrearCredenciales([FromBody] CrearCredencialesCommand command)
+        {
+            this.CrearCredencialesBusinessService.Crear(command);
         }
 
         [HttpPost("reenviar-codigo")]

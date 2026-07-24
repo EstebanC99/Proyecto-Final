@@ -1,4 +1,5 @@
 import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/exceptions/exceptions.dart';
 import 'package:care_well_app/domain/repositories/repositories.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +35,10 @@ class _FakeAuthRepository implements AuthRepository {
   ({String email, String codigo, String contrasenaNueva})?
   confirmarResetContrasenaArgs;
 
+  /// Si se setea, `crearCredenciales` lanza este error (para probar el manejo
+  /// de excepciones aguas arriba).
+  Object? crearCredencialesError;
+
   @override
   Future<Usuario> login(String email, String contrasena) async {
     if (email == 'test@example.com' && contrasena == _contrasenaActual) {
@@ -43,15 +48,7 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> register({
-    required String nombre,
-    required String apellido,
-    required String documento,
-    required DateTime fechaNacimiento,
-    required String email,
-    String? telefono,
-    required String contrasena,
-  }) async {}
+  Future<void> register(RegistroData data) async {}
 
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {}
@@ -98,10 +95,13 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Usuario> crearCredenciales({
+  Future<void> crearCredenciales({
     required String email,
     required String contrasena,
-  }) async => _usuario;
+    required String imagenDocumento,
+  }) async {
+    if (crearCredencialesError != null) throw crearCredencialesError!;
+  }
 
   @override
   Future<Usuario> actualizarPerfil({
@@ -170,12 +170,15 @@ void main() {
       final result = await container
           .read(authStateProvider.notifier)
           .register(
-            nombre: 'Test',
-            apellido: 'User',
-            documento: '30123456',
-            fechaNacimiento: DateTime(1990, 5, 20),
-            email: 'test@example.com',
-            contrasena: 'Password1',
+            RegistroData(
+              nombre: 'Test',
+              apellido: 'User',
+              documento: '30123456',
+              fechaNacimiento: DateTime(1990, 5, 20),
+              email: 'test@example.com',
+              contrasena: 'Password1',
+              imagenDocumento: 'ZG9jdW1lbnRv',
+            ),
           );
 
       expect(result.hasValue, isTrue);
@@ -189,35 +192,36 @@ void main() {
       await container
           .read(authStateProvider.notifier)
           .register(
-            nombre: 'Test',
-            apellido: 'User',
-            documento: '30123456',
-            fechaNacimiento: DateTime(1990, 5, 20),
-            email: 'test@example.com',
-            contrasena: 'Password1',
+            RegistroData(
+              nombre: 'Test',
+              apellido: 'User',
+              documento: '30123456',
+              fechaNacimiento: DateTime(1990, 5, 20),
+              email: 'test@example.com',
+              contrasena: 'Password1',
+              imagenDocumento: 'ZG9jdW1lbnRv',
+            ),
           );
 
       final sessionState = container.read(authStateProvider);
       expect(sessionState.value, isNull);
     });
 
-    test(
-      'crearCredenciales retorna AsyncValue con el usuario creado',
-      () async {
-        final container = _buildContainer();
-        addTearDown(container.dispose);
+    test('crearCredenciales completa sin error', () async {
+      final container = _buildContainer();
+      addTearDown(container.dispose);
 
-        final result = await container
-            .read(authStateProvider.notifier)
-            .crearCredenciales(
-              email: 'test@example.com',
-              contrasena: 'Password1',
-            );
+      final result = await container
+          .read(authStateProvider.notifier)
+          .crearCredenciales(
+            email: 'test@example.com',
+            contrasena: 'Password1',
+            imagenDocumento: 'ZG9jdW1lbnRv',
+          );
 
-        expect(result.hasValue, isTrue);
-        expect(result.value?.id, 101);
-      },
-    );
+      expect(result.hasValue, isTrue);
+      expect(result.hasError, isFalse);
+    });
 
     test('crearCredenciales no modifica el estado de sesión', () async {
       final container = _buildContainer();
@@ -228,10 +232,57 @@ void main() {
           .crearCredenciales(
             email: 'test@example.com',
             contrasena: 'Password1',
+            imagenDocumento: 'ZG9jdW1lbnRv',
           );
 
       final sessionState = container.read(authStateProvider);
       expect(sessionState.value, isNull);
+    });
+
+    test('crearCredenciales propaga ValidacionException (identidad no válida) '
+        'como AsyncValue.error', () async {
+      final fake = _FakeAuthRepository()
+        ..crearCredencialesError = const ValidacionException(
+          'No pudimos validar tu identidad con el documento.',
+        );
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fake)],
+      );
+      addTearDown(container.dispose);
+
+      final result = await container
+          .read(authStateProvider.notifier)
+          .crearCredenciales(
+            email: 'test@example.com',
+            contrasena: 'Password1',
+            imagenDocumento: 'ZG9jdW1lbnRv',
+          );
+
+      expect(result.hasError, isTrue);
+      expect(result.error, isA<ValidacionException>());
+    });
+
+    test('crearCredenciales propaga ServicioNoDisponibleException (503) como '
+        'AsyncValue.error', () async {
+      final fake = _FakeAuthRepository()
+        ..crearCredencialesError = const ServicioNoDisponibleException(
+          'El servicio no está disponible en este momento.',
+        );
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fake)],
+      );
+      addTearDown(container.dispose);
+
+      final result = await container
+          .read(authStateProvider.notifier)
+          .crearCredenciales(
+            email: 'test@example.com',
+            contrasena: 'Password1',
+            imagenDocumento: 'ZG9jdW1lbnRv',
+          );
+
+      expect(result.hasError, isTrue);
+      expect(result.error, isA<ServicioNoDisponibleException>());
     });
 
     test('solicitarRecuperacionContrasenaProvider es callable', () async {
