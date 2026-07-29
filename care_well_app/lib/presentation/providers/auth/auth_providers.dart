@@ -59,26 +59,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
     state = AsyncValue.data(usuario.copyWith(persona: persona));
   }
 
-  /// Actualiza el perfil del usuario en sesión y refresca el estado.
-  // Reservado para el futuro endpoint de credenciales/email; no cableado a la UI.
-  Future<void> actualizarPerfil({
-    String? email,
-    String? telefono,
-    String? documento,
-  }) async {
-    final usuario = state.value;
-    if (usuario == null) return;
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => _authRepository.actualizarPerfil(
-        usuarioId: usuario.id,
-        email: email,
-        telefono: telefono,
-        documento: documento,
-      ),
-    );
-  }
-
   /// Cambia la contraseña. La sesión continúa activa tras el cambio.
   ///
   /// Lanza excepción si la contraseña actual es incorrecta.
@@ -99,7 +79,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<Usuario?>> {
   /// Deja el estado en [AsyncValue.data(null)] para que el redirect del
   /// router lleve al usuario al login automáticamente.
   Future<void> eliminarCuenta() async {
-    await _authRepository.eliminarCuenta(state.value!.id);
+    await _authRepository.eliminarCuenta();
     state = const AsyncValue.data(null);
   }
 }

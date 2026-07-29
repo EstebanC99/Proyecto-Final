@@ -177,68 +177,6 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   }) => throw UnimplementedError();
 }
 
-class _FakeCareTeamRepository implements CareTeamRepository {
-  final List<AsignacionCuidado> _asignaciones;
-  int _nextId = 10000;
-
-  _FakeCareTeamRepository(List<AsignacionCuidado> asignaciones)
-    : _asignaciones = List.from(asignaciones);
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    int colaboradorId,
-  ) async =>
-      _asignaciones.where((a) => a.colaborador.id == colaboradorId).toList();
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    int personaCuidadaId,
-  ) async => _asignaciones
-      .where((a) => a.personaCuidada.id == personaCuidadaId)
-      .toList();
-
-  @override
-  Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async {
-    final nueva = AsignacionCuidado(
-      id: _nextId++,
-      personaCuidada: a.personaCuidada,
-      colaborador: a.colaborador,
-      rol: a.rol,
-      estado: a.estado,
-      fechaAlta: a.fechaAlta,
-    );
-    _asignaciones.add(nueva);
-    return nueva;
-  }
-
-  @override
-  Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado a) async {
-    final idx = _asignaciones.indexWhere((x) => x.id == a.id);
-    if (idx < 0) throw Exception('Asignación no encontrada: ${a.id}');
-    _asignaciones[idx] = a;
-    return a;
-  }
-
-  @override
-  Future<void> eliminarAsignacion(int id) async {
-    final idx = _asignaciones.indexWhere((a) => a.id == id);
-    if (idx < 0) throw Exception('Asignación no encontrada: $id');
-    _asignaciones.removeAt(idx);
-  }
-
-  @override
-  Future<List<RolCuidado>> getRoles() async => [
-    rolCuidadoResponsable,
-    rolCuidadoCuidador,
-  ];
-
-  @override
-  Future<RolCuidado> getRolById(int rolId) async => [
-    rolCuidadoResponsable,
-    rolCuidadoCuidador,
-  ].firstWhere((r) => r.id == rolId);
-}
-
 final _usuarioDemoMaria = Usuario(
   id: 101,
   persona: _personaMaria,
@@ -263,9 +201,6 @@ ProviderContainer _buildContainer({
       personaRepositoryProvider.overrideWithValue(_FakePersonaRepository(pers)),
       asignacionCuidadoRepositoryProvider.overrideWithValue(
         _FakeAsignacionCuidadoRepository(asigs),
-      ),
-      careTeamRepositoryProvider.overrideWithValue(
-        _FakeCareTeamRepository(asigs),
       ),
     ],
   );
@@ -557,9 +492,6 @@ void main() {
           asignacionCuidadoRepositoryProvider.overrideWithValue(
             _FakeAsignacionCuidadoRepository([]),
           ),
-          careTeamRepositoryProvider.overrideWithValue(
-            _FakeCareTeamRepository([]),
-          ),
         ],
       );
       addTearDown(container.dispose);
@@ -641,9 +573,6 @@ void main() {
           ),
           asignacionCuidadoRepositoryProvider.overrideWithValue(
             _FakeAsignacionCuidadoRepository([]),
-          ),
-          careTeamRepositoryProvider.overrideWithValue(
-            _FakeCareTeamRepository([]),
           ),
         ],
       );

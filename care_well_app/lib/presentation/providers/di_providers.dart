@@ -13,13 +13,6 @@ import '../../infrastructure/notifications/notifications.dart';
 import '../../infrastructure/repositories/repositories.dart';
 import '../../infrastructure/storage/token_storage.dart';
 
-/// Activa el modo demo (datasources mock, sin backend).
-///
-/// Por defecto [true] para que la app funcione sin servidor.
-/// Cambiar a [false] inyectando el valor via `--dart-define=USE_DEMO=false`
-/// para conectarse al backend real.
-const bool _useDemo = bool.fromEnvironment('USE_DEMO', defaultValue: true);
-
 //region Infraestructura HTTP Providers
 
 final flutterSecureStorageProvider = Provider<FlutterSecureStorage>(
@@ -47,7 +40,6 @@ final notificationSchedulerProvider = Provider<NotificationScheduler>(
 //region Datasources Providers
 
 final authDatasourceProvider = Provider<AuthDatasource>((ref) {
-  if (_useDemo) return DemoAuthDatasource();
   return ApiAuthDatasource(
     ref.watch(dioClientProvider),
     ref.watch(tokenStorageProvider),
@@ -55,7 +47,6 @@ final authDatasourceProvider = Provider<AuthDatasource>((ref) {
 });
 
 final personaDatasourceProvider = Provider<PersonaDatasource>((ref) {
-  if (_useDemo) return DemoPersonaDatasource();
   return ApiPersonaDatasource(ref.watch(dioClientProvider));
 });
 
@@ -63,10 +54,6 @@ final asignacionCuidadoDatasourceProvider =
     Provider<AsignacionCuidadoDatasource>((ref) {
       return ApiAsignacionCuidadoDatasource(ref.watch(dioClientProvider));
     });
-
-final careTeamDatasourceProvider = Provider<CareTeamDatasource>(
-  (ref) => DemoCareTeamDatasource(),
-);
 
 final agendaDatasourceProvider = Provider<AgendaDatasource>(
   (ref) => ApiAgendaDatasource(ref.watch(dioClientProvider)),
@@ -81,7 +68,6 @@ final alertaBienestarDatasourceProvider = Provider<AlertaBienestarDatasource>(
 );
 
 final eventoSaludDatasourceProvider = Provider<EventoSaludDatasource>((ref) {
-  if (_useDemo) return DemoEventoSaludDatasource();
   return ApiEventoSaludDatasource(ref.watch(dioClientProvider));
 });
 
@@ -129,10 +115,6 @@ final asignacionCuidadoRepositoryProvider =
         ref.watch(asignacionCuidadoDatasourceProvider),
       ),
     );
-
-final careTeamRepositoryProvider = Provider<CareTeamRepository>(
-  (ref) => CareTeamRepositoryImpl(ref.watch(careTeamDatasourceProvider)),
-);
 
 final agendaRepositoryProvider = Provider<AgendaRepository>(
   (ref) => AgendaRepositoryImpl(ref.watch(agendaDatasourceProvider)),

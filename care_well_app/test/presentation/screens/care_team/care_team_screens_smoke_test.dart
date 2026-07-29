@@ -136,34 +136,6 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   }) => throw UnimplementedError();
 }
 
-class _FakeCareTeamRepository implements CareTeamRepository {
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByColaborador(
-    int colaboradorId,
-  ) async => colaboradorId == 1 ? [_asignacionMaria()] : [];
-
-  @override
-  Future<List<AsignacionCuidado>> getAsignacionesByPersonaCuidada(
-    int personaCuidadaId,
-  ) async => [_asignacionMaria(), _asignacionCarlos()];
-
-  @override
-  Future<AsignacionCuidado> crearAsignacion(AsignacionCuidado a) async => a;
-
-  @override
-  Future<AsignacionCuidado> actualizarAsignacion(AsignacionCuidado a) async =>
-      a;
-
-  @override
-  Future<void> eliminarAsignacion(int id) async {}
-
-  @override
-  Future<List<RolCuidado>> getRoles() async => [rolCuidadoResponsable];
-
-  @override
-  Future<RolCuidado> getRolById(int rolId) async => rolCuidadoResponsable;
-}
-
 Widget _wrap(Widget child) => ProviderScope(
   overrides: [
     authStateProvider.overrideWith(
@@ -175,7 +147,6 @@ Widget _wrap(Widget child) => ProviderScope(
     asignacionCuidadoRepositoryProvider.overrideWithValue(
       _FakeAsignacionCuidadoRepository(),
     ),
-    careTeamRepositoryProvider.overrideWithValue(_FakeCareTeamRepository()),
   ],
   child: MaterialApp(home: child),
 );

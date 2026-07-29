@@ -80,7 +80,7 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(int usuarioId) async {}
+  Future<void> eliminarCuenta() async {}
 
   @override
   Future<void> cambiarContrasena({
@@ -101,21 +101,6 @@ class _FakeAuthRepository implements AuthRepository {
     required String imagenDocumento,
   }) async {
     if (crearCredencialesError != null) throw crearCredencialesError!;
-  }
-
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
-  }) async {
-    final personaActualizada = _usuario.persona.copyWith(
-      email: email ?? _usuario.persona.email,
-      telefono: telefono ?? _usuario.persona.telefono,
-      documento: documento ?? _usuario.persona.documento,
-    );
-    return _usuario.copyWith(persona: personaActualizada);
   }
 }
 
@@ -347,40 +332,6 @@ void main() {
         );
       },
     );
-
-    test(
-      'actualizarPerfil actualiza email y refresca el estado de sesión',
-      () async {
-        final container = _buildContainer();
-        addTearDown(container.dispose);
-
-        // Iniciar sesión primero.
-        await container
-            .read(authStateProvider.notifier)
-            .login('test@example.com', '1234');
-
-        await container
-            .read(authStateProvider.notifier)
-            .actualizarPerfil(email: 'nuevo@example.com');
-
-        final state = container.read(authStateProvider);
-        expect(state.hasValue, isTrue);
-        expect(state.value?.persona.email, 'nuevo@example.com');
-      },
-    );
-
-    test('actualizarPerfil sin sesión activa no hace nada', () async {
-      final container = _buildContainer();
-      addTearDown(container.dispose);
-
-      // Sin login previo: state es null.
-      await container
-          .read(authStateProvider.notifier)
-          .actualizarPerfil(email: 'test@example.com');
-
-      final state = container.read(authStateProvider);
-      expect(state.value, isNull);
-    });
 
     test(
       'cambiarContrasena con contraseña correcta completa sin cambiar sesión',

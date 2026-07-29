@@ -4,15 +4,8 @@ class ApiConfig {
     defaultValue: 'https://<tu-url-dev-tunnel>.devtunnels.ms',
   );
 
-  static const connectTimeout = Duration(seconds: 15);
-  static const receiveTimeout = Duration(seconds: 20);
-
-  /// Timeout extendido para los endpoints que ejecutan validación de identidad
-  /// con OCR/IA en el backend (llamada síncrona a Ollama, puede tardar bastante
-  /// con un modelo de visión corriendo local).
-  ///
-  /// Se aplica por request (override de [receiveTimeout]) únicamente en
-  /// [cuentaPath] y [crearCredencialesPath].
+  static const connectTimeout = Duration(seconds: 30);
+  static const receiveTimeout = Duration(seconds: 45);
   static const receiveTimeoutValidacionIdentidad = Duration(minutes: 2);
 
   static const loginPath = '/api/Authorization/login';
@@ -26,6 +19,7 @@ class ApiConfig {
       '/api/Cuenta/solicitar-reset-contrasena';
   static const confirmarResetContrasenaPath =
       '/api/Cuenta/confirmar-reset-contrasena';
+  static const eliminarCuentaPath = '/api/Cuenta/eliminar-cuenta';
 
   static const modificarPerfil = '/api/AdministrarPersona/modificar-perfil';
   static String imagenPersonaPath(int personaId) =>

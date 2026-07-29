@@ -59,7 +59,7 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> logout() async {}
 
   @override
-  Future<void> eliminarCuenta(int usuarioId) async {}
+  Future<void> eliminarCuenta() async {}
 
   @override
   Future<void> cambiarContrasena({
@@ -74,14 +74,6 @@ class _FakeAuthRepository implements AuthRepository {
     required String contrasena,
     required String imagenDocumento,
   }) async {}
-
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
-  }) async => _usuario;
 }
 
 Widget _wrap(Widget child) => ProviderScope(

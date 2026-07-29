@@ -474,5 +474,48 @@ namespace CareWell.Domain.Test.Auth
                 Assert.Null(excepcion);
             }
         }
+
+        public class ElMetodo_Eliminar : UsuarioTest
+        {
+            private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+            }
+
+            private void Action()
+            {
+                this.Target.Eliminar(this.entityLoaderDomainService.Object);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_EstadoUsuario_con_estado_Eliminado_del_servicio_EntityLoaderDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.GetByID<EstadoUsuario>(EstadosUsuario.Eliminado), Times.Once);
+            }
+
+            [Fact]
+            public void Setea_la_propiedad_Estado_con_el_estado_retornado_por_el_servicio_EntityLoaderDomainService()
+            {
+                // Arrange
+                var estado = Mock.Of<EstadoUsuario>(e => e.ID == EstadosUsuario.Eliminado);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<EstadoUsuario>(EstadosUsuario.Eliminado)).Returns(estado);
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Same(estado, this.Target.Estado);
+            }
+        }
     }
 }

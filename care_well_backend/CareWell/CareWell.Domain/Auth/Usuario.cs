@@ -73,6 +73,11 @@ namespace CareWell.Domain.Auth
                 throw new ValidacionDominioException(Mensajes.LaCuentaNoEstaHabilitadaParaRestablecerContrasena);
         }
 
+        public virtual void Eliminar(IEntityLoaderDomainService entityLoaderDomainService)
+        {
+            this.Estado = entityLoaderDomainService.GetByID<EstadoUsuario>(EstadosUsuario.Eliminado);
+        }
+
         #region Metodos Privados
 
         private static void ValidarContrasena(string contrasena)

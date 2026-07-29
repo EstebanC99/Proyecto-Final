@@ -50,7 +50,7 @@ class _FakeAuthDatasource implements AuthDatasource {
   Future<void> logout() => throw UnimplementedError();
 
   @override
-  Future<void> eliminarCuenta(int usuarioId) => throw UnimplementedError();
+  Future<void> eliminarCuenta() => throw UnimplementedError();
 
   @override
   Future<void> cambiarContrasena({
@@ -64,14 +64,6 @@ class _FakeAuthDatasource implements AuthDatasource {
     required String email,
     required String contrasena,
     required String imagenDocumento,
-  }) => throw UnimplementedError();
-
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
   }) => throw UnimplementedError();
 }
 

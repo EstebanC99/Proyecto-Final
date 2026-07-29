@@ -50,6 +50,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IAlertaBienestarBusinessService, AlertaBienestarBusinessService>();
             services.AddScoped<ICrearCredencialesBusinessService, CrearCredencialesBusinessService>();
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
+            services.AddScoped<IEliminarCuentaBusinessService, EliminarCuentaBusinessService>();
             services.AddScoped<IEnvioEmailBusinessService, EnvioEmailBusinessService>();
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();

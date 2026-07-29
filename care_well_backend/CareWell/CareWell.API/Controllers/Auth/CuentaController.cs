@@ -14,16 +14,19 @@ namespace CareWell.API.Controllers.Auth
         private ICrearCredencialesBusinessService CrearCredencialesBusinessService { get; set; }
         private IVerificacionEmailBusinessService VerificacionEmailBusinessService { get; set; }
         private IRecuperacionContrasenaBusinessService RecuperacionContrasenaBusinessService { get; set; }
+        private IEliminarCuentaBusinessService EliminarCuentaBusinessService { get; set; }
 
         public CuentaController(ICrearCuentaBusinessService crearCuentaBusinessService,
                                 ICrearCredencialesBusinessService crearCredencialesBusinessService,
                                 IVerificacionEmailBusinessService verificacionEmailBusinessService,
-                                IRecuperacionContrasenaBusinessService recuperacionContrasenaBusinessService)
+                                IRecuperacionContrasenaBusinessService recuperacionContrasenaBusinessService,
+                                IEliminarCuentaBusinessService eliminarCuentaBusinessService)
         {
             this.CrearCuentaBusinessService = crearCuentaBusinessService;
             this.CrearCredencialesBusinessService = crearCredencialesBusinessService;
             this.VerificacionEmailBusinessService = verificacionEmailBusinessService;
             this.RecuperacionContrasenaBusinessService = recuperacionContrasenaBusinessService;
+            this.EliminarCuentaBusinessService = eliminarCuentaBusinessService;
         }
 
         [HttpPost("crear")]
@@ -60,6 +63,12 @@ namespace CareWell.API.Controllers.Auth
         public void ConfirmarResetContrasena([FromBody] ConfirmarResetContrasenaCommand command)
         {
             this.RecuperacionContrasenaBusinessService.ConfirmarReset(command);
+        }
+
+        [HttpPost("eliminar-cuenta")]
+        public void EliminarCuenta()
+        {
+            this.EliminarCuentaBusinessService.Eliminar();
         }
     }
 }

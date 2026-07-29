@@ -48,7 +48,7 @@ class _FakeAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async {}
   @override
-  Future<void> eliminarCuenta(int usuarioId) async {}
+  Future<void> eliminarCuenta() async {}
   @override
   Future<void> cambiarContrasena({
     required int usuarioId,
@@ -66,13 +66,6 @@ class _FakeAuthRepository implements AuthRepository {
     required String contrasena,
     required String imagenDocumento,
   }) async {}
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
-  }) async => _usuario;
 }
 
 Widget _wrapWithUser(Widget child, {bool contrasenaCorrecta = true}) {

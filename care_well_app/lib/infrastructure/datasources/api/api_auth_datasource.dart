@@ -52,13 +52,9 @@ class ApiAuthDatasource implements AuthDatasource {
           'email': data.email,
           'telefono': data.telefono ?? '',
           'contrasena': data.contrasena,
-          // Foto del documento en base64 estándar (sin prefijo data-URI).
-          // Obligatoria: el backend valida identidad contra ella.
           'imagenDocumento': data.imagenDocumento,
-          // Foto de perfil en base64 estándar (opcional): se omite si es null.
           'imagen': ?data.imagen,
         },
-        // La validación de identidad con IA es síncrona y puede demorar.
         options: Options(
           receiveTimeout: ApiConfig.receiveTimeoutValidacionIdentidad,
         ),
@@ -68,8 +64,6 @@ class ApiAuthDatasource implements AuthDatasource {
     }
   }
 
-  // ── reenviarCodigoVerificacion ───────────────────────────────────────────────
-
   @override
   Future<void> reenviarCodigoVerificacion(String email) async {
     try {
@@ -78,8 +72,6 @@ class ApiAuthDatasource implements AuthDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
-
-  // ── verificarEmail ───────────────────────────────────────────────────────────
 
   @override
   Future<void> verificarEmail(String email, String codigo) async {
@@ -98,19 +90,16 @@ class ApiAuthDatasource implements AuthDatasource {
     await _tokenStorage.clear();
   }
 
-  // ── eliminarCuenta ───────────────────────────────────────────────────────────
-
   @override
-  Future<void> eliminarCuenta(int usuarioId) async {
-    // TODO: endpoint pendiente en el backend. Limpiar storage igual para
-    // que la sesión quede cerrada aunque el servidor no lo procese aún.
-    await _tokenStorage.clear();
-    throw UnimplementedError(
-      'TODO: endpoint de eliminación de cuenta pendiente en el backend.',
-    );
+  Future<void> eliminarCuenta() async {
+    try {
+      await _dio.post(
+        ApiConfig.eliminarCuentaPath
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
   }
-
-  // ── cambiarContrasena ────────────────────────────────────────────────────────
 
   @override
   Future<void> cambiarContrasena({
@@ -124,8 +113,6 @@ class ApiAuthDatasource implements AuthDatasource {
     );
   }
 
-  // ── solicitarRecuperacionContrasena ──────────────────────────────────────────
-
   @override
   Future<void> solicitarRecuperacionContrasena(String email) async {
     try {
@@ -137,8 +124,6 @@ class ApiAuthDatasource implements AuthDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
-
-  // ── confirmarResetContrasena ─────────────────────────────────────────────────
 
   @override
   Future<void> confirmarResetContrasena({
@@ -160,8 +145,6 @@ class ApiAuthDatasource implements AuthDatasource {
     }
   }
 
-  // ── crearCredenciales ────────────────────────────────────────────────────────
-
   @override
   Future<void> crearCredenciales({
     required String email,
@@ -174,10 +157,8 @@ class ApiAuthDatasource implements AuthDatasource {
         data: {
           'email': email,
           'contrasena': contrasena,
-          // Foto del documento en base64 estándar (sin prefijo data-URI).
           'imagenDocumento': imagenDocumento,
         },
-        // La validación de identidad con IA es síncrona y puede demorar.
         options: Options(
           receiveTimeout: ApiConfig.receiveTimeoutValidacionIdentidad,
         ),
@@ -185,20 +166,5 @@ class ApiAuthDatasource implements AuthDatasource {
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
     }
-  }
-
-  // ── actualizarPerfil ─────────────────────────────────────────────────────────
-
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
-  }) async {
-    // TODO: endpoint pendiente en el backend.
-    throw UnimplementedError(
-      'TODO: endpoint de actualización de perfil pendiente en el backend.',
-    );
   }
 }

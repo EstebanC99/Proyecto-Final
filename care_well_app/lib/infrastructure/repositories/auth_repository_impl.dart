@@ -41,8 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() => _datasource.logout();
 
   @override
-  Future<void> eliminarCuenta(int usuarioId) =>
-      _datasource.eliminarCuenta(usuarioId);
+  Future<void> eliminarCuenta() => _datasource.eliminarCuenta();
 
   @override
   Future<void> cambiarContrasena({
@@ -64,18 +63,5 @@ class AuthRepositoryImpl implements AuthRepository {
     email: email,
     contrasena: contrasena,
     imagenDocumento: imagenDocumento,
-  );
-
-  @override
-  Future<Usuario> actualizarPerfil({
-    required int usuarioId,
-    String? email,
-    String? telefono,
-    String? documento,
-  }) => _datasource.actualizarPerfil(
-    usuarioId: usuarioId,
-    email: email,
-    telefono: telefono,
-    documento: documento,
   );
 }
