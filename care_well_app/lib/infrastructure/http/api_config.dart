@@ -66,6 +66,8 @@ class ApiConfig {
       '/api/AdministrarHabitoVida/modificar-realizacion';
   static const eliminarRealizacionHabitoPath =
       '/api/AdministrarHabitoVida/eliminar-realizacion';
+  static const obtenerTiposHabitosVidaPath =
+      '/api/AdministrarTipoHabitoVida/obtener-todos';
 
   static const obtenerEventosSaludPath =
       '/api/AdministrarEventoSalud/obtener-todos';

@@ -1,7 +1,6 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/infrastructure/models/models.dart';
 
-/// Convierte entre [TipoHabitoModel] y [TipoHabito].
 class TipoHabitoMapper {
   TipoHabitoMapper._();
 

@@ -97,6 +97,10 @@ final lineaTiempoSaludDatasourceProvider = Provider<LineaTiempoSaludDatasource>(
   },
 );
 
+final tipoHabitoVidaDatasourceProvider = Provider<TipoHabitoVidaDatasource>(
+  (ref) => ApiTipoHabitoVidaDatasource(ref.watch(dioClientProvider)),
+);
+
 //endregion
 
 //region Repositories Providers
@@ -158,6 +162,10 @@ final lineaTiempoSaludRepositoryProvider = Provider<LineaTiempoSaludRepository>(
   (ref) => LineaTiempoSaludRepositoryImpl(
     ref.watch(lineaTiempoSaludDatasourceProvider),
   ),
+);
+
+final tipoHabitoVidaRepositoryProvider = Provider<TipoHabitoVidaRepository>(
+  (ref) => TipoHabitoVidaRepositoryImpl(ref.watch(tipoHabitoVidaDatasourceProvider)),
 );
 
 //endregion

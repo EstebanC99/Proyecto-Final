@@ -33,6 +33,7 @@ namespace CareWell.Repository
             services.AddScoped<IPersonaEstadoAnimoRepository, PersonaEstadoAnimoRepository>();
             services.AddScoped<IPersonaRepository, PersonaRepository>();
             services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
+            services.AddScoped<ITipoHabitoVidaRepository, TipoHabitoVidaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
             #endregion

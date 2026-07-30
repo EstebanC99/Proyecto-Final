@@ -12,3 +12,4 @@ export 'habito_vida_repository_impl.dart';
 export 'linea_tiempo_salud_repository_impl.dart';
 export 'persona_repository_impl.dart';
 export 'settings_repository_impl.dart';
+export 'tipo_habito_vida_repository_impl.dart';

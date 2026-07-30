@@ -5,6 +5,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
+import '../../widgets/widgets.dart';
 
 /// Formulario para registrar o editar un hábito de vida (US-28b y US-28c).
 ///
@@ -22,28 +23,8 @@ class HabitFormScreen extends ConsumerStatefulWidget {
 }
 
 class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
-  // Lista estática de tipos de hábito disponibles (reemplaza TipoHabito.values).
-  static final _tiposHabito = [
-    TipoHabitoVida(
-      id: TiposHabitoConst.actividadFisica,
-      descripcion: 'Actividad física',
-    ),
-    TipoHabitoVida(
-      id: TiposHabitoConst.alimentacion,
-      descripcion: 'Alimentación',
-    ),
-    TipoHabitoVida(id: TiposHabitoConst.sueno, descripcion: 'Sueño'),
-    TipoHabitoVida(
-      id: TiposHabitoConst.hidratacion,
-      descripcion: 'Hidratación',
-    ),
-    TipoHabitoVida(id: TiposHabitoConst.otro, descripcion: 'Bienestar'),
-  ];
-
-  TipoHabitoVida _tipo = TipoHabitoVida(
-    id: TiposHabitoConst.alimentacion,
-    descripcion: 'Alimentación',
-  );
+  /// Id del tipo seleccionado. `null` hasta que carga el catálogo.
+  int? _tipoId;
   final _descripcionCtrl = TextEditingController();
   bool _loading = false;
   bool _precargado = false;
@@ -65,7 +46,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
       final habito = await ref.read(habitoByIdProvider(widget.habitId!).future);
       if (habito != null && mounted) {
         setState(() {
-          _tipo = habito.tipo;
+          _tipoId = habito.tipo.id;
           _descripcionCtrl.text = habito.descripcion;
           _precargado = true;
         });
@@ -82,7 +63,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   }
 
   String get _placeholder {
-    switch (_tipo.id) {
+    switch (_tipoId) {
       case TiposHabitoConst.actividadFisica:
         return 'Ej. Caminata de 30 minutos por el parque.';
       case TiposHabitoConst.alimentacion:
@@ -98,13 +79,14 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
 
   Future<void> _guardar() async {
     final desc = _descripcionCtrl.text.trim();
-    if (desc.isEmpty) return;
+    final tipoId = _tipoId;
+    if (desc.isEmpty || tipoId == null) return;
     setState(() => _loading = true);
     try {
       if (_esEdicion) {
         await ref.read(modificarHabitoProvider)(
           habitoId: widget.habitId!,
-          tipoId: _tipo.id,
+          tipoId: tipoId,
           descripcion: desc,
         );
         if (mounted) {
@@ -114,10 +96,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
           );
         }
       } else {
-        await ref.read(crearHabitoProvider)(
-          tipoId: _tipo.id,
-          descripcion: desc,
-        );
+        await ref.read(crearHabitoProvider)(tipoId: tipoId, descripcion: desc);
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -142,6 +121,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   @override
   Widget build(BuildContext context) {
     final tieneDescripcion = _descripcionCtrl.text.trim().isNotEmpty;
+    final tiposAsync = ref.watch(tiposHabitoVidaProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -159,30 +139,56 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             // Categoría
             const _SectionLabel('Categoría'),
             const SizedBox(height: AppSpacing.sm),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _tiposHabito.map((t) {
-                  final selected = t.id == _tipo.id;
-                  final label = _labelTipo(t);
-                  return Padding(
-                    padding: const EdgeInsets.only(right: AppSpacing.sm),
-                    child: ChoiceChip(
-                      label: Text(label),
-                      selected: selected,
-                      onSelected: (_) => setState(() {
-                        _tipo = t;
-                        _descripcionCtrl.clear();
-                      }),
-                      selectedColor: AppColors.habitsAccent,
-                      labelStyle: TextStyle(
-                        color: selected ? Colors.white : AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  );
-                }).toList(),
+            tiposAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                child: SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
               ),
+              error: (err, _) => InlineErrorBanner(
+                message: 'No se pudieron cargar los tipos de hábito. $err',
+              ),
+              data: (tipos) {
+                if (tipos.isEmpty) {
+                  return const Text(
+                    'No hay tipos de hábito disponibles.',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  );
+                }
+                // Selección por defecto: primer tipo del catálogo.
+                _tipoId ??= tipos.first.id;
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: tipos.map((t) {
+                      final selected = t.id == _tipoId;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: AppSpacing.sm),
+                        child: ChoiceChip(
+                          label: Text(t.descripcion),
+                          selected: selected,
+                          onSelected: _loading
+                              ? null
+                              : (_) => setState(() {
+                                  _tipoId = t.id;
+                                  _descripcionCtrl.clear();
+                                }),
+                          selectedColor: AppColors.habitsAccent,
+                          labelStyle: TextStyle(
+                            color: selected
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -219,7 +225,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               width: double.infinity,
               height: AppSpacing.buttonHeight,
               child: FilledButton(
-                onPressed: (_loading || !tieneDescripcion) ? null : _guardar,
+                onPressed: (_loading || !tieneDescripcion || _tipoId == null)
+                    ? null
+                    : _guardar,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.habitsAccent,
                   shape: RoundedRectangleBorder(
@@ -249,8 +257,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
       ),
     );
   }
-
-  static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
 }
 
 class _SectionLabel extends StatelessWidget {

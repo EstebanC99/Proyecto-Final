@@ -20,7 +20,6 @@ export 'health/habito_vida_realizacion_model.dart';
 export 'health/nota_evento_salud_model.dart';
 export 'health/persona_estado_animo_model.dart';
 export 'health/tipo_evento_salud_model.dart';
-export 'health/tipo_habito_model.dart';
 export 'settings/configuracion_model.dart';
 export 'shared/entidad_basica_model.dart';
 export 'shared/persona_model.dart';
