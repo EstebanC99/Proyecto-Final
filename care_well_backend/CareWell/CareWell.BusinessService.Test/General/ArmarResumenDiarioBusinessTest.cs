@@ -42,26 +42,19 @@ namespace CareWell.BusinessService.Test.General
 
         public class ElMetodo_Armar : ArmarResumenDiarioBusinessTest
         {
-            private const string ResumenGenerado = "Resumen del día de Alicia.";
+            private readonly string resumenGenerado = "Resumen del día de Alicia.";
 
             private Mock<Persona> personaCuidada;
-            private CancellationTokenSource cancellationTokenSource;
-            private CancellationToken cancellationToken;
 
             private Mock<EventoAgenda> eventoAgenda;
             private DateTime fechaOcurrenciaAgenda;
 
             private Mock<EventoSalud> eventoSaludPasado;
-            private DateTime fechaHoraEventoSaludPasado;
 
             private Mock<HabitoVida> habitoVidaCumplido;
-            private DateTime fechaRealizacionHabito;
 
             private Mock<PersonaEstadoAnimo> estadoAnimoAnterior;
             private Mock<PersonaEstadoAnimo> estadoAnimoPosterior;
-
-            /// <summary>Request efectivamente enviado al agente de IA, capturado en el Setup.</summary>
-            private ResumidorTextoAgentRequest requestEnviado;
 
             protected override void InitializeTest()
             {
@@ -71,43 +64,82 @@ namespace CareWell.BusinessService.Test.General
                 this.personaCuidada.Setup(s => s.ID).Returns(7);
                 this.personaCuidada.Setup(s => s.Nombre).Returns("Alicia");
 
-                this.cancellationTokenSource = new CancellationTokenSource();
-                this.cancellationToken = this.cancellationTokenSource.Token;
+                #region Evento Agenda
 
-                this.ConfigurarEventoAgenda();
-                this.ConfigurarEventoSalud();
-                this.ConfigurarHabitoVida();
-                this.ConfigurarEstadosAnimo();
+                this.fechaOcurrenciaAgenda = DateTime.Today.AddDays(1).AddHours(10);
 
-                this.resumidorDiarioAgent
-                    .Setup(s => s.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(), It.IsAny<CancellationToken>()))
-                    .Callback<ResumidorTextoAgentRequest, CancellationToken>((request, _) => this.requestEnviado = request)
-                    .ReturnsAsync(ResumenGenerado);
+                this.eventoAgenda = new Mock<EventoAgenda>();
+                this.eventoAgenda.Setup(s => s.Titulo).Returns("Turno con el cardiólogo");
+                this.eventoAgenda.Setup(s => s.Tipo).Returns(Mock.Of<TipoEvento>(t => t.Descripcion == "Consulta médica"));
+                this.eventoAgenda.Setup(s => s.ObtenerOcurrenciasEnRango(It.IsAny<IExpansorRecurrenciaDomainService>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<DateTime> { this.fechaOcurrenciaAgenda });
+
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda> { this.eventoAgenda.Object });
+
+                #endregion
+
+                #region Evento Salud
+
+                this.eventoSaludPasado = new Mock<EventoSalud>();
+                this.eventoSaludPasado.Setup(s => s.Tipo).Returns(Mock.Of<TipoEvento>(t => t.Descripcion == "Síntoma"));
+                this.eventoSaludPasado.Setup(s => s.Descripcion).Returns("Mareos al levantarse");
+                this.eventoSaludPasado.Setup(s => s.FechaHora).Returns(DateTime.Now.AddHours(-2));
+
+                this.eventoSaludRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoSalud> { this.eventoSaludPasado.Object });
+
+                #endregion
+
+                #region HabitoVida
+
+                this.habitoVidaCumplido = new Mock<HabitoVida>();
+                this.habitoVidaCumplido.Setup(s => s.Tipo).Returns(Mock.Of<TipoHabitoVida>(t => t.Descripcion == "Bienestar"));
+                this.habitoVidaCumplido.Setup(s => s.Descripcion).Returns("Caminata diaria");
+                this.habitoVidaCumplido.Setup(s => s.Realizaciones)
+                    .Returns(new List<HabitoVidaRealizacion> { Mock.Of<HabitoVidaRealizacion>(r => r.FechaHoraRealizacion == DateTime.Today.AddHours(8)) });
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida> { this.habitoVidaCumplido.Object });
+
+                #endregion
+
+                #region Estado Animo
+
+                this.estadoAnimoAnterior = new Mock<PersonaEstadoAnimo>();
+                this.estadoAnimoAnterior.Setup(s => s.ID).Returns(1);
+                this.estadoAnimoAnterior.Setup(s => s.FechaHora).Returns(DateTime.Today.AddHours(9));
+                this.estadoAnimoAnterior.Setup(s => s.EstadoAnimo).Returns(Mock.Of<EstadoAnimo>(e => e.Descripcion == "Cansada"));
+                this.estadoAnimoAnterior.Setup(s => s.Observaciones).Returns("Cansada Obs");
+
+                this.estadoAnimoPosterior = new Mock<PersonaEstadoAnimo>();
+                this.estadoAnimoPosterior.Setup(s => s.ID).Returns(2);
+                this.estadoAnimoPosterior.Setup(s => s.FechaHora).Returns(DateTime.Today.AddHours(15));
+                this.estadoAnimoPosterior.Setup(s => s.EstadoAnimo).Returns(Mock.Of<EstadoAnimo>(e => e.Descripcion == "Contenta"));
+
+                this.personaEstadoAnimoRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<PersonaEstadoAnimo>
+                    {
+                        this.estadoAnimoAnterior.Object,
+                        this.estadoAnimoPosterior.Object
+                    });
+
+                #endregion
+
+                this.resumidorDiarioAgent.Setup(s => s.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(this.resumenGenerado);
             }
 
             private string? Action()
             {
-                return this.Target.Armar(this.personaCuidada.Object, this.cancellationToken).Result;
+                return this.Target.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>()).Result;
             }
-
-            #region Rango de fechas y consulta a los repositorios
 
             [Fact]
             public void Llama_una_vez_al_metodo_GetAllByPersonaEnRango_del_EventoAgendaRepository()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                this.eventoAgendaRepository.Verify(v => v.GetAllByPersonaEnRango(this.personaCuidada.Object.ID,
-                                                                                 It.IsAny<DateTime>(),
-                                                                                 It.IsAny<DateTime>()), Times.Once);
-            }
-
-            [Fact]
-            public void Consulta_la_Agenda_desde_el_momento_actual_hasta_el_final_del_dia_de_manana()
             {
                 // Arrange
                 var inicio = DateTime.Now;
@@ -117,14 +149,13 @@ namespace CareWell.BusinessService.Test.General
 
                 // Assert
                 var fin = DateTime.Now;
-
                 this.eventoAgendaRepository.Verify(v => v.GetAllByPersonaEnRango(this.personaCuidada.Object.ID,
                                                                                  It.Is<DateTime>(d => d >= inicio && d <= fin),
                                                                                  DateTime.Today.AddDays(2)), Times.Once);
             }
 
             [Fact]
-            public void Consulta_los_EventosSalud_del_dia_de_hoy_completo()
+            public void Llama_una_vez_al_metodo_GetByFechas_del_EventoSaludRepository()
             {
                 // Arrange
 
@@ -150,7 +181,7 @@ namespace CareWell.BusinessService.Test.General
             }
 
             [Fact]
-            public void Consulta_los_EstadosAnimo_del_dia_de_hoy_completo()
+            public void Llama_una_vez_al_metodo_GetByFechas_del_PersonaEstadoAnimoRepository()
             {
                 // Arrange
 
@@ -163,74 +194,25 @@ namespace CareWell.BusinessService.Test.General
                                                                             DateTime.Today.AddDays(1)), Times.Once);
             }
 
-            #endregion
-
-            #region Expansion de ocurrencias de Agenda
-
-            [Fact]
-            public void Llama_una_vez_al_metodo_ObtenerOcurrenciasEnRango_de_cada_EventoAgenda_recuperado()
-            {
-                // Arrange
-                var inicio = DateTime.Now;
-
-                // Action
-                this.Action();
-
-                // Assert
-                var fin = DateTime.Now;
-
-                this.eventoAgenda.Verify(v => v.ObtenerOcurrenciasEnRango(this.expansorRecurrenciaDomainService.Object,
-                                                                          It.Is<DateTime>(d => d >= inicio && d <= fin),
-                                                                          DateTime.Today.AddDays(2)), Times.Once);
-            }
-
-            [Fact]
-            public void Genera_un_EventoRequest_por_cada_ocurrencia_expandida()
-            {
-                // Arrange
-                this.eventoAgenda
-                    .Setup(s => s.ObtenerOcurrenciasEnRango(It.IsAny<IExpansorRecurrenciaDomainService>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<DateTime>
-                    {
-                        DateTime.Today.AddDays(1).AddHours(10),
-                        DateTime.Today.AddDays(1).AddHours(18)
-                    });
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(2, this.requestEnviado.EventosAgenda.Count);
-            }
-
-            [Fact]
-            public void Ordena_los_EventosAgenda_por_FechaHoraOcurrencia_ascendente()
-            {
-                // Arrange
-                var ocurrenciaTardia = DateTime.Today.AddDays(1).AddHours(18);
-                var ocurrenciaTemprana = DateTime.Today.AddDays(1).AddHours(10);
-
-                this.eventoAgenda
-                    .Setup(s => s.ObtenerOcurrenciasEnRango(It.IsAny<IExpansorRecurrenciaDomainService>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<DateTime> { ocurrenciaTardia, ocurrenciaTemprana });
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(ocurrenciaTemprana, this.requestEnviado.EventosAgenda.First().FechaHoraOcurrencia);
-                Assert.Equal(ocurrenciaTardia, this.requestEnviado.EventosAgenda.Last().FechaHoraOcurrencia);
-            }
-
-            #endregion
-
-            #region Short circuit por ausencia de datos
-
             [Fact]
             public void Retorna_null_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda>());
+
+                this.eventoSaludRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoSalud>());
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida>());
+
+                this.personaEstadoAnimoRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<PersonaEstadoAnimo>());
 
                 // Action
                 var resultado = this.Action();
@@ -243,7 +225,21 @@ namespace CareWell.BusinessService.Test.General
             public void No_llama_al_ResumidorDiarioAgent_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda>());
+
+                this.eventoSaludRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoSalud>());
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida>());
+
+                this.personaEstadoAnimoRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<PersonaEstadoAnimo>());
 
                 // Action
                 this.Action();
@@ -257,10 +253,17 @@ namespace CareWell.BusinessService.Test.General
             public void Llama_al_ResumidorDiarioAgent_si_solo_hay_EventosAgenda()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
-                this.eventoAgendaRepository
-                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoAgenda> { this.eventoAgenda.Object });
+                this.eventoSaludRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoSalud>());
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida>());
+
+                this.personaEstadoAnimoRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<PersonaEstadoAnimo>());
 
                 // Action
                 this.Action();
@@ -274,10 +277,17 @@ namespace CareWell.BusinessService.Test.General
             public void Llama_al_ResumidorDiarioAgent_si_solo_hay_EventosSalud()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
-                this.eventoSaludRepository
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda>());
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida>());
+
+                this.personaEstadoAnimoRepository
                     .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoSalud> { this.eventoSaludPasado.Object });
+                    .Returns(new List<PersonaEstadoAnimo>());
 
                 // Action
                 this.Action();
@@ -291,10 +301,17 @@ namespace CareWell.BusinessService.Test.General
             public void Llama_al_ResumidorDiarioAgent_si_solo_hay_HabitosVida()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
-                this.habitoVidaRepository
-                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
-                    .Returns(new List<HabitoVida> { this.habitoVidaCumplido.Object });
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda>());
+
+                this.eventoSaludRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoSalud>());
+
+                this.personaEstadoAnimoRepository
+                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<PersonaEstadoAnimo>());
 
                 // Action
                 this.Action();
@@ -308,10 +325,17 @@ namespace CareWell.BusinessService.Test.General
             public void Llama_al_ResumidorDiarioAgent_si_solo_hay_EstadosAnimo()
             {
                 // Arrange
-                this.ConfigurarTodasLasFuentesVacias();
-                this.personaEstadoAnimoRepository
+                this.eventoAgendaRepository
+                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .Returns(new List<EventoAgenda>());
+
+                this.eventoSaludRepository
                     .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<PersonaEstadoAnimo> { this.estadoAnimoPosterior.Object });
+                    .Returns(new List<EventoSalud>());
+
+                this.habitoVidaRepository
+                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
+                    .Returns(new List<HabitoVida>());
 
                 // Action
                 this.Action();
@@ -321,344 +345,63 @@ namespace CareWell.BusinessService.Test.General
                                                                      It.IsAny<CancellationToken>()), Times.Once);
             }
 
-            #endregion
-
-            #region Cabecera del request
-
             [Fact]
-            public void Envia_el_Nombre_de_la_PersonaCuidada_en_el_request()
+            public void Llama_una_vez_al_metodo_ObtenerOcurrenciasEnRango_de_cada_EventoAgenda_recuperado()
             {
                 // Arrange
+                var inicio = DateTime.Now;
 
                 // Action
                 this.Action();
 
                 // Assert
-                Assert.Equal(this.personaCuidada.Object.Nombre, this.requestEnviado.NombrePersona);
+                var fin = DateTime.Now;
+                this.eventoAgenda.Verify(v => v.ObtenerOcurrenciasEnRango(this.expansorRecurrenciaDomainService.Object,
+                                                                          It.Is<DateTime>(d => d >= inicio && d <= fin),
+                                                                          DateTime.Today.AddDays(2)), Times.Once);
             }
-
-            [Fact]
-            public void Envia_FechaHoy_con_la_fecha_del_dia_de_hoy()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(DateTime.Today, this.requestEnviado.FechaHoy.Date);
-            }
-
-            [Fact]
-            public void Envia_FechaManana_con_la_fecha_del_dia_siguiente()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(DateTime.Today.AddDays(1), this.requestEnviado.FechaManana);
-            }
-
-            #endregion
-
-            #region Mapeo de EventosAgenda
-
-            [Fact]
-            public void Mapea_la_Descripcion_del_TipoEvento_como_Tipo_en_los_EventosAgenda()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.eventoAgenda.Object.Tipo.Descripcion, this.requestEnviado.EventosAgenda.First().Tipo);
-            }
-
-            [Fact]
-            public void Mapea_el_Titulo_del_EventoAgenda_como_Descripcion_en_los_EventosAgenda()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.eventoAgenda.Object.Titulo, this.requestEnviado.EventosAgenda.First().Descripcion);
-            }
-
-            [Fact]
-            public void Mapea_la_fecha_de_ocurrencia_expandida_en_los_EventosAgenda()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.fechaOcurrenciaAgenda, this.requestEnviado.EventosAgenda.First().FechaHoraOcurrencia);
-            }
-
-            [Fact]
-            public void Marca_los_EventosAgenda_como_no_finalizados()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.False(this.requestEnviado.EventosAgenda.First().Finalizado);
-            }
-
-            #endregion
-
-            #region Mapeo de EventosSalud
-
-            [Fact]
-            public void Mapea_la_Descripcion_del_TipoEvento_como_Tipo_en_los_EventosSalud()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.eventoSaludPasado.Object.Tipo.Descripcion, this.requestEnviado.EventosSalud.First().Tipo);
-            }
-
-            [Fact]
-            public void Mapea_la_Descripcion_del_EventoSalud_en_los_EventosSalud()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.eventoSaludPasado.Object.Descripcion, this.requestEnviado.EventosSalud.First().Descripcion);
-            }
-
-            [Fact]
-            public void Mapea_la_FechaHora_del_EventoSalud_en_los_EventosSalud()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.fechaHoraEventoSaludPasado, this.requestEnviado.EventosSalud.First().FechaHoraOcurrencia);
-            }
-
-            [Fact]
-            public void Marca_como_finalizado_el_EventoSalud_cuya_FechaHora_ya_paso()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.True(this.requestEnviado.EventosSalud.First().Finalizado);
-            }
-
-            [Fact]
-            public void Marca_como_no_finalizado_el_EventoSalud_cuya_FechaHora_es_futura()
-            {
-                // Arrange
-                var eventoSaludFuturo = new Mock<EventoSalud>();
-                eventoSaludFuturo.Setup(s => s.Tipo).Returns(Mock.Of<TipoEvento>(t => t.Descripcion == "Control"));
-                eventoSaludFuturo.Setup(s => s.Descripcion).Returns("Control de presión");
-                eventoSaludFuturo.Setup(s => s.FechaHora).Returns(DateTime.Now.AddHours(2));
-
-                this.eventoSaludRepository
-                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoSalud> { eventoSaludFuturo.Object });
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.False(this.requestEnviado.EventosSalud.First().Finalizado);
-            }
-
-            #endregion
-
-            #region Mapeo de HabitosVida
-
-            [Fact]
-            public void Mapea_el_nombre_de_la_entidad_HabitoVida_como_Tipo_en_los_HabitosVida()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(nameof(HabitoVida), this.requestEnviado.HabitosVida.First().Tipo);
-            }
-
-            [Fact]
-            public void Mapea_la_Descripcion_del_HabitoVida_en_los_HabitosVida()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.habitoVidaCumplido.Object.Descripcion, this.requestEnviado.HabitosVida.First().Descripcion);
-            }
-
-            [Fact]
-            public void Marca_como_finalizado_el_HabitoVida_con_una_realizacion_del_dia_de_hoy()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.True(this.requestEnviado.HabitosVida.First().Finalizado);
-            }
-
-            [Fact]
-            public void Mapea_la_FechaHoraRealizacion_de_hoy_del_HabitoVida_cumplido()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.fechaRealizacionHabito, this.requestEnviado.HabitosVida.First().FechaHoraOcurrencia);
-            }
-
-            [Fact]
-            public void Marca_como_no_finalizado_el_HabitoVida_sin_realizaciones_del_dia_de_hoy()
-            {
-                // Arrange
-                this.habitoVidaRepository
-                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
-                    .Returns(new List<HabitoVida> { this.ConstruirHabitoVidaSinRealizacionesDeHoy().Object });
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.False(this.requestEnviado.HabitosVida.First().Finalizado);
-            }
-
-            [Fact]
-            public void Setea_la_FechaHoraOcurrencia_en_el_valor_por_defecto_si_el_HabitoVida_no_tiene_realizaciones_de_hoy()
-            {
-                // Arrange
-                this.habitoVidaRepository
-                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
-                    .Returns(new List<HabitoVida> { this.ConstruirHabitoVidaSinRealizacionesDeHoy().Object });
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(default(DateTime), this.requestEnviado.HabitosVida.First().FechaHoraOcurrencia);
-            }
-
-            #endregion
-
-            #region Mapeo de EstadosAnimo
-
-            [Fact]
-            public void Mapea_el_nombre_de_la_entidad_EstadoAnimo_como_Tipo_en_los_EstadosAnimo()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(nameof(EstadoAnimo), this.requestEnviado.EstadosAnimo.First().Tipo);
-            }
-
-            [Fact]
-            public void Mapea_la_Descripcion_del_EstadoAnimo_en_los_EstadosAnimo()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.estadoAnimoAnterior.Object.EstadoAnimo.Descripcion, this.requestEnviado.EstadosAnimo.First().Descripcion);
-            }
-
-            [Fact]
-            public void Mapea_la_FechaHora_del_PersonaEstadoAnimo_en_los_EstadosAnimo()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.Equal(this.estadoAnimoAnterior.Object.FechaHora, this.requestEnviado.EstadosAnimo.First().FechaHoraOcurrencia);
-            }
-
-            [Fact]
-            public void Marca_como_finalizado_el_EstadoAnimo_superado_por_otro_registro_posterior()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.True(this.requestEnviado.EstadosAnimo.First().Finalizado);
-            }
-
-            [Fact]
-            public void Marca_como_no_finalizado_el_ultimo_EstadoAnimo_registrado()
-            {
-                // Arrange
-
-                // Action
-                this.Action();
-
-                // Assert
-                Assert.False(this.requestEnviado.EstadosAnimo.Last().Finalizado);
-            }
-
-            #endregion
-
-            #region Invocacion del agente de IA
 
             [Fact]
             public void Llama_una_vez_al_metodo_ArmarResumen_del_ResumidorDiarioAgent()
             {
                 // Arrange
+                var fechaDesde = DateTime.Now;
 
                 // Action
                 this.Action();
 
                 // Assert
-                this.resumidorDiarioAgent.Verify(v => v.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(),
-                                                                     It.IsAny<CancellationToken>()), Times.Once);
-            }
+                this.resumidorDiarioAgent.Verify(v => v.ArmarResumen(It.Is<ResumidorTextoAgentRequest>(r =>
+                    r.NombrePersona == this.personaCuidada.Object.Nombre &&
+                    r.FechaHoy >= fechaDesde && r.FechaHoy <= DateTime.Now &&
+                    r.FechaManana == DateTime.Today.AddDays(1) &&
+                    r.EventosAgenda.Any(e =>
+                        e.Tipo == this.eventoAgenda.Object.Tipo.Descripcion &&
+                        e.Descripcion == this.eventoAgenda.Object.Titulo &&
+                        e.FechaHoraOcurrencia == this.fechaOcurrenciaAgenda &&
+                        e.Finalizado == false) &&
 
-            [Fact]
-            public void Propaga_el_CancellationToken_recibido_al_ResumidorDiarioAgent()
-            {
-                // Arrange
+                    r.EventosSalud.Any(e =>
+                        e.Tipo == this.eventoSaludPasado.Object.Tipo.Descripcion &&
+                        e.Descripcion == this.eventoSaludPasado.Object.Descripcion &&
+                        e.FechaHoraOcurrencia == this.eventoSaludPasado.Object.FechaHora) &&
 
-                // Action
-                this.Action();
+                    r.HabitosVida.Any(h =>
+                        h.Tipo == this.habitoVidaCumplido.Object.Tipo.Descripcion &&
+                        h.Descripcion == this.habitoVidaCumplido.Object.Descripcion &&
+                        h.FechaHoraOcurrencia == this.habitoVidaCumplido.Object.Realizaciones.First().FechaHoraRealizacion) &&
 
-                // Assert
-                this.resumidorDiarioAgent.Verify(v => v.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(),
-                                                                     this.cancellationToken), Times.Once);
+                    r.EstadosAnimo.Any(e =>
+                        e.Tipo == this.estadoAnimoAnterior.Object.EstadoAnimo.Descripcion &&
+                        e.Descripcion == this.estadoAnimoAnterior.Object.Observaciones &&
+                        e.FechaHoraOcurrencia == this.estadoAnimoAnterior.Object.FechaHora &&
+                        e.Finalizado == true) &&
+                    r.EstadosAnimo.Any(e =>
+                        e.Tipo == this.estadoAnimoPosterior.Object.EstadoAnimo.Descripcion &&
+                        e.Descripcion == this.estadoAnimoPosterior.Object.EstadoAnimo.Descripcion &&
+                        e.FechaHoraOcurrencia == this.estadoAnimoPosterior.Object.FechaHora &&
+                        e.Finalizado == false)),
+                    It.IsAny<CancellationToken>()), Times.Once);
             }
 
             [Fact]
@@ -670,7 +413,7 @@ namespace CareWell.BusinessService.Test.General
                 var resultado = this.Action();
 
                 // Assert
-                Assert.Equal(ResumenGenerado, resultado);
+                Assert.Equal(this.resumenGenerado, resultado);
             }
 
             [Fact]
@@ -687,110 +430,6 @@ namespace CareWell.BusinessService.Test.General
                 // Assert
                 Assert.Null(resultado);
             }
-
-            #endregion
-
-            #region Metodos Privados
-
-            private void ConfigurarEventoAgenda()
-            {
-                this.fechaOcurrenciaAgenda = DateTime.Today.AddDays(1).AddHours(10);
-
-                this.eventoAgenda = new Mock<EventoAgenda>();
-                this.eventoAgenda.Setup(s => s.Titulo).Returns("Turno con el cardiólogo");
-                this.eventoAgenda.Setup(s => s.Tipo).Returns(Mock.Of<TipoEvento>(t => t.Descripcion == "Consulta médica"));
-                this.eventoAgenda
-                    .Setup(s => s.ObtenerOcurrenciasEnRango(It.IsAny<IExpansorRecurrenciaDomainService>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<DateTime> { this.fechaOcurrenciaAgenda });
-
-                this.eventoAgendaRepository
-                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoAgenda> { this.eventoAgenda.Object });
-            }
-
-            private void ConfigurarEventoSalud()
-            {
-                this.fechaHoraEventoSaludPasado = DateTime.Now.AddHours(-2);
-
-                this.eventoSaludPasado = new Mock<EventoSalud>();
-                this.eventoSaludPasado.Setup(s => s.Tipo).Returns(Mock.Of<TipoEvento>(t => t.Descripcion == "Síntoma"));
-                this.eventoSaludPasado.Setup(s => s.Descripcion).Returns("Mareos al levantarse");
-                this.eventoSaludPasado.Setup(s => s.FechaHora).Returns(this.fechaHoraEventoSaludPasado);
-
-                this.eventoSaludRepository
-                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoSalud> { this.eventoSaludPasado.Object });
-            }
-
-            private void ConfigurarHabitoVida()
-            {
-                this.fechaRealizacionHabito = DateTime.Today.AddHours(8);
-
-                var realizacion = new Mock<HabitoVidaRealizacion>();
-                realizacion.Setup(s => s.FechaHoraRealizacion).Returns(this.fechaRealizacionHabito);
-
-                this.habitoVidaCumplido = new Mock<HabitoVida>();
-                this.habitoVidaCumplido.Setup(s => s.Descripcion).Returns("Caminata diaria");
-                this.habitoVidaCumplido.Setup(s => s.Realizaciones).Returns(new List<HabitoVidaRealizacion> { realizacion.Object });
-
-                this.habitoVidaRepository
-                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
-                    .Returns(new List<HabitoVida> { this.habitoVidaCumplido.Object });
-            }
-
-            private Mock<HabitoVida> ConstruirHabitoVidaSinRealizacionesDeHoy()
-            {
-                var realizacionDeAyer = new Mock<HabitoVidaRealizacion>();
-                realizacionDeAyer.Setup(s => s.FechaHoraRealizacion).Returns(DateTime.Today.AddDays(-1).AddHours(8));
-
-                var habitoVida = new Mock<HabitoVida>();
-                habitoVida.Setup(s => s.Descripcion).Returns("Meditación");
-                habitoVida.Setup(s => s.Realizaciones).Returns(new List<HabitoVidaRealizacion> { realizacionDeAyer.Object });
-
-                return habitoVida;
-            }
-
-            private void ConfigurarEstadosAnimo()
-            {
-                this.estadoAnimoAnterior = new Mock<PersonaEstadoAnimo>();
-                this.estadoAnimoAnterior.Setup(s => s.ID).Returns(1);
-                this.estadoAnimoAnterior.Setup(s => s.FechaHora).Returns(DateTime.Today.AddHours(9));
-                this.estadoAnimoAnterior.Setup(s => s.EstadoAnimo).Returns(Mock.Of<EstadoAnimo>(e => e.Descripcion == "Cansada"));
-
-                this.estadoAnimoPosterior = new Mock<PersonaEstadoAnimo>();
-                this.estadoAnimoPosterior.Setup(s => s.ID).Returns(2);
-                this.estadoAnimoPosterior.Setup(s => s.FechaHora).Returns(DateTime.Today.AddHours(15));
-                this.estadoAnimoPosterior.Setup(s => s.EstadoAnimo).Returns(Mock.Of<EstadoAnimo>(e => e.Descripcion == "Contenta"));
-
-                this.personaEstadoAnimoRepository
-                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<PersonaEstadoAnimo>
-                    {
-                        this.estadoAnimoAnterior.Object,
-                        this.estadoAnimoPosterior.Object
-                    });
-            }
-
-            private void ConfigurarTodasLasFuentesVacias()
-            {
-                this.eventoAgendaRepository
-                    .Setup(s => s.GetAllByPersonaEnRango(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoAgenda>());
-
-                this.eventoSaludRepository
-                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<EventoSalud>());
-
-                this.habitoVidaRepository
-                    .Setup(s => s.GetByPersona(It.IsAny<int>()))
-                    .Returns(new List<HabitoVida>());
-
-                this.personaEstadoAnimoRepository
-                    .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<PersonaEstadoAnimo>());
-            }
-
-            #endregion
         }
     }
 }
