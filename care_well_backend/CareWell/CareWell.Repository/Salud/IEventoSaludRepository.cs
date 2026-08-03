@@ -8,5 +8,6 @@ namespace CareWell.Repository.Salud
     {
         List<EventoSaludDataView> ObtenerTodos(EventoSaludQuery query);
         bool ExistePorOrigen(int eventoAgendaID, DateTime fechaOcurrencia);
+        List<EventoSalud> GetByFechas(int personaCuidadaID, DateTime fechaDesde, DateTime fechaHasta);
     }
 }

@@ -56,12 +56,14 @@ namespace CareWell.BusinessService
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
             services.AddScoped<IRecuperacionContrasenaBusinessService, RecuperacionContrasenaBusinessService>();
+            services.AddScoped<IResumenDiarioBusinessService, ResumenDiarioBusinessService>();
             services.AddScoped<IVerificacionEmailBusinessService, VerificacionEmailBusinessService>();
 
             #endregion
 
             #region Domain Services
 
+            services.AddScoped<IArmarResumenDiarioDomainService, ArmarResumenDiarioBusinessService>();
             services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
             services.AddScoped<IEvaluadorIdentidadPersonaDomainService, EvaluadorIdentidadPersonaBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();

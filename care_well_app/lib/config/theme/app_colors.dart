@@ -57,4 +57,9 @@ abstract final class AppColors {
   // Emergencia
   static const Color emergencyRed = Color(0xFFD14343);
   static const Color emergencyContainer = Color(0xFFFEE2E2);
+
+  // IA / contenido no clínico (Resumen inteligente).
+  // Reservados para superficies y acentos de contenido generado por IA.
+  static const Color aiAccent = Color(0xFF6366F1); // Indigo 500
+  static const Color aiContainer = Color(0xFFE0E7FF); // Indigo 100
 }

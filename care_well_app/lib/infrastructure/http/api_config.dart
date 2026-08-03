@@ -6,7 +6,14 @@ class ApiConfig {
 
   static const connectTimeout = Duration(seconds: 30);
   static const receiveTimeout = Duration(seconds: 45);
-  static const receiveTimeoutValidacionIdentidad = Duration(minutes: 2);
+  static const receiveTimeoutValidacionIdentidad = Duration(
+    minutes: 2,
+    seconds: 30,
+  );
+  static const receiveTimeoutResumenInteligente = Duration(
+    minutes: 2,
+    seconds: 30,
+  );
 
   static const loginPath = '/api/Authorization/login';
   static const refreshPath = '/api/Authorization/refresh-token';
@@ -91,6 +98,8 @@ class ApiConfig {
       '/api/LineaTiempoSalud/obtener-por-fechas';
 
   static const obtenerAlertasBienestarPath = '/api/AlertaBienestar/obtener';
+
+  static const obtenerResumenInteligentePath = '/api/ResumenDiario/generar';
 
   static const obtenerFichaSaludPath = '/api/AdministrarFichaSalud/obtener';
   static const crearFichaSaludPath = '/api/AdministrarFichaSalud/crear';

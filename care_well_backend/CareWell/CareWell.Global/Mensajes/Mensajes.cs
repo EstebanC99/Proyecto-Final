@@ -75,5 +75,6 @@
         public const string NoExistePersonaConEseEmail = "No encontramos ningún perfil con ese email.";
         public const string IdentidadNoValidada = "No pudimos validar tu identidad con el documento. Verificá que la foto sea nítida y legible, y que los datos coincidan con tu DNI.";
         public const string ServicioReconocimientoNoDisponible = "El servicio de validación de identidad no está disponible en este momento. Reintentá en unos minutos.";
+        public const string ServicioDeResumenDiarioNoDisponible = "El servicio de generación de resumen diario no está disponible en este momento. Reintentá en unos minutos.";
     }
 }

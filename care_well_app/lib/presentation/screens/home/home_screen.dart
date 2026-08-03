@@ -94,6 +94,10 @@ class HomeScreen extends ConsumerWidget {
                 const ContextSelector(),
                 const SizedBox(height: AppSpacing.md),
 
+                // Acceso al Resumen inteligente (estático: no dispara la IA)
+                const SummaryEntryCard(delay: Duration(milliseconds: 50)),
+                const SizedBox(height: AppSpacing.md),
+
                 // Grid 2×2
                 GridView(
                   shrinkWrap: true,

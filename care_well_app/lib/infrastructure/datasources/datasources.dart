@@ -16,3 +16,4 @@ export 'api/api_tipo_evento_datasource.dart';
 export 'api/api_tipo_habito_vida_datasource.dart';
 export 'api/api_linea_tiempo_salud_datasource.dart';
 export 'api/api_ficha_salud_datasource.dart';
+export 'api/api_summary_datasource.dart';

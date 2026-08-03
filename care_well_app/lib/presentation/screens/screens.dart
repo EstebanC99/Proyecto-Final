@@ -45,3 +45,5 @@ export 'health/mood_history_screen.dart';
 
 export 'emergency/emergency_screen.dart';
 export 'emergency/emergency_sent_screen.dart';
+
+export 'summary/summary_screen.dart';

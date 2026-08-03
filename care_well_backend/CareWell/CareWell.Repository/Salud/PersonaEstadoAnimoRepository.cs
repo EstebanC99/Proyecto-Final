@@ -33,6 +33,17 @@ namespace CareWell.Repository.Salud
                 .ToList();
         }
 
+        public List<PersonaEstadoAnimo> GetByFechas(int personaCuidadaID, DateTime fechaDesde, DateTime fechaHasta)
+        {
+            return this.DbSet
+                .Where(e =>
+                    e.Persona.ID == personaCuidadaID &&
+                    e.FechaHora.Date >= fechaDesde &&
+                    e.FechaHora.Date <= fechaHasta)
+                .OrderBy(e => e.FechaHora)
+                .ToList();
+        }
+
         #region Metodos Privados
 
         private static PersonaEstadoAnimoDataView MapToDataView(PersonaEstadoAnimo animo)

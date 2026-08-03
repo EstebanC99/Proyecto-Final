@@ -32,3 +32,4 @@ export 'care_team/care_team.dart';
 export 'agenda/agenda.dart';
 export 'health/health.dart';
 export 'emergency/emergency.dart';
+export 'summary/summary.dart';

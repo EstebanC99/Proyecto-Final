@@ -38,6 +38,8 @@ namespace CareWell.API.Filters
                 RecursoNoEncontradoException ex => (StatusCodes.Status404NotFound, ex.Message),
                 CuentaExistenteException ex => (StatusCodes.Status409Conflict, ex.Message),
                 ServicioNoDisponibleException ex => (StatusCodes.Status503ServiceUnavailable, ex.Message),
+                
+                OperationCanceledException => (499, "La solicitud fue cancelada."),
                 _ => (StatusCodes.Status500InternalServerError, "Ocurrió un error inesperado.")
             };
 

@@ -44,9 +44,18 @@ namespace CareWell.Repository.Salud
         {
             return this.DbContext.Set<HabitoVidaRealizacion>()
                 .Where(r => r.HabitoVida.Persona.ID == query.PersonaID
-                         && r.FechaHoraRealizacion >= query.FechaDesde 
+                         && r.FechaHoraRealizacion >= query.FechaDesde
                          && r.FechaHoraRealizacion <= query.FechaHasta)
                 .Select(MapRealizacionToDataView)
+                .ToList();
+        }
+
+        public List<HabitoVida> GetByPersona(int personaCuidadaID)
+        {
+            return this.DbSet
+                .Where(h => 
+                    h.Persona.ID == personaCuidadaID &&
+                    h.Activo)
                 .ToList();
         }
 

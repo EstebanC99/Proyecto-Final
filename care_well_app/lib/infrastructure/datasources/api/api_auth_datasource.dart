@@ -93,9 +93,7 @@ class ApiAuthDatasource implements AuthDatasource {
   @override
   Future<void> eliminarCuenta() async {
     try {
-      await _dio.post(
-        ApiConfig.eliminarCuentaPath
-      );
+      await _dio.post(ApiConfig.eliminarCuentaPath);
     } on DioException catch (e) {
       throw ApiExceptionMapper.map(e);
     }

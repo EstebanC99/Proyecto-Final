@@ -1,4 +1,5 @@
 ﻿using CareWell.DocumentIntelligence.ReconocedorTexto;
+using CareWell.DocumentIntelligence.ResumidorDiario;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ namespace CareWell.DocumentIntelligence
             services.AddSingleton<IChatClient>(serviceProvider =>
             {
                 var opciones = serviceProvider
-                    .GetRequiredService<IOptions<ReconocedorTextoDocumentoOptions>>()
+                    .GetRequiredService<IOptions<OllamaClientOptions>>()
                     .Value;
 
                 var httpClient = new HttpClient
@@ -29,8 +30,9 @@ namespace CareWell.DocumentIntelligence
 
             #endregion
 
-            #region Reconocedor de Texto
+            #region Agentes de IA
 
+            services.AddScoped<IResumidorDiarioAgent, ResumidorDiarioAgent>();
             services.AddScoped<IReconocedorTextoDocumentoAgent, ReconocedorTextoDocumentoAgent>();
 
             #endregion

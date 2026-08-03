@@ -302,6 +302,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
+          // Summary (Resumen inteligente)
+          GoRoute(
+            path: AppRoutes.summary,
+            name: AppRoutes.summaryName,
+            builder: (_, _) => const SummaryScreen(),
+          ),
+
           // Emergency
           GoRoute(
             path: AppRoutes.emergency,

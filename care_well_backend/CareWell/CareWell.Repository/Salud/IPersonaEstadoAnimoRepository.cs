@@ -8,5 +8,6 @@ namespace CareWell.Repository.Salud
     {
         PersonaEstadoAnimoDataView ObtenerAnimoHoy(PersonaEstadoAnimoHoyQuery query);
         List<PersonaEstadoAnimoDataView> ObtenerPorFechas(PersonaEstadoAnimoPorFechaQuery query);
+        List<PersonaEstadoAnimo> GetByFechas(int personaID, DateTime fechaDesde, DateTime fechaHasta);
     }
 }

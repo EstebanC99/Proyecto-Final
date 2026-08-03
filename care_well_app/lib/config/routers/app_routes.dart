@@ -50,6 +50,8 @@ abstract final class AppRoutes {
   static const emergency = '/emergency';
   static const emergencySent = '/emergency/sent';
 
+  static const summary = '/summary';
+
   // Nombres de ruta para navegación con go_router
   static const loginName = 'login';
   static const registerName = 'register';
@@ -92,4 +94,5 @@ abstract final class AppRoutes {
   static const healthTimelineName = 'health-timeline';
   static const emergencyName = 'emergency';
   static const emergencySentName = 'emergency-sent';
+  static const summaryName = 'summary';
 }

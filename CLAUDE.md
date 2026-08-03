@@ -29,7 +29,8 @@ PROYECTO-FINAL/                  # raíz del repo (Claude Code corre acá)
 │       ├── CareWell.DataViews/
 │       ├── CareWell.Global/
 │       ├── CareWell.Notifications/
-│       └── CareWell.Security/
+│       ├── CareWell.Security/
+│       └── CareWell.DocumentIntelligence/
 ├── care_well_doc/
 │   ├── Diagramas/               # diagramas (modelo de dominio .drawio, etc.)
 │   └── LATEX/                   # documentación en LaTeX
@@ -75,7 +76,14 @@ modifica la documentación en LaTeX.
   - `CareWell.Security` — contexto del usuario autenticado (`IUserContext`/`IUserContextWriter`,
     `UserContext`); proyecto hoja, poblado desde el JWT por un filtro de `API` y consumido por
     `BusinessService` para resolver el usuario actual (p. ej. en chequeos de permisos).
-- **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain, Notifications, Security`.
+  - `CareWell.DocumentIntelligence` — integración con IA generativa vía `Microsoft.Extensions.AI`
+    (`IChatClient`) sobre un modelo autoalojado con **Ollama** (`OllamaSharp`). Proyecto hoja
+    (solo referencia a `Global`); expone *agents* (`IReconocedorTextoDocumentoAgent` para OCR de
+    DNI —modelo de visión— e `IResumidorDiarioAgent` para el Resumen inteligente
+    —modelo de texto liviano CPU-only, `qwen2.5:3b-instruct`—) y `AddDocumentIntelligences()` para DI.
+    Cada agent define su *system prompt*, sus `*Options` (URL/modelo/timeout) y traduce las fallas
+    del proveedor a `ServicioNoDisponibleException`.
+- **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain, Notifications, Security, DocumentIntelligence`.
 - **Convenciones:** nombres en español; un `*Config.cs` por entidad en `Repository/Config/`.
 
 ## 4b. Stack (frontend)
@@ -170,7 +178,10 @@ Reservado a futuro — integraciones con apps de terceros:
 ## 9. Conceptos / features
 Subcarpetas por concepto dentro de cada capa, alineadas al MVP (nombres en inglés):
 `auth`, `profile`, `settings`, `dependents` (personas a cargo), `care_team` (mi equipo),
-`agenda`, `health` (mi salud), `emergency`. Lo común y reutilizable va en `shared/`.
+`agenda`, `health` (mi salud), `emergency`, `summary` (resumen inteligente de la persona a cargo — read model efímero
+generado por IA, US-9.16; compila 3 fuentes: eventos de salud, hábitos de vida y estados de ánimo
+—la Agenda queda para una mejora futura—; sin caché en el MVP: cada apertura de pantalla o "Actualizar"
+invoca al modelo). Lo común y reutilizable va en `shared/`.
 
 ## 10. Flujo de trabajo con los agentes
 - `arquitecto-software`: decisiones de arquitectura tanto del frontend Flutter como del backend

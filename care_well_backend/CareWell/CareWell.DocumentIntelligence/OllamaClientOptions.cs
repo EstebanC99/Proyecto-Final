@@ -1,6 +1,6 @@
-﻿namespace CareWell.DocumentIntelligence.ReconocedorTexto
+﻿namespace CareWell.DocumentIntelligence
 {
-    public class ReconocedorTextoDocumentoOptions
+    public class OllamaClientOptions
     {
         public string OllamaUrl { get; set; } = "http://localhost:11434";
         public string Modelo { get; set; } = "qwen2.5vl";

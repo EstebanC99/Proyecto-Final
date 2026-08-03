@@ -20,6 +20,7 @@ export 'health/realizacion_habito_mapper.dart';
 export 'health/tipo_evento_salud_mapper.dart';
 export 'health/tipo_habito_mapper.dart';
 export 'settings_mapper.dart';
+export 'summary/resumen_inteligente_mapper.dart';
 export 'shared/entidad_basica_mapper.dart';
 export 'shared/persona_mapper.dart';
 export 'shared/tipo_evento_mapper.dart';

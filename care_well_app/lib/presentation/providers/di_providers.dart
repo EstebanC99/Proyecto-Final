@@ -87,6 +87,10 @@ final settingsDatasourceProvider = Provider<SettingsDatasource>(
   (ref) => DemoSettingsDatasource(),
 );
 
+final summaryDatasourceProvider = Provider<SummaryDatasource>(
+  (ref) => ApiSummaryDatasource(ref.watch(dioClientProvider)),
+);
+
 final tipoEventoDatasourceProvider = Provider<TipoEventoDatasource>(
   (ref) => ApiTipoEventoDatasource(ref.watch(dioClientProvider)),
 );
@@ -154,6 +158,10 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepositoryImpl(ref.watch(settingsDatasourceProvider)),
 );
 
+final summaryRepositoryProvider = Provider<SummaryRepository>(
+  (ref) => SummaryRepositoryImpl(ref.watch(summaryDatasourceProvider)),
+);
+
 final tipoEventoRepositoryProvider = Provider<TipoEventoRepository>(
   (ref) => TipoEventoRepositoryImpl(ref.watch(tipoEventoDatasourceProvider)),
 );
@@ -165,7 +173,8 @@ final lineaTiempoSaludRepositoryProvider = Provider<LineaTiempoSaludRepository>(
 );
 
 final tipoHabitoVidaRepositoryProvider = Provider<TipoHabitoVidaRepository>(
-  (ref) => TipoHabitoVidaRepositoryImpl(ref.watch(tipoHabitoVidaDatasourceProvider)),
+  (ref) =>
+      TipoHabitoVidaRepositoryImpl(ref.watch(tipoHabitoVidaDatasourceProvider)),
 );
 
 //endregion

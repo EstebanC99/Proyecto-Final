@@ -78,23 +78,24 @@
 \contentsline {subsection}{\numberline {9.14}Gestión de Salud}{64}{}%
 \contentsline {subsubsection}{\numberline {9.14.1}Observaciones de bienestar}{66}{}%
 \contentsline {subsection}{\numberline {9.15}Gestión de Eventos}{68}{}%
-\contentsline {subsection}{\numberline {9.16}Reglas de negocio transversales}{70}{}%
-\contentsline {subsection}{\numberline {9.17}Limitaciones conocidas del MVP}{71}{}%
-\contentsline {section}{\numberline {10}Análisis de riesgos}{73}{}%
-\contentsline {subsection}{\numberline {10.1}Riesgos}{73}{}%
-\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{73}{}%
-\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{73}{}%
-\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{73}{}%
-\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{75}{}%
-\contentsline {subsubsection}{\numberline {10.3.3}Planes}{76}{}%
-\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{77}{}%
-\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{77}{}%
-\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{78}{}%
-\contentsline {subsubsection}{\numberline {10.4.3}Planes}{79}{}%
-\contentsline {section}{\numberline {11}Diseño}{80}{}%
-\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{80}{}%
-\contentsline {subsection}{\numberline {11.2}Accesibilidad}{80}{}%
-\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{80}{}%
-\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{80}{}%
-\contentsline {subsection}{\numberline {11.5}Prototipo}{81}{}%
-\contentsline {section}{Referencias}{82}{}%
+\contentsline {subsection}{\numberline {9.16}Resumen inteligente de la persona a cargo}{70}{}%
+\contentsline {subsection}{\numberline {9.17}Reglas de negocio transversales}{73}{}%
+\contentsline {subsection}{\numberline {9.18}Limitaciones conocidas del MVP}{74}{}%
+\contentsline {section}{\numberline {10}Análisis de riesgos}{76}{}%
+\contentsline {subsection}{\numberline {10.1}Riesgos}{76}{}%
+\contentsline {subsection}{\numberline {10.2}Análisis cualitativo}{76}{}%
+\contentsline {subsection}{\numberline {10.3}Riesgo 1 - Privacidad y Seguridad de Datos}{76}{}%
+\contentsline {subsubsection}{\numberline {10.3.1}Análisis}{76}{}%
+\contentsline {subsubsection}{\numberline {10.3.2}Tratamientos}{78}{}%
+\contentsline {subsubsection}{\numberline {10.3.3}Planes}{79}{}%
+\contentsline {subsection}{\numberline {10.4}Riesgo 2 - Integración de IA}{80}{}%
+\contentsline {subsubsection}{\numberline {10.4.1}Análisis}{80}{}%
+\contentsline {subsubsection}{\numberline {10.4.2}Tratamientos}{81}{}%
+\contentsline {subsubsection}{\numberline {10.4.3}Planes}{82}{}%
+\contentsline {section}{\numberline {11}Diseño}{83}{}%
+\contentsline {subsection}{\numberline {11.1}Intefaz sencilla e intuitiva}{83}{}%
+\contentsline {subsection}{\numberline {11.2}Accesibilidad}{83}{}%
+\contentsline {subsection}{\numberline {11.3}Seguridad y privacidad}{83}{}%
+\contentsline {subsection}{\numberline {11.4}Estadísiticas y reportes}{83}{}%
+\contentsline {subsection}{\numberline {11.5}Prototipo}{84}{}%
+\contentsline {section}{Referencias}{85}{}%

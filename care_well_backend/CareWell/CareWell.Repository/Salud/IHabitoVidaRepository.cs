@@ -8,5 +8,6 @@ namespace CareWell.Repository.Salud
     {
         List<HabitoVidaDataView> ObtenerTodos(HabitoVidaQuery query);
         List<HabitoVidaRealizacionDataView> ObtenerRealizacionesPorFecha(HabitoVidaQuery query);
+        List<HabitoVida> GetByPersona(int personaCuidadaID);
     }
 }
