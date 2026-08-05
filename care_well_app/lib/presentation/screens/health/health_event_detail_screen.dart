@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -27,10 +27,10 @@ class HealthEventDetailScreen extends ConsumerWidget {
     final puede = ref.watch(puedeRegistrarEventosSaludProvider).value ?? false;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
         title: eventoAsync.when(
           data: (e) => Text(
@@ -44,7 +44,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
           if (puede)
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: context.colors.error,
               tooltip: 'Eliminar evento',
               onPressed: () async {
                 final eliminado = await ConfirmDialog.show(
@@ -93,7 +93,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
               ),
 
               // ── Encabezado de sección de notas ──────────────────────────
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.lg,
@@ -106,7 +106,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -115,7 +115,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
 
               // ── Notas ────────────────────────────────────────────────────
               if (notas.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
@@ -126,7 +126,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
                           Icon(
                             Icons.description_outlined,
                             size: 36,
-                            color: AppColors.textDisabled,
+                            color: context.colors.textDisabled,
                           ),
                           SizedBox(height: AppSpacing.sm),
                           Text(
@@ -134,7 +134,7 @@ class HealthEventDetailScreen extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textDisabled,
+                              color: context.colors.textDisabled,
                             ),
                           ),
                         ],
@@ -184,8 +184,8 @@ class HealthEventDetailScreen extends ConsumerWidget {
                 pathParameters: {'id': eventId.toString()},
               ),
               tooltip: 'Agregar nota',
-              backgroundColor: AppColors.healthAccent,
-              child: const Icon(Icons.note_add, color: Colors.white),
+              backgroundColor: context.colors.healthAccent,
+              child: Icon(Icons.note_add, color: context.colors.onPrimary),
             )
           : null,
     );
@@ -210,7 +210,7 @@ class _EventHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: AppSpacing.elev1,
       ),
@@ -225,9 +225,9 @@ class _EventHeaderCard extends StatelessWidget {
               const Spacer(),
               Text(
                 fechaStr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textDisabled,
+                  color: context.colors.textDisabled,
                 ),
               ),
             ],
@@ -238,16 +238,16 @@ class _EventHeaderCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: context.colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.event_available_outlined,
                     size: 13,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   SizedBox(width: 4),
                   Text(
@@ -255,7 +255,7 @@ class _EventHeaderCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -266,9 +266,9 @@ class _EventHeaderCard extends StatelessWidget {
           // Descripción completa
           Text(
             evento.descripcion,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               height: 1.55,
             ),
           ),

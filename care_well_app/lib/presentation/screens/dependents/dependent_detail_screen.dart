@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -107,9 +107,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
 
     if (_fechaNacimiento == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Seleccioná la fecha de nacimiento.'),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colors.error,
         ),
       );
       return false;
@@ -177,7 +177,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${resultado.nombreCompleto} fue actualizado.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     } catch (e) {
@@ -188,7 +188,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
           content: Text(
             'Error al guardar: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colors.error,
         ),
       );
     }
@@ -237,7 +237,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       body: 'Formarás parte del equipo de cuidado de $nombre.',
       confirmLabel: 'Aceptar',
       icon: Icons.check_circle_outline,
-      accentColor: AppColors.success,
+      accentColor: context.colors.success,
       onConfirm: () async {
         final activar = ref.read(activarAsignacionProvider);
         await activar(asignacion: asignacion);
@@ -248,7 +248,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Te uniste al equipo de cuidado de $nombre.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
       if (context.canPop()) {
@@ -272,7 +272,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
           'La invitación será eliminada.',
       confirmLabel: 'Rechazar',
       icon: Icons.cancel_outlined,
-      accentColor: AppColors.error,
+      accentColor: context.colors.error,
       onConfirm: () async {
         final eliminar = ref.read(eliminarAsignacionProvider);
         await eliminar(asignacion: asignacion);
@@ -283,7 +283,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Rechazaste la invitación de $nombre.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
       if (context.canPop()) {
@@ -315,7 +315,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('$nombreCompletoPersona fue eliminado.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
       if (context.canPop()) {
@@ -335,9 +335,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Persona a cargo'),
         actions: [
           asignacionAsync.when(
@@ -352,26 +352,26 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextButton.icon(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.check_circle_outline,
-                        color: AppColors.success,
+                        color: context.colors.success,
                         size: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Aceptar',
-                        style: TextStyle(color: AppColors.success),
+                        style: TextStyle(color: context.colors.success),
                       ),
                       onPressed: () => _aceptarAsignacion(asignacion),
                     ),
                     TextButton.icon(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.cancel_outlined,
-                        color: AppColors.error,
+                        color: context.colors.error,
                         size: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Rechazar',
-                        style: TextStyle(color: AppColors.error),
+                        style: TextStyle(color: context.colors.error),
                       ),
                       onPressed: () => _rechazarAsignacion(asignacion),
                     ),
@@ -387,15 +387,15 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                   }
                 },
                 itemBuilder: (_) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'eliminar',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: AppColors.error),
+                        Icon(Icons.delete_outline, color: context.colors.error),
                         SizedBox(width: AppSpacing.sm),
                         Text(
                           'Eliminar asignación',
-                          style: TextStyle(color: AppColors.error),
+                          style: TextStyle(color: context.colors.error),
                         ),
                       ],
                     ),
@@ -450,7 +450,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                 // ── Header ────────────────────────────────────────────────
                 Container(
                   width: double.infinity,
-                  color: AppColors.surface,
+                  color: context.colors.surface,
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
@@ -462,10 +462,10 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         persona.nombreCompleto,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -475,9 +475,9 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                             final edad = calcularEdad(persona.fechaNacimiento);
                             return edad != null ? '$edad años' : '';
                           }(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -486,11 +486,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
                     ],
                   ),
                 ),
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: AppColors.outline,
-                ),
+                Divider(height: 1, thickness: 1, color: context.colors.outline),
 
                 // ── Campos editables ──────────────────────────────────────
                 _EditableField(
@@ -599,7 +595,7 @@ class _EditableField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          color: AppColors.surface,
+          color: context.colors.surface,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
@@ -609,7 +605,11 @@ class _EditableField extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.lg),
-                child: Icon(icon, size: 20, color: AppColors.textSecondary),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: context.colors.textSecondary,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -619,9 +619,9 @@ class _EditableField extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     TextField(
@@ -631,10 +631,10 @@ class _EditableField extends StatelessWidget {
                       textInputAction: textInputAction,
                       autocorrect: autocorrect,
                       onChanged: onChanged,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                       decoration: InputDecoration(
                         isDense: true,
@@ -643,9 +643,9 @@ class _EditableField extends StatelessWidget {
                         ),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
-                        focusedBorder: const UnderlineInputBorder(
+                        focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                             width: 1.5,
                           ),
                         ),
@@ -659,7 +659,7 @@ class _EditableField extends StatelessWidget {
             ],
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.outline),
+        Divider(height: 1, thickness: 1, color: context.colors.outline),
       ],
     );
   }
@@ -670,7 +670,7 @@ class _EditableField extends StatelessWidget {
 /// Fila de perfil para la fecha de nacimiento.
 ///
 /// Al tocar la fila se abre el [DatePicker]. Mientras la fecha seleccionada
-/// difiere de la original, el valor se muestra en [AppColors.primary] como
+/// difiere de la original, el valor se muestra en [AppPalette.primary] como
 /// indicador visual de cambio pendiente de guardar.
 class _FechaField extends StatelessWidget {
   const _FechaField({
@@ -690,7 +690,9 @@ class _FechaField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valorTexto = fecha != null ? formatFecha(fecha) : '—';
-    final colorValor = cambiada ? AppColors.primary : AppColors.textPrimary;
+    final colorValor = cambiada
+        ? context.colors.primary
+        : context.colors.textPrimary;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -698,7 +700,7 @@ class _FechaField extends StatelessWidget {
         InkWell(
           onTap: onTap,
           child: Container(
-            color: AppColors.surface,
+            color: context.colors.surface,
             constraints: const BoxConstraints(minHeight: 64),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
@@ -710,7 +712,7 @@ class _FechaField extends StatelessWidget {
                 Icon(
                   Icons.calendar_month_outlined,
                   size: 20,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -718,11 +720,11 @@ class _FechaField extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         'Fecha de nacimiento',
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -737,16 +739,16 @@ class _FechaField extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.edit_calendar_outlined,
                   size: 18,
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                 ),
               ],
             ),
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.outline),
+        Divider(height: 1, thickness: 1, color: context.colors.outline),
       ],
     );
   }
@@ -767,9 +769,11 @@ class _SaveBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.outline, width: 1)),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        border: Border(
+          top: BorderSide(color: context.colors.outline, width: 1),
+        ),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -783,12 +787,12 @@ class _SaveBar extends StatelessWidget {
           child: FilledButton(
             onPressed: onPressed,
             child: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 22,
                     height: 22,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      color: AppColors.onPrimary,
+                      color: context.colors.onPrimary,
                     ),
                   )
                 : const Text(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -99,7 +99,7 @@ class _HealthEventsMonthListState extends ConsumerState<HealthEventsMonthList>
     scrollAlDiaObjetivoUnaVez(diaObjetivo);
 
     return RefreshIndicator(
-      color: AppColors.healthAccent,
+      color: context.colors.healthAccent,
       onRefresh: widget.onRefresh,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),

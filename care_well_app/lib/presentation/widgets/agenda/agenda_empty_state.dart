@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/primary_button.dart';
 
@@ -30,33 +30,33 @@ class AgendaEmptyState extends StatelessWidget {
             Container(
               width: 96,
               height: 96,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryContainer,
+              decoration: BoxDecoration(
+                color: context.colors.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_month_outlined,
                 size: 52,
-                color: AppColors.primary,
+                color: context.colors.primary,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            const Text(
+            Text(
               'No hay eventos agendados',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Los eventos de salud, citas médicas y recordatorios aparecerán aquí.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.5,
               ),
             ),

@@ -1,6 +1,7 @@
 ﻿using CareWell.BusinessService.Auth;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
+using CareWell.Domain.DomainServices.Auth;
 using CareWell.Repository.Auth;
 using CareWell.Security;
 using Moq;
@@ -12,6 +13,7 @@ namespace CareWell.BusinessService.Test.Auth
         private Mock<IUserContext> userContext;
         private Mock<IUsuarioRepository> usuarioRepository;
         private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
+        private Mock<IAdministrarDispositivoDomainService> administrarDispositivoDomainService;
 
         protected override void InitializeTest()
         {
@@ -20,12 +22,15 @@ namespace CareWell.BusinessService.Test.Auth
             this.userContext = new Mock<IUserContext>();
             this.usuarioRepository = new Mock<IUsuarioRepository>();
             this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
+            this.administrarDispositivoDomainService = new Mock<IAdministrarDispositivoDomainService>();
 
-            this.Target = new EliminarCuentaBusinessService(
+            this.Target = new EliminarCuentaBusinessService
+            (
                 this.unitOfWork.Object,
                 this.userContext.Object,
                 this.usuarioRepository.Object,
-                this.entityLoaderDomainService.Object
+                this.entityLoaderDomainService.Object,
+                this.administrarDispositivoDomainService.Object
             );
         }
 
@@ -83,6 +88,18 @@ namespace CareWell.BusinessService.Test.Auth
 
                 // Assert
                 this.usuario.Verify(v => v.Eliminar(this.entityLoaderDomainService.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_DesactivarTodosDelUsuario_del_AdministrarDispositivoDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.administrarDispositivoDomainService.Verify(v => v.DesactivarTodosDelUsuario(this.usuario.Object), Times.Once);
             }
 
             [Fact]

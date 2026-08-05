@@ -396,3 +396,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Credenciales Firebase — NUNCA versionar
+**/*firebase-adminsdk*.json
+**/google-services.json
+**/GoogleService-Info.plist

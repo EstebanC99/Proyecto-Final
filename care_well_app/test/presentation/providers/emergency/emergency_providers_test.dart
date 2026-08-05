@@ -128,39 +128,52 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
 }
 
 class _FakeEmergencyRepository implements EmergencyRepository {
-  final List<Emergencia> _emergencias = [];
-  int _nextId = 10000;
+  _FakeEmergencyRepository({this.historial = const []});
+
+  /// Argumentos con los que se activó cada emergencia.
+  final List<({int personaId, String? descripcion})> activadas = [];
+
+  /// Lo que devuelve [getEmergenciasByPersona], en el orden en que se declara.
+  final List<Emergencia> historial;
+
+  /// Argumentos con los que se consultó el historial.
+  final List<({int personaId, int cantidad})> consultas = [];
 
   @override
-  Future<Emergencia> activarEmergencia({
+  Future<void> activarEmergencia({
     required int personaId,
     String? descripcion,
   }) async {
-    final emg = Emergencia(
-      id: _nextId++,
-      persona: _personaAlicia,
-      fechaHora: DateTime.now(),
-    );
-    _emergencias.add(emg);
-    return emg;
+    activadas.add((personaId: personaId, descripcion: descripcion));
   }
 
   @override
-  Future<List<Emergencia>> getEmergenciasByPersona(int personaId) async =>
-      _emergencias.where((e) => e.persona.id == personaId).toList();
-
-  @override
-  Future<Emergencia> marcarAtendida(int emergenciaId) async =>
-      _emergencias.firstWhere((e) => e.id == emergenciaId);
+  Future<List<Emergencia>> getEmergenciasByPersona(
+    int personaId, {
+    int cantidad = 20,
+  }) async {
+    consultas.add((personaId: personaId, cantidad: cantidad));
+    return historial;
+  }
 }
+
+Emergencia _emergencia(int id, DateTime fechaHora) => Emergencia(
+  id: id,
+  persona: _personaAlicia,
+  activador: _personaMaria,
+  fechaHora: fechaHora,
+);
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
+/// [scheduler] solo hace falta en los tests que verifican que el cliente NO
+/// emite notificaciones locales; el resto usa uno descartable.
 ProviderContainer _makeContainer({
   required List<AsignacionCuidado> asignaciones,
-  required FakeNotificationScheduler scheduler,
+  FakeNotificationScheduler? scheduler,
+  _FakeEmergencyRepository? emergencyRepository,
 }) {
-  final fakeEmergencyRepo = _FakeEmergencyRepository();
+  final fakeEmergencyRepo = emergencyRepository ?? _FakeEmergencyRepository();
   return ProviderContainer(
     overrides: [
       authStateProvider.overrideWith(
@@ -175,7 +188,9 @@ ProviderContainer _makeContainer({
         _FakeAsignacionCuidadoRepository(asignaciones),
       ),
       emergencyRepositoryProvider.overrideWithValue(fakeEmergencyRepo),
-      notificationSchedulerProvider.overrideWithValue(scheduler),
+      notificationSchedulerProvider.overrideWithValue(
+        scheduler ?? FakeNotificationScheduler(),
+      ),
     ],
   );
 }
@@ -198,11 +213,7 @@ void main() {
             fechaAlta: DateTime.now(),
           ),
         ];
-        final scheduler = FakeNotificationScheduler();
-        final container = _makeContainer(
-          asignaciones: asignaciones,
-          scheduler: scheduler,
-        );
+        final container = _makeContainer(asignaciones: asignaciones);
         addTearDown(container.dispose);
 
         final equipo = await container.read(equipoEmergenciaProvider.future);
@@ -214,54 +225,113 @@ void main() {
       });
     });
 
-    group('activarEmergenciaProvider', () {
+    group('historialEmergenciasProvider', () {
+      test('es vacío si no hay persona de contexto', () async {
+        final repo = _FakeEmergencyRepository();
+        final container = ProviderContainer(
+          overrides: [
+            personaVisualizacionSeleccionadaProvider.overrideWith(
+              (ref) async => null,
+            ),
+            emergencyRepositoryProvider.overrideWithValue(repo),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final historial = await container.read(
+          historialEmergenciasProvider.future,
+        );
+
+        expect(historial, isEmpty);
+        // Sin persona no hay a quién consultarle: no se llama al backend.
+        expect(repo.consultas, isEmpty);
+      });
+
+      test('pide la cantidad definida en EmergenciasConst', () async {
+        final repo = _FakeEmergencyRepository();
+        final container = _makeContainer(
+          asignaciones: const [],
+          emergencyRepository: repo,
+        );
+        addTearDown(container.dispose);
+
+        await container.read(historialEmergenciasProvider.future);
+
+        expect(repo.consultas, hasLength(1));
+        expect(repo.consultas.single.personaId, _personaAlicia.id);
+        expect(
+          repo.consultas.single.cantidad,
+          EmergenciasConst.cantidadHistorialCorto,
+        );
+      });
+
       test(
-        'llama showImmediateNotification una vez por miembro del equipo',
+        'devuelve las emergencias en el orden que llegan del backend',
         () async {
-          final miembros = [
-            _asignacion(401, _personaMaria),
-            _asignacion(402, _personaCarlos),
-          ];
-          final scheduler = FakeNotificationScheduler();
+          // El backend ya ordena de la más reciente a la más antigua. Si alguien
+          // agrega un sort "para asegurarse", este test lo frena.
+          final repo = _FakeEmergencyRepository(
+            historial: [
+              _emergencia(3, DateTime(2026, 8, 5, 14, 0)),
+              _emergencia(1, DateTime(2026, 7, 1, 9, 30)),
+              _emergencia(2, DateTime(2026, 8, 1, 20, 15)),
+            ],
+          );
           final container = _makeContainer(
-            asignaciones: miembros,
-            scheduler: scheduler,
+            asignaciones: const [],
+            emergencyRepository: repo,
           );
           addTearDown(container.dispose);
 
-          // Pre-cargar equipo
-          await container.read(equipoEmergenciaProvider.future);
+          final historial = await container.read(
+            historialEmergenciasProvider.future,
+          );
 
-          final accion = container.read(activarEmergenciaProvider);
-          await accion();
-
-          // Debe haber enviado una notificación por cada miembro activo
-          expect(scheduler.shown.length, equals(miembros.length));
+          expect(historial.map((e) => e.id), [3, 1, 2]);
         },
       );
+    });
 
-      test('registra la emergencia en el repositorio', () async {
-        final scheduler = FakeNotificationScheduler();
+    group('activarEmergenciaProvider', () {
+      test('registra la emergencia para la persona de contexto', () async {
+        final repo = _FakeEmergencyRepository();
         final container = _makeContainer(
           asignaciones: [_asignacion(401, _personaMaria)],
+          emergencyRepository: repo,
+        );
+        addTearDown(container.dispose);
+
+        await container.read(activarEmergenciaProvider)();
+
+        expect(repo.activadas, hasLength(1));
+        expect(repo.activadas.single.personaId, _personaAlicia.id);
+        expect(repo.activadas.single.descripcion, isNull);
+      });
+
+      test('no notifica localmente a los miembros del equipo', () async {
+        // El aviso push lo envía el backend: el cliente no debe emitir
+        // notificaciones locales por cada miembro.
+        final scheduler = FakeNotificationScheduler();
+        final container = _makeContainer(
+          asignaciones: [
+            _asignacion(401, _personaMaria),
+            _asignacion(402, _personaCarlos),
+          ],
           scheduler: scheduler,
         );
         addTearDown(container.dispose);
 
         await container.read(equipoEmergenciaProvider.future);
-        final emergencia = await container.read(activarEmergenciaProvider)();
+        await container.read(activarEmergenciaProvider)();
 
-        expect(emergencia.id, greaterThan(0));
-        expect(emergencia.persona.id, _personaAlicia.id);
+        expect(scheduler.shown, isEmpty);
       });
     });
 
     group('puedeActivarEmergenciaProvider', () {
       test('retorna true con permiso activarEmergencia', () async {
-        final scheduler = FakeNotificationScheduler();
         final container = _makeContainer(
           asignaciones: [_asignacion(401, _personaMaria)],
-          scheduler: scheduler,
         );
         addTearDown(container.dispose);
 
@@ -274,11 +344,7 @@ void main() {
       test(
         'retorna false sin asignación para persona ajena (Alicia)',
         () async {
-          final scheduler = FakeNotificationScheduler();
-          final container = _makeContainer(
-            asignaciones: [],
-            scheduler: scheduler,
-          );
+          final container = _makeContainer(asignaciones: []);
           addTearDown(container.dispose);
 
           final puede = await container.read(
@@ -292,7 +358,6 @@ void main() {
         'retorna true cuando el contexto es el propio usuario sin asignaciones',
         () async {
           // Sobreescribir el contexto a María (propio usuario).
-          final scheduler = FakeNotificationScheduler();
           final container = ProviderContainer(
             overrides: [
               authStateProvider.overrideWith(
@@ -309,7 +374,6 @@ void main() {
               emergencyRepositoryProvider.overrideWithValue(
                 _FakeEmergencyRepository(),
               ),
-              notificationSchedulerProvider.overrideWithValue(scheduler),
             ],
           );
           addTearDown(container.dispose);

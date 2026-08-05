@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Encabezado de grupo de eventos por fecha.
 ///
@@ -63,11 +63,11 @@ class DateGroupLabel extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16, bottom: 8),
       child: Text(
         _label().toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
     );

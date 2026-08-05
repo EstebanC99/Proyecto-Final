@@ -1,11 +1,11 @@
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/screens/screens.dart';
+import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../_fakes/fake_notification_scheduler.dart';
 import '../../../_fakes/test_fixtures.dart';
 
 final _personaAlicia = Persona(
@@ -39,9 +39,6 @@ Widget _wrap({List<AsignacionCuidado>? equipo}) {
       equipoEmergenciaProvider.overrideWith(
         (ref) async => equipo ?? [_asignacion],
       ),
-      notificationSchedulerProvider.overrideWithValue(
-        FakeNotificationScheduler(),
-      ),
     ],
     child: const MaterialApp(home: EmergencySentScreen()),
   );
@@ -62,6 +59,30 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('Alerta enviada'), findsOneWidget);
+    });
+
+    testWidgets('el cuerpo describe el envío, no la recepción', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(
+        find.textContaining('Se envió la alerta a tu equipo de cuidado'),
+        findsOneWidget,
+      );
+      // No debe afirmar que a alguien le llegó el aviso.
+      expect(find.textContaining('notificada'), findsNothing);
+    });
+
+    testWidgets('la lista del equipo lleva el encabezado que la aclara', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.text('Equipo de cuidado'), findsOneWidget);
+      expect(find.byType(EmergencyTeamMemberCard), findsOneWidget);
     });
 
     testWidgets('botón volver al inicio visible', (tester) async {

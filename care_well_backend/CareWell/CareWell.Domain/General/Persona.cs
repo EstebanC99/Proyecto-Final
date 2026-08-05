@@ -76,6 +76,11 @@ namespace CareWell.Domain.General
                 throw new CuentaExistenteException(Mensajes.PersonaYaTieneUsuario);
         }
 
+        public virtual string NombreCompleto()
+        {
+            return $"{this.Nombre} {this.Apellido}";
+        }
+
         #region Metodos Privados
 
         private void SetearCamposPerfil(ModificarPerfil modificarPerfil)

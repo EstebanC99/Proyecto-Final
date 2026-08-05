@@ -5,8 +5,8 @@ import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-import '../../../_fakes/fake_notification_scheduler.dart';
 import '../../../_fakes/test_fixtures.dart';
 
 final _personaAlicia = Persona(
@@ -34,7 +34,18 @@ final _asignacion = AsignacionCuidado(
   fechaAlta: DateTime(2024, 1, 8),
 );
 
-Widget _wrap({bool puedeActivar = true, List<AsignacionCuidado>? equipo}) {
+Emergencia _emergencia(int id) => Emergencia(
+  id: id,
+  persona: _personaAlicia,
+  activador: _personaMaria,
+  fechaHora: DateTime(2026, 8, 5, 14, 32),
+);
+
+Widget _wrap({
+  bool puedeActivar = true,
+  List<AsignacionCuidado>? equipo,
+  List<Emergencia> historial = const [],
+}) {
   return ProviderScope(
     overrides: [
       personaVisualizacionSeleccionadaProvider.overrideWith(
@@ -44,15 +55,19 @@ Widget _wrap({bool puedeActivar = true, List<AsignacionCuidado>? equipo}) {
         (ref) async => equipo ?? [_asignacion],
       ),
       puedeActivarEmergenciaProvider.overrideWith((ref) async => puedeActivar),
-      notificationSchedulerProvider.overrideWithValue(
-        FakeNotificationScheduler(),
-      ),
+      // Sin este override la pantalla llamaría al repositorio real (Dio) al
+      // construirse.
+      historialEmergenciasProvider.overrideWith((ref) async => historial),
     ],
     child: const MaterialApp(home: EmergencyScreen()),
   );
 }
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('es');
+  });
+
   group('EmergencyScreen', () {
     testWidgets('smoke: renderiza sin errores', (tester) async {
       await tester.pumpWidget(_wrap());
@@ -82,6 +97,59 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 2100));
       expect(find.textContaining('Alicia'), findsWidgets);
+    });
+
+    testWidgets('sin emergencias previas muestra el vacío del historial', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 2100));
+
+      expect(find.text('Últimas emergencias'), findsOneWidget);
+      expect(find.text('Sin emergencias registradas'), findsOneWidget);
+      expect(find.byType(EmergencyHistoryTile), findsNothing);
+    });
+
+    testWidgets('muestra un tile por emergencia del historial', (tester) async {
+      await tester.pumpWidget(
+        _wrap(historial: [_emergencia(7), _emergencia(8)]),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 2100));
+
+      expect(find.byType(EmergencyHistoryTile), findsNWidgets(2));
+      expect(find.text('Sin emergencias registradas'), findsNothing);
+    });
+
+    testWidgets('el botón sigue operativo aunque falle el historial', (
+      tester,
+    ) async {
+      // El historial es accesorio: si se cae, la pantalla tiene que seguir
+      // sirviendo para lo único que importa.
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            personaVisualizacionSeleccionadaProvider.overrideWith(
+              (ref) async => _personaAlicia,
+            ),
+            equipoEmergenciaProvider.overrideWith((ref) async => [_asignacion]),
+            puedeActivarEmergenciaProvider.overrideWith((ref) async => true),
+            historialEmergenciasProvider.overrideWith(
+              (ref) async => throw Exception('backend caído'),
+            ),
+          ],
+          child: const MaterialApp(home: EmergencyScreen()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 2100));
+
+      final btn = tester.widget<EmergencyButton>(find.byType(EmergencyButton));
+      expect(btn.enabled, isTrue);
+      // Nada de error en pantalla: el fallo se absorbe en silencio.
+      expect(find.byType(InlineErrorBanner), findsNothing);
+      expect(find.text('Últimas emergencias'), findsNothing);
     });
   });
 }

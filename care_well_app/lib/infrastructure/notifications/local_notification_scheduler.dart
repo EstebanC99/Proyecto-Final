@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../domain/notifications/notification_channel.dart';
 import '../../domain/notifications/notification_id.dart';
+import '../../domain/notifications/notification_payload.dart';
 import '../../domain/notifications/notification_scheduler.dart';
 
 /// Implementación concreta de [NotificationScheduler] usando
@@ -13,7 +17,21 @@ class LocalNotificationScheduler implements NotificationScheduler {
   static const _channelId = 'agenda_reminders';
   static const _channelName = 'Recordatorios de agenda';
 
+  /// Canal de las alertas de emergencia.
+  ///
+  /// El id es un CONTRATO con el backend (`CanalesNotificacionPush.Emergencias`)
+  /// y con el `default_notification_channel_id` del `AndroidManifest.xml`: si no
+  /// coincide carácter por carácter, la notificación push llega con importancia
+  /// por defecto y no suena.
+  static const _channelEmergenciaId = 'emergencias';
+  static const _channelEmergenciaName = 'Emergencias';
+
   final _plugin = FlutterLocalNotificationsPlugin();
+
+  final _tapController = StreamController<NotificationPayload>.broadcast();
+
+  /// Payload de la notificación que abrió la app, resuelto en [init].
+  NotificationPayload? _launchPayload;
 
   /// Retorna un id de notificación positivo a partir del id entero del evento.
   ///
@@ -41,21 +59,42 @@ class LocalNotificationScheduler implements NotificationScheduler {
     await _plugin.initialize(
       settings: settings,
       onDidReceiveNotificationResponse: (details) {
-        // TODO(deeplink): navegar al evento vía payload (details.payload = eventId).
+        final payload = NotificationPayload.decode(details.payload);
+        if (payload != null) _tapController.add(payload);
       },
     );
 
-    await _plugin
+    // La app pudo haber sido abierta por una notificación local. Ese payload no
+    // puede publicarse en el stream: init() corre antes de runApp(), así que
+    // todavía no hay suscriptores y el evento se perdería.
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      _launchPayload = NotificationPayload.decode(
+        launchDetails?.notificationResponse?.payload,
+      );
+    }
+
+    final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(
-          const AndroidNotificationChannel(
-            _channelId,
-            _channelName,
-            importance: Importance.high,
-          ),
-        );
+        >();
+
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _channelId,
+        _channelName,
+        importance: Importance.high,
+      ),
+    );
+
+    // Las emergencias usan la importancia máxima: deben interrumpir.
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _channelEmergenciaId,
+        _channelEmergenciaName,
+        importance: Importance.max,
+      ),
+    );
   }
 
   @override
@@ -113,20 +152,46 @@ class LocalNotificationScheduler implements NotificationScheduler {
     required String titulo,
     required String cuerpo,
     String? payload,
+    NotificationChannel canal = NotificationChannel.agenda,
   }) async {
     await _plugin.show(
       id: notificationId,
       title: titulo,
       body: cuerpo,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
+        android: _androidDetailsFor(canal),
       ),
       payload: payload,
     );
+  }
+
+  @override
+  Stream<NotificationPayload> get onNotificationTap => _tapController.stream;
+
+  @override
+  Future<NotificationPayload?> getLaunchPayload() async => _launchPayload;
+
+  /// Libera el controller de taps.
+  ///
+  /// En producción no tiene llamador: el scheduler se crea en `main.dart` y
+  /// vive todo el proceso. Existe para que los tests no filtren el stream.
+  Future<void> dispose() => _tapController.close();
+
+  /// Traduce el canal del dominio a la configuración concreta de Android.
+  AndroidNotificationDetails _androidDetailsFor(NotificationChannel canal) {
+    return switch (canal) {
+      NotificationChannel.agenda => const AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      NotificationChannel.emergencias => const AndroidNotificationDetails(
+        _channelEmergenciaId,
+        _channelEmergenciaName,
+        importance: Importance.max,
+        priority: Priority.max,
+      ),
+    };
   }
 }

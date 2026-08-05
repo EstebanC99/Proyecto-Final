@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/constraints/terms_content.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'primary_button.dart';
 import 'secondary_text_button.dart';
@@ -41,7 +41,7 @@ class TermsBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.outline,
+              color: context.colors.outline,
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
           ),
@@ -58,20 +58,20 @@ class TermsBottomSheet extends StatelessWidget {
                 child: Text(
                   'Términos y Condiciones',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(false),
                 icon: const Icon(Icons.close),
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 tooltip: 'Cerrar sin aceptar',
               ),
             ],
           ),
         ),
-        const Divider(height: 1, color: AppColors.outline),
+        Divider(height: 1, color: context.colors.outline),
         // Cuerpo scrolleable
         Flexible(
           child: SingleChildScrollView(
@@ -85,7 +85,7 @@ class TermsBottomSheet extends StatelessWidget {
                 Text(
                   'Versión $kTermsVersion',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -138,7 +138,7 @@ class TermsBottomSheet extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(height: 1, color: AppColors.outline),
+        Divider(height: 1, color: context.colors.outline),
         // Acciones fijas
         Padding(
           padding: EdgeInsets.fromLTRB(
@@ -185,14 +185,14 @@ class _Section extends StatelessWidget {
           Text(
             title,
             style: theme.textTheme.titleMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             body,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               height: 1.5,
             ),
           ),

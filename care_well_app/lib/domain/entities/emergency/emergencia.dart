@@ -3,16 +3,17 @@ import '../shared/persona.dart';
 
 /// Registro de una emergencia activada para una persona a cargo.
 ///
-/// Cuando un colaborador activa la alerta, se crea una [Emergencia] que
-/// notifica a todo el equipo de cuidado.
+/// Es un registro INMUTABLE del hecho (un log): no se marca como atendida ni
+/// se modifica. El aviso al equipo de cuidado lo resuelve el backend con
+/// notificaciones push; lo que se garantiza es el registro, no la entrega.
 class Emergencia extends BaseEntity {
-  /// Persona que originó la emergencia.
+  /// Persona bajo cuidado para la que se activó la alerta.
   final Persona persona;
 
-  final DateTime fechaHora;
+  /// Persona que activó la alerta.
+  final Persona activador;
 
-  /// `true` una vez que el equipo confirmó que la situación fue atendida.
-  final bool atendida;
+  final DateTime fechaHora;
 
   /// Descripción breve opcional ingresada por quien activó la alerta.
   final String? descripcion;
@@ -20,8 +21,8 @@ class Emergencia extends BaseEntity {
   const Emergencia({
     required super.id,
     required this.persona,
+    required this.activador,
     required this.fechaHora,
-    this.atendida = false,
     this.descripcion,
   });
 
@@ -29,15 +30,15 @@ class Emergencia extends BaseEntity {
   Emergencia copyWith({
     int? id,
     Persona? persona,
+    Persona? activador,
     DateTime? fechaHora,
-    bool? atendida,
     String? descripcion,
   }) {
     return Emergencia(
       id: id ?? this.id,
       persona: persona ?? this.persona,
+      activador: activador ?? this.activador,
       fechaHora: fechaHora ?? this.fechaHora,
-      atendida: atendida ?? this.atendida,
       descripcion: descripcion ?? this.descripcion,
     );
   }

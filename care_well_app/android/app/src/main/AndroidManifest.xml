@@ -37,6 +37,13 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- Canal por defecto de las notificaciones push de FCM.
+             DEBE coincidir con CanalesNotificacionPush.Emergencias del backend
+             y con el canal creado en LocalNotificationScheduler. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="emergencias" />
+
         <!-- Activity de recorte de imágenes requerida por image_cropper (uCrop) -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"

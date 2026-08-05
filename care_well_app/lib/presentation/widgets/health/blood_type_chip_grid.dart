@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../config/constraints/health_catalogs.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Selector de Factor sanguíneo: grilla 4×2 de chips de selección única.
@@ -58,13 +58,13 @@ class BloodTypeChipGrid extends StatelessWidget {
           ],
         ),
         if (showError)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
               'Seleccioná el factor sanguíneo',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.error,
+                color: context.colors.error,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -97,20 +97,20 @@ class _BloodChip extends StatelessWidget {
     final Color textColor;
 
     if (selected) {
-      borderColor = AppColors.healthAccent;
+      borderColor = context.colors.healthAccent;
       borderWidth = 2;
-      bgColor = AppColors.healthContainer;
-      textColor = AppColors.healthAccent;
+      bgColor = context.colors.healthContainer;
+      textColor = context.colors.healthAccent;
     } else if (showError) {
-      borderColor = AppColors.error;
+      borderColor = context.colors.error;
       borderWidth = 2;
-      bgColor = AppColors.surface;
-      textColor = AppColors.textPrimary;
+      bgColor = context.colors.surface;
+      textColor = context.colors.textPrimary;
     } else {
-      borderColor = AppColors.outline;
+      borderColor = context.colors.outline;
       borderWidth = 1.5;
-      bgColor = AppColors.surface;
-      textColor = AppColors.textPrimary;
+      bgColor = context.colors.surface;
+      textColor = context.colors.textPrimary;
     }
 
     return Material(

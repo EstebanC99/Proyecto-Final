@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/avatar.dart';
 import '../shared/persona_avatar.dart';
@@ -35,7 +35,7 @@ class HomeHeader extends ConsumerWidget {
       duration: const Duration(milliseconds: 400),
       child: Container(
         height: 64,
-        color: AppColors.surface,
+        color: context.colors.surface,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Row(
           children: [
@@ -47,12 +47,12 @@ class HomeHeader extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.sm),
             RichText(
-              text: const TextSpan(
+              text: TextSpan(
                 children: [
                   TextSpan(
                     text: 'Care',
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Inter',
@@ -61,7 +61,7 @@ class HomeHeader extends ConsumerWidget {
                   TextSpan(
                     text: 'Well',
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Inter',
@@ -104,8 +104,8 @@ class HomeHeader extends ConsumerWidget {
                         // Saludo
                         Text(
                           'Hola, $userName',
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: context.colors.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),

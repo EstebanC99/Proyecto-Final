@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -149,7 +149,7 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -175,11 +175,11 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Text(_esEdicion ? 'Editar evento' : 'Nuevo evento'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: tiposAsync.when(
@@ -224,9 +224,11 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
                     onSelected: _loading
                         ? null
                         : (_) => setState(() => _tipo = t),
-                    selectedColor: TipoEventoTheme.accentFor(t.id),
+                    selectedColor: TipoEventoTheme.accentFor(context, t.id),
                     labelStyle: TextStyle(
-                      color: selected ? Colors.white : AppColors.textPrimary,
+                      color: selected
+                          ? context.colors.onPrimary
+                          : context.colors.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -338,18 +340,21 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
             onChanged: _loading
                 ? null
                 : (v) => setState(() => _generarEventoSalud = v),
-            activeThumbColor: AppColors.healthAccent,
-            title: const Text(
+            activeThumbColor: context.colors.healthAccent,
+            title: Text(
               'Generar evento de salud',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
-            subtitle: const Text(
+            subtitle: Text(
               'Se registrará también en Mi Salud cuando ocurra.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 12,
+                color: context.colors.textSecondary,
+              ),
             ),
           ),
 
@@ -362,18 +367,18 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
             child: FilledButton(
               onPressed: puedeGuardar ? _guardar : null,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.colors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 ),
               ),
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     )
                   : Text(
@@ -430,9 +435,9 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             _unidadFrecuencia(_frecuencia!, _intervalo),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -483,10 +488,10 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
       ),
     );
   }
@@ -523,20 +528,20 @@ class _PickerField extends StatelessWidget {
               vertical: AppSpacing.md,
             ),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.outline),
+              border: Border.all(color: context.colors.outline),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              color: AppColors.surface,
+              color: context.colors.surface,
             ),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: AppColors.textSecondary),
+                Icon(icon, size: 20, color: context.colors.textSecondary),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
@@ -560,7 +565,7 @@ class _IntervaloStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: context.colors.outline),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -574,10 +579,10 @@ class _IntervaloStepper extends StatelessWidget {
           ),
           Text(
             '$valor',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           IconButton(
@@ -618,9 +623,9 @@ class _DuracionStepper extends StatelessWidget {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: context.colors.outline),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        color: AppColors.surface,
+        color: context.colors.surface,
       ),
       child: Row(
         children: [
@@ -629,8 +634,8 @@ class _DuracionStepper extends StatelessWidget {
               Icons.remove_rounded,
               size: 20,
               color: puedeRestar
-                  ? AppColors.textPrimary
-                  : AppColors.textDisabled,
+                  ? context.colors.textPrimary
+                  : context.colors.textDisabled,
             ),
             onPressed: puedeRestar ? () => onChanged!(valor - _step) : null,
           ),
@@ -642,8 +647,8 @@ class _DuracionStepper extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: valor == 0
-                    ? AppColors.textSecondary
-                    : AppColors.textPrimary,
+                    ? context.colors.textSecondary
+                    : context.colors.textPrimary,
               ),
             ),
           ),
@@ -652,8 +657,8 @@ class _DuracionStepper extends StatelessWidget {
               Icons.add_rounded,
               size: 20,
               color: puedeSumar
-                  ? AppColors.textPrimary
-                  : AppColors.textDisabled,
+                  ? context.colors.textPrimary
+                  : context.colors.textDisabled,
             ),
             onPressed: puedeSumar ? () => onChanged!(valor + _step) : null,
           ),
@@ -695,18 +700,18 @@ class _RecordatorioCarrusel extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           value: activo,
           onChanged: onActivoChanged,
-          activeThumbColor: AppColors.info,
-          title: const Text(
+          activeThumbColor: context.colors.info,
+          title: Text(
             'Recordatorio',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
-          subtitle: const Text(
+          subtitle: Text(
             'Recibí una notificación antes del evento.',
-            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
           ),
         ),
         AnimatedSize(
@@ -715,7 +720,7 @@ class _RecordatorioCarrusel extends StatelessWidget {
           child: activo
               ? Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: _buildCarrusel(),
+                  child: _buildCarrusel(context),
                 )
               : const SizedBox.shrink(),
         ),
@@ -723,7 +728,7 @@ class _RecordatorioCarrusel extends StatelessWidget {
     );
   }
 
-  Widget _buildCarrusel() {
+  Widget _buildCarrusel(BuildContext context) {
     final idx = _indices.indexOf(anticipacion ?? 0);
     final safeIdx = idx < 0 ? 0 : idx;
     final label = _opciones[_indices[safeIdx]]!;
@@ -732,7 +737,7 @@ class _RecordatorioCarrusel extends StatelessWidget {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        color: AppColors.infoContainer,
+        color: context.colors.infoContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -741,7 +746,9 @@ class _RecordatorioCarrusel extends StatelessWidget {
             icon: Icon(
               Icons.chevron_left_rounded,
               size: 28,
-              color: enPrimero ? AppColors.textDisabled : AppColors.info,
+              color: enPrimero
+                  ? context.colors.textDisabled
+                  : context.colors.info,
             ),
             onPressed: enPrimero
                 ? null
@@ -751,10 +758,10 @@ class _RecordatorioCarrusel extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.info,
+                color: context.colors.info,
               ),
             ),
           ),
@@ -762,7 +769,9 @@ class _RecordatorioCarrusel extends StatelessWidget {
             icon: Icon(
               Icons.chevron_right_rounded,
               size: 28,
-              color: enUltimo ? AppColors.textDisabled : AppColors.info,
+              color: enUltimo
+                  ? context.colors.textDisabled
+                  : context.colors.info,
             ),
             onPressed: enUltimo
                 ? null
@@ -777,8 +786,8 @@ class _RecordatorioCarrusel extends StatelessWidget {
 /// Carrusel de selección de frecuencia de recurrencia.
 ///
 /// Presenta cuatro posiciones: "Nunca" (null) → Diaria → Semanal → Mensual.
-/// Mismo estilo visual que [_RecordatorioCarrusel]: fondo [AppColors.infoContainer],
-/// texto y flechas en [AppColors.info], height 56, radio [AppSpacing.radiusMd].
+/// Mismo estilo visual que [_RecordatorioCarrusel]: fondo [AppPalette.infoContainer],
+/// texto y flechas en [AppPalette.info], height 56, radio [AppSpacing.radiusMd].
 /// Las flechas se deshabilitan en los extremos del rango y cuando [onChanged] es null.
 class _FrecuenciaCarrusel extends StatelessWidget {
   const _FrecuenciaCarrusel({required this.frecuencia, this.onChanged});
@@ -813,7 +822,7 @@ class _FrecuenciaCarrusel extends StatelessWidget {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        color: AppColors.infoContainer,
+        color: context.colors.infoContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -823,8 +832,8 @@ class _FrecuenciaCarrusel extends StatelessWidget {
               Icons.chevron_left_rounded,
               size: 28,
               color: (enPrimero || onChanged == null)
-                  ? AppColors.textDisabled
-                  : AppColors.info,
+                  ? context.colors.textDisabled
+                  : context.colors.info,
             ),
             onPressed: (enPrimero || onChanged == null)
                 ? null
@@ -834,10 +843,10 @@ class _FrecuenciaCarrusel extends StatelessWidget {
             child: Text(
               _label(_opciones[safeIdx]),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.info,
+                color: context.colors.info,
               ),
             ),
           ),
@@ -846,8 +855,8 @@ class _FrecuenciaCarrusel extends StatelessWidget {
               Icons.chevron_right_rounded,
               size: 28,
               color: (enUltimo || onChanged == null)
-                  ? AppColors.textDisabled
-                  : AppColors.info,
+                  ? context.colors.textDisabled
+                  : context.colors.info,
             ),
             onPressed: (enUltimo || onChanged == null)
                 ? null

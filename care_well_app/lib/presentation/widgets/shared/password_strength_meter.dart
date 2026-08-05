@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Nivel de fortaleza de una contraseña.
@@ -55,9 +55,9 @@ class PasswordStrengthMeter extends StatelessWidget {
         return theme.colorScheme.surfaceContainerHighest;
       }
       return switch (strength) {
-        PasswordStrength.weak => AppColors.strengthWeak,
-        PasswordStrength.medium => AppColors.strengthMedium,
-        PasswordStrength.strong => AppColors.strengthStrong,
+        PasswordStrength.weak => context.colors.strengthWeak,
+        PasswordStrength.medium => context.colors.strengthMedium,
+        PasswordStrength.strong => context.colors.strengthStrong,
       };
     }
 

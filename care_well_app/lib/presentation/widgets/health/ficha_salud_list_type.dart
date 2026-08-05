@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Tipos de lista de la Ficha de salud. Un único descriptor centraliza el
 /// acento visual, ícono y textos de cada tipo, para reutilizarlos en la
@@ -9,17 +9,17 @@ enum FichaListType { antecedentes, alergias, enfermedades }
 
 extension FichaListTypeX on FichaListType {
   /// Color de acento (ícono, borde de card, botón "+ Agregar").
-  Color get accent => switch (this) {
-    FichaListType.antecedentes => AppColors.healthAccent,
-    FichaListType.alergias => AppColors.warning,
-    FichaListType.enfermedades => AppColors.info,
+  Color accent(BuildContext context) => switch (this) {
+    FichaListType.antecedentes => context.colors.healthAccent,
+    FichaListType.alergias => context.colors.warning,
+    FichaListType.enfermedades => context.colors.info,
   };
 
   /// Color de contenedor tenue (fondo del ícono en estado vacío).
-  Color get container => switch (this) {
-    FichaListType.antecedentes => AppColors.healthContainer,
-    FichaListType.alergias => AppColors.warningContainer,
-    FichaListType.enfermedades => AppColors.infoContainer,
+  Color container(BuildContext context) => switch (this) {
+    FichaListType.antecedentes => context.colors.healthContainer,
+    FichaListType.alergias => context.colors.warningContainer,
+    FichaListType.enfermedades => context.colors.infoContainer,
   };
 
   IconData get icon => switch (this) {

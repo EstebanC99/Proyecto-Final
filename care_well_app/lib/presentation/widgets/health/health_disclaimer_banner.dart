@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Banner prominente con el aviso legal sobre recomendaciones médicas.
@@ -19,14 +19,16 @@ class HealthDisclaimerBanner extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.warningContainer,
+        color: context.colors.warningContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: context.colors.warning.withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.warning),
+          Icon(Icons.info_outline, size: 18, color: context.colors.warning),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
@@ -34,7 +36,7 @@ class HealthDisclaimerBanner extends StatelessWidget {
               'la consulta con un profesional de la salud.',
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.warning.withValues(alpha: 0.85),
+                color: context.colors.warning.withValues(alpha: 0.85),
                 height: 1.4,
               ),
             ),

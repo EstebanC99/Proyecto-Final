@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Placeholder con animación de shimmer para el estado de carga de [NavTile].
@@ -60,7 +60,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
         child: Container(
           constraints: const BoxConstraints(minHeight: AppSpacing.minTapTarget),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: context.colors.surfaceVariant,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -72,7 +72,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
               ),
@@ -81,7 +81,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
                 height: 14,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
               ),
@@ -90,7 +90,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
                 height: 14,
                 width: 60,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
               ),

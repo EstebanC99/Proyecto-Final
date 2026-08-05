@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../../domain/entities/entities.dart';
 import '../../../domain/repositories/repositories.dart';
 import '../di_providers.dart';
+import '../notifications/push_token_providers.dart';
 
 /// Notifier que gestiona el estado de la sesión activa.
 ///
@@ -88,6 +89,25 @@ final authStateProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<Usuario?>>(
       (ref) => AuthNotifier(ref.watch(authRepositoryProvider)),
     );
+
+/// Cierra la sesión dando de baja el dispositivo push en el ORDEN correcto.
+///
+/// El endpoint de baja exige JWT: si se llamara después de limpiar la sesión
+/// devolvería 401 y el dispositivo seguiría recibiendo las emergencias de un
+/// equipo del que ya se desconectó.
+///
+/// SIEMPRE cerrar sesión por acá, nunca llamando a `logout()` directo.
+final cerrarSesionProvider = Provider<Future<void> Function()>((ref) {
+  return () async {
+    try {
+      await ref.read(pushTokenSynchronizerProvider).darDeBajaDispositivo();
+    } catch (_) {
+      // Nunca impedir el cierre de sesión por una falla de red.
+    }
+
+    await ref.read(authStateProvider.notifier).logout();
+  };
+});
 
 /// Provider autoDispose para solicitar recuperación de contraseña.
 ///

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -99,7 +99,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
       ..showSnackBar(
         SnackBar(
           content: Text('$nombre eliminado'),
-          backgroundColor: AppColors.textPrimary,
+          backgroundColor: context.colors.textPrimary,
           duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: 'DESHACER',
@@ -119,7 +119,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
       title: '¿Salir sin guardar?',
       body: 'Se perderán los cambios de la ficha que no guardaste.',
       confirmLabel: 'Salir',
-      accentColor: AppColors.warning,
+      accentColor: context.colors.warning,
       icon: Icons.logout_outlined,
       onConfirm: () async {},
     );
@@ -167,11 +167,11 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         appBar: AppBar(
           title: const Text('Ficha de salud'),
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor: context.colors.surface,
+          foregroundColor: context.colors.textPrimary,
           elevation: 0,
         ),
         body: personaAsync.when(
@@ -186,7 +186,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
           ),
           data: (persona) {
             if (persona == null) {
-              return const Center(
+              return Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                   child: Text(
@@ -194,7 +194,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -268,12 +268,12 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
           const SizedBox(height: AppSpacing.xl),
           const _SectionLabel('Datos generales'),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
+          Text(
             'Factor sanguíneo *',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -330,7 +330,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
               form.antecedentes[i].descripcion,
               'Vínculo: ${form.antecedentes[i].vinculoFamiliar}',
             ],
-            accent: FichaListType.antecedentes.accent,
+            accent: FichaListType.antecedentes.accent(context),
             onTap: puedeEditar ? () => _edicionAntecedente(i) : null,
             onDelete: puedeEditar ? () => _borrarAntecedente(i) : null,
           ),
@@ -354,7 +354,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
               if (form.alergias[i].medicamento != null)
                 'Medicamento: ${form.alergias[i].medicamento}',
             ],
-            accent: FichaListType.alergias.accent,
+            accent: FichaListType.alergias.accent(context),
             onTap: puedeEditar ? () => _edicionAlergia(i) : null,
             onDelete: puedeEditar ? () => _borrarAlergia(i) : null,
           ),
@@ -378,7 +378,7 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
                 form.enfermedades[i].observacion!,
             ],
             vigente: form.enfermedades[i].vigente,
-            accent: FichaListType.enfermedades.accent,
+            accent: FichaListType.enfermedades.accent(context),
             onTap: puedeEditar ? () => _edicionEnfermedad(i) : null,
             onDelete: puedeEditar ? () => _borrarEnfermedad(i) : null,
           ),
@@ -501,10 +501,10 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w700,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
         letterSpacing: 0.5,
       ),
     );
@@ -554,27 +554,27 @@ class _StickyFooter extends StatelessWidget {
               child: FilledButton(
                 onPressed: enabled ? onPressed : null,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  disabledBackgroundColor: AppColors.outline,
+                  backgroundColor: context.colors.primary,
+                  disabledBackgroundColor: context.colors.outline,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   ),
                 ),
                 child: loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: Colors.white,
+                          color: context.colors.onPrimary,
                         ),
                       )
-                    : const Text(
+                    : Text(
                         'Guardar ficha',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: context.colors.onPrimary,
                         ),
                       ),
               ),
@@ -591,20 +591,24 @@ class _SinPermisoState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.lock_outline, size: 64, color: AppColors.textDisabled),
+            Icon(
+              Icons.lock_outline,
+              size: 64,
+              color: context.colors.textDisabled,
+            ),
             SizedBox(height: AppSpacing.md),
             Text(
               'No tenés permiso para ver la ficha de salud de esta persona.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -624,7 +628,7 @@ class _LoadingSkeleton extends StatelessWidget {
       height: height,
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       ),
     );

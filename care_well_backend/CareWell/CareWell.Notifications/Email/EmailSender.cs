@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
@@ -7,10 +8,13 @@ namespace CareWell.Notifications.Email
     public class EmailSender : IEmailSender
     {
         private EmailOptions EmailOptions { get; set; }
+        private ILogger<EmailSender> Logger { get; set; }
 
-        public EmailSender(IOptions<EmailOptions> options)
+        public EmailSender(IOptions<EmailOptions> options,
+                           ILogger<EmailSender> logger)
         {
             this.EmailOptions = options.Value;
+            this.Logger = logger;
         }
 
         public bool Enviar(string destinatario, string nombre, string asunto, string cuerpoHtml)
@@ -34,7 +38,7 @@ namespace CareWell.Notifications.Email
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ElasticEmail] Error al enviar email a '{destinatario}': {ex}");
+                this.Logger.LogError(ex, "Error al enviar email a '{Destinatario}'.", destinatario);
                 return false;
             }
         }

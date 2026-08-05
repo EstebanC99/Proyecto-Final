@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Ítem de lista de configuración.
 ///
 /// Altura mínima 56 dp, objetivo táctil mínimo 48 dp.
-/// Variante [destructive]: ícono y texto en [AppColors.error].
+/// Variante [destructive]: ícono y texto en [AppPalette.error].
 class SettingsItem extends StatelessWidget {
   const SettingsItem({
     super.key,
@@ -26,7 +26,7 @@ class SettingsItem extends StatelessWidget {
   /// Callback al tocar el ítem.
   final VoidCallback onTap;
 
-  /// Si es `true`, el ícono y el texto se muestran en color [AppColors.error].
+  /// Si es `true`, el ícono y el texto se muestran en color [AppPalette.error].
   final bool destructive;
 
   /// Widget opcional a la derecha en lugar del chevron por defecto.
@@ -34,8 +34,12 @@ class SettingsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = destructive ? AppColors.error : AppColors.textPrimary;
-    final iconColor = destructive ? AppColors.error : AppColors.textSecondary;
+    final color = destructive
+        ? context.colors.error
+        : context.colors.textPrimary;
+    final iconColor = destructive
+        ? context.colors.error
+        : context.colors.textSecondary;
 
     return InkWell(
       onTap: onTap,
@@ -45,7 +49,7 @@ class SettingsItem extends StatelessWidget {
           horizontal: AppSpacing.xl,
           vertical: AppSpacing.sm,
         ),
-        color: AppColors.surface,
+        color: context.colors.surface,
         child: Row(
           children: [
             Icon(icon, size: 24, color: iconColor),

@@ -3,6 +3,7 @@ using CareWell.BusinessService;
 using CareWell.DocumentIntelligence;
 using CareWell.Notifications;
 using CareWell.Notifications.Email;
+using CareWell.Notifications.Push;
 using CareWell.Repository;
 using CareWell.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,7 +36,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
-builder.Services.Configure<OllamaClientOptions>(builder.Configuration.GetSection("ReconocedorTexto"));
+builder.Services.Configure<OllamaClientOptions>(builder.Configuration.GetSection("Ollama"));
+builder.Services.Configure<PushOptions>(builder.Configuration.GetSection("Push"));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

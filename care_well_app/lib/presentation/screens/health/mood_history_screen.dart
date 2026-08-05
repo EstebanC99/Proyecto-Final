@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -19,11 +19,11 @@ class MoodHistoryScreen extends ConsumerWidget {
     final nombrePersona = personaAsync.value?.nombre ?? 'la persona a cargo';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Historial de ánimo'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
         actions: [
           if (personaAsync.value != null)
@@ -31,9 +31,9 @@ class MoodHistoryScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Chip(
                 label: Text(nombrePersona),
-                backgroundColor: AppColors.moodContainer,
-                labelStyle: const TextStyle(
-                  color: AppColors.moodAccent,
+                backgroundColor: context.colors.moodContainer,
+                labelStyle: TextStyle(
+                  color: context.colors.moodAccent,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -49,7 +49,7 @@ class MoodHistoryScreen extends ConsumerWidget {
           ),
         ),
         data: (estados) => RefreshIndicator(
-          color: AppColors.moodAccent,
+          color: context.colors.moodAccent,
           onRefresh: () async => ref.invalidate(estadosAnimoProvider),
           child: CustomScrollView(
             slivers: [
@@ -60,18 +60,18 @@ class MoodHistoryScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: context.colors.surface,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'ÚLTIMOS 7 DÍAS',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -87,7 +87,7 @@ class MoodHistoryScreen extends ConsumerWidget {
               ),
 
               // Encabezado registros recientes
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.lg,
@@ -100,7 +100,7 @@ class MoodHistoryScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -109,7 +109,7 @@ class MoodHistoryScreen extends ConsumerWidget {
 
               // Lista de registros
               if (estados.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
@@ -119,7 +119,7 @@ class MoodHistoryScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ),
@@ -156,7 +156,7 @@ class _MoodRecordItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final level = moodLevel(estado.estado);
-    final color = moodLevelColor(level);
+    final color = moodLevelColor(context.colors, level);
     final fecha = DateFormat('d MMM yyyy', 'es').format(estado.fecha);
 
     return GestureDetector(
@@ -165,7 +165,7 @@ class _MoodRecordItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         ),
         child: Row(
@@ -191,17 +191,17 @@ class _MoodRecordItem extends StatelessWidget {
                 children: [
                   Text(
                     fecha,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textDisabled,
+                      color: context.colors.textDisabled,
                     ),
                   ),
                   if (estado.observaciones != null)
                     Text(
                       estado.observaciones!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -235,25 +235,28 @@ class _MoodRecordItem extends StatelessWidget {
           children: [
             Text(
               fechaHora,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textDisabled,
+                color: context.colors.textDisabled,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             if (estado.observaciones != null)
               Text(
                 estado.observaciones!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   height: 1.5,
                 ),
               )
             else
-              const Text(
+              Text(
                 'Sin observación registrada.',
-                style: TextStyle(fontSize: 14, color: AppColors.textDisabled),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textDisabled,
+                ),
               ),
           ],
         ),

@@ -7,7 +7,8 @@ import '../../../domain/entities/entities.dart';
 
 /// Asignaciones activas del equipo de cuidado de la persona de contexto.
 ///
-/// Usadas para mostrar quiénes serán notificados y para enviar las notificaciones.
+/// Es solo informativo: sirve para mostrar en pantalla quiénes integran el
+/// equipo. El envío del aviso lo resuelve el backend con notificaciones push.
 final equipoEmergenciaProvider = FutureProvider<List<AsignacionCuidado>>((
   ref,
 ) async {
@@ -22,6 +23,32 @@ final equipoEmergenciaProvider = FutureProvider<List<AsignacionCuidado>>((
       .where((a) => a.estado.id == EstadosAsignacionConst.activa)
       .toList();
 });
+
+// ─── Historial corto ──────────────────────────────────────────────────────────
+
+/// Últimas emergencias registradas para la persona de contexto.
+///
+/// `autoDispose` a propósito: la pantalla se abandona al activar una emergencia
+/// (se navega a la de alerta enviada), así que al volver a entrar el provider se
+/// reconstruye y el historial ya incluye la emergencia recién creada. No hace
+/// falta invalidarlo a mano desde [activarEmergenciaProvider].
+final historialEmergenciasProvider =
+    FutureProvider.autoDispose<List<Emergencia>>((ref) async {
+      final persona = await ref.watch(
+        personaVisualizacionSeleccionadaProvider.future,
+      );
+      if (persona == null) return [];
+
+      // El backend ya devuelve de la más reciente a la más antigua
+      // (OrderByDescending por FechaHora). NO reordenar acá: sería duplicar una
+      // regla que vive del otro lado y que además condiciona qué 5 llegan.
+      return ref
+          .read(emergencyRepositoryProvider)
+          .getEmergenciasByPersona(
+            persona.id,
+            cantidad: EmergenciasConst.cantidadHistorialCorto,
+          );
+    });
 
 // ─── Permisos RBAC ────────────────────────────────────────────────────────────
 
@@ -64,14 +91,10 @@ final puedeActivarEmergenciaProvider = FutureProvider<bool>((ref) async {
 
 /// Activa la emergencia para la persona de contexto.
 ///
-/// Registra la emergencia en el repositorio y envía una notificación local
-/// inmediata a cada miembro activo del equipo.
-///
-/// TODO(backend): cuando el backend esté disponible, reemplazar las notificaciones
-/// locales por notificaciones push reales a los dispositivos remotos del equipo.
-final activarEmergenciaProvider = Provider<Future<Emergencia> Function()>((
-  ref,
-) {
+/// Solo registra la emergencia en el backend: el aviso push al equipo de
+/// cuidado lo envía el servidor (excluyendo al activador y a la persona
+/// cuidada), por lo que el cliente no notifica a nadie por su cuenta.
+final activarEmergenciaProvider = Provider<Future<void> Function()>((ref) {
   return () async {
     final usuario = ref.read(authStateProvider).value;
     if (usuario == null) throw Exception('Sin sesión activa');
@@ -81,28 +104,8 @@ final activarEmergenciaProvider = Provider<Future<Emergencia> Function()>((
     );
     if (persona == null) throw Exception('Sin persona de contexto');
 
-    final miembros = await ref.read(equipoEmergenciaProvider.future);
-    final scheduler = ref.read(notificationSchedulerProvider);
-    final repo = ref.read(emergencyRepositoryProvider);
-
-    // Registrar la emergencia en el repositorio.
-    final emergencia = await repo.activarEmergencia(
-      personaId: persona.id,
-      descripcion: null,
-    );
-
-    // Notificación local por cada miembro del equipo activo.
-    for (final m in miembros) {
-      final notifId = '${emergencia.id}_${m.id}'.hashCode & 0x7fffffff;
-      await scheduler.showImmediateNotification(
-        notificationId: notifId,
-        titulo: 'Emergencia — ${persona.nombre} ${persona.apellido}',
-        cuerpo:
-            '${usuario.persona.nombre} está solicitando asistencia inmediata.',
-        payload: emergencia.id.toString(),
-      );
-    }
-
-    return emergencia;
+    await ref
+        .read(emergencyRepositoryProvider)
+        .activarEmergencia(personaId: persona.id, descripcion: null);
   };
 });

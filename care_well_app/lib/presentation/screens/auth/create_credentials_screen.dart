@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
@@ -194,15 +194,15 @@ class _CreateCredentialsScreenState
               Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer,
+                  color: context.colors.primaryContainer,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.info_outline,
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -211,7 +211,7 @@ class _CreateCredentialsScreenState
                         'Tu cuenta fue creada por un familiar o cuidador. '
                         'Completá tus datos para poder acceder.',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onPrimaryContainer,
+                          color: context.colors.onPrimaryContainer,
                         ),
                       ),
                     ),
@@ -244,7 +244,7 @@ class _CreateCredentialsScreenState
               Text(
                 'Verificá tu identidad',
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -252,7 +252,7 @@ class _CreateCredentialsScreenState
               Text(
                 'Tomá una foto de tu DNI para confirmar que sos vos.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -281,7 +281,7 @@ class _CreateCredentialsScreenState
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                     size: 20,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   tooltip: _showPassword
                       ? 'Ocultar contraseña'
@@ -367,7 +367,7 @@ class _CreateCredentialsScreenState
                   'Estamos verificando tu documento… esto puede demorar hasta '
                   'un minuto.',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -421,7 +421,7 @@ class _TcRow extends StatelessWidget {
                 child: RichText(
                   text: TextSpan(
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                     children: [
                       const TextSpan(text: 'Acepto los '),
@@ -433,7 +433,7 @@ class _TcRow extends StatelessWidget {
                           child: Text(
                             'Términos y Condiciones',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppColors.primary,
+                              color: context.colors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -454,7 +454,7 @@ class _TcRow extends StatelessWidget {
             child: Text(
               error!,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.error,
+                color: context.colors.error,
               ),
             ),
           ),

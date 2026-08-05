@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Chip pequeño que muestra el rol del usuario en el sistema.
 ///
-/// Fondo [AppColors.primaryContainer], texto [AppColors.primary], 12 sp, weight 600.
+/// Fondo [AppPalette.primaryContainer], texto [AppPalette.primary], 12 sp, weight 600.
 class RoleBadge extends StatelessWidget {
   const RoleBadge({super.key, required this.rol});
 
@@ -20,15 +20,15 @@ class RoleBadge extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.primaryContainer,
+        color: context.colors.primaryContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
       ),
       child: Text(
         rol,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: AppColors.primary,
+          color: context.colors.primary,
         ),
       ),
     );

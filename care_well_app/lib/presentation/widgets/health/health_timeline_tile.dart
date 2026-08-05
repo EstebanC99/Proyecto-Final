@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import 'health_timeline_style.dart';
@@ -25,7 +25,7 @@ class HealthTimelineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = categoriaEventoColor(evento.categoriaEvento);
+    final color = categoriaEventoColor(context, evento.categoriaEvento);
     final label = categoriaEventoLabel(evento.categoriaEvento);
     final fechaStr = DateFormat(
       'd MMM · HH:mm',
@@ -59,7 +59,7 @@ class HealthTimelineTile extends StatelessWidget {
                       child: Center(
                         child: Container(
                           width: 2,
-                          color: AppColors.surfaceVariant,
+                          color: context.colors.surfaceVariant,
                         ),
                       ),
                     ),
@@ -77,7 +77,7 @@ class HealthTimelineTile extends StatelessWidget {
                     vertical: AppSpacing.md,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: context.colors.surface,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     boxShadow: AppSpacing.elev1,
                   ),
@@ -109,19 +109,19 @@ class HealthTimelineTile extends StatelessWidget {
                       // Fecha
                       Text(
                         fechaStr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textDisabled,
+                          color: context.colors.textDisabled,
                         ),
                       ),
                       const SizedBox(height: 2),
                       // Título / descripción truncada
                       Text(
                         evento.descripcion,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

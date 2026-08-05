@@ -1,4 +1,4 @@
-import 'package:care_well_app/config/theme/app_colors.dart';
+import 'package:care_well_app/config/theme/app_palette.dart';
 import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,7 +37,7 @@ void main() {
       await tester.pumpWidget(buildItem(destructive: true));
 
       final text = tester.widget<Text>(find.text('Mi Perfil'));
-      expect(text.style?.color, AppColors.error);
+      expect(text.style?.color, AppPalette.light.error);
     });
 
     testWidgets('variante normal no usa color error en el texto', (
@@ -46,7 +46,7 @@ void main() {
       await tester.pumpWidget(buildItem(destructive: false));
 
       final text = tester.widget<Text>(find.text('Mi Perfil'));
-      expect(text.style?.color, isNot(AppColors.error));
+      expect(text.style?.color, isNot(AppPalette.light.error));
     });
 
     testWidgets('onTap se invoca al tocar', (tester) async {

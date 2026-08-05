@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'status_chip.dart';
 
@@ -41,7 +41,7 @@ class HealthListItemCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border(left: BorderSide(color: accent, width: 3)),
         boxShadow: AppSpacing.elev1,
@@ -70,10 +70,10 @@ class HealthListItemCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
                           ),
@@ -89,9 +89,9 @@ class HealthListItemCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 2),
                             child: Text(
                               line,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                color: AppColors.textSecondary,
+                                color: context.colors.textSecondary,
                                 height: 1.35,
                               ),
                             ),
@@ -107,7 +107,7 @@ class HealthListItemCard extends StatelessWidget {
                       onPressed: onDelete,
                       padding: EdgeInsets.zero,
                       iconSize: 20,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       icon: const Icon(Icons.delete_outline),
                       tooltip: 'Eliminar',
                     ),

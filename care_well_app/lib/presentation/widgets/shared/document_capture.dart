@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import 'image_source_sheet.dart';
 
 /// Muestra la hoja de selección de origen, abre el selector/cámara, permite
@@ -22,6 +22,10 @@ import 'image_source_sheet.dart';
 /// Privacidad: la imagen es PII sensible. Solo se codifica en memoria y se
 /// devuelve al llamador; no se cachea en disco ni se registra en logs.
 Future<String?> pickDocumentImageAsBase64(BuildContext context) async {
+  // Se captura antes de los `await`: la UI nativa del cropper no participa del
+  // árbol de widgets y no puede leer el tema después del gap asincrónico.
+  final palette = context.colors;
+
   final source = await ImageSourceSheet.show(
     context,
     title: 'Foto del documento',
@@ -45,9 +49,9 @@ Future<String?> pickDocumentImageAsBase64(BuildContext context) async {
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: 'Recortar documento',
-        toolbarColor: AppColors.primary,
-        toolbarWidgetColor: AppColors.surface,
-        activeControlsWidgetColor: AppColors.primary,
+        toolbarColor: palette.primary,
+        toolbarWidgetColor: palette.onPrimary,
+        activeControlsWidgetColor: palette.primary,
         lockAspectRatio: true,
         hideBottomControls: true,
       ),

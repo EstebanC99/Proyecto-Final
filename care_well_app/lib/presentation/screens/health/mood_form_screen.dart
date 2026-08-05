@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -51,9 +51,13 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                 TextButton(
                   onPressed: () =>
                       context.pushNamed(AppRoutes.healthMoodHistoryName),
-                  child: const Text(
+                  child: Text(
                     'Ver historial',
-                    style: TextStyle(color: Colors.white),
+                    // El SnackBar se pinta sobre `inverseSurface`, que se
+                    // invierte con el tema: el texto no puede ser blanco fijo.
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                    ),
                   ),
                 ),
               ],
@@ -66,7 +70,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -81,11 +85,11 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
     final nombrePersona = personaAsync.value?.nombre ?? 'la persona a cargo';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Estado de ánimo'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -121,10 +125,10 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                     ),
                     child: Text(
                       '¿Cómo se siente $nombrePersona hoy?',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
@@ -137,7 +141,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                       vertical: AppSpacing.xl,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: context.colors.surface,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
                     child: MoodDialSelector(
@@ -151,12 +155,12 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Observación (opcional)
-                  const Text(
+                  Text(
                     'Observación',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -168,13 +172,13 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                     textAlignVertical: TextAlignVertical.top,
                     decoration: InputDecoration(
                       hintText: 'Ej. Estuvo tranquila, durmió bien',
-                      hintStyle: const TextStyle(color: AppColors.textDisabled),
-                      prefixIcon: const Padding(
+                      hintStyle: TextStyle(color: context.colors.textDisabled),
+                      prefixIcon: Padding(
                         padding: EdgeInsets.only(top: 14),
                         child: Icon(
                           Icons.description_outlined,
                           size: 20,
-                          color: AppColors.textDisabled,
+                          color: context.colors.textDisabled,
                         ),
                       ),
                       prefixIconConstraints: const BoxConstraints(minWidth: 48),
@@ -200,7 +204,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                         ? FilledButton(
                             onPressed: _loading ? null : _registrar,
                             style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.moodAccent,
+                              backgroundColor: context.colors.moodAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusLg,
@@ -208,12 +212,12 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                               ),
                             ),
                             child: _loading
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      color: Colors.white,
+                                      color: context.colors.onPrimary,
                                     ),
                                   )
                                 : const Text(
@@ -227,11 +231,12 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                         : OutlinedButton(
                             onPressed: null,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                color: AppColors.moodAccent,
+                              side: BorderSide(
+                                color: context.colors.moodAccent,
                                 width: 2,
                               ),
-                              disabledForegroundColor: AppColors.moodAccent,
+                              disabledForegroundColor:
+                                  context.colors.moodAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusLg,
@@ -248,7 +253,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                           ),
                   ),
                   if (!_hasInteracted)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: AppSpacing.sm),
                       child: SizedBox(
                         width: double.infinity,
@@ -257,7 +262,7 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ),

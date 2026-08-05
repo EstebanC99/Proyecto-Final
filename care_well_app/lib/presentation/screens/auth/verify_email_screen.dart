@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
@@ -134,9 +134,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       setState(() => _isResending = false);
       _startCooldown();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Te enviamos un nuevo código a tu email.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     } catch (error) {
@@ -168,7 +168,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Volver',
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
       ),
       body: SafeArea(
@@ -181,20 +181,20 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               Icon(
                 Icons.mark_email_read_outlined,
                 size: 64,
-                color: AppColors.primary,
+                color: context.colors.primary,
               ),
               const SizedBox(height: AppSpacing.xl),
               Text(
                 'Verificá tu email',
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text.rich(
                 TextSpan(
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   children: [
                     const TextSpan(
@@ -253,7 +253,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                     ? Text(
                         'Podés reenviar el código en ${_cooldownRestante}s',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       )
                     : SecondaryTextButton(

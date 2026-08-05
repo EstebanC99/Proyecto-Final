@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -106,7 +106,10 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
 
     if (fechaErr != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(fechaErr), backgroundColor: AppColors.error),
+        SnackBar(
+          content: Text(fechaErr),
+          backgroundColor: context.colors.error,
+        ),
       );
       return false;
     }
@@ -152,7 +155,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
           content: Text(
             'Error: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colors.error,
         ),
       );
     }
@@ -198,9 +201,9 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: Text(
           widget.dependentId == null
               ? 'Nueva persona a cargo'
@@ -221,7 +224,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
               Text(
                 'Completá los datos de la persona que vas a registrar.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -238,10 +241,10 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       _imagenBase64 == null ? 'Agregar foto' : 'Cambiar foto',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                     ),
                   ],
@@ -398,9 +401,9 @@ class _TcCheckboxRow extends StatelessWidget {
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textPrimary,
+                ),
                 children: [
                   const TextSpan(text: 'Acepto los '),
                   WidgetSpan(
@@ -411,7 +414,7 @@ class _TcCheckboxRow extends StatelessWidget {
                       child: Text(
                         'Términos y Condiciones',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

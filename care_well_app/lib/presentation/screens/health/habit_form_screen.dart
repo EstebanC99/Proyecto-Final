@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -109,7 +109,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -124,11 +124,11 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     final tiposAsync = ref.watch(tiposHabitoVidaProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Text(_esEdicion ? 'Editar hábito' : 'Nuevo hábito'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -153,9 +153,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               ),
               data: (tipos) {
                 if (tipos.isEmpty) {
-                  return const Text(
+                  return Text(
                     'No hay tipos de hábito disponibles.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: context.colors.textSecondary),
                   );
                 }
                 // Selección por defecto: primer tipo del catálogo.
@@ -176,11 +176,11 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                                   _tipoId = t.id;
                                   _descripcionCtrl.clear();
                                 }),
-                          selectedColor: AppColors.habitsAccent,
+                          selectedColor: context.colors.habitsAccent,
                           labelStyle: TextStyle(
                             color: selected
-                                ? Colors.white
-                                : AppColors.textPrimary,
+                                ? context.colors.onPrimary
+                                : context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -229,18 +229,18 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                     ? null
                     : _guardar,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.habitsAccent,
+                  backgroundColor: context.colors.habitsAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   ),
                 ),
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: Colors.white,
+                          color: context.colors.onPrimary,
                         ),
                       )
                     : Text(
@@ -267,10 +267,10 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
       ),
     );
   }

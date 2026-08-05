@@ -1,3 +1,6 @@
+import 'notification_channel.dart';
+import 'notification_payload.dart';
+
 /// Contrato para programar y cancelar notificaciones locales de recordatorios.
 ///
 /// Implementado en la capa infrastructure. La capa domain no importa
@@ -32,10 +35,28 @@ abstract class NotificationScheduler {
   Future<void> cancelAll();
 
   /// Muestra una notificación local inmediata (sin programación futura).
+  ///
+  /// [canal] determina la importancia con la que se presenta al usuario.
   Future<void> showImmediateNotification({
     required int notificationId,
     required String titulo,
     required String cuerpo,
     String? payload,
+    NotificationChannel canal = NotificationChannel.agenda,
   });
+
+  /// Payloads de las notificaciones locales que el usuario tocó con la app
+  /// abierta.
+  ///
+  /// Emite solo los que se pudieron decodificar; los inválidos se descartan.
+  /// Quién navega a dónde es decisión de presentation: acá solo sale el dato.
+  Stream<NotificationPayload> get onNotificationTap;
+
+  /// Payload de la notificación local que abrió la app, si fue así.
+  ///
+  /// Va aparte de [onNotificationTap] porque el scheduler se inicializa antes
+  /// de que exista un suscriptor: un stream broadcast perdería ese evento
+  /// siempre. Es el mismo rol que cumple `getInitialMessage()` en el servicio
+  /// de push.
+  Future<NotificationPayload?> getLaunchPayload();
 }

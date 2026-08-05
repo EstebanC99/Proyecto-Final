@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'ficha_salud_list_type.dart';
 
@@ -36,9 +36,9 @@ class HealthListSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: context.colors.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,29 +72,29 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(type.icon, size: 20, color: type.accent),
+        Icon(type.icon, size: 20, color: type.accent(context)),
         const SizedBox(width: AppSpacing.sm),
         Text(
           type.sectionTitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: context.colors.surfaceVariant,
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
           ),
           child: Text(
             '$count',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),
@@ -123,19 +123,19 @@ class _AddChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-            border: Border.all(color: type.accent, width: 1.5),
+            border: Border.all(color: type.accent(context), width: 1.5),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add, size: 16, color: type.accent),
+              Icon(Icons.add, size: 16, color: type.accent(context)),
               const SizedBox(width: 4),
               Text(
                 'Agregar',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: type.accent,
+                  color: type.accent(context),
                 ),
               ),
             ],
@@ -166,22 +166,22 @@ class _EmptyState extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: type.container,
+            color: type.container(context),
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
-          child: Icon(type.icon, size: 24, color: type.accent),
+          child: Icon(type.icon, size: 24, color: type.accent(context)),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           type.emptyText,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 14, color: context.colors.textSecondary),
         ),
         if (canEdit)
           TextButton(
             onPressed: onAdd,
-            style: TextButton.styleFrom(foregroundColor: type.accent),
+            style: TextButton.styleFrom(foregroundColor: type.accent(context)),
             child: const Text(
               '+ Agregar el primero',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),

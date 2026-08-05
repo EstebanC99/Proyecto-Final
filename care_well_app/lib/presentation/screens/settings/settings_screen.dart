@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -20,13 +20,13 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Configuración'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.outline),
+          child: Container(height: 1, color: context.colors.outline),
         ),
       ),
       body: ListView(
@@ -103,14 +103,14 @@ class SettingsScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha((0.4 * 255).round()),
+      barrierColor: context.colors.scrim,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         ),
-        icon: const Icon(
+        icon: Icon(
           Icons.warning_amber_rounded,
-          color: AppColors.warning,
+          color: context.colors.warning,
           size: 20,
         ),
         title: const Text('¿Cerrar sesión?'),
@@ -123,10 +123,11 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Cancelar'),
           ),
           TextButton(
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(foregroundColor: context.colors.error),
             onPressed: () async {
               Navigator.of(dialogCtx).pop();
-              await ref.read(authStateProvider.notifier).logout();
+              // Da de baja el dispositivo push antes de limpiar la sesión.
+              await ref.read(cerrarSesionProvider)();
               // El redirect del router lleva a /login automáticamente.
             },
             child: const Text('Cerrar sesión'),
@@ -142,7 +143,7 @@ class SettingsScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha((0.4 * 255).round()),
+      barrierColor: context.colors.scrim,
       builder: (dialogCtx) => _EliminarCuentaDialog(ref: ref),
     );
   }
@@ -202,9 +203,9 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       ),
-      icon: const Icon(
+      icon: Icon(
         Icons.warning_amber_rounded,
-        color: AppColors.warning,
+        color: context.colors.warning,
         size: 24,
       ),
       title: const Text('¿Eliminar tu cuenta?'),
@@ -215,7 +216,7 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
           RichText(
             text: TextSpan(
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.5,
               ),
               children: const [
@@ -237,7 +238,7 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
           Text(
             'Escribí DELETE para confirmar:',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -250,7 +251,7 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
               hintText: 'DELETE',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                borderSide: const BorderSide(color: AppColors.outline),
+                borderSide: BorderSide(color: context.colors.outline),
               ),
             ),
           ),
@@ -264,17 +265,17 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor: _confirmacionCorrecta
-                ? AppColors.error
-                : AppColors.textDisabled,
+                ? context.colors.error
+                : context.colors.textDisabled,
           ),
           onPressed: (_confirmacionCorrecta && !_isLoading) ? _eliminar : null,
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.error,
+                    color: context.colors.error,
                   ),
                 )
               : const Text('Eliminar mi cuenta'),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/constraints/terms_content.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// US-08 · Pantalla de lectura de Términos y Condiciones.
@@ -16,13 +16,13 @@ class TermsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Términos y condiciones'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.outline),
+          child: Container(height: 1, color: context.colors.outline),
         ),
       ),
       body: Stack(
@@ -40,14 +40,14 @@ class TermsScreen extends StatelessWidget {
                 Text(
                   'Versión $kTermsVersion',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   kTermsContent,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     height: 1.6,
                   ),
                 ),
@@ -55,7 +55,7 @@ class TermsScreen extends StatelessWidget {
                 Text(
                   'Deslizá para leer más',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textDisabled,
+                    color: context.colors.textDisabled,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -74,7 +74,10 @@ class TermsScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [AppColors.surface.withAlpha(0), AppColors.surface],
+                    colors: [
+                      context.colors.surface.withAlpha(0),
+                      context.colors.surface,
+                    ],
                   ),
                 ),
               ),

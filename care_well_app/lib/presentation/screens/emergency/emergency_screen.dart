@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -11,7 +11,7 @@ import '../../widgets/widgets.dart';
 
 /// Pantalla principal de emergencia (US-34).
 ///
-/// Muestra el [EmergencyButton] pulsante y la lista de miembros que serán notificados.
+/// Muestra el [EmergencyButton] pulsante y la lista del equipo de cuidado.
 /// Requiere confirmación via [EmergencyConfirmDialog] antes de activar.
 class EmergencyScreen extends ConsumerWidget {
   const EmergencyScreen({super.key});
@@ -26,30 +26,30 @@ class EmergencyScreen extends ConsumerWidget {
     final persona = personaAsync.value;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.surface,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Emergencia',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: AppColors.emergencyRed,
+            color: context.colors.emergencyRed,
           ),
         ),
-        backgroundColor: AppColors.surface,
-        iconTheme: const IconThemeData(color: AppColors.emergencyRed),
+        backgroundColor: context.colors.surface,
+        iconTheme: IconThemeData(color: context.colors.emergencyRed),
         elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.outline),
+          child: Container(height: 1, color: context.colors.outline),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFF1F0), Colors.white],
+            colors: [context.colors.emergencyContainer, context.colors.surface],
           ),
         ),
         child: SingleChildScrollView(
@@ -63,20 +63,23 @@ class EmergencyScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
 
               // Texto explicativo
-              const Text(
-                'Al activar la emergencia, todos los miembros del equipo '
-                'recibirán una notificación inmediata.',
+              Text(
+                'Al activar la emergencia, se enviará un aviso inmediato '
+                'a tu equipo de cuidado.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: context.colors.textSecondary,
+                ),
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Card de miembros a notificar
+              // Card del equipo de cuidado
               equipoAsync.when(
                 loading: () => Container(
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: context.colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   ),
                 ),
@@ -87,7 +90,7 @@ class EmergencyScreen extends ConsumerWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: context.colors.surface,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     boxShadow: AppSpacing.elev1,
                   ),
@@ -96,20 +99,20 @@ class EmergencyScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.groups,
                             size: 20,
-                            color: AppColors.emergencyRed,
+                            color: context.colors.emergencyRed,
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             miembros.isEmpty
                                 ? 'Sin miembros en el equipo'
-                                : 'Se notificará a (${miembros.length} personas):',
-                            style: const TextStyle(
+                                : 'Equipo de cuidado',
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                         ],
@@ -121,18 +124,18 @@ class EmergencyScreen extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.person,
                                   size: 16,
-                                  color: AppColors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: Text(
                                     '${m.colaborador.nombre} ${m.colaborador.apellido}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.textPrimary,
+                                      color: context.colors.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -140,9 +143,9 @@ class EmergencyScreen extends ConsumerWidget {
                                   m.rol.id == RolesCuidadoConst.responsable
                                       ? '(Responsable)'
                                       : '(Cuidador/a)',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -167,10 +170,31 @@ class EmergencyScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              const Text(
+              Text(
                 'Tocá el botón para enviar la alerta',
-                style: TextStyle(fontSize: 13, color: AppColors.textDisabled),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: context.colors.textDisabled,
+                ),
               ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Historial corto. Va DEBAJO del botón a propósito: arriba lo
+              // desplazaría según cuántas emergencias haya, o sea que el
+              // control más importante de la pantalla cambiaría de lugar
+              // según los datos.
+              ref
+                  .watch(historialEmergenciasProvider)
+                  .when(
+                    // Sin spinner: el historial es accesorio y no debe competir
+                    // con el botón.
+                    loading: () => const SizedBox.shrink(),
+                    // Silencioso: si el historial falla, la pantalla igual tiene
+                    // que servir para activar la emergencia. Nunca un error acá.
+                    error: (_, _) => const SizedBox.shrink(),
+                    data: (emergencias) =>
+                        _HistorialCard(emergencias: emergencias),
+                  ),
               const SizedBox(height: AppSpacing.xxxl),
             ],
           ),
@@ -180,13 +204,11 @@ class EmergencyScreen extends ConsumerWidget {
   }
 
   Future<void> _handleTap(BuildContext context, WidgetRef ref) async {
-    final equipo = ref.read(equipoEmergenciaProvider).value ?? [];
     final persona = ref.read(personaVisualizacionSeleccionadaProvider).value;
     if (persona == null) return;
 
     final confirmo = await EmergencyConfirmDialog.show(
       context,
-      cantidadMiembros: equipo.length,
       nombrePersona: persona.nombre,
       onConfirm: () async {
         await ref.read(activarEmergenciaProvider)();
@@ -196,5 +218,70 @@ class EmergencyScreen extends ConsumerWidget {
     if (confirmo == true && context.mounted) {
       context.goNamed(AppRoutes.emergencySentName);
     }
+  }
+}
+
+/// Card del historial corto de emergencias de la persona de contexto.
+///
+/// El caso vacío SÍ se muestra: "no hay emergencias registradas" es una
+/// respuesta exitosa, y además es información tranquilizadora. Loading y error
+/// no son respuestas —son estados donde el cliente no sabe nada— y ahí el
+/// silencio es mejor que el ruido.
+class _HistorialCard extends StatelessWidget {
+  const _HistorialCard({required this.emergencias});
+
+  final List<Emergencia> emergencias;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        boxShadow: AppSpacing.elev1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.history,
+                size: 20,
+                color: context.colors.textSecondary,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Últimas emergencias',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: context.colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          if (emergencias.isEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Sin emergencias registradas',
+              style: TextStyle(
+                fontSize: 13,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ] else ...[
+            const Divider(height: AppSpacing.lg),
+            for (int i = 0; i < emergencias.length; i++) ...[
+              EmergencyHistoryTile(emergencia: emergencias[i]),
+              if (i < emergencias.length - 1)
+                Divider(height: 1, color: context.colors.surfaceVariant),
+            ],
+          ],
+        ],
+      ),
+    );
   }
 }

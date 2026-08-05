@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -70,9 +70,9 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
         _guardando = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Permisos actualizados.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     } catch (e) {
@@ -83,7 +83,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
           content: Text(
             'Error: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colors.error,
         ),
       );
     }
@@ -149,9 +149,9 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
         if (puede && context.mounted) context.pop();
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.surface,
+          backgroundColor: context.colors.surface,
           title: asignacionAsync.when(
             loading: () => const Text('Miembro del equipo'),
             error: (e, st) => const Text('Miembro del equipo'),
@@ -163,9 +163,9 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
               error: (e, st) => const SizedBox.shrink(),
               data: (a) => a != null
                   ? IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.delete_outline,
-                        color: AppColors.error,
+                        color: context.colors.error,
                       ),
                       tooltip: 'Quitar del equipo',
                       onPressed: () => _confirmarBaja(a),
@@ -214,7 +214,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
               children: [
                 // Header del miembro
                 Container(
-                  color: AppColors.surface,
+                  color: context.colors.surface,
                   child: MemberCard(
                     asignacion: asignacion,
                     isCurrentUser: false,
@@ -222,7 +222,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                     showChevron: false,
                   ),
                 ),
-                const Divider(height: 1, color: AppColors.outline),
+                Divider(height: 1, color: context.colors.outline),
 
                 // Sección permisos
                 Expanded(
@@ -240,17 +240,17 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                           ),
                           child: RichText(
                             text: TextSpan(
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                               children: [
                                 const TextSpan(text: 'Permisos sobre '),
                                 TextSpan(
                                   text: personaCuidada.nombreCompleto,
-                                  style: const TextStyle(
-                                    color: AppColors.primary,
+                                  style: TextStyle(
+                                    color: context.colors.primary,
                                   ),
                                 ),
                               ],
@@ -260,7 +260,7 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
 
                         // Lista de permisos
                         Container(
-                          color: AppColors.surface,
+                          color: context.colors.surface,
                           child: Column(
                             children: todosLosCodigos.asMap().entries.map((
                               entry,
@@ -277,12 +277,12 @@ class _CareTeamMemberScreenState extends ConsumerState<CareTeamMemberScreen> {
                                     ),
                                   ),
                                   if (i < todosLosCodigos.length - 1)
-                                    const Divider(
+                                    Divider(
                                       height: 1,
                                       thickness: 1,
                                       indent: AppSpacing.lg,
                                       endIndent: AppSpacing.lg,
-                                      color: AppColors.surfaceVariant,
+                                      color: context.colors.surfaceVariant,
                                     ),
                                 ],
                               );

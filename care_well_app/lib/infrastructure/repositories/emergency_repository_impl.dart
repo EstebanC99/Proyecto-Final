@@ -8,7 +8,7 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
   const EmergencyRepositoryImpl(this._datasource);
 
   @override
-  Future<Emergencia> activarEmergencia({
+  Future<void> activarEmergencia({
     required int personaId,
     String? descripcion,
   }) => _datasource.activarEmergencia(
@@ -17,10 +17,8 @@ class EmergencyRepositoryImpl implements EmergencyRepository {
   );
 
   @override
-  Future<List<Emergencia>> getEmergenciasByPersona(int personaId) =>
-      _datasource.getEmergenciasByPersona(personaId);
-
-  @override
-  Future<Emergencia> marcarAtendida(int emergenciaId) =>
-      _datasource.marcarAtendida(emergenciaId);
+  Future<List<Emergencia>> getEmergenciasByPersona(
+    int personaId, {
+    int cantidad = 20,
+  }) => _datasource.getEmergenciasByPersona(personaId, cantidad: cantidad);
 }

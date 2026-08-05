@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
@@ -123,7 +123,7 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
               Text(
                 'Recuperar contraseña',
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -132,7 +132,7 @@ class _RecoverPasswordScreenState extends ConsumerState<RecoverPasswordScreen> {
                 'vamos a enviar un código de 6 dígitos para restablecer tu '
                 'contraseña.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),

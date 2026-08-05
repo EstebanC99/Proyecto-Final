@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -48,11 +48,11 @@ class HealthEventsScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Eventos de salud'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -95,7 +95,7 @@ class HealthEventsScreen extends ConsumerWidget {
               ),
               data: (eventos) {
                 if (personaAsync.value == null) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                       child: Text(
@@ -103,7 +103,7 @@ class HealthEventsScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -145,8 +145,8 @@ class HealthEventsScreen extends ConsumerWidget {
           ? FloatingActionButton(
               onPressed: () => context.pushNamed(AppRoutes.healthEventsNewName),
               tooltip: 'Nuevo evento de salud',
-              backgroundColor: AppColors.healthAccent,
-              child: const Icon(Icons.add, color: Colors.white),
+              backgroundColor: context.colors.healthAccent,
+              child: Icon(Icons.add, color: context.colors.onPrimary),
             )
           : null,
     );
@@ -168,26 +168,29 @@ class _EmptyMonthState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.favorite_outline,
               size: 64,
-              color: AppColors.textDisabled,
+              color: context.colors.textDisabled,
             ),
             const SizedBox(height: AppSpacing.md),
-            const Text(
+            Text(
               'Sin eventos en este mes.',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             if (puede)
-              const Text(
+              Text(
                 'Usá el botón + para registrar el primer evento.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: AppColors.textDisabled),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textDisabled,
+                ),
               ),
           ],
         ),
@@ -218,7 +221,7 @@ class _EventosSkeleton extends StatelessWidget {
             width: 120,
             height: 12,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: context.colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
           ),
@@ -228,7 +231,7 @@ class _EventosSkeleton extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: context.colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               ),
             ),

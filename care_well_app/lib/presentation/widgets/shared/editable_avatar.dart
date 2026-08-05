@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import 'avatar.dart';
 
 /// Avatar editable: un [Avatar] con un badge de cámara superpuesto que indica
@@ -46,15 +46,15 @@ class EditableAvatar extends StatelessWidget {
               width: badgeSize,
               height: badgeSize,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: context.colors.primary,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.surface, width: 2),
+                border: Border.all(color: context.colors.surface, width: 2),
               ),
               alignment: Alignment.center,
               child: Icon(
                 Icons.photo_camera_outlined,
                 size: badgeSize * 0.55,
-                color: AppColors.onPrimary,
+                color: context.colors.onPrimary,
               ),
             ),
           ),

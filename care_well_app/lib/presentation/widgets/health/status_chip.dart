@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Chip de estado para una enfermedad: "Activa" (vigente) o "Resuelta".
@@ -15,11 +15,11 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = vigente
-        ? AppColors.warningContainer
-        : AppColors.successContainer;
+        ? context.colors.warningContainer
+        : context.colors.successContainer;
     // Variante oscurecida del warning para cumplir contraste AA sobre el
     // contenedor claro (ver sistema de diseño §3.6).
-    final fg = vigente ? const Color(0xFF8A6400) : AppColors.success;
+    final fg = vigente ? const Color(0xFF8A6400) : context.colors.success;
     final label = vigente ? 'Activa' : 'Resuelta';
 
     return Container(

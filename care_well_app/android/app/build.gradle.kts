@@ -5,6 +5,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// El plugin de Google Services aborta el build si falta google-services.json, y
+// ese archivo no se versiona (lleva las claves del proyecto Firebase). Se aplica
+// solo si está presente, de modo que un clone limpio compile y corra igual,
+// simplemente sin notificaciones push. La contraparte en Dart es el
+// `pushDisponibleProvider`, que en ese caso resuelve a NullPushMessagingService.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.example.care_well_app"
     compileSdk = flutter.compileSdkVersion

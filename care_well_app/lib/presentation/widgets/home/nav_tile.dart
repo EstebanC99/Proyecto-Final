@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Tile de navegación cuadrado para el grid 2×2 del menú principal.
@@ -81,7 +81,11 @@ class _NavTileState extends State<NavTile> {
                       color: widget.accentColor,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(widget.icon, size: 28, color: Colors.white),
+                    child: Icon(
+                      widget.icon,
+                      size: 28,
+                      color: context.colors.onPrimary,
+                    ),
                   ),
                   if (widget.badge != null)
                     Positioned(top: -4, right: -4, child: widget.badge!),
@@ -91,10 +95,10 @@ class _NavTileState extends State<NavTile> {
               Text(
                 widget.label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

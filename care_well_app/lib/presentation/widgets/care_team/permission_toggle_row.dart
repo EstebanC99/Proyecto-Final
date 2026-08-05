@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Fila de permiso con toggle.
@@ -35,18 +35,18 @@ class PermissionToggleRow extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),
             Switch(
               value: value,
               onChanged: onChanged,
-              activeThumbColor: AppColors.primary,
-              activeTrackColor: AppColors.primaryContainer,
+              activeThumbColor: context.colors.primary,
+              activeTrackColor: context.colors.primaryContainer,
             ),
           ],
         ),

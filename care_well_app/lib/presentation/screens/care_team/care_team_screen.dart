@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -32,7 +32,7 @@ class CareTeamScreen extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.outline,
+              color: context.colors.outline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -74,9 +74,9 @@ class CareTeamScreen extends ConsumerWidget {
     final usuario = ref.watch(authStateProvider).value;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Equipo de cuidado'),
         actions: [
           puedeAdministrarAsync.when(
@@ -88,14 +88,14 @@ class CareTeamScreen extends ConsumerWidget {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: context.colors.primary,
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.add,
-                          color: Colors.white,
+                          color: context.colors.onPrimary,
                           size: 24,
                         ),
                         tooltip: 'Agregar miembro',
@@ -130,9 +130,9 @@ class CareTeamScreen extends ConsumerWidget {
         data: (puede) => puede
             ? FloatingActionButton(
                 onPressed: () => _mostrarSelectorAlta(context),
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.colors.primary,
                 tooltip: 'Agregar miembro',
-                child: const Icon(Icons.add, color: Colors.white),
+                child: Icon(Icons.add, color: context.colors.onPrimary),
               )
             : null,
         orElse: () => null,
@@ -190,7 +190,7 @@ class _TeamBody extends ConsumerWidget {
             .toList();
 
         return RefreshIndicator(
-          color: AppColors.primary,
+          color: context.colors.primary,
           onRefresh: () async {
             ref.invalidate(
               asignacionesPorPersonaCuidadaProvider(personaCtx.id),
@@ -320,7 +320,7 @@ class _TeamBody extends ConsumerWidget {
           'Podés volver a invitarlo más adelante.',
       confirmLabel: 'Cancelar solicitud',
       icon: Icons.cancel_outlined,
-      accentColor: AppColors.error,
+      accentColor: context.colors.error,
       onConfirm: () async {
         final eliminar = ref.read(eliminarAsignacionProvider);
         await eliminar(asignacion: asignacion);
@@ -331,7 +331,7 @@ class _TeamBody extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Solicitud a $nombre cancelada.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     }
@@ -365,7 +365,7 @@ class _TeamBody extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('$nombre fue reactivado en el equipo.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     }
@@ -382,11 +382,11 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.8,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
       ),
     );
   }
@@ -402,7 +402,7 @@ class _EmptySubsection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Text(
         mensaje,
-        style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+        style: TextStyle(fontSize: 14, color: context.colors.textSecondary),
       ),
     );
   }
@@ -422,31 +422,34 @@ class _EmptyNoPersonas extends StatelessWidget {
             Container(
               width: 80,
               height: 80,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryContainer,
+              decoration: BoxDecoration(
+                color: context.colors.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.people_outline,
                 size: 48,
-                color: AppColors.primary,
+                color: context.colors.primary,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
+            Text(
               'No tenés personas a cargo registradas.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Primero registrá una persona a cargo para poder gestionar su equipo de cuidado.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 14,
+                color: context.colors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -469,7 +472,7 @@ class _SkeletonTeam extends StatelessWidget {
             height: 36,
             width: 220,
             decoration: BoxDecoration(
-              color: AppColors.outline,
+              color: context.colors.outline,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
           ),
@@ -478,7 +481,7 @@ class _SkeletonTeam extends StatelessWidget {
             Container(
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.outline,
+                color: context.colors.outline,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               ),
             ),
@@ -508,7 +511,7 @@ class _PendingRequestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(color: const Color(0xFFF5A623), width: 1),
       ),
@@ -530,19 +533,19 @@ class _PendingRequestCard extends StatelessWidget {
                   children: [
                     Text(
                       colaborador.nombreCompleto,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     if (colaborador.email != null) ...[
                       const SizedBox(height: 2),
                       Text(
                         colaborador.email!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -553,9 +556,9 @@ class _PendingRequestCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           'Invitado como $rolLabel',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ],
@@ -573,8 +576,8 @@ class _PendingRequestCard extends StatelessWidget {
               label: const Text('Cancelar solicitud'),
               onPressed: onCancelar,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.error,
-                side: const BorderSide(color: AppColors.error),
+                foregroundColor: context.colors.error,
+                side: BorderSide(color: context.colors.error),
               ),
             ),
           ),
@@ -623,9 +626,9 @@ class _ReactivableCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.outline, width: 1),
+        border: Border.all(color: context.colors.outline, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -645,19 +648,19 @@ class _ReactivableCard extends StatelessWidget {
                   children: [
                     Text(
                       colaborador.nombreCompleto,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     if (colaborador.email != null) ...[
                       const SizedBox(height: 2),
                       Text(
                         colaborador.email!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -671,9 +674,9 @@ class _ReactivableCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             'Era $rolLabel',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ),
@@ -692,8 +695,8 @@ class _ReactivableCard extends StatelessWidget {
               label: const Text('Reactivar'),
               onPressed: onReactivar,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
+                foregroundColor: context.colors.primary,
+                side: BorderSide(color: context.colors.primary),
               ),
             ),
           ),

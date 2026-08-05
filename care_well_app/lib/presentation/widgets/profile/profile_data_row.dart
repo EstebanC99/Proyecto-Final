@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/app_text_field.dart';
 
@@ -145,10 +145,10 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
           ),
-          color: AppColors.surface,
+          color: context.colors.surface,
           child: _editando ? _buildEditing() : _buildReading(),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.outline),
+        Divider(height: 1, thickness: 1, color: context.colors.outline),
       ],
     );
   }
@@ -157,7 +157,7 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(widget.icon, size: 20, color: AppColors.textSecondary),
+        Icon(widget.icon, size: 20, color: context.colors.textSecondary),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
@@ -166,18 +166,18 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
             children: [
               Text(
                 widget.label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 widget.value.isNotEmpty ? widget.value : '—',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ],
@@ -190,7 +190,7 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
             child: IconButton(
               onPressed: _activarEdicion,
               icon: const Icon(Icons.edit, size: 20),
-              color: AppColors.primary,
+              color: context.colors.primary,
               tooltip: 'Editar ${widget.label}',
               padding: EdgeInsets.zero,
             ),
@@ -205,7 +205,11 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: AppSpacing.lg),
-          child: Icon(widget.icon, size: 20, color: AppColors.textSecondary),
+          child: Icon(
+            widget.icon,
+            size: 20,
+            color: context.colors.textSecondary,
+          ),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
@@ -229,7 +233,7 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
           child: IconButton(
             onPressed: _guardando ? null : _cancelar,
             icon: const Icon(Icons.close, size: 20),
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             tooltip: 'Cancelar',
             padding: EdgeInsets.zero,
           ),
@@ -239,21 +243,21 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
           width: AppSpacing.minTapTarget,
           height: AppSpacing.minTapTarget,
           child: _guardando
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(12),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                     ),
                   ),
                 )
               : IconButton(
                   onPressed: _confirmar,
                   icon: const Icon(Icons.check, size: 20),
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                   tooltip: 'Guardar',
                   padding: EdgeInsets.zero,
                 ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Encabezado de grupo por día para la lista de eventos de salud.
 ///
 /// Análogo a [_DayGroupHeader] de la agenda, pero expuesto como widget
-/// público del módulo de salud. Muestra "HOY" en [AppColors.healthAccent],
-/// "MAÑANA" en [AppColors.textSecondary], o el nombre completo del día.
+/// público del módulo de salud. Muestra "HOY" en [AppPalette.healthAccent],
+/// "MAÑANA" en [AppPalette.textSecondary], o el nombre completo del día.
 /// Es colapsable: cuando está cerrado muestra el contador de eventos.
 class HealthEventDayGroupHeader extends StatelessWidget {
   const HealthEventDayGroupHeader({
@@ -66,8 +66,8 @@ class HealthEventDayGroupHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelColor = _esHoy
-        ? AppColors.healthAccent
-        : AppColors.textSecondary;
+        ? context.colors.healthAccent
+        : context.colors.textSecondary;
 
     return InkWell(
       onTap: onTap,
@@ -90,10 +90,10 @@ class HealthEventDayGroupHeader extends StatelessWidget {
             if (!expanded) ...[
               Text(
                 '$count ${count == 1 ? "evento" : "eventos"}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(width: 4),
@@ -103,7 +103,7 @@ class HealthEventDayGroupHeader extends StatelessWidget {
                   ? Icons.expand_more_rounded
                   : Icons.chevron_right_rounded,
               size: 18,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ],
         ),

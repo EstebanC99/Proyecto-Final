@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/wellbeing_alert_catalogs.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -78,7 +78,7 @@ class _WellbeingObservationsBannerState
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: AppSpacing.elev1,
       ),
@@ -112,9 +112,11 @@ class _WellbeingObservationsBannerState
     // Tratamiento visual segun severidad agregada (decision D1 aplicada al
     // banner colapsado): ambar si hay >= 1 "Atencion", azul si todas informativas.
     final Color fondo = hayAtencion
-        ? AppColors.warningContainer
-        : AppColors.surface;
-    final Color borde = hayAtencion ? AppColors.warning : AppColors.info;
+        ? context.colors.warningContainer
+        : context.colors.surface;
+    final Color borde = hayAtencion
+        ? context.colors.warning
+        : context.colors.info;
     final IconData icono = hayAtencion ? Icons.priority_high : Icons.info;
 
     return Material(
@@ -128,9 +130,9 @@ class _WellbeingObservationsBannerState
                 ? Border(left: BorderSide(color: borde, width: 3))
                 : Border(
                     left: BorderSide(color: borde, width: 3),
-                    top: const BorderSide(color: AppColors.outline),
-                    right: const BorderSide(color: AppColors.outline),
-                    bottom: const BorderSide(color: AppColors.outline),
+                    top: BorderSide(color: context.colors.outline),
+                    right: BorderSide(color: context.colors.outline),
+                    bottom: BorderSide(color: context.colors.outline),
                   ),
           ),
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -142,19 +144,19 @@ class _WellbeingObservationsBannerState
                 height: 28,
                 decoration: BoxDecoration(color: borde, shape: BoxShape.circle),
                 alignment: Alignment.center,
-                child: Icon(icono, size: 16, color: AppColors.onPrimary),
+                child: Icon(icono, size: 16, color: context.colors.onPrimary),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Observaciones de bienestar',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     if (hayAtencion) ...[
@@ -185,10 +187,10 @@ class _WellbeingObservationsBannerState
               const SizedBox(width: AppSpacing.sm),
               _counterBadge(total),
               const SizedBox(width: AppSpacing.sm),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ],
           ),
@@ -203,7 +205,7 @@ class _WellbeingObservationsBannerState
 
   Widget _expandedHeader(int total) {
     return Material(
-      color: AppColors.surface,
+      color: context.colors.surface,
       child: InkWell(
         onTap: () => setState(() => _expanded = false),
         child: Padding(
@@ -213,35 +215,35 @@ class _WellbeingObservationsBannerState
               Container(
                 width: 32,
                 height: 32,
-                decoration: const BoxDecoration(
-                  color: AppColors.primaryContainer,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryContainer,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
+                child: Icon(
                   Icons.visibility,
                   size: 18,
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Observaciones de bienestar',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
               _counterBadge(total),
               const SizedBox(width: AppSpacing.sm),
-              const Icon(
+              Icon(
                 Icons.expand_more_rounded,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ],
           ),
@@ -261,12 +263,12 @@ class _WellbeingObservationsBannerState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          Text(
             _disclaimer,
             style: TextStyle(
               fontSize: 12,
               height: 1.4,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -309,15 +311,15 @@ class _WellbeingObservationsBannerState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
       ),
       child: Text(
         '$total',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w700,
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
     );

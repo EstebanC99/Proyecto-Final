@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -74,7 +74,7 @@ class _HealthEventNoteFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -86,8 +86,8 @@ class _HealthEventNoteFormScreenState
     final charsUsados = _contenidoCtrl.text.length;
     final mostrarContador = charsUsados >= _contadorThreshold;
     final countColor = charsUsados >= _maxChars
-        ? AppColors.healthAccent
-        : AppColors.textDisabled;
+        ? context.colors.healthAccent
+        : context.colors.textDisabled;
 
     return PopScope(
       canPop: false,
@@ -97,11 +97,11 @@ class _HealthEventNoteFormScreenState
         if (ok && context.mounted) Navigator.of(context).pop();
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         appBar: AppBar(
           title: const Text('Nueva nota'),
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor: context.colors.surface,
+          foregroundColor: context.colors.textPrimary,
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -112,19 +112,19 @@ class _HealthEventNoteFormScreenState
               // Label campo nota
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Nota',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
-                  const Text(
+                  Text(
                     ' *',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.healthAccent,
+                      color: context.colors.healthAccent,
                     ),
                   ),
                 ],
@@ -148,24 +148,24 @@ class _HealthEventNoteFormScreenState
                 onChanged: (_) => setState(() => _errorInline = null),
                 decoration: InputDecoration(
                   hintText: 'Escribí tu observación sobre este evento...',
-                  hintStyle: const TextStyle(color: AppColors.textDisabled),
+                  hintStyle: TextStyle(color: context.colors.textDisabled),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    borderSide: const BorderSide(color: AppColors.outline),
+                    borderSide: BorderSide(color: context.colors.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     borderSide: BorderSide(
                       color: _errorInline != null
-                          ? AppColors.healthAccent
-                          : AppColors.primary,
+                          ? context.colors.healthAccent
+                          : context.colors.primary,
                       width: 2,
                     ),
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    borderSide: const BorderSide(
-                      color: AppColors.healthAccent,
+                    borderSide: BorderSide(
+                      color: context.colors.healthAccent,
                       width: 2,
                     ),
                   ),
@@ -194,18 +194,18 @@ class _HealthEventNoteFormScreenState
                 child: FilledButton(
                   onPressed: _loading ? null : _guardar,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.healthAccent,
+                    backgroundColor: context.colors.healthAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
                   ),
                   child: _loading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: Colors.white,
+                            color: context.colors.onPrimary,
                           ),
                         )
                       : const Text(

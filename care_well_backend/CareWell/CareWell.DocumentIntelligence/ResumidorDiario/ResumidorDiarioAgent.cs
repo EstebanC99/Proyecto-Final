@@ -36,10 +36,10 @@ namespace CareWell.DocumentIntelligence.ResumidorDiario
         Estructura de salida:
         RESUMEN DE HOY
         (estado general en 1-2 oraciones)
-        - Salud: (...)
-        - Ánimo: (...)
-        - Hábitos: (...)
-        - Pendiente hoy: (compromisos de Agenda que todavía faltan hoy; si no hay, "Sin pendientes")
+        - Salud: (solo los eventos de salud que pasaron)
+        - Ánimo: (resumen de como estuvo sintiendose en el dia)
+        - Hábitos: (completados y sin completar)
+        - Pendiente hoy: (compromisos de Agenda que todavía faltan hoy; si no hay, "Sin compromisos de agenda pendientes para hoy")
 
         MAÑANA
         - Compromisos agendados: (los de Agenda que caen mañana, con horario; si no hay, "Sin compromisos agendados")

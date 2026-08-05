@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 
@@ -22,7 +22,7 @@ abstract final class OcurrenciaActionSheet {
   }) {
     return showModalBottomSheet<OcurrenciaAccion>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXl),
@@ -38,7 +38,7 @@ abstract final class OcurrenciaActionSheet {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
               ),
@@ -50,15 +50,15 @@ abstract final class OcurrenciaActionSheet {
                 ),
                 child: Text(
                   ocurrencia.titulo,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              const Divider(height: 1, color: AppColors.outline),
+              Divider(height: 1, color: context.colors.outline),
               if (!ocurrencia.esRecurrente)
                 _AccionTile(
                   icon: Icons.edit_outlined,
@@ -107,7 +107,9 @@ class _AccionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = destructive ? AppColors.error : AppColors.textPrimary;
+    final color = destructive
+        ? context.colors.error
+        : context.colors.textPrimary;
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(

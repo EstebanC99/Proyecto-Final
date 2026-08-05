@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../profile/role_badge.dart';
@@ -48,7 +48,7 @@ class PersonCard extends StatelessWidget {
     final edad = calcularEdad(persona.fechaNacimiento);
 
     final card = Material(
-      color: AppColors.surface,
+      color: context.colors.surface,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       child: InkWell(
         onTap: onTap,
@@ -81,10 +81,10 @@ class PersonCard extends StatelessWidget {
                   children: [
                     Text(
                       persona.nombreCompleto,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -93,9 +93,9 @@ class PersonCard extends StatelessWidget {
                         if (edad != null) ...[
                           Text(
                             '$edad años',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
@@ -123,10 +123,10 @@ class PersonCard extends StatelessWidget {
               ),
               // Chevron (solo si la tarjeta es interactiva)
               if (onTap != null)
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: AppColors.outlineStrong,
+                  color: context.colors.outlineStrong,
                 ),
             ],
           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -34,7 +34,7 @@ abstract final class HabitoRealizacionSheet {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXl),
@@ -53,7 +53,7 @@ abstract final class HabitoRealizacionSheet {
   }) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXl),
@@ -99,7 +99,7 @@ class _MarcarRealizadoSheetState extends ConsumerState<_MarcarRealizadoSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
         setState(() => _loading = false);
@@ -125,24 +125,24 @@ class _MarcarRealizadoSheetState extends ConsumerState<_MarcarRealizadoSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.outline,
+                color: context.colors.outline,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const Text(
+          Text(
             'Marcar como realizado',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          const Text(
+          Text(
             'Podés agregar un comentario opcional.',
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.md),
           TextField(
@@ -169,26 +169,26 @@ class _MarcarRealizadoSheetState extends ConsumerState<_MarcarRealizadoSheet> {
             child: FilledButton(
               onPressed: _loading ? null : _confirmar,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.success,
+                backgroundColor: context.colors.success,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 ),
               ),
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'Marcar como realizado',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     ),
             ),
@@ -218,12 +218,12 @@ class _OpcionesRealizacionSheet extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.outline,
+              color: context.colors.outline,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -232,21 +232,21 @@ class _OpcionesRealizacionSheet extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           ListTile(
-            leading: const Icon(Icons.edit_outlined, color: AppColors.primary),
+            leading: Icon(Icons.edit_outlined, color: context.colors.primary),
             title: const Text('Editar comentario'),
             onTap: () {
               Navigator.of(context).pop();
               showModalBottomSheet<void>(
                 context: context,
                 isScrollControlled: true,
-                backgroundColor: AppColors.surface,
+                backgroundColor: context.colors.surface,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(AppSpacing.radiusXl),
@@ -260,9 +260,9 @@ class _OpcionesRealizacionSheet extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.cancel_outlined,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
             title: const Text('Marcar como no realizado'),
             onTap: () {
@@ -273,7 +273,7 @@ class _OpcionesRealizacionSheet extends ConsumerWidget {
                 title: '¿Quitar la realización?',
                 body: 'El hábito volverá a aparecer como Pendiente para hoy.',
                 confirmLabel: 'Quitar',
-                accentColor: AppColors.warning,
+                accentColor: context.colors.warning,
                 icon: Icons.undo_outlined,
                 onConfirm: () => eliminar(
                   habitoId: habito.id,
@@ -335,7 +335,7 @@ class _EditarComentarioSheetState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
         setState(() => _loading = false);
@@ -361,18 +361,18 @@ class _EditarComentarioSheetState
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.outline,
+                color: context.colors.outline,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const Text(
+          Text(
             'Editar comentario',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -400,26 +400,26 @@ class _EditarComentarioSheetState
             child: FilledButton(
               onPressed: _loading ? null : _guardar,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.colors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 ),
               ),
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'Guardar',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     ),
             ),

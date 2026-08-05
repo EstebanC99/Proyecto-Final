@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -45,11 +45,11 @@ class HealthTimelineScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Línea de tiempo'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -92,7 +92,7 @@ class HealthTimelineScreen extends ConsumerWidget {
               ),
               data: (eventos) {
                 if (personaAsync.value == null) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                       child: Text(
@@ -100,7 +100,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -137,20 +137,20 @@ class _EmptyMonthState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.timeline, size: 64, color: AppColors.textDisabled),
+            Icon(Icons.timeline, size: 64, color: context.colors.textDisabled),
             SizedBox(height: AppSpacing.md),
             Text(
               'Sin registros en este mes.',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -182,7 +182,7 @@ class _TimelineSkeleton extends StatelessWidget {
             width: 120,
             height: 12,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: context.colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
           ),
@@ -192,7 +192,7 @@ class _TimelineSkeleton extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: context.colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               ),
             ),

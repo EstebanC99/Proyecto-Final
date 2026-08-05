@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
@@ -145,7 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                     size: 20,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   tooltip: _showPassword
                       ? 'Ocultar contraseña'
@@ -242,14 +242,14 @@ class _CareWellLogo extends StatelessWidget {
               TextSpan(
                 text: 'Care',
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               TextSpan(
                 text: 'Well',
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -260,7 +260,7 @@ class _CareWellLogo extends StatelessWidget {
         Text(
           'Cuidá en equipo',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],
@@ -275,17 +275,17 @@ class _Divider extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.outline)),
+        Expanded(child: Divider(color: context.colors.outline)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
             'o',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.outline)),
+        Expanded(child: Divider(color: context.colors.outline)),
       ],
     );
   }
@@ -309,7 +309,7 @@ class _RegistroBlock extends StatelessWidget {
           horizontal: AppSpacing.lg,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.outline),
+          border: Border.all(color: context.colors.outline),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         ),
         child: Row(
@@ -318,13 +318,13 @@ class _RegistroBlock extends StatelessWidget {
             Text(
               '¿No tenés cuenta?  ',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             Text(
               'Crear cuenta',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: AppColors.primary,
+                color: context.colors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),

@@ -4,15 +4,14 @@ import '../entities/entities.dart';
 abstract class EmergencyDatasource {
   /// Activa una nueva emergencia para la persona con [personaId].
   ///
-  /// Retorna la [Emergencia] creada con su id generado.
-  Future<Emergencia> activarEmergencia({
-    required int personaId,
-    String? descripcion,
+  /// No retorna la emergencia creada: el registro queda del lado del servidor y
+  /// el aviso al equipo de cuidado lo envía el backend.
+  Future<void> activarEmergencia({required int personaId, String? descripcion});
+
+  /// Retorna las últimas [cantidad] emergencias de la persona con [personaId],
+  /// de la más reciente a la más antigua.
+  Future<List<Emergencia>> getEmergenciasByPersona(
+    int personaId, {
+    int cantidad = 20,
   });
-
-  /// Retorna el historial de emergencias de la persona con [personaId].
-  Future<List<Emergencia>> getEmergenciasByPersona(int personaId);
-
-  /// Marca la emergencia con [emergenciaId] como atendida.
-  Future<Emergencia> marcarAtendida(int emergenciaId);
 }

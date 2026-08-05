@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Skeleton de carga de la pantalla de Resumen (US 9.16).
 ///
 /// Muestra 4-5 barras con el mismo pulso de opacidad que [NavTileSkeleton] y el
-/// texto "Redactando tu resumen…" en [AppColors.aiAccent]. Se usa en lugar de
+/// texto "Redactando tu resumen…" en [AppPalette.aiAccent]. Se usa en lugar de
 /// un spinner genérico, para reforzar que el contenido se está "escribiendo".
 class SummaryLoadingSkeleton extends StatefulWidget {
   const SummaryLoadingSkeleton({super.key});
@@ -52,23 +52,27 @@ class _SummaryLoadingSkeletonState extends State<SummaryLoadingSkeleton>
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: context.colors.surface,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             boxShadow: AppSpacing.elev1,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.auto_awesome, size: 16, color: AppColors.aiAccent),
+                  Icon(
+                    Icons.auto_awesome,
+                    size: 16,
+                    color: context.colors.aiAccent,
+                  ),
                   SizedBox(width: AppSpacing.sm),
                   Text(
                     'Redactando tu resumen…',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.aiAccent,
+                      color: context.colors.aiAccent,
                     ),
                   ),
                 ],
@@ -81,7 +85,7 @@ class _SummaryLoadingSkeletonState extends State<SummaryLoadingSkeleton>
                   child: Container(
                     height: 12,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
+                      color: context.colors.surfaceVariant,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
                   ),

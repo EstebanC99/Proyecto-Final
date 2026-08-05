@@ -13,6 +13,8 @@ export 'health/habito_vida_providers.dart';
 export 'health/ficha_salud_providers.dart';
 export 'health/linea_tiempo_providers.dart';
 export 'health/tipos_habito_vida_providers.dart';
+export 'notifications/push_notification_providers.dart';
+export 'notifications/push_token_providers.dart';
 export 'profile/profile_providers.dart';
 export 'summary/summary_providers.dart';
 export 'shared/acciones_por_permisos_cuidado_providers.dart';

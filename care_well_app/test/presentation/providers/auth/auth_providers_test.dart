@@ -5,8 +5,18 @@ import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../_fakes/fake_dispositivo_repository.dart';
+import '../../../_fakes/fake_push_messaging_service.dart';
+
+const _token = 'fid-abc:token-inicial';
+
 // Implementacion manual de AuthRepository para tests, sin dependencias externas.
 class _FakeAuthRepository implements AuthRepository {
+  _FakeAuthRepository({this.log});
+
+  /// Log compartido para verificar el ORDEN relativo a otras operaciones.
+  final List<String>? log;
+
   static final _persona = Persona(
     id: 1,
     nombre: 'Test',
@@ -77,7 +87,7 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout() async {}
+  Future<void> logout() async => log?.add('logout');
 
   @override
   Future<void> eliminarCuenta() async {}
@@ -107,6 +117,26 @@ class _FakeAuthRepository implements AuthRepository {
 ProviderContainer _buildContainer() => ProviderContainer(
   overrides: [authRepositoryProvider.overrideWithValue(_FakeAuthRepository())],
 );
+
+/// Contenedor con los fakes que necesita el cierre de sesión: además del
+/// repositorio de auth, el proveedor de push y el repositorio de dispositivos.
+({ProviderContainer container, FakeDispositivoRepository dispositivos})
+_buildContainerConPush(List<String> log) {
+  final push = FakePushMessagingService(token: _token);
+  final dispositivos = FakeDispositivoRepository(log: log);
+
+  final container = ProviderContainer(
+    overrides: [
+      authRepositoryProvider.overrideWithValue(_FakeAuthRepository(log: log)),
+      pushMessagingServiceProvider.overrideWithValue(push),
+      dispositivoRepositoryProvider.overrideWithValue(dispositivos),
+    ],
+  );
+  addTearDown(container.dispose);
+  addTearDown(push.dispose);
+
+  return (container: container, dispositivos: dispositivos);
+}
 
 void main() {
   group('AuthNotifier', () {
@@ -400,5 +430,36 @@ void main() {
         expect(state, const AsyncValue<Usuario?>.data(null));
       },
     );
+  });
+
+  group('cerrarSesionProvider', () {
+    test('da de baja el dispositivo ANTES de limpiar la sesión', () async {
+      final log = <String>[];
+      final ctx = _buildContainerConPush(log);
+
+      await ctx.container
+          .read(authStateProvider.notifier)
+          .login('test@example.com', '1234');
+      await ctx.container.read(cerrarSesionProvider)();
+
+      // El endpoint de baja exige JWT: si se invirtiera el orden, daría 401.
+      expect(log, ['eliminar', 'logout']);
+      expect(ctx.dispositivos.eliminados, [_token]);
+      expect(ctx.container.read(authStateProvider).value, isNull);
+    });
+
+    test('cierra la sesión aunque falle la baja del dispositivo', () async {
+      final log = <String>[];
+      final ctx = _buildContainerConPush(log);
+      ctx.dispositivos.fallarAlEliminar = true;
+
+      await ctx.container
+          .read(authStateProvider.notifier)
+          .login('test@example.com', '1234');
+      await ctx.container.read(cerrarSesionProvider)();
+
+      expect(log, ['eliminar', 'logout']);
+      expect(ctx.container.read(authStateProvider).value, isNull);
+    });
   });
 }

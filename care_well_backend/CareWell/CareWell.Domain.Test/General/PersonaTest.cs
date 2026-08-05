@@ -522,5 +522,60 @@ namespace CareWell.Domain.Test.General
                 Assert.Null(excepcion);
             }
         }
+
+        public class ElMetodo_NombreCompleto : PersonaTest
+        {
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                #region Modificar Perfil
+
+                var modificarPerfil = new ModificarPerfil(
+                    Nombre: "Esteban",
+                    Apellido: "Carignani",
+                    Documento: "41567829",
+                    FechaNacimiento: DateTime.Today,
+                    Telefono: "3364562256",
+                    Imagen: new byte[8]
+                );
+
+                this.Target.ModificarPerfil(modificarPerfil,
+                                            Mock.Of<Persona>(),
+                                            Mock.Of<IValidadorPermisoAccion>());
+
+                #endregion
+            }
+
+            private string Action()
+            {
+                return this.Target.NombreCompleto();
+            }
+
+            [Fact]
+            public void Retorna_el_Nombre_y_Apellido_compuestos()
+            {
+                // Arrange
+                var esperado = $"{this.Target.Nombre} {this.Target.Apellido}";
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equal(esperado, resultado);
+            }
+
+            [Fact]
+            public void Retorna_un_string()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.IsType<string>(resultado);
+            }
+        }
     }
 }

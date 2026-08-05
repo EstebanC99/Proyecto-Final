@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -26,11 +26,11 @@ class HabitsScreen extends ConsumerWidget {
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Hábitos de vida'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -63,7 +63,7 @@ class HabitsScreen extends ConsumerWidget {
               ),
               data: (habitos) {
                 if (habitos.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                       child: Column(
@@ -72,7 +72,7 @@ class HabitsScreen extends ConsumerWidget {
                           Icon(
                             Icons.self_improvement,
                             size: 64,
-                            color: AppColors.textDisabled,
+                            color: context.colors.textDisabled,
                           ),
                           SizedBox(height: AppSpacing.md),
                           Text(
@@ -80,7 +80,7 @@ class HabitsScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                           SizedBox(height: AppSpacing.sm),
@@ -89,7 +89,7 @@ class HabitsScreen extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textDisabled,
+                              color: context.colors.textDisabled,
                             ),
                           ),
                         ],
@@ -98,7 +98,7 @@ class HabitsScreen extends ConsumerWidget {
                   );
                 }
                 return RefreshIndicator(
-                  color: AppColors.habitsAccent,
+                  color: context.colors.habitsAccent,
                   onRefresh: () async {
                     ref.invalidate(habitosProvider);
                     await ref.read(habitosProvider.future);
@@ -131,8 +131,8 @@ class HabitsScreen extends ConsumerWidget {
           ? FloatingActionButton(
               onPressed: () => context.pushNamed(AppRoutes.healthHabitsNewName),
               tooltip: 'Nuevo hábito',
-              backgroundColor: AppColors.habitsAccent,
-              child: const Icon(Icons.add, color: Colors.white),
+              backgroundColor: context.colors.habitsAccent,
+              child: Icon(Icons.add, color: context.colors.onPrimary),
             )
           : null,
     );
@@ -182,7 +182,7 @@ class _HabitoCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           boxShadow: AppSpacing.elev1,
         ),
@@ -192,13 +192,13 @@ class _HabitoCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.habitsContainer,
+                color: context.colors.habitsContainer,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 _iconTipo(habito.tipo),
                 size: 20,
-                color: AppColors.habitsAccent,
+                color: context.colors.habitsAccent,
               ),
             ),
             const SizedBox(width: AppSpacing.md),
@@ -208,18 +208,18 @@ class _HabitoCard extends StatelessWidget {
                 children: [
                   Text(
                     _labelTipo(habito.tipo),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.habitsAccent,
+                      color: context.colors.habitsAccent,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     habito.descripcion,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -251,8 +251,8 @@ class _RealizacionChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: realizado
-            ? AppColors.successContainer
-            : AppColors.surfaceVariant,
+            ? context.colors.successContainer
+            : context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -263,7 +263,9 @@ class _RealizacionChip extends StatelessWidget {
                 ? Icons.check_circle_outline
                 : Icons.radio_button_unchecked,
             size: 13,
-            color: realizado ? AppColors.success : AppColors.textDisabled,
+            color: realizado
+                ? context.colors.success
+                : context.colors.textDisabled,
           ),
           const SizedBox(width: 4),
           Text(
@@ -271,7 +273,9 @@ class _RealizacionChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: realizado ? AppColors.success : AppColors.textDisabled,
+              color: realizado
+                  ? context.colors.success
+                  : context.colors.textDisabled,
             ),
           ),
         ],
@@ -294,7 +298,7 @@ class _HabitosSkeleton extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: AppSpacing.sm),
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: context.colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
           ),

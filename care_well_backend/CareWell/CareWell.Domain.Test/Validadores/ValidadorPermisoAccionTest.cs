@@ -627,6 +627,100 @@ namespace CareWell.Domain.Test.Validadores
             }
         }
 
+        public class ElMetodo_ValidarPuedeActivarEmergencia : ValidadorPermisoAccionTest
+        {
+            private Mock<Persona> personaCuidada;
+            private Mock<Persona> colaborador;
+            private Mock<AsignacionCuidado> asignacionCuidado;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.personaCuidada = new Mock<Persona>();
+                this.personaCuidada.Setup(s => s.ID).Returns(1);
+
+                this.colaborador = new Mock<Persona>();
+                this.colaborador.Setup(s => s.ID).Returns(2);
+
+                this.asignacionCuidado = new Mock<AsignacionCuidado>();
+                this.asignacionCuidado.Setup(s => s.PersonaCuidada).Returns(this.personaCuidada.Object);
+                this.asignacionCuidado.Setup(s => s.Colaborador).Returns(this.colaborador.Object);
+                this.asignacionCuidado.Setup(s => s.Permisos).Returns(new List<PermisoCuidado> { Mock.Of<PermisoCuidado>(p => p.ID == PermisosCuidado.ActivarEmergencia) });
+                this.asignacionCuidado.Setup(s => s.Estado).Returns(Mock.Of<EstadoAsignacionCuidado>(e => e.ID == EstadosAsignacionCuidado.Activa));
+
+                this.entityLoaderDomainService.Setup(s => s.Query<AsignacionCuidado>()).Returns(new List<AsignacionCuidado> { this.asignacionCuidado.Object }.AsQueryable);
+            }
+
+            private void Action()
+            {
+                this.Target.ValidarPuedeActivarEmergencia
+                (
+                    this.personaCuidada.Object,
+                    this.colaborador.Object
+                );
+            }
+
+            [Fact]
+            public void Si_la_persona_cuidada_es_igual_al_colaborador_no_busca_ninguna_asignacion()
+            {
+                // Arrange
+                this.colaborador.Setup(s => s.ID).Returns(this.personaCuidada.Object.ID);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.Query<AsignacionCuidado>(), Times.Never);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Query_AsignacionCuidado_del_EntityLoaderDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(v => v.Query<AsignacionCuidado>(), Times.Once);
+            }
+
+            [Fact]
+            public void Si_no_existe_asignacion_cuidado_entre_la_persona_a_cuidar_y_el_asignador_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.entityLoaderDomainService.Setup(s => s.Query<AsignacionCuidado>()).Returns(new List<AsignacionCuidado>().AsQueryable);
+
+                // Action & Assert
+                var exception = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion, exception.Message);
+            }
+
+            [Fact]
+            public void Si_en_la_asignacion_cuidado_entre_la_persona_a_cuidar_y_el_asignador_no_tiene_el_permiso_de_activar_emergencia_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.asignacionCuidado.Setup(s => s.Permisos).Returns(new List<PermisoCuidado> { Mock.Of<PermisoCuidado>(p => p.ID == PermisosCuidado.EditarFichaSalud) });
+
+                // Action & Assert
+                var exception = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.UsuarioNoHabilitadoParaEjecutarAccion, exception.Message);
+            }
+
+            [Fact]
+            public void En_cualquier_otro_caso_no_arroja_excepcion()
+            {
+                // Arrange
+
+                // Action
+                var excepcion = Record.Exception(() => this.Action());
+
+                // Assert
+                Assert.Null(excepcion);
+            }
+        }
+
         public class ElMetodo_ValidarVisualizacion : ValidadorPermisoAccionTest
         {
             private Mock<Persona> personaCuidada;

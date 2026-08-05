@@ -1,43 +1,37 @@
-import 'dart:convert';
+import '../shared/persona_model.dart';
 
-/// DTO de [Emergencia] para serialización JSON.
+/// DTO de lectura de una emergencia.
+///
+/// Es solo de lectura a propósito: el cliente nunca envía una emergencia
+/// completa (activar manda únicamente `{personaID, descripcion}`), así que no
+/// necesita `toJson`.
 class EmergenciaModel {
   final int id;
-  final int personaId;
+  final PersonaModel persona;
+  final PersonaModel activador;
+
+  /// ISO-8601 sin offset (hora local del servidor), como el resto de la API.
   final String fechaHora;
-  final bool atendida;
+
   final String? descripcion;
 
   const EmergenciaModel({
     required this.id,
-    required this.personaId,
+    required this.persona,
+    required this.activador,
     required this.fechaHora,
-    this.atendida = false,
     this.descripcion,
   });
 
   factory EmergenciaModel.fromJson(Map<String, dynamic> json) {
     return EmergenciaModel(
       id: json['id'] as int,
-      personaId: json['personaId'] as int,
+      persona: PersonaModel.fromJson(json['persona'] as Map<String, dynamic>),
+      activador: PersonaModel.fromJson(
+        json['activador'] as Map<String, dynamic>,
+      ),
       fechaHora: json['fechaHora'] as String,
-      atendida: (json['atendida'] as bool?) ?? false,
       descripcion: json['descripcion'] as String?,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'personaId': personaId,
-      'fechaHora': fechaHora,
-      'atendida': atendida,
-      if (descripcion != null) 'descripcion': descripcion,
-    };
-  }
-
-  factory EmergenciaModel.fromRawJson(String source) =>
-      EmergenciaModel.fromJson(json.decode(source) as Map<String, dynamic>);
-
-  String toRawJson() => json.encode(toJson());
 }

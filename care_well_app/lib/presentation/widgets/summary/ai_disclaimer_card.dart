@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Disclaimer de contenido generado por IA para la pantalla de Resumen (US 9.16).
 ///
-/// Fondo [AppColors.aiContainer], ícono `auto_awesome` y chip "IA". Deja claro
+/// Fondo [AppPalette.aiContainer], ícono `auto_awesome` y chip "IA". Deja claro
 /// el carácter no clínico del resumen. El screen decide cuándo mostrarlo: se
 /// oculta cuando no hay datos (no se generó nada por IA).
 class AiDisclaimerCard extends StatelessWidget {
@@ -21,13 +21,13 @@ class AiDisclaimerCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.aiContainer,
+        color: context.colors.aiContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.auto_awesome, size: 20, color: AppColors.aiAccent),
+          Icon(Icons.auto_awesome, size: 20, color: context.colors.aiAccent),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -37,10 +37,10 @@ class AiDisclaimerCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   _texto,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 1.4,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -61,16 +61,16 @@ class _AiChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.aiAccent,
+        color: context.colors.aiAccent,
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
       ),
-      child: const Text(
+      child: Text(
         'IA',
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,
-          color: AppColors.onPrimary,
+          color: context.colors.onPrimary,
         ),
       ),
     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../widgets/widgets.dart';
 
@@ -25,7 +25,7 @@ class AccountCreatedScreen extends StatelessWidget {
         if (!didPop) context.goNamed(AppRoutes.loginName);
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -47,14 +47,14 @@ class AccountCreatedScreen extends StatelessWidget {
                           child: Container(
                             width: 88,
                             height: 88,
-                            decoration: const BoxDecoration(
-                              color: AppColors.successContainer,
+                            decoration: BoxDecoration(
+                              color: context.colors.successContainer,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.check_circle,
                               size: 48,
-                              color: AppColors.success,
+                              color: context.colors.success,
                             ),
                           ),
                         ),
@@ -67,7 +67,7 @@ class AccountCreatedScreen extends StatelessWidget {
                         child: Text(
                           'Email verificado',
                           style: theme.textTheme.headlineMedium?.copyWith(
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                           textAlign: TextAlign.center,
@@ -81,7 +81,7 @@ class AccountCreatedScreen extends StatelessWidget {
                         'Iniciá sesión para empezar a usar CareWell.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),

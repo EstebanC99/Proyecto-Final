@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../domain/global/tipos_evento_agenda_const.dart';
 
 /// Tema visual (ícono y colores) asociado a un tipo de evento de agenda.
@@ -10,7 +10,7 @@ import '../../../domain/global/tipos_evento_agenda_const.dart';
 /// presentacional: no mantiene estado ni conoce el dominio más allá de los ids.
 ///
 /// El tipo "Bienestar" reutiliza la paleta de Mi Salud
-/// ([AppColors.healthAccent]/[AppColors.healthContainer]) para mantener
+/// ([AppPalette.healthAccent]/[AppPalette.healthContainer]) para mantener
 /// coherencia entre módulos.
 abstract final class TipoEventoTheme {
   /// Ícono representativo del tipo con [id].
@@ -31,36 +31,36 @@ abstract final class TipoEventoTheme {
   };
 
   /// Color de acento (ícono/texto destacado) del tipo con [id].
-  static Color accentFor(int id) => switch (id) {
-    TiposEventoAgendaConst.citaMedica => AppColors.info,
-    TiposEventoAgendaConst.medicacion => AppColors.secondary,
-    TiposEventoAgendaConst.rehabilitacion => AppColors.primary,
-    TiposEventoAgendaConst.control => AppColors.primary,
-    TiposEventoAgendaConst.hospitalizacion => AppColors.error,
-    TiposEventoAgendaConst.cirugia => AppColors.error,
-    TiposEventoAgendaConst.tratamiento => AppColors.info,
-    TiposEventoAgendaConst.bienestar => AppColors.healthAccent,
-    TiposEventoAgendaConst.sintoma => AppColors.warning,
-    TiposEventoAgendaConst.diagnostico => AppColors.info,
-    TiposEventoAgendaConst.vacuna => AppColors.success,
-    TiposEventoAgendaConst.actividadFisica => AppColors.habitsAccent,
-    _ => AppColors.textSecondary,
+  static Color accentFor(BuildContext context, int id) => switch (id) {
+    TiposEventoAgendaConst.citaMedica => context.colors.info,
+    TiposEventoAgendaConst.medicacion => context.colors.secondary,
+    TiposEventoAgendaConst.rehabilitacion => context.colors.primary,
+    TiposEventoAgendaConst.control => context.colors.primary,
+    TiposEventoAgendaConst.hospitalizacion => context.colors.error,
+    TiposEventoAgendaConst.cirugia => context.colors.error,
+    TiposEventoAgendaConst.tratamiento => context.colors.info,
+    TiposEventoAgendaConst.bienestar => context.colors.healthAccent,
+    TiposEventoAgendaConst.sintoma => context.colors.warning,
+    TiposEventoAgendaConst.diagnostico => context.colors.info,
+    TiposEventoAgendaConst.vacuna => context.colors.success,
+    TiposEventoAgendaConst.actividadFisica => context.colors.habitsAccent,
+    _ => context.colors.textSecondary,
   };
 
   /// Color de contenedor (fondo suave) del tipo con [id].
-  static Color containerFor(int id) => switch (id) {
-    TiposEventoAgendaConst.citaMedica => AppColors.infoContainer,
-    TiposEventoAgendaConst.medicacion => AppColors.secondaryContainer,
-    TiposEventoAgendaConst.rehabilitacion => AppColors.primaryContainer,
-    TiposEventoAgendaConst.control => AppColors.primaryContainer,
-    TiposEventoAgendaConst.hospitalizacion => AppColors.errorContainer,
-    TiposEventoAgendaConst.cirugia => AppColors.errorContainer,
-    TiposEventoAgendaConst.tratamiento => AppColors.infoContainer,
-    TiposEventoAgendaConst.bienestar => AppColors.healthContainer,
-    TiposEventoAgendaConst.sintoma => AppColors.warningContainer,
-    TiposEventoAgendaConst.diagnostico => AppColors.infoContainer,
-    TiposEventoAgendaConst.vacuna => AppColors.successContainer,
-    TiposEventoAgendaConst.actividadFisica => AppColors.habitsContainer,
-    _ => AppColors.surfaceVariant,
+  static Color containerFor(BuildContext context, int id) => switch (id) {
+    TiposEventoAgendaConst.citaMedica => context.colors.infoContainer,
+    TiposEventoAgendaConst.medicacion => context.colors.secondaryContainer,
+    TiposEventoAgendaConst.rehabilitacion => context.colors.primaryContainer,
+    TiposEventoAgendaConst.control => context.colors.primaryContainer,
+    TiposEventoAgendaConst.hospitalizacion => context.colors.errorContainer,
+    TiposEventoAgendaConst.cirugia => context.colors.errorContainer,
+    TiposEventoAgendaConst.tratamiento => context.colors.infoContainer,
+    TiposEventoAgendaConst.bienestar => context.colors.healthContainer,
+    TiposEventoAgendaConst.sintoma => context.colors.warningContainer,
+    TiposEventoAgendaConst.diagnostico => context.colors.infoContainer,
+    TiposEventoAgendaConst.vacuna => context.colors.successContainer,
+    TiposEventoAgendaConst.actividadFisica => context.colors.habitsContainer,
+    _ => context.colors.surfaceVariant,
   };
 }

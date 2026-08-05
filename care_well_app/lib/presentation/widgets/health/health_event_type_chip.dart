@@ -18,7 +18,7 @@ class HealthEventTypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = healthEventColor(tipo);
+    final color = healthEventColor(context, tipo);
     final label = healthEventLabel(tipo);
     final icon = healthEventIcon(tipo);
 

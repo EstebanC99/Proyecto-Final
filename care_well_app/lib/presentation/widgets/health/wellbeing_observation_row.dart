@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/constraints/wellbeing_alert_catalogs.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 
@@ -33,10 +33,14 @@ class WellbeingObservationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     // Severidad -> fondo, borde y color de etiqueta.
     final Color fondo = _esAtencion
-        ? AppColors.warningContainer
-        : AppColors.surface;
-    final Color bordeIzq = _esAtencion ? AppColors.warning : AppColors.info;
-    final Color severidadColor = _esAtencion ? _atencionText : AppColors.info;
+        ? context.colors.warningContainer
+        : context.colors.surface;
+    final Color bordeIzq = _esAtencion
+        ? context.colors.warning
+        : context.colors.info;
+    final Color severidadColor = _esAtencion
+        ? _atencionText
+        : context.colors.info;
     final IconData severidadIcon = _esAtencion
         ? Icons.priority_high
         : Icons.info_outline;
@@ -44,11 +48,11 @@ class WellbeingObservationRow extends StatelessWidget {
 
     // Categoría -> círculo tenue + ícono de acento.
     final Color categoriaBg = _esAnimo
-        ? AppColors.moodContainer
-        : AppColors.habitsContainer;
+        ? context.colors.moodContainer
+        : context.colors.habitsContainer;
     final Color categoriaFg = _esAnimo
-        ? AppColors.moodAccent
-        : AppColors.habitsAccent;
+        ? context.colors.moodAccent
+        : context.colors.habitsAccent;
     final IconData categoriaIcon = _esAnimo ? Icons.mood : Icons.directions_run;
 
     // Radio compartido por las tres capas de decoración.
@@ -61,10 +65,10 @@ class WellbeingObservationRow extends StatelessWidget {
     // que además pinta el borde siguiendo las esquinas redondeadas).
     final Border? outlineBorder = _esAtencion
         ? null
-        : const Border(
-            top: BorderSide(color: AppColors.outline),
-            right: BorderSide(color: AppColors.outline),
-            bottom: BorderSide(color: AppColors.outline),
+        : Border(
+            top: BorderSide(color: context.colors.outline),
+            right: BorderSide(color: context.colors.outline),
+            bottom: BorderSide(color: context.colors.outline),
           );
 
     return DecoratedBox(
@@ -123,10 +127,10 @@ class WellbeingObservationRow extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         alerta.mensaje,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           height: 1.4,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                     ],
@@ -134,12 +138,12 @@ class WellbeingObservationRow extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 // Affordance de navegación, alineado al centro del círculo.
-                const SizedBox(
+                SizedBox(
                   height: 28,
                   child: Icon(
                     Icons.chevron_right,
                     size: 20,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],

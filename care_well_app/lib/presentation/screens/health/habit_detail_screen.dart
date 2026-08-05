@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -46,10 +46,10 @@ class HabitDetailScreen extends ConsumerWidget {
         ref.watch(esMiembroEquipoActivoProvider).value ?? false;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
         title: habitoAsync.when(
           data: (h) => Text(
@@ -71,7 +71,7 @@ class HabitDetailScreen extends ConsumerWidget {
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              color: AppColors.error,
+              color: context.colors.error,
               tooltip: 'Eliminar',
               onPressed: () async {
                 final eliminado = await ConfirmDialog.show(
@@ -107,7 +107,7 @@ class HabitDetailScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.colors.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 boxShadow: AppSpacing.elev1,
               ),
@@ -120,13 +120,13 @@ class HabitDetailScreen extends ConsumerWidget {
                       width: 72,
                       height: 72,
                       decoration: BoxDecoration(
-                        color: AppColors.habitsContainer,
+                        color: context.colors.habitsContainer,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         _iconTipo(habito.tipo),
                         size: 36,
-                        color: AppColors.habitsAccent,
+                        color: context.colors.habitsAccent,
                       ),
                     ),
                   ),
@@ -136,11 +136,11 @@ class HabitDetailScreen extends ConsumerWidget {
                   Center(
                     child: Text(
                       _labelTipo(habito.tipo),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.6,
-                        color: AppColors.habitsAccent,
+                        color: context.colors.habitsAccent,
                       ),
                     ),
                   ),
@@ -149,9 +149,9 @@ class HabitDetailScreen extends ConsumerWidget {
                   // Descripción
                   Text(
                     habito.descripcion,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       height: 1.5,
                     ),
                   ),
@@ -160,17 +160,17 @@ class HabitDetailScreen extends ConsumerWidget {
                   // Persona
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.person_outline,
                         size: 16,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Text(
                         habito.persona.descripcion,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -180,13 +180,13 @@ class HabitDetailScreen extends ConsumerWidget {
                   // Realización de hoy
                   const Divider(),
                   const SizedBox(height: AppSpacing.sm),
-                  const Text(
+                  Text(
                     'REALIZACIÓN DE HOY',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -226,8 +226,8 @@ class _RealizacionDetalleCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: realizado
-            ? AppColors.successContainer
-            : AppColors.surfaceVariant,
+            ? context.colors.successContainer
+            : context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -238,7 +238,9 @@ class _RealizacionDetalleCard extends StatelessWidget {
                 ? Icons.check_circle_outline
                 : Icons.radio_button_unchecked,
             size: 20,
-            color: realizado ? AppColors.success : AppColors.textDisabled,
+            color: realizado
+                ? context.colors.success
+                : context.colors.textDisabled,
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -251,17 +253,17 @@ class _RealizacionDetalleCard extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: realizado
-                        ? AppColors.success
-                        : AppColors.textDisabled,
+                        ? context.colors.success
+                        : context.colors.textDisabled,
                   ),
                 ),
                 if (realizado) ...[
                   const SizedBox(height: 2),
                   Text(
                     '${realizacion.fechaHora.hour.toString().padLeft(2, '0')}:${realizacion.fechaHora.minute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   if (realizacion.comentarios != null &&
@@ -269,30 +271,30 @@ class _RealizacionDetalleCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       realizacion.comentarios!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                         height: 1.4,
                       ),
                     ),
                   ],
                 ],
                 if (!realizado)
-                  const Text(
+                  Text(
                     'Tocá para marcar como realizado.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textDisabled,
+                      color: context.colors.textDisabled,
                     ),
                   ),
               ],
             ),
           ),
           if (realizado)
-            const Icon(
+            Icon(
               Icons.edit_outlined,
               size: 16,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
         ],
       ),

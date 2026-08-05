@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Variante de [NavTile] para el estado vacío de "Personas a cargo".
@@ -69,21 +69,21 @@ class _EmptyStateTileState extends State<EmptyStateTile> {
                     color: widget.accentColor.withValues(alpha: 0.40),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.elderly,
                     size: 28,
-                    color: Colors.white,
+                    color: context.colors.onPrimary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                const Text(
+                Text(
                   'Aún no tenés\npersonas a cargo',
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],

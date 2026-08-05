@@ -3,6 +3,7 @@ using CareWell.DataViews.Auth;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.Factories;
+using CareWell.Global.Constantes.Auth;
 using CareWell.Queries.Auth;
 using CareWell.Repository;
 using CareWell.Repository.Auth;
@@ -65,7 +66,7 @@ namespace CareWell.BusinessService.Auth
             
             refreshToken.Crear(Guid.NewGuid().ToString("N"),
                                this.EntityLoaderDomainService.GetByID<Usuario>(query.UsuarioID),
-                               DateTime.Now.AddDays(30));
+                               DateTime.Now.AddDays(ParametrosSesion.DiasVigenciaRefreshToken));
 
             this.RefreshTokenRepository.Add(refreshToken);
 

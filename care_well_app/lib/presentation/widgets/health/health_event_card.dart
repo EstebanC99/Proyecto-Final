@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 
@@ -41,30 +41,30 @@ IconData _iconForTipo(TipoEventoSalud tipo) {
 }
 
 /// Retorna el color de acento correspondiente al tipo de evento de salud.
-Color _colorForTipo(TipoEventoSalud tipo) {
+Color _colorForTipo(BuildContext context, TipoEventoSalud tipo) {
   switch (tipo.id) {
     case TiposEventoAgendaConst.citaMedica:
     case TiposEventoAgendaConst.control:
-      return AppColors.healthAccent;
+      return context.colors.healthAccent;
     case TiposEventoAgendaConst.hospitalizacion:
     case TiposEventoAgendaConst.cirugia:
-      return AppColors.error;
+      return context.colors.error;
     case TiposEventoAgendaConst.medicacion:
       return const Color(0xFF2563EB);
     case TiposEventoAgendaConst.tratamiento:
     case TiposEventoAgendaConst.rehabilitacion:
-      return AppColors.moodAccent;
+      return context.colors.moodAccent;
     case TiposEventoAgendaConst.bienestar:
-      return AppColors.success;
+      return context.colors.success;
     case TiposEventoAgendaConst.sintoma:
     case TiposEventoAgendaConst.actividadFisica:
-      return AppColors.habitsAccent;
+      return context.colors.habitsAccent;
     case TiposEventoAgendaConst.diagnostico:
       return const Color(0xFF0284C7);
     case TiposEventoAgendaConst.vacuna:
       return const Color(0xFF059669);
     default:
-      return AppColors.textSecondary;
+      return context.colors.textSecondary;
   }
 }
 
@@ -73,7 +73,8 @@ String _labelForTipo(TipoEventoSalud tipo) => tipo.descripcion;
 
 /// Funciones públicas para uso en otros widgets del módulo salud.
 IconData healthEventIcon(TipoEventoSalud tipo) => _iconForTipo(tipo);
-Color healthEventColor(TipoEventoSalud tipo) => _colorForTipo(tipo);
+Color healthEventColor(BuildContext context, TipoEventoSalud tipo) =>
+    _colorForTipo(context, tipo);
 String healthEventLabel(TipoEventoSalud tipo) => _labelForTipo(tipo);
 
 /// Card de un [EventoSalud] para la lista mensual y la línea de tiempo.
@@ -102,7 +103,7 @@ class HealthEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _colorForTipo(evento.tipo);
+    final color = _colorForTipo(context, evento.tipo);
     final label = _labelForTipo(evento.tipo);
     final icon = _iconForTipo(evento.tipo);
     final fechaHora = evento.fechaHora.toLocal();
@@ -119,7 +120,7 @@ class HealthEventCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           boxShadow: AppSpacing.elev1,
         ),
@@ -168,9 +169,9 @@ class HealthEventCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         fechaStr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textDisabled,
+                          color: context.colors.textDisabled,
                         ),
                       ),
                     ],
@@ -179,9 +180,9 @@ class HealthEventCard extends StatelessWidget {
                   // Descripción truncada
                   Text(
                     evento.descripcion,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -195,14 +196,14 @@ class HealthEventCard extends StatelessWidget {
                           Icon(
                             Icons.event_available_outlined,
                             size: 11,
-                            color: AppColors.textDisabled,
+                            color: context.colors.textDisabled,
                           ),
                           const SizedBox(width: 3),
-                          const Text(
+                          Text(
                             'Desde agenda',
                             style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textDisabled,
+                              color: context.colors.textDisabled,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -231,10 +232,10 @@ class HealthEventCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.textDisabled,
+              color: context.colors.textDisabled,
             ),
           ],
         ),

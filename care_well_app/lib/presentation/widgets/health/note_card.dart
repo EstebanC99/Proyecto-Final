@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../shared/confirm_dialog.dart';
@@ -61,10 +61,10 @@ class NoteCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: const Border(
-          left: BorderSide(color: AppColors.healthAccent, width: 3),
+        border: Border(
+          left: BorderSide(color: context.colors.healthAccent, width: 3),
         ),
         boxShadow: const [
           BoxShadow(
@@ -96,18 +96,18 @@ class NoteCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     nota.autor.descripcion,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
                 Text(
                   '$fechaStr · $horaStr',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textDisabled,
+                    color: context.colors.textDisabled,
                   ),
                 ),
               ],
@@ -116,16 +116,16 @@ class NoteCard extends StatelessWidget {
             // Contenido
             Text(
               nota.contenido,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 height: 1.5,
               ),
             ),
             // Fila de acciones (solo cuando hay callbacks)
             if (_tieneAcciones) ...[
               const SizedBox(height: AppSpacing.xs),
-              const Divider(height: 1, color: AppColors.outline),
+              Divider(height: 1, color: context.colors.outline),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -133,14 +133,14 @@ class NoteCard extends StatelessWidget {
                     _AccionButton(
                       icon: Icons.edit_outlined,
                       label: 'Editar',
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                       onTap: () => _abrirEdicion(context),
                     ),
                   if (onDelete != null)
                     _AccionButton(
                       icon: Icons.delete_outline,
                       label: 'Eliminar',
-                      color: AppColors.error,
+                      color: context.colors.error,
                       onTap: () => _confirmarEliminar(context),
                     ),
                 ],
@@ -248,7 +248,7 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -276,18 +276,18 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.outline,
+                color: context.colors.outline,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const Text(
+          Text(
             'Editar nota',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -304,16 +304,16 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
             onChanged: (_) => setState(() => _error = null),
             decoration: InputDecoration(
               hintText: 'Escribí tu observación sobre este evento...',
-              hintStyle: const TextStyle(color: AppColors.textDisabled),
+              hintStyle: TextStyle(color: context.colors.textDisabled),
               errorText: _error,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                borderSide: const BorderSide(color: AppColors.outline),
+                borderSide: BorderSide(color: context.colors.outline),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                borderSide: const BorderSide(
-                  color: AppColors.healthAccent,
+                borderSide: BorderSide(
+                  color: context.colors.healthAccent,
                   width: 2,
                 ),
               ),
@@ -328,8 +328,8 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
                 style: TextStyle(
                   fontSize: 11,
                   color: charsActuales >= _maxChars
-                      ? AppColors.healthAccent
-                      : AppColors.textDisabled,
+                      ? context.colors.healthAccent
+                      : context.colors.textDisabled,
                 ),
               ),
             ),
@@ -342,15 +342,15 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
                       ? null
                       : () => Navigator.of(context).pop(),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.outline),
+                    side: BorderSide(color: context.colors.outline),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
                     minimumSize: const Size(0, 48),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Cancelar',
-                    style: TextStyle(color: AppColors.textPrimary),
+                    style: TextStyle(color: context.colors.textPrimary),
                   ),
                 ),
               ),
@@ -359,26 +359,26 @@ class _EditNoteSheetState extends State<_EditNoteSheet> {
                 child: FilledButton(
                   onPressed: _loading ? null : _guardar,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.healthAccent,
+                    backgroundColor: context.colors.healthAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
                     minimumSize: const Size(0, 48),
                   ),
                   child: _loading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.colors.onPrimary,
                           ),
                         )
-                      : const Text(
+                      : Text(
                           'Guardar',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.colors.onPrimary,
                           ),
                         ),
                 ),

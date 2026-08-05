@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'avatar.dart' show imageProviderFromBase64;
 
@@ -67,7 +67,7 @@ class DocumentCaptureField extends StatelessWidget {
                   icon: const Icon(Icons.delete_outline, size: 18),
                   label: const Text('Quitar'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
+                    foregroundColor: context.colors.error,
                   ),
                 ),
               ),
@@ -81,7 +81,7 @@ class DocumentCaptureField extends StatelessWidget {
             child: Text(
               errorText!,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.error,
+                color: context.colors.error,
               ),
             ),
           ),
@@ -101,7 +101,9 @@ class _CapturaVacia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final borderColor = hasError ? AppColors.error : AppColors.outline;
+    final borderColor = hasError
+        ? context.colors.error
+        : context.colors.outline;
 
     return InkWell(
       onTap: onTap,
@@ -110,23 +112,23 @@ class _CapturaVacia extends StatelessWidget {
         aspectRatio: 1.585,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.primaryContainer.withValues(alpha: 0.25),
+            color: context.colors.primaryContainer.withValues(alpha: 0.25),
             border: Border.all(color: borderColor, width: hasError ? 1.5 : 1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.badge_outlined,
                 size: 40,
-                color: AppColors.primary,
+                color: context.colors.primary,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Tocá para tomar la foto de tu DNI',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
@@ -137,7 +139,7 @@ class _CapturaVacia extends StatelessWidget {
                 child: Text(
                   'Deben leerse con claridad tu nombre, apellido y número.',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -163,7 +165,7 @@ class _PreviewFoto extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(color: AppColors.outline),
+          border: Border.all(color: context.colors.outline),
           image: DecorationImage(image: imagen, fit: BoxFit.cover),
         ),
       ),

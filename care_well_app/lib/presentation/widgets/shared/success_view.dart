@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'primary_button.dart';
 
@@ -44,7 +44,7 @@ class SuccessView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -62,14 +62,14 @@ class SuccessView extends StatelessWidget {
                 child: Container(
                   width: 112,
                   height: 112,
-                  decoration: const BoxDecoration(
-                    color: AppColors.successContainer,
+                  decoration: BoxDecoration(
+                    color: context.colors.successContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check_circle_outline,
                     size: 80,
-                    color: AppColors.success,
+                    color: context.colors.success,
                   ),
                 ),
               ),
@@ -78,10 +78,10 @@ class SuccessView extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               // Mensaje con nombre resaltado
@@ -92,18 +92,18 @@ class SuccessView extends StatelessWidget {
                   child: RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         height: 1.5,
                       ),
                       children: [
                         if (highlightedName != null)
                           TextSpan(
                             text: highlightedName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                         if (subtitle != null) TextSpan(text: subtitle),
@@ -131,10 +131,10 @@ class SuccessView extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       secondaryButtonLabel!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                     ),
                   ),

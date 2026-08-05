@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Tarjeta con el bloque narrativo del resumen (US 9.16).
@@ -19,16 +19,16 @@ class SummaryNarrativeCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: AppSpacing.elev1,
       ),
       child: SelectableText(
         texto,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           height: 1.55,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
     );

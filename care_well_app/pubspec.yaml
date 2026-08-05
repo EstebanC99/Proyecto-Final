@@ -43,6 +43,10 @@ dependencies:
   # Recorte/encuadre de imágenes (crop 1:1 al elegir foto de perfil)
   image_cropper: ^9.1.0
 
+  # Firebase
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

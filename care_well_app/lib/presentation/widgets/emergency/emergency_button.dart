@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Botón circular grande de emergencia con anillos pulsantes.
 ///
@@ -59,7 +59,9 @@ class _EmergencyButtonState extends State<EmergencyButton>
                     height: 160,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.emergencyRed.withValues(alpha: 0.10),
+                      color: context.colors.emergencyRed.withValues(
+                        alpha: 0.10,
+                      ),
                     ),
                   ),
                 ),
@@ -69,7 +71,7 @@ class _EmergencyButtonState extends State<EmergencyButton>
                   height: 140,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.emergencyRed.withValues(alpha: 0.15),
+                    color: context.colors.emergencyRed.withValues(alpha: 0.15),
                   ),
                 ),
                 // Botón central
@@ -80,11 +82,11 @@ class _EmergencyButtonState extends State<EmergencyButton>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _pressed
-                        ? const Color(0xFFB02F2F)
-                        : AppColors.emergencyRed,
+                        ? context.colors.emergencyRedPressed
+                        : context.colors.emergencyRed,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.emergencyRed.withValues(
+                        color: context.colors.emergencyRed.withValues(
                           alpha: _pressed ? 0.3 : 0.4,
                         ),
                         blurRadius: _pressed ? 8 : 20,
@@ -92,17 +94,21 @@ class _EmergencyButtonState extends State<EmergencyButton>
                       ),
                     ],
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, size: 48, color: Colors.white),
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: context.colors.onEmergency,
+                      ),
                       SizedBox(height: 2),
                       Text(
                         'EMERGENCIA',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: context.colors.onEmergency,
                           letterSpacing: 0.5,
                         ),
                       ),

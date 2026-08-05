@@ -4,6 +4,7 @@ export 'alerta_bienestar_repository_impl.dart';
 export 'asignacion_cuidado_repository_impl.dart';
 export 'auth_repository_impl.dart';
 export 'care_team_repository_impl.dart';
+export 'dispositivo_repository_impl.dart';
 export 'emergency_repository_impl.dart';
 export 'estado_animo_repository_impl.dart';
 export 'evento_salud_repository_impl.dart';

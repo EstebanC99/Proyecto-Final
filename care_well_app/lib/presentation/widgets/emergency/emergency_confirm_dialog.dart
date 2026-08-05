@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/inline_error_banner.dart';
 
@@ -10,7 +10,6 @@ import '../shared/inline_error_banner.dart';
 /// ```dart
 /// final confirmo = await EmergencyConfirmDialog.show(
 ///   context,
-///   cantidadMiembros: 3,
 ///   nombrePersona: 'Alicia',
 ///   onConfirm: () async { ... },
 /// );
@@ -18,19 +17,16 @@ import '../shared/inline_error_banner.dart';
 class EmergencyConfirmDialog extends StatefulWidget {
   const EmergencyConfirmDialog({
     super.key,
-    required this.cantidadMiembros,
     required this.nombrePersona,
     required this.onConfirm,
   });
 
-  final int cantidadMiembros;
   final String nombrePersona;
   final Future<void> Function() onConfirm;
 
   /// Muestra el dialog y retorna `true` si el usuario confirmó.
   static Future<bool?> show(
     BuildContext context, {
-    required int cantidadMiembros,
     required String nombrePersona,
     required Future<void> Function() onConfirm,
   }) {
@@ -38,7 +34,6 @@ class EmergencyConfirmDialog extends StatefulWidget {
       context: context,
       barrierDismissible: true,
       builder: (_) => EmergencyConfirmDialog(
-        cantidadMiembros: cantidadMiembros,
         nombrePersona: nombrePersona,
         onConfirm: onConfirm,
       ),
@@ -85,8 +80,8 @@ class _EmergencyConfirmDialogState extends State<EmergencyConfirmDialog> {
             // Franja roja superior
             Container(
               height: 6,
-              decoration: const BoxDecoration(
-                color: AppColors.emergencyRed,
+              decoration: BoxDecoration(
+                color: context.colors.emergencyRed,
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(AppSpacing.radiusXl),
                 ),
@@ -102,31 +97,30 @@ class _EmergencyConfirmDialogState extends State<EmergencyConfirmDialog> {
                     child: Icon(
                       Icons.notifications_active,
                       size: 48,
-                      color: AppColors.emergencyRed,
+                      color: context.colors.emergencyRed,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   // Título
-                  const Text(
+                  Text(
                     '¿Activar emergencia?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   // Cuerpo
                   Text(
-                    'Se enviará una notificación urgente a '
-                    '${widget.cantidadMiembros} miembro${widget.cantidadMiembros != 1 ? 's' : ''} '
-                    'del equipo de cuidado de ${widget.nombrePersona}. '
+                    'Se enviará una alerta urgente al equipo de cuidado de '
+                    '${widget.nombrePersona}. '
                     'Usá esto solo ante una situación real.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -139,14 +133,14 @@ class _EmergencyConfirmDialogState extends State<EmergencyConfirmDialog> {
                   // Botón confirmar
                   Semantics(
                     label:
-                        'Confirmar. Enviar alerta de emergencia a ${widget.cantidadMiembros} personas.',
+                        'Confirmar. Enviar alerta de emergencia al equipo de cuidado.',
                     child: SizedBox(
                       width: double.infinity,
                       height: 48,
                       child: FilledButton(
                         onPressed: _loading ? null : _handleConfirm,
                         style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.emergencyRed,
+                          backgroundColor: context.colors.emergencyRed,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusMd,
@@ -154,20 +148,20 @@ class _EmergencyConfirmDialogState extends State<EmergencyConfirmDialog> {
                           ),
                         ),
                         child: _loading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 24,
                                 height: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Colors.white,
+                                  color: context.colors.onEmergency,
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 'Sí, enviar alerta',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.white,
+                                  color: context.colors.onEmergency,
                                 ),
                               ),
                       ),
@@ -185,7 +179,7 @@ class _EmergencyConfirmDialogState extends State<EmergencyConfirmDialog> {
                             ? null
                             : () => Navigator.of(context).pop(false),
                         style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primary,
+                          foregroundColor: context.colors.primary,
                         ),
                         child: const Text(
                           'Cancelar',

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -29,7 +29,7 @@ class EmergencySentScreen extends ConsumerWidget {
         if (!didPop) context.goNamed(AppRoutes.homeName);
       },
       child: Scaffold(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -51,14 +51,14 @@ class EmergencySentScreen extends ConsumerWidget {
                           child: Container(
                             width: 88,
                             height: 88,
-                            decoration: const BoxDecoration(
-                              color: AppColors.successContainer,
+                            decoration: BoxDecoration(
+                              color: context.colors.successContainer,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.check_circle,
                               size: 48,
-                              color: AppColors.success,
+                              color: context.colors.success,
                             ),
                           ),
                         ),
@@ -68,37 +68,50 @@ class EmergencySentScreen extends ConsumerWidget {
                       // Título
                       Semantics(
                         focusable: true,
-                        child: const Text(
+                        child: Text(
                           'Alerta enviada',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
 
-                      // Cuerpo
+                      // Cuerpo: describe la acción ejecutada, no la entrega.
+                      // El cliente no puede verificar la recepción del aviso.
                       Text(
-                        '${miembros.length} persona${miembros.length != 1 ? 's fueron' : ' fue'} notificada${miembros.length != 1 ? 's' : ''}. '
+                        'Se envió la alerta a tu equipo de cuidado. '
                         'Permanecé donde estás si es seguro hacerlo.',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
 
-                      // Card de miembros notificados
-                      if (miembros.isNotEmpty)
+                      // Lista del equipo de cuidado (destinatarios del aviso)
+                      if (miembros.isNotEmpty) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Equipo de cuidado',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: context.colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(AppSpacing.lg),
                           decoration: BoxDecoration(
-                            color: AppColors.background,
+                            color: context.colors.background,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusMd,
                             ),
@@ -106,24 +119,27 @@ class EmergencySentScreen extends ConsumerWidget {
                           child: Column(
                             children: [
                               for (int i = 0; i < miembros.length; i++) ...[
-                                NotifiedMembersCard(asignacion: miembros[i]),
+                                EmergencyTeamMemberCard(
+                                  asignacion: miembros[i],
+                                ),
                                 if (i < miembros.length - 1)
-                                  const Divider(
+                                  Divider(
                                     height: 1,
-                                    color: AppColors.surfaceVariant,
+                                    color: context.colors.surfaceVariant,
                                   ),
                               ],
                             ],
                           ),
                         ),
+                      ],
                       const SizedBox(height: AppSpacing.md),
 
                       // Timestamp
                       Text(
                         'Alerta enviada a las $ahora',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textDisabled,
+                          color: context.colors.textDisabled,
                         ),
                       ),
                     ],
@@ -140,11 +156,11 @@ class EmergencySentScreen extends ConsumerWidget {
                     child: OutlinedButton(
                       onPressed: () => context.goNamed(AppRoutes.homeName),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(
-                          color: AppColors.primary,
+                        side: BorderSide(
+                          color: context.colors.primary,
                           width: 2,
                         ),
-                        foregroundColor: AppColors.primary,
+                        foregroundColor: context.colors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusLg,

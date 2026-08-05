@@ -1,5 +1,6 @@
 ﻿using CareWell.Repository.Agenda;
 using CareWell.Repository.Auth;
+using CareWell.Repository.Emergencias;
 using CareWell.Repository.EquipoCuidado;
 using CareWell.Repository.General;
 using CareWell.Repository.Salud;
@@ -25,6 +26,8 @@ namespace CareWell.Repository
             services.AddScoped<IAlertaBienestarRepository, AlertaBienestarRepository>();
             services.AddScoped<IAsignacionCuidadoRepository, AsignacionCuidadoRepository>();
             services.AddScoped<ICodigoVerificacionRepository, CodigoVerificacionRepository>();
+            services.AddScoped<IDispositivoUsuarioRepository, DispositivoUsuarioRepository>();
+            services.AddScoped<IEmergenciaRepository, EmergenciaRepository>();
             services.AddScoped<IEventoAgendaRepository, EventoAgendaRepository>();
             services.AddScoped<IEventoSaludRepository, EventoSaludRepository>();
             services.AddScoped<IFichaSaludRepository, FichaSaludRepository>();

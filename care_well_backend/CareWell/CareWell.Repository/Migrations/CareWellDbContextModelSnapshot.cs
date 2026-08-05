@@ -141,6 +141,45 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_CodigoVerificacion", (string)null);
                 });
 
+            modelBuilder.Entity("CareWell.Domain.Auth.DispositivoUsuario", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_DispositivoUsuario");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaAlta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaUltimoUso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ID_Usuario")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Plataforma")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("ID_Usuario", "Activo");
+
+                    b.ToTable("t_DispositivoUsuario", (string)null);
+                });
+
             modelBuilder.Entity("CareWell.Domain.Auth.EstadoUsuario", b =>
                 {
                     b.Property<int>("ID")
@@ -232,9 +271,6 @@ namespace CareWell.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<bool>("Atendida")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Descripcion")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -245,9 +281,14 @@ namespace CareWell.Repository.Migrations
                     b.Property<int>("ID_Persona")
                         .HasColumnType("int");
 
+                    b.Property<int>("ID_Persona_Activador")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
 
-                    b.HasIndex("ID_Persona");
+                    b.HasIndex("ID_Persona_Activador");
+
+                    b.HasIndex("ID_Persona", "FechaHora");
 
                     b.ToTable("t_Emergencia", (string)null);
                 });
@@ -832,6 +873,17 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("CareWell.Domain.Auth.DispositivoUsuario", b =>
+                {
+                    b.HasOne("CareWell.Domain.Auth.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("CareWell.Domain.Auth.RefreshToken", b =>
                 {
                     b.HasOne("CareWell.Domain.Auth.Usuario", "Usuario")
@@ -869,6 +921,14 @@ namespace CareWell.Repository.Migrations
                         .HasForeignKey("ID_Persona")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("CareWell.Domain.General.Persona", "Activador")
+                        .WithMany()
+                        .HasForeignKey("ID_Persona_Activador")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Activador");
 
                     b.Navigation("Persona");
                 });

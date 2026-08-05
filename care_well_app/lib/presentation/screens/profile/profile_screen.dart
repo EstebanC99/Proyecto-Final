@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -21,9 +21,9 @@ class ProfileScreen extends ConsumerWidget {
     final rol = ref.watch(rolEnSistemaProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Mi Perfil'),
         actions: [
           IconButton(
@@ -49,7 +49,7 @@ class ProfileScreen extends ConsumerWidget {
                 // Encabezado de perfil
                 Container(
                   width: double.infinity,
-                  color: AppColors.surface,
+                  color: context.colors.surface,
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Column(
                     children: [
@@ -71,10 +71,10 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         persona.nombreCompleto,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
@@ -82,11 +82,7 @@ class ProfileScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: AppColors.outline,
-                ),
+                Divider(height: 1, thickness: 1, color: context.colors.outline),
 
                 // Sección de datos
                 ProfileDataRow(
@@ -129,7 +125,7 @@ class _ProfileSkeleton extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-            color: AppColors.surface,
+            color: context.colors.surface,
             padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
               children: [
@@ -137,7 +133,7 @@ class _ProfileSkeleton extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.outline,
+                    color: context.colors.outline,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -146,7 +142,7 @@ class _ProfileSkeleton extends StatelessWidget {
                   width: 160,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: AppColors.outline,
+                    color: context.colors.outline,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
                 ),
@@ -155,14 +151,14 @@ class _ProfileSkeleton extends StatelessWidget {
                   width: 90,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: AppColors.outline,
+                    color: context.colors.outline,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.outline),
+          Divider(height: 1, thickness: 1, color: context.colors.outline),
           for (int i = 0; i < 4; i++) ...[
             Container(
               constraints: const BoxConstraints(minHeight: 64),
@@ -170,14 +166,14 @@ class _ProfileSkeleton extends StatelessWidget {
                 horizontal: AppSpacing.xl,
                 vertical: AppSpacing.md,
               ),
-              color: AppColors.surface,
+              color: context.colors.surface,
               child: Row(
                 children: [
                   Container(
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: AppColors.outline,
+                      color: context.colors.outline,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -190,7 +186,7 @@ class _ProfileSkeleton extends StatelessWidget {
                           width: 60,
                           height: 12,
                           decoration: BoxDecoration(
-                            color: AppColors.outline,
+                            color: context.colors.outline,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSm,
                             ),
@@ -201,7 +197,7 @@ class _ProfileSkeleton extends StatelessWidget {
                           width: 140,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: AppColors.outline,
+                            color: context.colors.outline,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSm,
                             ),
@@ -213,7 +209,7 @@ class _ProfileSkeleton extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: AppColors.outline),
+            Divider(height: 1, thickness: 1, color: context.colors.outline),
           ],
         ],
       ),

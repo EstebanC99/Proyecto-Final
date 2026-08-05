@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -25,9 +25,9 @@ class DependentsScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Personas a cargo'),
       ),
       body: _Body(
@@ -40,12 +40,12 @@ class DependentsScreen extends ConsumerWidget {
         error: (e, st) => null,
         data: (lista) => FloatingActionButton(
           onPressed: () => context.pushNamed(AppRoutes.dependentsNewName),
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.colors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           tooltip: 'Agregar persona',
-          child: const Icon(Icons.add, color: Colors.white),
+          child: Icon(Icons.add, color: context.colors.onPrimary),
         ),
       ),
     );
@@ -99,7 +99,7 @@ class _Body extends ConsumerWidget {
       body: 'Formarás parte del equipo de cuidado de $nombre.',
       confirmLabel: 'Aceptar',
       icon: Icons.check_circle_outline,
-      accentColor: AppColors.success,
+      accentColor: context.colors.success,
       onConfirm: () async {
         final activar = ref.read(activarAsignacionProvider);
         await activar(asignacion: asignacion);
@@ -110,7 +110,7 @@ class _Body extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Te uniste al equipo de cuidado de $nombre.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     }
@@ -131,7 +131,7 @@ class _Body extends ConsumerWidget {
           'La invitación será eliminada.',
       confirmLabel: 'Rechazar',
       icon: Icons.cancel_outlined,
-      accentColor: AppColors.error,
+      accentColor: context.colors.error,
       onConfirm: () async {
         final eliminar = ref.read(eliminarAsignacionProvider);
         await eliminar(asignacion: asignacion);
@@ -142,7 +142,7 @@ class _Body extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Rechazaste la invitación de $nombre.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     }
@@ -164,7 +164,7 @@ class _Body extends ConsumerWidget {
           'cancelará su baja definitiva.',
       confirmLabel: 'Reactivar',
       icon: Icons.restore,
-      accentColor: AppColors.primary,
+      accentColor: context.colors.primary,
       onConfirm: () async {
         final reactivar = ref.read(reactivarAsignacionProvider);
         await reactivar(asignacion: asignacion);
@@ -175,7 +175,7 @@ class _Body extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('$nombre fue reactivado.'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
         ),
       );
     }
@@ -188,7 +188,7 @@ class _Body extends ConsumerWidget {
         ref.invalidate(misAsignacionesProvider);
         await ref.read(misAsignacionesProvider.future);
       },
-      color: AppColors.primary,
+      color: context.colors.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -273,9 +273,9 @@ class _Body extends ConsumerWidget {
                     ),
                     child: Text(
                       'No participás como cuidador en ningún equipo.',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   );
@@ -312,11 +312,11 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
     );
@@ -349,19 +349,16 @@ class _EmptySection extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: const BoxDecoration(
-              color: AppColors.primaryContainer,
+            decoration: BoxDecoration(
+              color: context.colors.primaryContainer,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 48, color: AppColors.primary),
+            child: Icon(icon, size: 48, color: context.colors.primary),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             mensaje,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: context.colors.textSecondary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -399,7 +396,7 @@ class _PendingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(color: const Color(0xFFF5A623), width: 1),
         ),
@@ -420,18 +417,18 @@ class _PendingCard extends StatelessWidget {
                     children: [
                       Text(
                         persona.nombreCompleto,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Te invitaron a cuidar a ${persona.nombre}.',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -450,7 +447,7 @@ class _PendingCard extends StatelessWidget {
                     label: const Text('Aceptar'),
                     onPressed: onAceptar,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.success,
+                      backgroundColor: context.colors.success,
                     ),
                   ),
                 ),
@@ -461,8 +458,8 @@ class _PendingCard extends StatelessWidget {
                     label: const Text('Rechazar'),
                     onPressed: onRechazar,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
+                      foregroundColor: context.colors.error,
+                      side: BorderSide(color: context.colors.error),
                     ),
                   ),
                 ),
@@ -519,7 +516,7 @@ class _SkeletonList extends StatelessWidget {
           child: Container(
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.outline,
+              color: context.colors.outline,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             ),
           ),

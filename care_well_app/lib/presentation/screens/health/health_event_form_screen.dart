@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -87,7 +87,7 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceFirst('Exception: ', '')),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -102,15 +102,15 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
     final tiposAsync = ref.watch(tiposEventoProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Text(
           widget.eventId == null
               ? 'Nuevo evento de salud'
               : 'Editar evento de salud',
         ),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -135,9 +135,9 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
               ),
               data: (tipos) {
                 if (tipos.isEmpty) {
-                  return const Text(
+                  return Text(
                     'No hay tipos de evento disponibles.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: context.colors.textSecondary),
                   );
                 }
                 // Selección por defecto: primer tipo del catálogo.
@@ -155,11 +155,11 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
                           onSelected: _loading
                               ? null
                               : (_) => setState(() => _tipoId = t.id),
-                          selectedColor: AppColors.healthAccent,
+                          selectedColor: context.colors.healthAccent,
                           labelStyle: TextStyle(
                             color: selected
-                                ? Colors.white
-                                : AppColors.textPrimary,
+                                ? context.colors.onPrimary
+                                : context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -234,18 +234,18 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
                     ? null
                     : _guardar,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.healthAccent,
+                  backgroundColor: context.colors.healthAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   ),
                 ),
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: Colors.white,
+                          color: context.colors.onPrimary,
                         ),
                       )
                     : const Text(
@@ -274,10 +274,10 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
       ),
     );
   }
@@ -317,20 +317,20 @@ class _PickerField extends StatelessWidget {
               vertical: AppSpacing.md,
             ),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.outline),
+              border: Border.all(color: context.colors.outline),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              color: AppColors.surface,
+              color: context.colors.surface,
             ),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: AppColors.textSecondary),
+                Icon(icon, size: 20, color: context.colors.textSecondary),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),

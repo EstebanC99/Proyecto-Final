@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Chip que informa cuándo se generó el resumen (US 9.16), ej. "Generado hace
@@ -18,20 +18,20 @@ class SummaryGenerationChip extends StatelessWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.schedule, size: 14, color: AppColors.textSecondary),
+          Icon(Icons.schedule, size: 14, color: context.colors.textSecondary),
           const SizedBox(width: AppSpacing.xs),
           Text(
             'Generado ${_relativo(generadoEn)}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],

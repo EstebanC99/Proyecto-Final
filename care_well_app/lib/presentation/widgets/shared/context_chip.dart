@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Chip pill que muestra el nombre de la persona de contexto activa.
 ///
@@ -29,32 +29,32 @@ class ContextChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.primaryContainer,
+        color: context.colors.primaryContainer,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.person_outline,
             size: 14,
-            color: AppColors.onPrimaryContainer,
+            color: context.colors.onPrimaryContainer,
           ),
           const SizedBox(width: 5),
           Text(
             sufijo != null ? '$nombrePersona $sufijo' : nombrePersona,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.onPrimaryContainer,
+              color: context.colors.onPrimaryContainer,
             ),
           ),
           if (interactivo) ...[
             const SizedBox(width: 2),
-            const Icon(
+            Icon(
               Icons.expand_more,
               size: 14,
-              color: AppColors.onPrimaryContainer,
+              color: context.colors.onPrimaryContainer,
             ),
           ],
         ],

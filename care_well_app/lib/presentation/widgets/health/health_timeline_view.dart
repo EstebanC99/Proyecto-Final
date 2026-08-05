@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import 'health_timeline_tile.dart';
@@ -72,7 +72,7 @@ class _HealthTimelineViewState extends State<HealthTimelineView> {
       ..sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
 
     return RefreshIndicator(
-      color: AppColors.healthAccent,
+      color: context.colors.healthAccent,
       onRefresh: widget.onRefresh,
       child: ListView.builder(
         controller: _scrollController,
@@ -101,11 +101,11 @@ class _HealthTimelineViewState extends State<HealthTimelineView> {
                       'EEEE d',
                       'es',
                     ).format(evento.fechaHora.toLocal()),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
-                      color: AppColors.textDisabled,
+                      color: context.colors.textDisabled,
                     ),
                   ),
                 ),

@@ -1,16 +1,19 @@
 ﻿using CareWell.BusinessService.Abstractions.Agenda;
 using CareWell.BusinessService.Abstractions.Auth;
+using CareWell.BusinessService.Abstractions.Emergencias;
 using CareWell.BusinessService.Abstractions.EquipoCuidado;
 using CareWell.BusinessService.Abstractions.General;
 using CareWell.BusinessService.Abstractions.Salud;
 using CareWell.BusinessService.Agenda;
 using CareWell.BusinessService.Auth;
+using CareWell.BusinessService.Emergencias;
 using CareWell.BusinessService.EquipoCuidado;
 using CareWell.BusinessService.General;
 using CareWell.BusinessService.Salud;
 using CareWell.Domain.DomainServices;
 using CareWell.Domain.DomainServices.Agenda;
 using CareWell.Domain.DomainServices.Auth;
+using CareWell.Domain.DomainServices.Emergencias;
 using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.DomainServices.Salud;
 using CareWell.Domain.Factories;
@@ -38,6 +41,8 @@ namespace CareWell.BusinessService
 
             #region Business Services
 
+            services.AddScoped<IActivarEmergenciaBusinessService, ActivarEmergenciaBusinessService>();
+            services.AddScoped<IAdministrarDispositivoBusinessService, AdministrarDispositivoBusinessService>();
             services.AddScoped<IAdministrarEquipoCuidadoBusinessService, AdministrarEquipoCuidadoBusinessService>();
             services.AddScoped<IAdministrarEventoAgendaBusinessService, AdministrarEventoAgendaBusinessService>();
             services.AddScoped<IAdministrarEventoSaludBusinessService, AdministrarEventoSaludBusinessService>();
@@ -63,12 +68,14 @@ namespace CareWell.BusinessService
 
             #region Domain Services
 
+            services.AddScoped<IAdministrarDispositivoDomainService, AdministrarDispositivoBusinessService>();
             services.AddScoped<IArmarResumenDiarioDomainService, ArmarResumenDiarioBusinessService>();
             services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
             services.AddScoped<IEvaluadorIdentidadPersonaDomainService, EvaluadorIdentidadPersonaBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();
             services.AddScoped<IGeneradorCodigoOtpDomainService, GeneradorCodigoOtpBusinessService>();
             services.AddScoped<IGestorCodigoVerificacionDomainService, GestorCodigoVerificacionBusinessService>();
+            services.AddScoped<INotificarEmergenciaDomainService, NotificarEmergenciaBusinessService>();
             services.AddScoped<ISerializadorFechasExceptuadasDomainService, SerializadorFechasExceptuadasBusinessService>();
 
             #endregion

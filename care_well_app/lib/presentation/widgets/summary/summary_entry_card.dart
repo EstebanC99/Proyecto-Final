@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Card de acceso al Resumen inteligente en el Home (US 9.16).
 ///
-/// Superficie blanca con acento propio de contenido de IA ([AppColors.aiAccent]).
+/// Superficie blanca con acento propio de contenido de IA ([AppPalette.aiAccent]).
 /// Es **estática**: no dispara la generación de IA desde el Home, solo navega a
 /// la pantalla dedicada, que es la que genera el resumen al abrirse.
 class SummaryEntryCard extends StatelessWidget {
@@ -23,7 +23,7 @@ class SummaryEntryCard extends StatelessWidget {
       duration: const Duration(milliseconds: 400),
       delay: delay,
       child: Material(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         elevation: 0,
         child: InkWell(
@@ -33,7 +33,7 @@ class SummaryEntryCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.aiContainer, width: 1.5),
+              border: Border.all(color: context.colors.aiContainer, width: 1.5),
               boxShadow: AppSpacing.elev1,
             ),
             child: Row(
@@ -41,19 +41,19 @@ class SummaryEntryCard extends StatelessWidget {
                 Container(
                   width: 44,
                   height: 44,
-                  decoration: const BoxDecoration(
-                    color: AppColors.aiContainer,
+                  decoration: BoxDecoration(
+                    color: context.colors.aiContainer,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.auto_awesome,
                     size: 22,
-                    color: AppColors.aiAccent,
+                    color: context.colors.aiAccent,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -62,7 +62,7 @@ class SummaryEntryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       SizedBox(height: 2),
@@ -71,17 +71,17 @@ class SummaryEntryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           height: 1.3,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
                   size: 20,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ],
             ),

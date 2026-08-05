@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -47,12 +47,12 @@ class HomeScreen extends ConsumerWidget {
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.surface,
         shape: BoxShape.circle,
         border: Border.all(
           color: animoHoy != null
-              ? moodLevelColor(moodLevel(animoHoy.estado))
-              : AppColors.textDisabled,
+              ? moodLevelColor(context.colors, moodLevel(animoHoy.estado))
+              : context.colors.textDisabled,
           width: 2,
         ),
         boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
@@ -62,7 +62,7 @@ class HomeScreen extends ConsumerWidget {
           animoHoy != null ? moodEmoji(animoHoy.estado) : '?',
           style: TextStyle(
             fontSize: 12,
-            color: animoHoy != null ? null : AppColors.textDisabled,
+            color: animoHoy != null ? null : context.colors.textDisabled,
             fontWeight: animoHoy != null ? null : FontWeight.bold,
           ),
         ),
@@ -70,7 +70,7 @@ class HomeScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, _) {

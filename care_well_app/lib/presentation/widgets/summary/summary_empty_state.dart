@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Estado vacío de la pantalla de Resumen (US 9.16), cuando la persona no tiene
@@ -20,36 +20,36 @@ class SummaryEmptyState extends StatelessWidget {
             Container(
               width: 72,
               height: 72,
-              decoration: const BoxDecoration(
-                color: AppColors.aiContainer,
+              decoration: BoxDecoration(
+                color: context.colors.aiContainer,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: const Icon(
+              child: Icon(
                 Icons.auto_awesome_outlined,
                 size: 34,
-                color: AppColors.aiAccent,
+                color: context.colors.aiAccent,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
+            Text(
               'Nada para resumir todavía',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Cuando registres eventos de salud, hábitos o estados de ánimo '
               'del día, vas a poder generar un resumen acá.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],

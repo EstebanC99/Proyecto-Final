@@ -53,13 +53,13 @@ class InlineErrorBanner extends StatelessWidget {
         Icons.error_outline,
       ),
       BannerTone.warning => (
-        AppColors.warningContainer,
-        AppColors.warning,
+        context.colors.warningContainer,
+        context.colors.warning,
         Icons.info_outline,
       ),
       BannerTone.info => (
-        AppColors.infoContainer,
-        AppColors.info,
+        context.colors.infoContainer,
+        context.colors.info,
         Icons.info_outline,
       ),
     };

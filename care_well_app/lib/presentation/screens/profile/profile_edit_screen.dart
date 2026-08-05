@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/constraints/validators.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -109,9 +109,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     return PopScope(
       canPop: !_isLoading,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.colors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.surface,
+          backgroundColor: context.colors.surface,
           title: const Text('Mi Perfil'),
         ),
         body: authState.when(
@@ -140,7 +140,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   // Encabezado de perfil (solo lectura)
                   Container(
                     width: double.infinity,
-                    color: AppColors.surface,
+                    color: context.colors.surface,
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Column(
                       children: [
@@ -152,10 +152,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           persona.nombreCompleto,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -163,10 +163,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                       ],
                     ),
                   ),
-                  const Divider(
+                  Divider(
                     height: 1,
                     thickness: 1,
-                    color: AppColors.outline,
+                    color: context.colors.outline,
                   ),
 
                   // Nombre — editable

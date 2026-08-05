@@ -101,6 +101,12 @@ class ApiConfig {
 
   static const obtenerResumenInteligentePath = '/api/ResumenDiario/generar';
 
+  static const registrarDispositivoPath = '/api/Dispositivo/registrar';
+  static const eliminarDispositivoPath = '/api/Dispositivo/eliminar';
+
+  static const activarEmergenciaPath = '/api/Emergencia/activar';
+  static const obtenerEmergenciasPath = '/api/Emergencia/obtener';
+
   static const obtenerFichaSaludPath = '/api/AdministrarFichaSalud/obtener';
   static const crearFichaSaludPath = '/api/AdministrarFichaSalud/crear';
   static const modificarFichaSaludPath = '/api/AdministrarFichaSalud/modificar';

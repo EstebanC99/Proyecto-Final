@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../domain/entities/entities.dart';
 import 'mood_dial_selector.dart';
 
@@ -45,11 +45,14 @@ class MoodBarChart extends StatelessWidget {
     return Column(
       children: [
         if (!hasDatos)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Text(
               'Sin registros esta semana',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 13,
+                color: context.colors.textSecondary,
+              ),
             ),
           )
         else
@@ -60,8 +63,8 @@ class MoodBarChart extends StatelessWidget {
               final level = levelByDay[day];
               final barHeight = level != null ? (level / 5) * 80 : 0.0;
               final color = level != null
-                  ? moodLevelColor(level.round())
-                  : AppColors.surfaceVariant;
+                  ? moodLevelColor(context.colors, level.round())
+                  : context.colors.surfaceVariant;
               final dayLabel = DateFormat(
                 'E',
                 'es',
@@ -77,7 +80,9 @@ class MoodBarChart extends StatelessWidget {
                     width: 28,
                     height: barHeight > 0 ? barHeight : 4,
                     decoration: BoxDecoration(
-                      color: barHeight > 0 ? color : AppColors.surfaceVariant,
+                      color: barHeight > 0
+                          ? color
+                          : context.colors.surfaceVariant,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -85,9 +90,9 @@ class MoodBarChart extends StatelessWidget {
                   // Etiqueta de día
                   Text(
                     dayLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

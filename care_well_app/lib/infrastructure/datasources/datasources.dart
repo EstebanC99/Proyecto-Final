@@ -1,6 +1,5 @@
 // Barrel de todas las implementaciones concretas de datasources.
 // Demo (mock sin servidor):
-export 'demo/demo_emergency_datasource.dart';
 export 'demo/demo_settings_datasource.dart';
 
 // API (contra el backend REST):
@@ -17,3 +16,5 @@ export 'api/api_tipo_habito_vida_datasource.dart';
 export 'api/api_linea_tiempo_salud_datasource.dart';
 export 'api/api_ficha_salud_datasource.dart';
 export 'api/api_summary_datasource.dart';
+export 'api/api_dispositivo_datasource.dart';
+export 'api/api_emergency_datasource.dart';

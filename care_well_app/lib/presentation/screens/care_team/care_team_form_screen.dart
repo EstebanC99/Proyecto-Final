@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -121,7 +121,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
           content: Text(
             'Error: ${e.toString().replaceFirst('Exception: ', '')}',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colors.error,
         ),
       );
     }
@@ -172,8 +172,11 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: AppColors.surface, title: Text(title)),
+      backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.surface,
+        title: Text(title),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.xl,
@@ -187,17 +190,17 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
             // Subtítulo de contexto
             RichText(
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 children: [
                   TextSpan(text: '$headerBody '),
                   TextSpan(
                     text: '$personaNombre.',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ],
@@ -226,7 +229,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
             // Bloque de permisos
             Container(
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.colors.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 boxShadow: const [
                   BoxShadow(
@@ -250,12 +253,12 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Permisos asignados',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -263,19 +266,19 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
                           _esResponsable
                               ? 'El responsable obtiene acceso completo. Podés ajustarlo después.'
                               : 'Definí qué puede hacer el cuidador. Podés ajustarlo después.',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                             height: 1.45,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Divider(
+                  Divider(
                     height: 1,
                     thickness: 1,
-                    color: AppColors.surfaceVariant,
+                    color: context.colors.surfaceVariant,
                   ),
                   // Filas de permisos
                   ...todosLosCodigos.asMap().entries.map((entry) {
@@ -290,12 +293,12 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
                               setState(() => _permisos[permiso.id] = v),
                         ),
                         if (i < todosLosCodigos.length - 1)
-                          const Divider(
+                          Divider(
                             height: 1,
                             thickness: 1,
                             indent: AppSpacing.lg,
                             endIndent: AppSpacing.lg,
-                            color: AppColors.surfaceVariant,
+                            color: context.colors.surfaceVariant,
                           ),
                       ],
                     );

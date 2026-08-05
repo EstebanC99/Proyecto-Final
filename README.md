@@ -254,6 +254,12 @@ backend local o a un túnel de desarrollo:
 flutter run --dart-define=API_BASE_URL=https://tu-backend
 ```
 
+**Notificaciones push.** Requieren el archivo `android/app/google-services.json`, que **no
+está versionado** porque contiene las claves del proyecto Firebase. Sin él la app compila y
+corre igual, solo que sin push. En
+[`care_well_app/README.md`](care_well_app/README.md#notificaciones-push-google-servicesjson)
+está de dónde bajarlo y cómo degrada la app cuando falta.
+
 **Modo demo.** El proyecto incluye datasources de demostración
 (`lib/infrastructure/datasources/demo/`) además de las implementaciones contra la API
 (`lib/infrastructure/datasources/api/`). Ambas cumplen los mismos contratos definidos en

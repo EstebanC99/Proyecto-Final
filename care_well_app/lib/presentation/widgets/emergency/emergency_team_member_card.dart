@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../shared/persona_avatar.dart';
 
-/// Card de un miembro notificado en la pantalla de emergencia enviada.
+/// Card de un miembro del equipo de cuidado en la pantalla de alerta enviada.
 ///
-/// Muestra avatar, nombre del colaborador, su rol y un ícono de check verde.
-class NotifiedMembersCard extends StatelessWidget {
-  const NotifiedMembersCard({super.key, required this.asignacion});
+/// Muestra avatar, nombre del colaborador y su rol. El ícono de campana en
+/// color neutro comunica "destinatario del aviso": el cliente no puede
+/// verificar la recepción, así que no debe afirmarla con un check de éxito.
+class EmergencyTeamMemberCard extends StatelessWidget {
+  const EmergencyTeamMemberCard({super.key, required this.asignacion});
 
   final AsignacionCuidado asignacion;
 
@@ -21,7 +23,7 @@ class NotifiedMembersCard extends StatelessWidget {
         : 'Cuidador/a';
 
     return Semantics(
-      label: '${persona.nombre} ${persona.apellido}, $rolLabel, notificado',
+      label: '${persona.nombre} ${persona.apellido}, $rolLabel',
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
@@ -42,23 +44,27 @@ class NotifiedMembersCard extends StatelessWidget {
                 children: [
                   Text(
                     '${persona.nombre} ${persona.apellido}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     rolLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.check_circle, size: 20, color: AppColors.success),
+            Icon(
+              Icons.notifications_active_outlined,
+              size: 20,
+              color: context.colors.textSecondary,
+            ),
           ],
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Fila de dato de perfil para una fecha, con edición mediante [showDatePicker].
@@ -87,11 +87,11 @@ class _ProfileDateRowState extends State<ProfileDateRow> {
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
           ),
-          color: AppColors.surface,
+          color: context.colors.surface,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(widget.icon, size: 20, color: AppColors.textSecondary),
+              Icon(widget.icon, size: 20, color: context.colors.textSecondary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -100,27 +100,27 @@ class _ProfileDateRowState extends State<ProfileDateRow> {
                   children: [
                     Text(
                       widget.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       fechaStr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     if (_errorText != null) ...[
                       const SizedBox(height: 2),
                       Text(
                         _errorText!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.error,
+                          color: context.colors.error,
                         ),
                       ),
                     ],
@@ -131,21 +131,21 @@ class _ProfileDateRowState extends State<ProfileDateRow> {
                 width: AppSpacing.minTapTarget,
                 height: AppSpacing.minTapTarget,
                 child: _guardando
-                    ? const Padding(
+                    ? Padding(
                         padding: EdgeInsets.all(12),
                         child: SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                           ),
                         ),
                       )
                     : IconButton(
                         onPressed: _seleccionarFecha,
                         icon: const Icon(Icons.edit, size: 20),
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                         tooltip: 'Editar ${widget.label}',
                         padding: EdgeInsets.zero,
                       ),
@@ -153,7 +153,7 @@ class _ProfileDateRowState extends State<ProfileDateRow> {
             ],
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.outline),
+        Divider(height: 1, thickness: 1, color: context.colors.outline),
       ],
     );
   }

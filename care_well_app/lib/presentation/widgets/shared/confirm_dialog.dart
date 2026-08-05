@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Diálogo de confirmación de acción destructiva reutilizable.
@@ -29,7 +29,7 @@ class ConfirmDialog extends StatefulWidget {
     required this.confirmLabel,
     required this.onConfirm,
     this.icon,
-    this.accentColor = AppColors.error,
+    this.accentColor,
   });
 
   /// Título del diálogo.
@@ -49,10 +49,10 @@ class ConfirmDialog extends StatefulWidget {
 
   /// Color de acento del ícono y del botón de confirmación.
   ///
-  /// Por defecto [AppColors.error] (variante destructiva). Para acciones no
-  /// destructivas (p. ej. reactivar) pasar un color positivo como
-  /// [AppColors.primary] o [AppColors.success].
-  final Color accentColor;
+  /// Si es `null` se resuelve contra el tema vigente como [AppPalette.error]
+  /// (variante destructiva). Para acciones no destructivas (p. ej. reactivar)
+  /// pasar un color positivo como [AppPalette.primary] o [AppPalette.success].
+  final Color? accentColor;
 
   /// Muestra el diálogo y retorna `true` si el usuario confirmó la acción.
   static Future<bool> show(
@@ -62,7 +62,7 @@ class ConfirmDialog extends StatefulWidget {
     required String confirmLabel,
     required Future<void> Function() onConfirm,
     IconData? icon,
-    Color accentColor = AppColors.error,
+    Color? accentColor,
   }) async {
     final result = await showDialog<bool>(
       context: context,
@@ -99,6 +99,10 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // El acento por defecto se resuelve acá (y no en el constructor) para que
+    // siga al tema vigente: un valor por defecto tiene que ser constante.
+    final accentColor = widget.accentColor ?? context.colors.error;
+
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
@@ -110,25 +114,25 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
           Icon(
             widget.icon ?? Icons.person_remove_outlined,
             size: 48,
-            color: widget.accentColor,
+            color: accentColor,
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             widget.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             widget.body,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -140,26 +144,26 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             child: FilledButton(
               onPressed: _loading ? null : _handleConfirm,
               style: FilledButton.styleFrom(
-                backgroundColor: widget.accentColor,
+                backgroundColor: accentColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
               ),
               child: _loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     )
                   : Text(
                       widget.confirmLabel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: context.colors.onPrimary,
                       ),
                     ),
             ),
@@ -174,17 +178,17 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
                   ? null
                   : () => Navigator.of(context).pop(false),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.outline, width: 1.5),
+                side: BorderSide(color: context.colors.outline, width: 1.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Cancelar',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),

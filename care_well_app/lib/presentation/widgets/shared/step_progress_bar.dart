@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Barra de progreso de pasos para flujos multi-pantalla.
@@ -42,7 +42,7 @@ class StepProgressBar extends StatelessWidget {
                   margin: EdgeInsets.only(right: isLast ? 0 : AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.primary
+                        ? context.colors.primary
                         : theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),

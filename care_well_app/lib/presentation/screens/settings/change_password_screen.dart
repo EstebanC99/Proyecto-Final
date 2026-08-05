@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -93,13 +93,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
   Widget _buildFormulario(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Cambiar contraseña'),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppColors.outline),
+          child: Container(height: 1, color: context.colors.outline),
         ),
       ),
       body: SafeArea(
@@ -110,20 +110,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Nueva contraseña',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                const Text(
+                Text(
                   'Tu nueva contraseña reemplazará la actual.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -196,7 +196,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   Widget _buildExito(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -207,14 +207,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               Container(
                 width: 112,
                 height: 112,
-                decoration: const BoxDecoration(
-                  color: AppColors.successContainer,
+                decoration: BoxDecoration(
+                  color: context.colors.successContainer,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle,
                   size: 80,
-                  color: AppColors.success,
+                  color: context.colors.success,
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -224,7 +224,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 'Contraseña actualizada',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -234,7 +234,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               Text(
                 'Tu nueva contraseña ya está activa.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

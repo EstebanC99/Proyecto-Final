@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Hoja inferior para elegir el origen de una imagen (cámara o galería).
@@ -22,7 +22,7 @@ abstract final class ImageSourceSheet {
   }) {
     return showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXl),
@@ -38,7 +38,7 @@ abstract final class ImageSourceSheet {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
               ),
@@ -50,15 +50,15 @@ abstract final class ImageSourceSheet {
                 ),
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              const Divider(height: 1, color: AppColors.outline),
+              Divider(height: 1, color: context.colors.outline),
               _OrigenTile(
                 icon: Icons.photo_camera_outlined,
                 label: 'Tomar foto',
@@ -86,6 +86,10 @@ abstract final class ImageSourceSheet {
 /// selección de imagen o recorte). La imagen se redimensiona a 1024px máximo y
 /// se comprime a calidad 75 antes de codificar.
 Future<String?> pickImageAsBase64(BuildContext context) async {
+  // Se captura antes de los `await`: la UI nativa del cropper no participa del
+  // árbol de widgets y no puede leer el tema después del gap asincrónico.
+  final palette = context.colors;
+
   final source = await ImageSourceSheet.show(context);
   if (source == null) return null;
 
@@ -106,9 +110,9 @@ Future<String?> pickImageAsBase64(BuildContext context) async {
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: 'Recortar foto',
-        toolbarColor: AppColors.primary,
-        toolbarWidgetColor: AppColors.surface,
-        activeControlsWidgetColor: AppColors.primary,
+        toolbarColor: palette.primary,
+        toolbarWidgetColor: palette.onPrimary,
+        activeControlsWidgetColor: palette.primary,
         cropStyle: CropStyle.circle,
         lockAspectRatio: true,
         hideBottomControls: true,
@@ -142,13 +146,13 @@ class _OrigenTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.textPrimary),
+      leading: Icon(icon, color: context.colors.textPrimary),
       title: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
       onTap: onTap,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../shared/app_text_field.dart';
@@ -45,7 +45,7 @@ class ItemFormBottomSheet extends StatefulWidget {
     return showModalBottomSheet<ItemFormResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXl),
@@ -184,7 +184,7 @@ class _ItemFormBottomSheetState extends State<ItemFormBottomSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.outline,
+                  color: context.colors.outline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -195,17 +195,17 @@ class _ItemFormBottomSheetState extends State<ItemFormBottomSheet> {
                 Expanded(
                   child: Text(
                     titulo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close),
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ],
             ),
@@ -218,18 +218,18 @@ class _ItemFormBottomSheetState extends State<ItemFormBottomSheet> {
               child: FilledButton(
                 onPressed: _isValid ? _guardar : null,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  disabledBackgroundColor: AppColors.outline,
+                  backgroundColor: context.colors.primary,
+                  disabledBackgroundColor: context.colors.outline,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   ),
                 ),
                 child: Text(
                   _isEdit ? 'Guardar cambios' : 'Agregar',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: context.colors.onPrimary,
                   ),
                 ),
               ),
@@ -242,7 +242,7 @@ class _ItemFormBottomSheetState extends State<ItemFormBottomSheet> {
                     onPressed: () =>
                         Navigator.of(context).pop(const ItemDeleted()),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.error,
+                      foregroundColor: context.colors.error,
                     ),
                     child: Text(
                       'Eliminar ${type.singular}',
@@ -361,7 +361,7 @@ class _VigenteSwitch extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -369,16 +369,16 @@ class _VigenteSwitch extends StatelessWidget {
           Expanded(
             child: Text(
               vigente ? 'Activa' : 'Resuelta',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),
           Switch(
             value: vigente,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: context.colors.primary,
             onChanged: onChanged,
           ),
         ],

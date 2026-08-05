@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -31,11 +31,11 @@ class SummaryScreen extends ConsumerWidget {
     final cargando = personaAsync.isLoading || resumenAsync.isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Resumen'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
         actions: [
           IconButton(
@@ -96,7 +96,7 @@ class SummaryScreen extends ConsumerWidget {
     // Sin persona seleccionada: mismo patrón que HealthScreen.
     if (personaAsync.value == null && !personaAsync.isLoading) {
       return _scrollable(
-        const Center(
+        Center(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
@@ -104,7 +104,7 @@ class SummaryScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -163,13 +163,13 @@ class SummaryScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
                 SummaryNarrativeCard(texto: resumen.texto!),
                 const SizedBox(height: AppSpacing.lg),
-                const Text(
+                Text(
                   'Este resumen no reemplaza las pantallas de detalle de cada '
                   'módulo.',
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.4,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
@@ -146,11 +146,11 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
         ref.watch(puedeGestionarAgendaProvider).value ?? false;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Calendario'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -193,7 +193,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
               ),
               data: (ocurrencias) {
                 if (personaAsync.value == null) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                       child: Text(
@@ -201,7 +201,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -227,7 +227,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
                 scrollAlDiaObjetivoUnaVez(diaObjetivo);
 
                 return RefreshIndicator(
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                   onRefresh: () async {
                     ref.invalidate(ocurrenciasDelMesProvider);
                     await ref.read(ocurrenciasDelMesProvider.future);
@@ -299,8 +299,8 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
           ? FloatingActionButton(
               onPressed: () => context.pushNamed(AppRoutes.agendaNewName),
               tooltip: 'Nuevo evento',
-              backgroundColor: AppColors.primary,
-              child: const Icon(Icons.add, color: AppColors.onPrimary),
+              backgroundColor: context.colors.primary,
+              child: Icon(Icons.add, color: context.colors.onPrimary),
             )
           : null,
     );
@@ -329,7 +329,7 @@ class _OcurrenciasSkeleton extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: AppSpacing.sm),
             height: 84,
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: context.colors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
           ),
@@ -400,21 +400,21 @@ class _DayGroupHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 _label().toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ),
             if (!expanded) ...[
               Text(
                 '$count ${count == 1 ? "evento" : "eventos"}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(width: 4),
@@ -424,7 +424,7 @@ class _DayGroupHeader extends StatelessWidget {
                   ? Icons.expand_more_rounded
                   : Icons.chevron_right_rounded,
               size: 18,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ],
         ),

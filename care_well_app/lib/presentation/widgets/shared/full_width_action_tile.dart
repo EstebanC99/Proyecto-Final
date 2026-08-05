@@ -1,6 +1,8 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
+import '../../../config/theme/app_palette.dart';
+
 import '../../../config/theme/app_spacing.dart';
 
 /// Tile de acción full-width con ícono + texto sobre fondo de color sólido.
@@ -58,12 +60,12 @@ class _FullWidthActionTileState extends State<FullWidthActionTile> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(widget.icon, size: 32, color: Colors.white),
+                Icon(widget.icon, size: 32, color: context.colors.onPrimary),
                 const SizedBox(width: AppSpacing.md),
                 Text(
                   widget.label,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.colors.onPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

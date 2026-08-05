@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import 'notification_status_chip.dart';
@@ -31,23 +31,23 @@ class OcurrenciaCard extends StatelessWidget {
     final editable = ocurrencia.esEditable();
     final tipoId = ocurrencia.tipo.id;
     final accent = editable
-        ? TipoEventoTheme.accentFor(tipoId)
-        : AppColors.textDisabled;
+        ? TipoEventoTheme.accentFor(context, tipoId)
+        : context.colors.textDisabled;
     final container = editable
-        ? TipoEventoTheme.containerFor(tipoId)
-        : AppColors.surfaceVariant;
+        ? TipoEventoTheme.containerFor(context, tipoId)
+        : context.colors.surfaceVariant;
     final tieneRecordatorio =
         ocurrencia.minutosAnticipacionRecordatorio != null;
 
     final card = Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: AppSpacing.elev1,
         border: editable
             ? null
-            : Border.all(color: AppColors.outline, width: 1),
+            : Border.all(color: context.colors.outline, width: 1),
       ),
       child: InkWell(
         onTap: onTap,
@@ -84,7 +84,9 @@ class OcurrenciaCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: editable ? accent : AppColors.textDisabled,
+                            color: editable
+                                ? accent
+                                : context.colors.textDisabled,
                           ),
                         ),
                         if (ocurrencia.esRecurrente) ...[
@@ -93,16 +95,16 @@ class OcurrenciaCard extends StatelessWidget {
                             Icons.repeat_rounded,
                             size: 14,
                             color: editable
-                                ? AppColors.textSecondary
-                                : AppColors.textDisabled,
+                                ? context.colors.textSecondary
+                                : context.colors.textDisabled,
                           ),
                         ],
                         const Spacer(),
                         if (!editable)
-                          const Icon(
+                          Icon(
                             Icons.lock_outline,
                             size: 14,
-                            color: AppColors.textDisabled,
+                            color: context.colors.textDisabled,
                           ),
                       ],
                     ),
@@ -113,8 +115,8 @@ class OcurrenciaCard extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: editable
-                            ? AppColors.textPrimary
-                            : AppColors.textDisabled,
+                            ? context.colors.textPrimary
+                            : context.colors.textDisabled,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -122,9 +124,9 @@ class OcurrenciaCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       ocurrencia.tipo.descripcion,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     if (ocurrencia.descripcion != null &&
@@ -132,9 +134,9 @@ class OcurrenciaCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         ocurrencia.descripcion!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

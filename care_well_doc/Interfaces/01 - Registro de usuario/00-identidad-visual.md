@@ -271,3 +271,206 @@ Estilo **plano con sombras suaves** (no Material clásico pesado).
 - Definir `inputDecorationTheme`, `filledButtonTheme`, `checkboxTheme`, `bottomSheetTheme`,
   `appBarTheme` con los estilos canónicos de la sección 5.
 - Ubicación sugerida: `care_well_app/lib/config/theme/app_theme.dart` (+ `app_status_colors.dart`).
+
+---
+
+## 8. Tema oscuro
+
+### 8.0 Activación y filosofía
+
+El tema oscuro **no es seleccionable dentro de la app**: se activa automáticamente cuando el
+sistema operativo del dispositivo está en modo oscuro (`ThemeMode.system` en el `MaterialApp`).
+No hay toggle in-app; esta sección solo define la paleta y las adaptaciones de componentes que
+`AppTheme` debe exponer como segundo `ThemeData` (`dark`).
+
+Principios de adaptación (siguiendo Material 3 y las guías de accesibilidad ya vigentes en la
+sección 2):
+
+1. **Nunca negro puro / blanco puro.** Fondos con tinte teal muy oscuro (~`#0F1917`–`#1E2B29`,
+   en línea con la práctica M3 de `#121212`–`#1A1A1A`); texto principal en blanco roto
+   (`#EDF3F2`, ~95% de luminosidad) en vez de `#FFFFFF`.
+2. **Los tonos vivos del claro se aclaran y desaturan, no se oscurecen.** `primary` (#1A8C82) y
+   `secondary` (#F2785C) pierden legibilidad si se oscurecen sobre un fondo ya oscuro; en dark
+   se usan versiones más claras y ligeramente menos saturadas de esos mismos matices.
+3. **"Superficie elevada" = más clara, no con más sombra.** Siguiendo la técnica de *tonal
+   elevation* de Material 3: en vez de oscurecer con una sombra negra (invisible sobre fondo
+   oscuro), los elementos elevados usan un tono de superficie más claro (`surface` →
+   `surfaceVariant`) y/o un borde sutil de 1 dp. Ver 8.9.
+4. **La semántica de estado no cambia:** error sigue siendo rojo, success verde, warning ámbar,
+   info azul; solo se ajusta el tono para que funcione sobre fondo oscuro.
+5. **Los nombres de token son idénticos a los del tema claro** (`primary`, `onPrimary`,
+   `background`, `error`, `strengthWeak`, `moodScaleGood`, etc.). Solo cambia el valor HEX y,
+   quirúrgicamente, algún rol de componente (ver 8.10). Esto permite que `AppColors` pase a
+   tener una variante `light` y una `dark` con la misma forma, sin renombrar nada en el resto
+   del código.
+
+### 8.1 Primario — Teal (dark)
+
+| Token | Claro | Oscuro | Notas |
+|---|---|---|---|
+| `primary` | `#1A8C82` | `#4FBDB0` | Teal aclarado y algo menos saturado; sigue siendo reconociblemente "el verde de CareWell". |
+| `primaryHover` | `#157469` | `#3FA89C` | Estado pressed/hover: versión algo más oscura que `primary` (dark), igual que en claro. |
+| `primaryContainer` | `#C9EDE8` | `#1B3B37` | Container oscuro con tinte teal (no un teal claro): mismo rol, distinta dirección de luminosidad. |
+| `onPrimary` | `#FFFFFF` | `#08302B` | Texto/íconos sobre `primary`. Como `primary` (dark) es un tono medio-claro, el texto pasa a oscuro. |
+| `onPrimaryContainer` | `#0A3D38` | `#A9E6DD` | Texto claro sobre el container oscuro. |
+
+### 8.2 Secundario — Coral (dark)
+
+| Token | Claro | Oscuro | Notas |
+|---|---|---|---|
+| `secondary` | `#F2785C` | `#F59A82` | Coral aclarado/desaturado ~10-15%: el original ya es un tono vívido y vibra sobre fondo oscuro si no se suaviza. |
+| `secondaryContainer` | `#FCE2DA` | `#3D2117` | Container oscuro con tinte coral/marrón cálido. |
+| `onSecondary` | `#FFFFFF` | `#452016` | Con `secondary` (dark) más claro, el texto sobre el chip/botón pasa a un marrón oscuro cálido en vez de blanco. |
+| `onSecondaryContainer` *(implícito, = `textPrimary`)* | `#16201F` | `#EDF3F2` | Mismo criterio que en claro (`theme.dart` mapea `onSecondaryContainer → textPrimary`). |
+
+### 8.3 Neutros — texto y superficies (dark)
+
+| Token | Claro | Oscuro | Notas |
+|---|---|---|---|
+| `background` | `#F6F8F8` | `#0F1917` | Fondo general. Gris-teal casi negro, no negro puro. |
+| `surface` | `#FFFFFF` | `#16211F` | Tarjetas, campos, hojas — un paso "más claro" que `background` (elevación tonal M3: a más elevación, más clara la superficie). |
+| `surfaceVariant` | `#EDF1F1` | `#1E2B29` | Superficie diferenciada / rol de "elevación 2" en dark (ver 8.9). |
+| `outline` | `#C5CECE` | `#30403C` | Bordes de campos en reposo, divisores sutiles. |
+| `outlineStrong` | `#9AA5A5` | `#5C7975` | Bordes de mayor contraste. Mismo valor que `textDisabled` (igual que en claro, donde ambos también coinciden). |
+| `textPrimary` | `#16201F` | `#EDF3F2` | Texto principal. Blanco roto (~95% L), no `#FFFFFF`, para reducir el "vibrado" de texto muy claro sobre fondo muy oscuro. |
+| `textSecondary` | `#566060` | `#9DB3AF` | Texto secundario, labels, ayudas. |
+| `textDisabled` | `#9AA5A5` | `#5C7975` | Placeholder, texto deshabilitado. Deliberadamente por debajo de AA (igual criterio que en claro): el estado disabled está exento del requisito de contraste de texto de WCAG. |
+
+### 8.4 Colores de estado — semánticos (dark)
+
+| Token | Claro | Oscuro | Container claro | Container oscuro |
+|---|---|---|---|---|
+| `error` | `#D14343` | `#E2727A` | `#FBE3E3` | `#3B1E20` |
+| `success` | `#2E9E5B` | `#6FCB8E` | `#D8F0E1` | `#1C3327` |
+| `warning` | `#E0A100` | `#F0C05A` | `#FBF0CF` | `#3A2E12` |
+| `info` | `#2E77C2` | `#6FA8E0` | `#DBE9FB` | `#1B2C3E` |
+
+`onErrorContainer` (mapeado a `error` en `theme.dart`) usa el mismo criterio en dark: texto
+`error` (dark) sobre `errorContainer` (dark) → ver contraste verificado en 8.8.
+
+### 8.5 Indicador de fortaleza de contraseña (dark)
+
+| Nivel | Token | Claro | Oscuro |
+|---|---|---|---|
+| Débil | `strengthWeak` | `#D14343` (= `error`) | `#E2727A` (= `error` dark) |
+| Media | `strengthMedium` | `#E0A100` (= `warning`) | `#F0C05A` (= `warning` dark) |
+| Fuerte | `strengthStrong` | `#2E9E5B` (= `success`) | `#6FCB8E` (= `success` dark) |
+
+### 8.6 Escala de estado de ánimo (dark, US-31)
+
+Se mantiene el criterio del claro: 5 tonos rojo→ámbar→verde, tokens propios (no reutilizan
+`error`/`warning`/`success` sueltos salvo en los extremos, donde coinciden por diseño).
+
+| Nivel | Token | Claro | Oscuro |
+|---|---|---|---|
+| Muy mal | `moodScaleVeryBad` | `#D14343` | `#E2727A` (= `error` dark) |
+| Mal | `moodScaleBad` | `#C85A2E` | `#E0935F` |
+| Regular (default) | `moodScaleNeutral` | `#E0A100` | `#F0C05A` (= `warning` dark) |
+| Bien | `moodScaleGood` | `#8CAA22` | `#B4D06A` |
+| Muy bien | `moodScaleVeryGood` | `#2E9E5B` | `#6FCB8E` (= `success` dark) |
+
+**Regla de uso (se mantiene igual que en claro, sección 2.6.1):** estos tokens solo se aplican
+a elementos decorativos (fondo del blob a alpha, anillo a alpha 1.0, puntos de indicador),
+nunca como color de texto sobre `surface`/`background`. En dark, subir el alpha del fondo del
+blob de `0.16` a **`0.20`** (ver 8.10): un mismo alpha bajo se percibe con menos presencia sobre
+fondo oscuro que sobre fondo claro. El label del estado sigue siempre en `textPrimary` (dark).
+
+> **Nota de consistencia doc↔código:** el código actual (`app_colors.dart`) tiene
+> `moodScaleBad = #EA580C`, que no coincide con el `#C85A2E` documentado en la sección 2.6.1 de
+> este archivo (fuente de verdad). Esta tabla de dark usa como ancla el valor **documentado**
+> (`#C85A2E`). Si se decide adoptar `#EA580C` como valor real de claro, el oscuro correspondiente
+> debería recalcularse (sería `#F0935F`, que coincide con el propuesto para `habitsAccent` dark
+> en 8.11 — motivo de más para reconciliar el valor con `arquitecto-software`/`dev-flutter` antes
+> de implementar dark).
+
+### 8.7 Colores de marca reservados (Mi salud / Emergencia / IA) — no forman parte del set base
+
+Estos tokens existen en `app_colors.dart` pero no estaban documentados en la sección 2 de este
+archivo. Se incluyen acá por completitud, ya que el tema oscuro los necesita igual. Ver 8.11.
+
+### 8.8 Verificación de contraste (WCAG) — dark
+
+Ratios calculados con la fórmula de luminancia relativa de WCAG 2.x sobre los HEX finales:
+
+| Par | Ratio | Nivel |
+|---|---|---|
+| `textPrimary` sobre `background` | ~16.0:1 | AAA |
+| `textPrimary` sobre `surface` | ~14.7:1 | AAA |
+| `textSecondary` sobre `surface` | ~7.5:1 | AAA (supera holgadamente el AA de texto normal) |
+| `onPrimary` (#08302B) sobre `primary` (#4FBDB0) | ~6.3:1 | AA para texto normal (mejora respecto al claro, que solo llegaba a AA large/bold) |
+| `onSecondary` (#452016) sobre `secondary` (#F59A82) | ~6.7:1 | AA |
+| `error` (#E2727A) sobre `surface` | ~5.4:1 | AA |
+| `error` sobre `errorContainer` (rol `onErrorContainer`) | ~5.0:1 | AA |
+| `warning` (#F0C05A) sobre `surface` | ~9.7:1 | AAA |
+| `info` (#6FA8E0) sobre `surface` | ~6.6:1 | AA/AAA |
+| `success` (#6FCB8E) sobre `surface` | ~8.4:1 | AAA |
+| `outlineStrong`/`textDisabled` (#5C7975) sobre `surface` | ~3.5:1 | Por debajo de AA de texto (intencional: disabled/placeholder, exento). Cumple el umbral de 3:1 para límites de componentes UI (WCAG 1.4.11). |
+
+Igual que en claro (2.6): nunca comunicar estado solo por color; error siempre lleva ícono +
+texto; fortaleza y ánimo siempre llevan etiqueta textual.
+
+### 8.9 Elevación y sombras (dark)
+
+Las sombras negras del claro (`elev1`, `elev2`) casi no se perciben sobre un fondo ya oscuro. En
+dark se reemplazan por **elevación tonal** (superficie más clara) y bordes sutiles, no por más
+sombra:
+
+| Token | Claro | Oscuro |
+|---|---|---|
+| `elev0` | sin sombra, `outline` 1 dp | Igual (sin sombra, `outline` dark 1 dp). |
+| `elev1` | y-offset 2, blur 8, `#16201F` @ 6% | Sin sombra. Fondo pasa de `surface` a `surfaceVariant` (tono más claro) + opcional borde 1 dp `outline`. |
+| `elev2` | y-offset 8, blur 24, `#16201F` @ 12% | Sin sombra. Fondo `surfaceVariant` (en vez de `surface`) + borde superior sutil 1 dp `outline` en bottom sheet. Scrim de fondo sube de negro @ 40% a **negro @ 55%** (se necesita más opacidad para separar visualmente el modal de un fondo que ya es oscuro). |
+
+### 8.10 Componentes base — adaptación a dark
+
+| Componente | Ajustes en dark |
+|---|---|
+| **Botón primario** (5.1) | Fondo `primary` (dark), texto `onPrimary` (dark). Pressed: `primaryHover` (dark). **Disabled** (cambia de criterio respecto al claro): fondo `surfaceVariant`, texto `textDisabled` — en dark, rellenar el botón con un gris claro (equivalente al `outline` del claro) se ve fuera de lugar; se usa una superficie oscura neutra + texto tenue, igual al patrón M3 de "12% overlay sobre surface". Loading: `CircularProgressIndicator` `onPrimary` (dark). |
+| **Botón secundario/texto** (5.2) | Texto `primary` (dark), sin fondo. |
+| **Campo de texto** (5.3) | Fondo `surface` (dark), borde `outline` (dark). Foco: borde 2 dp `primary` (dark). Error: borde 2 dp `error` (dark) + texto error `error` (dark). Disabled: fondo `surfaceVariant` (dark), texto `textDisabled` (dark). Valor `textPrimary` (dark); placeholder `textDisabled` (dark). |
+| **Checkbox** (5.4) | Sin marcar: borde 2 dp `outlineStrong` (dark). Marcado: relleno `primary` (dark), check `onPrimary` (dark). |
+| **Barra de progreso del wizard** (5.5) | Track `surfaceVariant` (dark). Relleno `primary` (dark). |
+| **Indicador de fortaleza** (5.6) | Segmentos activos con `strengthWeak/Medium/Strong` (dark); inactivos `surfaceVariant` (dark). |
+| **Banner de error** (5.7) | Fondo `errorContainer` (dark), ícono y texto `error` (dark). |
+| **App bar de flujo** (5.8) | Fondo `background` (dark) en reposo. Al hacer scroll, en vez de `elev1` (sombra): fondo `surfaceVariant` (dark) + borde inferior sutil 1 dp `outline` (dark). Ícono "atrás" `textPrimary` (dark). |
+| **Bottom sheet** (5.9) | Fondo `surfaceVariant` (dark) en vez de `surface` (técnica de elevación tonal, ver 8.9), esquinas `radiusXl`, sin sombra. Grabber `outlineStrong` (dark) (necesita algo más de contraste que `outline` al estar sobre una superficie ya elevada). Scrim negro @ 55%. |
+| **Selector de ánimo carrusel** (5.10) | Blob: fondo del color de escala (dark, 8.6) a **alpha 0.20** (subido desde 0.16 del claro), anillo 3 dp al mismo color alpha 1.0. Label `textPrimary` (dark). Flechas deshabilitadas en `textDisabled` (dark). El resto de la interacción (swipe, haptics, transición 250 ms) no cambia. |
+
+### 8.11 Acentos de módulo — complemento (no forman parte del set base solicitado)
+
+Tokens ya presentes en `app_colors.dart` para sub-módulos específicos (Mi salud, Hábitos,
+Emergencia, IA), sin equivalente dark aún. Se proponen acá para que `dev-flutter` no quede
+bloqueado más adelante; **no forman parte del pedido original de esta sección** y conviene
+validarlos puntualmente con cada pantalla antes de darlos por definitivos:
+
+| Token | Claro | Oscuro | Notas |
+|---|---|---|---|
+| `healthAccent` | `#E11D48` | `#F27C93` | Acento del módulo Ficha de salud. |
+| `healthContainer` | `#FFE4E6` | `#3B1622` | |
+| `habitsAccent` | `#EA580C` | `#F0935F` | Acento del sub-módulo Hábitos de vida. |
+| `habitsContainer` | `#FFEDD5` | `#3A2414` | |
+| `moodAccent` | `#7C3AED` | `#B69CF0` | Acento del sub-módulo Estados de ánimo dentro de Mi salud (distinto de la escala de 5 tonos de 8.6). |
+| `moodContainer` | `#EDE9FE` | `#2A2140` | |
+| `emergencyRed` | `#D14343` | `#E2727A` (= `error` dark) | En claro ya coincide con `error`; se mantiene la duplicación intencional en dark. |
+| `emergencyContainer` | `#FEE2E2` | `#3B1E20` (= `errorContainer` dark) | |
+| `aiAccent` | `#6366F1` | `#A5A8F5` | Contenido generado por IA (Resumen inteligente). |
+| `aiContainer` | `#E0E7FF` | `#26254A` | |
+
+### 8.12 Notas de implementación (Flutter)
+
+- `AppColors` pasa de una única clase estática a exponer dos variantes (por ejemplo
+  `AppColors.light` / `AppColors.dark`, o una clase por brillo) para no romper el patrón de
+  constantes ya usado; `AppTheme` gana un segundo `ThemeData get dark`, con `ColorScheme`
+  construido igual que `light` (sección 7) pero con `brightness: Brightness.dark` y los HEX de
+  esta sección.
+- `AppStatusColors` (`ThemeExtension`) necesita una segunda instancia estática, por ejemplo
+  `AppStatusColors.dark`, con los valores de 8.4/8.5, y `AppTheme.dark` debe registrarla en
+  `extensions: const [AppStatusColors.dark]`.
+- La escala de ánimo (8.6) y los acentos de módulo (8.11) no viven en `AppStatusColors`
+  (son constantes directas de `AppColors`); si se quiere que cambien con el tema en vez de leerse
+  siempre del mismo lugar, conviene evaluar con `arquitecto-software`/`dev-flutter` si conviene
+  moverlos también a una `ThemeExtension` en esta instancia, ya que hoy son `static const`
+  fijos sin variante por brillo.
+- `main.dart`/`MaterialApp`: `themeMode: ThemeMode.system`, `theme: AppTheme().light`,
+  `darkTheme: AppTheme().dark`.
+- Antes de implementar, reconciliar la discrepancia doc↔código de `moodScaleBad` señalada en 8.6.

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Color de acento para una categoría de la línea de tiempo de salud.
 ///
 /// Las categorías son las que concatena el backend en `EventoBase.categoriaEvento`:
 /// `"Hábito"`, `"Evento"` y `"Ánimo"`.
-Color categoriaEventoColor(String categoria) {
+Color categoriaEventoColor(BuildContext context, String categoria) {
   switch (categoria) {
     case 'Hábito':
-      return AppColors.habitsAccent;
+      return context.colors.habitsAccent;
     case 'Evento':
-      return AppColors.healthAccent;
+      return context.colors.healthAccent;
     case 'Ánimo':
-      return AppColors.moodAccent;
+      return context.colors.moodAccent;
     default:
-      return AppColors.textSecondary;
+      return context.colors.textSecondary;
   }
 }
 

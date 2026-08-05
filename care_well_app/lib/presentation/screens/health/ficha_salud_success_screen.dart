@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -33,7 +33,7 @@ class FichaSaludSuccessScreen extends ConsumerWidget {
         if (!didPop) _salir(context, ref);
       },
       child: Scaffold(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colors.surface,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -55,14 +55,14 @@ class FichaSaludSuccessScreen extends ConsumerWidget {
                           child: Container(
                             width: 88,
                             height: 88,
-                            decoration: const BoxDecoration(
-                              color: AppColors.successContainer,
+                            decoration: BoxDecoration(
+                              color: context.colors.successContainer,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.check_circle,
                               size: 48,
-                              color: AppColors.success,
+                              color: context.colors.success,
                             ),
                           ),
                         ),
@@ -72,12 +72,12 @@ class FichaSaludSuccessScreen extends ConsumerWidget {
                       // Título
                       Semantics(
                         focusable: true,
-                        child: const Text(
+                        child: Text(
                           'Ficha de salud guardada',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -85,12 +85,12 @@ class FichaSaludSuccessScreen extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.sm),
 
                       // Cuerpo
-                      const Text(
+                      Text(
                         'Los datos de salud se guardaron correctamente.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),

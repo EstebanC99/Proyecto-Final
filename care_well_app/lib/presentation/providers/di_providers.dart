@@ -35,6 +35,22 @@ final notificationSchedulerProvider = Provider<NotificationScheduler>(
   (ref) => LocalNotificationScheduler(),
 );
 
+/// Indica si el SDK de mensajería push se inicializó correctamente.
+///
+/// Se sobreescribe desde `main.dart`; el default `false` es el que usan los
+/// tests, que nunca tienen Firebase disponible.
+final pushDisponibleProvider = Provider<bool>((ref) => false);
+
+/// Servicio de push real o inerte según haya SDK disponible.
+///
+/// Sin esta bifurcación, un entorno sin `google-services.json` explotaría al
+/// construir [FirebasePushMessagingService], lejos de la causa real.
+final pushMessagingServiceProvider = Provider<PushMessagingService>((ref) {
+  return ref.watch(pushDisponibleProvider)
+      ? FirebasePushMessagingService()
+      : const NullPushMessagingService();
+});
+
 //endregion
 
 //region Datasources Providers
@@ -80,11 +96,15 @@ final estadoAnimoDatasourceProvider = Provider<EstadoAnimoDatasource>(
 );
 
 final emergencyDatasourceProvider = Provider<EmergencyDatasource>(
-  (ref) => DemoEmergencyDatasource(),
+  (ref) => ApiEmergencyDatasource(ref.watch(dioClientProvider)),
 );
 
 final settingsDatasourceProvider = Provider<SettingsDatasource>(
   (ref) => DemoSettingsDatasource(),
+);
+
+final dispositivoDatasourceProvider = Provider<DispositivoDatasource>(
+  (ref) => ApiDispositivoDatasource(ref.watch(dioClientProvider)),
 );
 
 final summaryDatasourceProvider = Provider<SummaryDatasource>(
@@ -156,6 +176,10 @@ final emergencyRepositoryProvider = Provider<EmergencyRepository>(
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepositoryImpl(ref.watch(settingsDatasourceProvider)),
+);
+
+final dispositivoRepositoryProvider = Provider<DispositivoRepository>(
+  (ref) => DispositivoRepositoryImpl(ref.watch(dispositivoDatasourceProvider)),
 );
 
 final summaryRepositoryProvider = Provider<SummaryRepository>(

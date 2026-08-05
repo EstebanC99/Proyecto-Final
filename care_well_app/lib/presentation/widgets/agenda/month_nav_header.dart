@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Encabezado de navegación mensual para la pantalla de agenda.
@@ -52,10 +52,10 @@ class MonthNavHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 48,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: context.colors.surface,
         border: Border(
-          bottom: BorderSide(color: AppColors.outline, width: 0.5),
+          bottom: BorderSide(color: context.colors.outline, width: 0.5),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
@@ -70,10 +70,10 @@ class MonthNavHeader extends StatelessWidget {
             child: Center(
               child: Text(
                 _etiqueta,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   letterSpacing: 0.1,
                 ),
               ),
@@ -117,7 +117,9 @@ class _ArrowButton extends StatelessWidget {
           child: Icon(
             icon,
             size: 28,
-            color: habilitado ? AppColors.primary : AppColors.textDisabled,
+            color: habilitado
+                ? context.colors.primary
+                : context.colors.textDisabled,
           ),
         ),
       ),

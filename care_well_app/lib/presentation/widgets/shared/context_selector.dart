@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import 'persona_avatar.dart';
@@ -88,7 +88,7 @@ class ContextSelector extends ConsumerWidget {
 
 /// Banner horizontal que muestra la persona de contexto activa.
 ///
-/// Ocupa el ancho disponible; fondo [AppColors.primaryContainer], radio 12.
+/// Ocupa el ancho disponible; fondo [AppPalette.primaryContainer], radio 12.
 /// La lógica de tap vive en el widget padre [ContextSelector].
 class _ContextBanner extends StatelessWidget {
   const _ContextBanner({
@@ -118,7 +118,7 @@ class _ContextBanner extends StatelessWidget {
         vertical: AppSpacing.sm + 4, // ~12dp vertical
       ),
       decoration: BoxDecoration(
-        color: AppColors.primaryContainer,
+        color: context.colors.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -135,18 +135,18 @@ class _ContextBanner extends StatelessWidget {
               children: [
                 Text(
                   subtitulo,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                     height: 1.2,
                   ),
                 ),
                 Text(
                   nombreCompleto,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     height: 1.3,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -158,7 +158,7 @@ class _ContextBanner extends StatelessWidget {
           // Ícono de expansión (solo si es interactivo)
           if (interactivo) ...[
             const SizedBox(width: AppSpacing.xs),
-            const Icon(Icons.expand_more, size: 24, color: AppColors.primary),
+            Icon(Icons.expand_more, size: 24, color: context.colors.primary),
           ],
         ],
       ),
@@ -190,7 +190,7 @@ class _PersonaSelectorSheet extends StatelessWidget {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: AppColors.outline,
+            color: context.colors.outline,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -227,7 +227,7 @@ class _PersonaSelectorSheet extends StatelessWidget {
             title: Text('${opcion.persona.nombre} ${opcion.persona.apellido}'),
             subtitle: Text(rolLabel),
             trailing: isSelected
-                ? const Icon(Icons.check, color: AppColors.primary)
+                ? Icon(Icons.check, color: context.colors.primary)
                 : null,
             onTap: () => onSelect(opcion.persona.id),
           );

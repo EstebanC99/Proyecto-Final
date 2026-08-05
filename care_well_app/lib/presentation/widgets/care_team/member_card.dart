@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../shared/persona_avatar.dart';
@@ -34,20 +34,20 @@ class MemberCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final esResponsable = asignacion.rol.id == RolesCuidadoConst.responsable;
     final avatarBg = esResponsable
-        ? AppColors.primaryContainer
-        : AppColors.secondaryContainer;
+        ? context.colors.primaryContainer
+        : context.colors.secondaryContainer;
     final badgeLabel = esResponsable ? 'Responsable' : 'Cuidador';
     final badgeBg = esResponsable
-        ? AppColors.primaryContainer
-        : AppColors.secondaryContainer;
+        ? context.colors.primaryContainer
+        : context.colors.secondaryContainer;
     final badgeText = esResponsable
-        ? AppColors.onPrimaryContainer
+        ? context.colors.onPrimaryContainer
         : const Color(0xFF7A2E1A);
 
     final colaborador = asignacion.colaborador;
 
     return Material(
-      color: AppColors.surface,
+      color: context.colors.surface,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       child: InkWell(
         onTap: onTap,
@@ -88,19 +88,19 @@ class MemberCard extends StatelessWidget {
                       children: [
                         Text(
                           colaborador.nombreCompleto,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         if (isCurrentUser) ...[
                           const SizedBox(width: 4),
-                          const Text(
+                          Text(
                             '(Vos)',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -110,9 +110,9 @@ class MemberCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         colaborador.email!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -147,10 +147,10 @@ class MemberCard extends StatelessWidget {
                   ),
                   if (showChevron) ...[
                     const SizedBox(height: 6),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right,
                       size: 20,
-                      color: AppColors.outlineStrong,
+                      color: context.colors.outlineStrong,
                     ),
                   ],
                 ],

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../../domain/exceptions/exceptions.dart';
@@ -362,7 +362,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             icon: const Icon(Icons.arrow_back),
             tooltip: 'Volver',
           ),
-          backgroundColor: AppColors.background,
+          backgroundColor: context.colors.background,
           elevation: 0,
         ),
         body: SafeArea(
@@ -401,14 +401,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         Text(
           'Creá tu cuenta',
           style: theme.textTheme.headlineMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Empecemos con tus datos personales.',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -429,7 +429,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Text(
             'Foto de perfil (opcional)',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),
@@ -499,8 +499,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               'Fecha de nacimiento',
               style: theme.textTheme.labelMedium?.copyWith(
                 color: _fechaNacimientoError != null
-                    ? AppColors.error
-                    : AppColors.textSecondary,
+                    ? context.colors.error
+                    : context.colors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -516,8 +516,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: _fechaNacimientoError != null
-                        ? AppColors.error
-                        : AppColors.outline,
+                        ? context.colors.error
+                        : context.colors.outline,
                     width: _fechaNacimientoError != null ? 1.5 : 1,
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -528,16 +528,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Icons.calendar_today_outlined,
                       size: 20,
                       color: _fechaNacimiento != null
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary,
+                          ? context.colors.textPrimary
+                          : context.colors.textSecondary,
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       fechaFormateada,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: _fechaNacimiento != null
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
+                            ? context.colors.textPrimary
+                            : context.colors.textSecondary,
                       ),
                     ),
                   ],
@@ -551,7 +551,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 child: Text(
                   _fechaNacimientoError!,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.error,
+                    color: context.colors.error,
                   ),
                 ),
               ),
@@ -625,7 +625,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         Text(
           'Verificá tu identidad',
           style: theme.textTheme.headlineMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -633,7 +633,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           'Tomá una foto de tu DNI para confirmar que los datos coinciden con '
           'los que ingresaste.',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -669,16 +669,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         const SizedBox(height: AppSpacing.xl),
         Text(
           'Creá tu contraseña',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: AppColors.textPrimary),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            color: context.colors.textPrimary,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Vas a usarla junto con tu email para entrar.',
           style: Theme.of(
             context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          ).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
         ),
         const SizedBox(height: AppSpacing.xl),
 
@@ -698,7 +698,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
               size: 20,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
             tooltip: _showPassword
                 ? 'Ocultar contraseña'
@@ -732,7 +732,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
               size: 20,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
             tooltip: _showConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña',
           ),
@@ -785,9 +785,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           Text(
             'Estamos verificando tu documento… esto puede demorar hasta un '
             'minuto.',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: context.colors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -836,7 +836,7 @@ class _TcCheckbox extends StatelessWidget {
             child: Text(
               error!,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: AppColors.error,
+                color: context.colors.error,
               ),
             ),
           ),
@@ -858,7 +858,7 @@ class _TcText extends StatelessWidget {
     return RichText(
       text: TextSpan(
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
         children: [
           const TextSpan(text: 'Acepto los '),
@@ -870,7 +870,7 @@ class _TcText extends StatelessWidget {
               child: Text(
                 'Términos y Condiciones',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -885,7 +885,7 @@ class _TcText extends StatelessWidget {
               child: Text(
                 'Política de Privacidad',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),

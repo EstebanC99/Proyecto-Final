@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Decodifica una imagen en base64 estándar (sin prefijo data-URI) a un
 /// [ImageProvider] utilizable por Flutter.
@@ -45,10 +45,10 @@ class Avatar extends StatelessWidget {
   final double size;
 
   /// Color de fondo del círculo (solo aplica al fallback de inicial).
-  /// Por defecto [AppColors.primaryContainer].
+  /// Por defecto [AppPalette.primaryContainer].
   final Color? backgroundColor;
 
-  /// Color del texto de la inicial. Por defecto [AppColors.onPrimaryContainer].
+  /// Color del texto de la inicial. Por defecto [AppPalette.onPrimaryContainer].
   final Color? textColor;
 
   @override
@@ -71,7 +71,7 @@ class Avatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.primaryContainer,
+        color: backgroundColor ?? context.colors.primaryContainer,
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
@@ -80,7 +80,7 @@ class Avatar extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.bold,
-          color: textColor ?? AppColors.onPrimaryContainer,
+          color: textColor ?? context.colors.onPrimaryContainer,
         ),
       ),
     );

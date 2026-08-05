@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Sección de configuración con encabezado y lista de ítems.
 ///
-/// El [title] se muestra en mayúsculas, 12 sp, color [AppColors.textSecondary].
+/// El [title] se muestra en mayúsculas, 12 sp, color [AppPalette.textSecondary].
 /// Los [items] se apilan en una [Column] bajo el encabezado.
 class SettingsSection extends StatelessWidget {
   const SettingsSection({super.key, required this.title, required this.items});
@@ -30,15 +30,15 @@ class SettingsSection extends StatelessWidget {
           ),
           child: Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               letterSpacing: 0.5,
             ),
           ),
         ),
-        const Divider(height: 1, thickness: 1, color: AppColors.outline),
+        Divider(height: 1, thickness: 1, color: context.colors.outline),
         ...items,
       ],
     );

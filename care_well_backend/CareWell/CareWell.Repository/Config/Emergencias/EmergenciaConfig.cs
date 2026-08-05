@@ -13,9 +13,12 @@ namespace CareWell.Repository.Config.Emergencias
             builder.Property(e => e.ID).HasColumnName("ID_Emergencia").ValueGeneratedOnAdd();
 
             builder.HasOne(e => e.Persona).WithMany().HasForeignKey("ID_Persona").OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Activador).WithMany().HasForeignKey("ID_Persona_Activador").OnDelete(DeleteBehavior.Restrict);
+            
             builder.Property(e => e.FechaHora).IsRequired();
-            builder.Property(e => e.Atendida).IsRequired();
             builder.Property(e => e.Descripcion).HasMaxLength(500);
+
+            builder.HasIndex("ID_Persona", nameof(Emergencia.FechaHora));
         }
     }
 }

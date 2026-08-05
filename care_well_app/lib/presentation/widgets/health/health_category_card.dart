@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
 /// Card cuadrada de categoría de salud para el hub Mi salud.
@@ -102,16 +102,16 @@ class _HealthCategoryCardState extends State<HealthCategoryCard> {
             color: widget.accentColor,
             shape: BoxShape.circle,
           ),
-          child: Icon(widget.icon, size: 24, color: Colors.white),
+          child: Icon(widget.icon, size: 24, color: context.colors.onPrimary),
         ),
         const SizedBox(height: AppSpacing.sm),
         // Etiqueta
         Text(
           widget.label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -120,9 +120,9 @@ class _HealthCategoryCardState extends State<HealthCategoryCard> {
           const SizedBox(height: 4),
           Text(
             widget.description!,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               height: 1.3,
             ),
             maxLines: 2,
@@ -133,10 +133,7 @@ class _HealthCategoryCardState extends State<HealthCategoryCard> {
           const SizedBox(height: 4),
           Text(
             widget.lastRecord!,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 11, color: context.colors.textSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

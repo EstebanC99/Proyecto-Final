@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 
 /// Chip pequeño que indica si un evento tiene recordatorio programado.
 ///
@@ -16,7 +16,9 @@ class NotificationStatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: activo ? AppColors.infoContainer : AppColors.surfaceVariant,
+        color: activo
+            ? context.colors.infoContainer
+            : context.colors.surfaceVariant,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -25,7 +27,7 @@ class NotificationStatusChip extends StatelessWidget {
           Icon(
             Icons.notifications_outlined,
             size: 12,
-            color: activo ? AppColors.info : AppColors.textDisabled,
+            color: activo ? context.colors.info : context.colors.textDisabled,
           ),
           const SizedBox(width: 4),
           Text(
@@ -33,7 +35,7 @@ class NotificationStatusChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: activo ? AppColors.info : AppColors.textDisabled,
+              color: activo ? context.colors.info : context.colors.textDisabled,
             ),
           ),
         ],

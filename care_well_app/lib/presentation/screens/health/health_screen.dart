@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/routers/app_routes.dart';
-import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -21,11 +21,11 @@ class HealthScreen extends ConsumerWidget {
     final puedeVerFichaAsync = ref.watch(puedeVerSaludProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Salud'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: context.colors.surface,
+        foregroundColor: context.colors.textPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -57,7 +57,7 @@ class HealthScreen extends ConsumerWidget {
               ),
               data: (persona) {
                 if (persona == null) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                       child: Text(
@@ -65,7 +65,7 @@ class HealthScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -90,7 +90,7 @@ class HealthScreen extends ConsumerWidget {
                         children: [
                           HealthCategoryCard(
                             icon: Icons.self_improvement,
-                            accentColor: AppColors.habitsAccent,
+                            accentColor: context.colors.habitsAccent,
                             label: 'Hábitos de vida',
                             description:
                                 'Rutinas diarias aconsejables para el bienestar de la persona.',
@@ -99,7 +99,7 @@ class HealthScreen extends ConsumerWidget {
                           ),
                           HealthCategoryCard(
                             icon: Icons.medical_services_outlined,
-                            accentColor: AppColors.healthAccent,
+                            accentColor: context.colors.healthAccent,
                             label: 'Ficha de salud',
                             description:
                                 'Datos clínicos: factor sanguíneo, antecedentes, alergias y enfermedades.',
@@ -119,7 +119,7 @@ class HealthScreen extends ConsumerWidget {
                           ),
                           HealthCategoryCard(
                             icon: Icons.mood,
-                            accentColor: AppColors.moodAccent,
+                            accentColor: context.colors.moodAccent,
                             label: 'Estado de ánimo',
                             description:
                                 'Registro periódico del bienestar emocional',
@@ -132,7 +132,7 @@ class HealthScreen extends ConsumerWidget {
                       FullWidthActionTile(
                         icon: Icons.timeline,
                         label: 'Línea de tiempo',
-                        color: AppColors.healthAccent,
+                        color: context.colors.healthAccent,
                         onTap: () =>
                             context.pushNamed(AppRoutes.healthTimelineName),
                       ),
