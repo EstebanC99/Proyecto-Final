@@ -1,0 +1,44 @@
+# Artefactos de compilación de LaTeX.
+# Se regeneran con `latexmk -pdf CuidadoPersonas.tex`; no se versionan.
+#
+# Lo que SÍ se versiona en esta carpeta:
+#   - CuidadoPersonas.tex  (fuente editable)
+#   - CuidadoPersonas.pdf  (documento compilado, referencia del proyecto)
+#   - Imagenes/ y Recursos/
+#
+# Nota: los archivos que hoy ya están trackeados no dejan de estarlo por figurar
+# en este .gitignore. Para sacarlos del índice hay que correr, una sola vez:
+#   git rm --cached care_well_doc/LATEX/CuidadoPersonas.aux \
+#       care_well_doc/LATEX/CuidadoPersonas.bbl \
+#       care_well_doc/LATEX/CuidadoPersonas.bcf \
+#       care_well_doc/LATEX/CuidadoPersonas.blg \
+#       care_well_doc/LATEX/CuidadoPersonas.fdb_latexmk \
+#       care_well_doc/LATEX/CuidadoPersonas.fls \
+#       care_well_doc/LATEX/CuidadoPersonas.run.xml \
+#       care_well_doc/LATEX/CuidadoPersonas.synctex.gz \
+#       care_well_doc/LATEX/CuidadoPersonas.toc
+
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Sobrantes de corridas interrumpidas de pdflatex (p. ej. pdflatex21932.fls).
+# Uno de estos llegó a romper la compilación al ser leído por latexmk.
+pdflatex*.fls
+
+# Copias que dejan biber/latexmk cuando una corrida falla
+# (CuidadoPersonas.bbl-SAVE-ERROR, CuidadoPersonas.bcf-SAVE-ERROR, ...).
+*-SAVE-ERROR
+
+# Directorio de salida intermedio de latexmk / editores LaTeX.
+build/

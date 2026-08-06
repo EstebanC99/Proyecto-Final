@@ -4,6 +4,7 @@
 % PREÁMBULO
 % Paquetes:
 \usepackage[spanish]{babel}
+\usepackage{csquotes}
 \usepackage{graphicx}
 \usepackage{tikz,color}
 \usepackage{pgf-pie}
@@ -14,6 +15,22 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 \usepackage{wrapfig}
+% Permite cortar las URL largas en cualquier caracter (se carga despues de
+% biblatex, que ya trae el paquete url, para poder redefinir sus cortes).
+\usepackage{xurl}
+
+% Habilita los cortes de URL dentro de la bibliografia generada por biblatex.
+\setcounter{biburlnumpenalty}{9000}
+\setcounter{biburlucpenalty}{9000}
+\setcounter{biburllcpenalty}{9000}
+% Afloja el ajuste de linea unicamente dentro de la bibliografia, donde las URL
+% largas dejan renglones sin puntos de corte utiles.
+\appto{\bibsetup}{\emergencystretch=1em}
+
+% Separacion vertical equivalente a una linea en blanco.
+% Sustituye el uso de \newline o \\ al cierre de un parrafo, que dejaba una
+% linea vacia y provocaba avisos "Underfull \hbox (badness 10000)".
+\newcommand{\saltolinea}{\par\vspace{\baselineskip}}
 \bibliography{Recursos/Bibliografia}
 
 % CUERPO
@@ -106,7 +123,7 @@
     \end{enumerate}
     \subsection{Organigrama}
     \par Si bien la empresa resulta ser una startup inicial que consta de pocas personas integrándola, realizamos el organigrama basándonos en los roles y funciones que cumplen sus integrantes.
-    \par \includegraphics[width=1\textwidth]{Imagenes/Organigrama.jpg}
+    \par\noindent \includegraphics[width=1\textwidth]{Imagenes/Organigrama.jpg}
     \par Profundizaremos un poco más en las tareas a cargo de cada uno de los departamentos que integran a la empresa.
     \begin{itemize}
         \item[\textbf{Gerencia:}] Se compone del equipo fundador de la empresa, encargados de la toma de decisiones relacionadas al futuro de la empresa, el camino a seguir y los proyectos a encarar.
@@ -142,43 +159,48 @@
         \item[] \textit{Mercado competitivo:} El gran nivel de demanda y competencia salarial que presenta el actual mercado de tecnología, dificulta el ingreso competitivo y la rentabilidad inmediata de la empresa.
     \end{itemize}
     \subsection{Procesos principales}
-    \par Tomando en consideración el análisis hecho de la organización, y el foco que hacen en las problemáticas sociales, consideramos los siguientes procesos principales.
-    \newline
-    \par \noindent \textbf{\underline{Investigación y desarrollo}} \newline
-    \par Dentro de los procesos de investigación y desarrollo incluimos procesos más atómicos como:
+    Tomando en consideración el análisis hecho de la organización, y el foco que hacen en las problemáticas sociales, consideramos los siguientes procesos principales.
+
+    \noindent \textbf{\underline{Investigación y desarrollo}}
+
+    Dentro de los procesos de investigación y desarrollo incluimos procesos más atómicos como:
     \begin{itemize}
         \item[] \textit{Identificación de necesidades:} este proceso engloba la realización de un análisis de las necesidades específicas de los stakeholders tanto a nivel individual como a nivel colectivo. Dentro del mismo se engloban tareas como la realización de encuestas, entrevistas, grupos focales, etc., que permitan comprender los desafíos y oportunidades que enfrentan.
         \item[] \textit{Diseño y modelado de soluciones:} consiste en diseñar las posibles soluciones tecnológicas innovadoras que hagan frente a las necesidades identificadas previamente, priorizando la facilidad de uso y las capacidades de los usuarios a los que apunta. Se emplean metodologías de modelado centradas en la experiencia de usuario para asegurar la conformidad y usabilidad de las aplicaciones.
         \item[] \textit{Desarrollo de software:} este proceso engloba todas las tareas relacionadas a la materialización de las propuestas tecnológicas planteadas y diseñadas previamente. Se definen y emplean metodologías de desarrollo acordes a las necesidades de cada proyecto y herramientas modernas, asegurando la calidad, seguridad y confiabilidad de las soluciones. Además se incluyen las tareas relacionadas al testing y pruebas para garantizar que las soluciones funcionen correctamente y cumplan con los requisitos establecidos.
     \end{itemize}
-    \par \noindent \textbf{\underline{Implementación y soporte}}
-    \newline
-    \par Este proceso engloba la salida y puesta en producción de las aplicaciones desarrolladas, junto con el seguimiento y mejora continua de las mismas, atendiendo a las necesidades de los usuarios y las opiniones recibidas.
+
+    \noindent \textbf{\underline{Implementación y soporte}}
+
+    Este proceso engloba la salida y puesta en producción de las aplicaciones desarrolladas, junto con el seguimiento y mejora continua de las mismas, atendiendo a las necesidades de los usuarios y las opiniones recibidas.
     \begin{itemize}
         \item[] \textit{Implementación:} engloba el lanzamiento y puesta en producción de las soluciones tecnológicas en los entornos donde se utilizarán, brindando capacitación y asistencia a los usuarios para garantizar una adopción exitosa. Además se pautan mecanismos de seguimiento y evaluación para medir el impacto de las soluciones y realizar mejoras continuas.
         \item[] \textit{Soporte técnico:} consiste en brindar soporte técnico a los usuarios, resolviendo problemas de manera oportuna y eficiente. Para su efectividad, se utilizan canales de comunicación efectivos previamente definidos como información de contacto, opiniones y valoración en plataformas de descargas, etc.
         \item[] \textit{Actualizaciones y mantenimiento:} abarca las tareas enfocadas en actualizaciones periódicas de las soluciones tecnológicas para incorporar nuevas funcionalidades, corregir errores y mejorar el rendimiento.
     \end{itemize}
-    \par \noindent \textbf{\underline{Gestión y administración}}
-    \newline
-    \par Los procesos de gestión y administración son aquellos que alinean los objetivos estratégicos de la empresa con la visión y misión de las mismas, a fin de orientar los esfuerzos colectivos hacia una misma meta.
+
+    \noindent \textbf{\underline{Gestión y administración}}
+
+    Los procesos de gestión y administración son aquellos que alinean los objetivos estratégicos de la empresa con la visión y misión de las mismas, a fin de orientar los esfuerzos colectivos hacia una misma meta.
     \begin{itemize}
         \item[] \textit{Planificación estratégica:} consiste en establecer un plan estratégico que defina los objetivos a largo plazo de la startup, las estrategias para alcanzarlos y los recursos necesarios. Se realizan revisiones periódicas del plan para adaptarlo a las condiciones cambiantes del mercado y las necesidades de los usuarios.
         \item[] \textit{Gestión financiera:} engloba la gestión de los recursos financieros de manera eficiente, asegurando la sostenibilidad de la startup a largo plazo. Realizando periódicamente presupuestos, control de gastos y análisis de rentabilidad que sirvan de apoyo a la hora de tomar decisiones financieras.
         \item[] \textit{Gestión del talento humano:} abarca las tareas relacionadas al reclutamiento, evaluación, selección y capacitación de personal que formará parte de la empresa.
     \end{itemize}
-    \par \noindent \textbf{\underline{Marketing y ventas}}
-    \newline
-    \par Este proceso engloba todas aquellas tareas relacionadas a la divulgación, promoción y alcance de las soluciones tecnológicas puestas en el mercado. A su vez, engloba la definición de estrategias y planes para potenciar el alcance de la marca y su posicionamiento estratégico en el mercado.
+
+    \noindent \textbf{\underline{Marketing y ventas}}
+
+    Este proceso engloba todas aquellas tareas relacionadas a la divulgación, promoción y alcance de las soluciones tecnológicas puestas en el mercado. A su vez, engloba la definición de estrategias y planes para potenciar el alcance de la marca y su posicionamiento estratégico en el mercado.
     \begin{itemize}
         \item[] \textit{Estrategia de marketing:} se establece una estrategia publicitaria que permita dar a conocer las soluciones tecnológicas a los usuarios potenciales y generar interés en su adopción. Los principales canales de difusión consisten en la publicidad digital y la valoración en plataformas de descargas.
         \item[] \textit{Ventas:} consiste en la definición de un proceso de ventas efectivo que permita convertir a los clientes potenciales en usuarios reales. Incluye demostraciones de casos de éxito, pruebas gratuitas y planes de suscripción.
         \item[] \textit{Atención al cliente:} abarca los servicios de atención al cliente para fidelizar a los usuarios y resolver sus inquietudes.
     \end{itemize}
-    \par \noindent \textbf{\underline{Evaluación y mejora continua}}
-    \newline
-    \par Este proceso consiste en monitorear el impacto de las soluciones tecnológicas en la calidad de vida de las personas alcanzadas, utilizando indicadores clave de rendimiento (KPIs) para medir el éxito de las soluciones e identificar áreas de mejora.
-    \par Además, se implementa un proceso de mejora continua capaz de optimizar las soluciones tecnológicas, los procesos internos y las estrategias de negocio, haciendo uso y beneficio de la retroalimentación de los usuarios y los datos recopilados.
+
+    \noindent \textbf{\underline{Evaluación y mejora continua}}
+
+    Este proceso consiste en monitorear el impacto de las soluciones tecnológicas en la calidad de vida de las personas alcanzadas, utilizando indicadores clave de rendimiento (KPIs) para medir el éxito de las soluciones e identificar áreas de mejora.
+    Además, se implementa un proceso de mejora continua capaz de optimizar las soluciones tecnológicas, los procesos internos y las estrategias de negocio, haciendo uso y beneficio de la retroalimentación de los usuarios y los datos recopilados.
 
     \newpage
 
@@ -186,7 +208,7 @@
     \section{Análisis de problemas}
     \par El surgimiento de la iniciativa de realizar un software que se encargue de la gestión y organización de las tareas que implica estar al cuidado de otras personas, se origina en las complejas problemáticas con las que nos encontramos diariamente.
     \par A fin de poder abordarlas con mayor exactitud y precisión, llevamos a cabo la realización de un cuestionario presentado a unas cincuenta personas, de diferentes edades, oficios y calidades de vida, con preguntas orientadas a sus experiencias en el cuidado de adultos mayores, niños pequeños, personas con alguna condición específica, etc. A partir del mismo, analizamos los resultados y concluimos en las diferentes problemáticas comunes.
-    \newline
+    \saltolinea
     \subsection{Gráficas de respuestas}
     \par En esta sección presentamos las diferentes gráficas correspondientes a cada una de las preguntas realizadas en el relevamiento, que permiten posteriormente identificar potenciales usuarios, problemáticas, funcionalidades, etc.
     \par El relevamiento fue orientado a aquellas personas que se encuentran en posición de cuidador, ya sea profesionalmente o por algún vínculo en especial.
@@ -204,7 +226,7 @@
             7/Niñeros, 
             4/Hermanos}
         \end{tikzpicture} 
-    \newline
+    \saltolinea
     \par En la categorización de los tipos de vínculos se estableció que cuando se habla de “Padres”, se hace referencia a que la persona que contestó la encuesta tiene a cargo a sus hijos, en cambio cuando se dice “Hijos”, los participantes del cuestionario referían a que cuidaron a sus padres.
     \par Teniendo en cuenta los datos del cuestionario, se desprende el siguiente análisis:
     \begin{itemize}
@@ -216,6 +238,7 @@
     \par El objetivo de la pregunta era conocer cuáles eran las principales problemáticas, inconvenientes y dificultades con las que se encuentran los cuidadores.
     \par En este caso las personas que respondieron, realizaron distintos abordajes a la pregunta y al igual que en la pregunta anterior se realizó una limpieza y normalización de los datos de las respuestas. En este caso se registraron cincuenta y tres respuestas.
     \newline
+        \begin{adjustbox}{max width=\textwidth}
         \begin{tikzpicture}
             \pie[explode={0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2}]
             {30/Cansancio y disponibilidad, 
@@ -227,8 +250,9 @@
             5/Daños y enfermedades, 
             4/Movilidad y entorno, 
             2/Cuidadores}
-        \end{tikzpicture} 
-    \newline
+        \end{tikzpicture}
+        \end{adjustbox} 
+    \saltolinea
     \par En primer lugar, teniendo en cuenta las respuestas, el análisis que podemos hacer sobre las principales problemáticas que están relacionadas con el cansancio, disponibilidad de tiempos, desconocimiento, organización, enfermedades; se vinculan directamente con la \textit{“pregunta 2: ¿Qué vínculo/relación tienen o tenían?”} donde la mayoría son familiares de las personas que están al cuidado, por lo que tiene sentido que su principal tarea no sea la de brindar cuidado o asistencia a sus allegados, si no que lo realicen en conjunto con las actividades diarias que tiene cada uno.
     \par Las otras temáticas como la responsabilidad, dañarse y movilidad se relacionan con las personas que contestaron y pertenecen al grupo de cuidadores externos a la familia. Tienen que ver con las problemáticas y preocupaciones que intervienen en sus trabajos.
     \par Por otro lado, se registraron dos problemáticas relacionadas con la comunicación:
@@ -249,7 +273,7 @@
             16/Whatsapp, 
             14/Escrito formal}
         \end{tikzpicture} 
-    \newline
+    \saltolinea
     \par En primer lugar destacamos dos diferenciaciones principales en el tipo de comunicación:
     \begin{itemize}
         \item \textbf{Formal:} Este tipo de comunicación está asociado a la información que transmite de fuentes profesionales.
@@ -281,7 +305,7 @@
             32/No, 
             10/No responde}
         \end{tikzpicture} 
-    \newline
+    \saltolinea
     \par Estas respuestas se obtuvieron luego de una limpieza en los datos donde:
     \begin{itemize}
         \item \textbf{No responde:} Representa el 10\% del total de respuestas, estas personas completaron el formulario, pero eligieron no realizar ninguna respuesta en esta pregunta.
@@ -297,6 +321,7 @@
     \par Por último, esta pregunta estaba orientada a consultarle a las personas que contestaron la encuesta, cuáles serían los requerimientos o funcionalidades que creían necesarias en la aplicación.
     \par En este caso, obtuvimos respuestas muy diversas y realizamos un resumen de las principales funcionalidades descritas. 
     \newline
+        \begin{adjustbox}{max width=\textwidth}
         \begin{tikzpicture}
             \pie[explode={0.2, 0.2, 0.2}, rotate=290]
             {40/Sin responder,
@@ -306,8 +331,9 @@
             9/Gestión de emergencias,
             9/Gestión de medicación,
             5/Comunicación y apoyo}
-        \end{tikzpicture} 
-    \newline
+        \end{tikzpicture}
+        \end{adjustbox} 
+    \saltolinea
     \par El 40\% no respondió a la pregunta consideramos que esto sucedió por no tener una idea clara de que podría realizar la aplicación.
     \par Teniendo en cuenta el otro 60\% que sí respondieron la pregunta, recopilamos las siguientes funcionalidades:
     \begin{itemize}
@@ -450,6 +476,10 @@
     \par \textbf{Nota:} el diagrama que se presenta a continuación corresponde a la \textbf{planificación inicial} del proyecto, elaborada al comienzo del mismo y comprendida entre marzo de 2024 y mayo de 2025. Se conserva en este documento como \textbf{registro histórico de la planificación original} y no refleja las fechas de ejecución efectivas: el desarrollo se extendió más allá del horizonte previsto, incorporando además módulos y capacidades que no formaban parte de la estimación inicial (entre ellos, las funcionalidades basadas en inteligencia artificial). Las desviaciones respecto de esta planificación se explican por el carácter iterativo incremental de la metodología adoptada (véase la sección \textit{Metodología a utilizar}).
     
     \begin{landscape}
+        % Dentro de landscape, lscape reasigna \hsize/\linewidth/\textheight pero deja
+        % \textwidth con el valor de la pagina vertical: la medida util es \linewidth.
+        % El diagrama se reduce solo lo necesario para entrar en la caja apaisada.
+        \noindent\begin{adjustbox}{max width=\linewidth, max totalheight=\textheight}
         \begin{ganttchart}[
             hgrid,
             vgrid,
@@ -498,9 +528,14 @@
             \ganttbar[bar/.style={fill=red}]{Prototipado}{27}{30} 
 
         \end{ganttchart}
+        \end{adjustbox}
 
         \newpage
 
+        % Dentro de landscape, lscape reasigna \hsize/\linewidth/\textheight pero deja
+        % \textwidth con el valor de la pagina vertical: la medida util es \linewidth.
+        % El diagrama se reduce solo lo necesario para entrar en la caja apaisada.
+        \noindent\begin{adjustbox}{max width=\linewidth, max totalheight=\textheight}
         \begin{ganttchart}[
             hgrid,
             vgrid,
@@ -553,6 +588,7 @@
             \ganttbar[bar/.style={fill=orange}]{Implementación}{55}{60} 
 
         \end{ganttchart}
+        \end{adjustbox}
     \end{landscape}
 
 
@@ -563,48 +599,48 @@
     \par Para llevar a cabo el desarrollo del proyecto propuesto, es esencial contar con personal que posea las competencias adecuadas, tanto en el ámbito técnico como en la planificación, coordinación y ejecución de tareas dentro de equipos de trabajo eficientes y autónomos. Los roles definidos para el desarrollo del proyecto y las responsabilidades de cada rol ya fueron detalladas en la planificación inicial del proyecto, donde también se especificaron las actividades asignadas a cada uno.
     \subsubsection{Factores operativos funcionales}
     \par En relación con la funcionalidad que el sistema propuesto ofrece al usuario final, se analizan a continuación los aspectos que el sistema debe cumplir en cada una de sus funciones clave para alcanzar la operatividad deseada.
-    \newline
+    \saltolinea
     \par \textit{\underline{Usabilidad}}
-    \newline
+    \saltolinea
     \par La aplicación móvil debe ser muy fácil de entender y usar, donde la interfaz de usuario de la aplicación debe ser simple, intuitiva y fácil de navegar, incluso para usuarios con poca experiencia en tecnología o que presenten diferentes discapacidades, por lo que la accesibilidad es también un aspecto clave a tener en cuenta. Se deben utilizar íconos claros, menús bien organizados y texto conciso para facilitar la comprensión de las funcionalidades. 
     \par Además, la aplicación debe ser fácil de aprender a usar, incluso para usuarios que la utilizan por primera vez. Se deben incluir ayudas para que los usuarios puedan familiarizarse rápidamente con las principales características. Por otro lado, el diseño y la funcionalidad de la aplicación deben ser consistentes en todas las pantallas. Esto va a ayudar a los usuarios a anticipar cómo funciona la aplicación y evitará confusiones.
-    \newline
+    \saltolinea
     \par \textit{\underline{Confiabilidad}} 
-    \newline
+    \saltolinea
     \par La confiabilidad es un factor clave para la confianza de los usuarios porque una aplicación confiable tendrá más probabilidades de ser utilizada regularmente por los cuidadores, lo que les permitirá gestionar sus tareas y responsabilidades de manera efectiva.
     \par La aplicación debe ser estable y funcionar sin errores ni bloqueos, incluso bajo cargas de trabajo pesadas por lo que se deben realizar pruebas de carga y rendimiento exhaustivas para identificar y corregir cualquier problema de estabilidad. La aplicación debe ser monitoreada y registrada para identificar y solucionar problemas de manera rápida y eficiente. Se deben implementar herramientas de monitoreo para registrar el rendimiento de la aplicación, los errores y la actividad del usuario. Por otro lado, la aplicación debe tener un plan de recuperación ante desastres para minimizar el impacto de cualquier interrupción del servicio. Se deben implementar copias de seguridad de datos y procedimientos de recuperación para restaurar la aplicación en caso de un fallo.
-    \newline
+    \saltolinea
     \par \textit{\underline{Rendimiento}} 
-    \newline
+    \saltolinea
     \par Al igual que los aspectos anteriores el rendimiento es fundamental para que los usuarios continúen utilizando la aplicación. Por lo que la aplicación debe utilizar los recursos del dispositivo de manera eficiente, como la batería, la memoria y el procesador. Se deben implementar técnicas de optimización para minimizar el consumo de recursos, se puede aplicar monitoreo para identificar y solucionar problemas de rendimiento.
-    \newline
+    \saltolinea
     \par \textit{\underline{Seguridad}} 
-    \newline
+    \saltolinea
     \par La aplicación debe ser segura y proteger los datos confidenciales de los usuarios, como la información personal e indicaciones médicas que ingresen los usuarios, permitiendo que esta sea visible para los diferentes roles con sus correspondientes permisos. Se deben implementar medidas de seguridad adecuadas como autenticación, gestión basada en roles y autorización. Además, se deben realizar pruebas de seguridad exhaustivas para identificar y corregir cualquier vulnerabilidad de seguridad.
     \par Posterior a la primera implementación la aplicación debe actualizarse periódicamente para corregir vulnerabilidades de seguridad conocidas. Se debe implementar un proceso de gestión de vulnerabilidades para identificar, evaluar y corregir vulnerabilidades de manera oportuna. Otra de los puntos que se puede implementar es solicitar a los usuarios contraseñas seguras y confiables para aumentar la protección de la información.
-    \newline
+    \saltolinea
     \par \textit{\underline{Escalabilidad}} 
-    \newline
+    \saltolinea
     \par La aplicación debe ser escalable para satisfacer la demanda futura, se debe diseñar la arquitectura de la aplicación para que pueda manejar un mayor número de usuarios y datos sin afectar el rendimiento. Se deberá evaluar la infraestructura a utilizar como son los servicios en la nube o servidores autoescalables para proporcionar la capacidad de computación y almacenamiento necesaria. Otro de los aspectos a considerar es la utilización de base de datos escalable que pueda manejar un gran volumen de datos sin afectar el rendimiento.
     \par Se deberán realizar pruebas de carga exhaustivas para identificar y corregir cualquier cuello de botella de escalabilidad. Las pruebas deben realizarse con diferentes cargas de trabajo y escenarios de uso. Y la aplicación debe ser monitoreada para identificar y solucionar problemas de escalabilidad.
     \subsubsection{Factores operativos no funcionales}
     \par En relación con aspectos que no actúan de forma directa a las funcionalidades del sistema, pero son considerablemente críticas para la correcta ejecución y desempeño del mismo, se analizan los aspectos que debe cumplir para alcanzar la operatividad deseada.
-    \newline
+    \saltolinea
     \par \noindent \textit{\underline{Disponibilidad}} 
-    \newline
+    \saltolinea
     \par La aplicación debe estar disponible las 24 horas del día, los 7 días de la semana, con un tiempo de inactividad mínimo debido a que las consultas e interacciones se pueden dar en cualquier momento. Se deberá implementar una infraestructura robusta y redundante para garantizar la disponibilidad de la aplicación, además, debe tener un plan de recuperación ante desastres para minimizar el impacto de cualquier interrupción del servicio.
     \par Para ello se deberán realizar pruebas de disponibilidad exhaustivas para identificar y corregir cualquier punto único de fallo. La aplicación deberá contar con un servicio de recepción de incidentes donde los usuarios informen inconvenientes en la aplicación y se deberá realizar un plan claro de comunicación de interrupción de servicio o disponibilidad de ser necesario.
-    \newline
+    \saltolinea
     \par \noindent \textit{\underline{Mantenimiento}} 
-    \newline
+    \saltolinea
     \par La aplicación debe ser fácil de mantener y que pueda adaptarse a los cambios en los requisitos comerciales y tecnológicos. Para ello, se debe desarrollar un plan de mantenimiento que defina las actividades de mantenimiento preventivo y correctivo que se deben realizar para mantener la aplicación en buen estado. El plan de mantenimiento debe incluir procedimientos para actualizar el código, corregir errores, implementar nuevas funciones y mejorar el rendimiento. Además, debe registrar todos los errores y excepciones que ocurran, estos deben ser detallados y deben incluir información suficiente para identificar y corregir la causa raíz de los problemas.
-    \newline
+    \saltolinea
     \par \noindent \textit{\underline{Portabilidad}} 
-    \newline
+    \saltolinea
     \par La aplicación deberá poder ejecutarse en diferentes plataformas y dispositivos, lo que la hace más accesible para una amplia gama de usuarios. Para esto, debe diseñarse de forma independiente de la plataforma, lo que significa que no debe depender de ninguna tecnología o marco específico de una plataforma en particular. Se debe utilizar una herramienta de desarrollo multiplataforma para desarrollar la aplicación. Esto permitirá compilar la aplicación para diferentes plataformas sin necesidad de realizar grandes cambios en el código. Se debe realizar documentación que incluya información sobre las tecnologías utilizadas, el diseño de la aplicación y las pruebas de portabilidad realizadas.
-    \newline
+    \saltolinea
     \par \noindent \textit{\underline{Compatibilidad}} 
-    \newline
+    \saltolinea
     \par La aplicación debe ser compatible con los principales sistemas operativos móviles, como Android e iOS, con una amplia gama de dispositivos móviles, incluyendo teléfonos inteligentes, tabletas y phablets. Además deberá ser compatible con diferentes tipos de redes, como redes Wi-Fi, redes celulares y redes 3G/4G/5G. Se deben realizar pruebas exhaustivas para garantizar que la aplicación funcione correctamente en diferentes versiones de estos sistemas operativos, que funcione correctamente en diferentes pantallas y resoluciones.
     \subsection{Análisis de factibilidad técnica}
     \par En términos de factibilidad técnica, no existen grandes problemáticas o amenazas que dificulten la salida del proyecto. Hoy en día, la sociedad se encuentra altamente informatizada, y debido a esto, en todos los hogares hay al menos un celular por persona, acceso a algún proveedor de Internet y conocimiento básico de uso.
@@ -632,7 +668,10 @@
         \item Aprendizaje y utilización de tecnología actualizada y nueva en el mercado.
         \item Buena documentación y soporte por parte de Google.
     \end{itemize}
-    \par El back-end estará alojado en el mismo \textbf{servidor privado virtual (VPS)} que la base de datos, mientras que la aplicación podrá ser descargada desde Google Play Store. Consideramos, en principio, que el acceso a Internet será mandatorio, pero se evaluará a futuro la posibilidad de hacerlo opcional para ciertas tareas.
+    % La secuencia "virtual (VPS)" no ofrece ningun punto de corte valido, asi que
+    % se afloja el ajuste solo en este parrafo para no invadir el margen derecho.
+    \par\begingroup\emergencystretch=1em
+    El back-end estará alojado en el mismo \textbf{servidor privado virtual (VPS)} que la base de datos, mientras que la aplicación podrá ser descargada desde Google Play Store. Consideramos, en principio, que el acceso a Internet será mandatorio, pero se evaluará a futuro la posibilidad de hacerlo opcional para ciertas tareas.\par\endgroup
     \subsubsection{Compatibilidad con dispositivos}
     \par La aplicación mobile solo será soportada para dispositivos \textbf{Android}. Si bien esto reduce el potencial alcance de mercado, no contamos con los recursos necesarios para realizar una primera versión soportada por iOS, por lo que optamos por realizar prueba de mercado en personas que cuenten con dispositivos bajo el sistema operativo mencionado, y evaluar la ampliación de alcance a futuro.
     \par Además, la misma no resulta una aplicación de alto consumo de recursos, por lo que debería ser soportada por una amplia cantidad de dispositivos actuales del mercado sin problema alguno.
@@ -654,14 +693,14 @@
     \par Utilizaremos \textbf{Git} como controlador de versiones para la aplicación, a través de \textbf{GitHub}, el mismo es de uso gratuito, y contamos con licencias facultativas para el uso de funciones premium.
     \subsection{Factibilidad legal}
     \subsubsection{Normativas nacionales}
-    \par \textbf{1. Ley N° 25326 de Protección de Datos Personales} \newline
+    \par \textbf{1. Ley N° 25326 de Protección de Datos Personales} \saltolinea
     \par Regula el tratamiento de los datos personales para garantizar el derecho a la intimidad y privacidad de las personas. Los datos personales son información sobre personas físicas y jurídicas, entre ellos se incluyen: datos personales guardados en archivos, registros, bancos de datos públicos o privados y que se almacenan, imágenes en videos de sistemas de vigilancia, datos biométricos, datos genéticos, entre otros. Los aspectos claves de la ley son: consentimiento informado, derechos de acceso, rectificación y supresión de datos, y medidas de seguridad.
     \par La ley reconoce los derechos a que: tus datos personales no sean utilizados ni registrados sin tu consentimiento (aunque existen algunas excepciones), pedir y que te den información sobre qué datos personales tuyos están registrados en bancos de datos públicos o privados, pedir que tus datos sean corregidos o actualizados, pedir que sean suprimidos, en los casos en que corresponda, pedir que sean guardados confidencialmente, iniciar acción judicial para conocer tus datos o exigir su rectificación, supresión, confidencialidad o actualización.
     \par Establece obligaciones para los responsables de bases de datos y los derechos de los titulares de los datos. Estos deben respetar los derechos sobre tus datos personales y darte la información que les pidas, deben exhibir los derechos que te reconoce la ley sobre tus datos personales en un lugar visible y de manera clara.
     \par Al exhibir la información sobre tus derechos, también tienen que informar que la Agencia de Acceso a la Información Pública es el organismo en el que podés hacer denuncias y reclamos para proteger tus datos personales.\cite{Ley25326}
-    \newline
+    \saltolinea
     \par \textbf{2. Ley N° 26.388 de Delitos Informáticos} 
-    \newline
+    \saltolinea
     \par Tipifica y sanciona delitos informáticos contra:
     \begin{itemize}
         \item La integridad sexual: sanciona las siguientes conductas: producir, financiar, ofrecer, comerciar, publicar, facilitar, divulgar o distribuir cualquier representación de una persona menor de 18 años dedicada a actividades sexuales explícitas o de sus partes genitales; tener representaciones de personas menores de edad de actividades sexuales explícitas o de sus partes genitales para distribuirlas o comercializarlas. También sanciona el ciberacoso a personas menores de edad (grooming). Este delito consiste en tomar contacto con una persona menor de edad a través de medios de comunicación electrónica (redes, mail, chat, etc.) para cometer alguno de los delitos contra su integridad sexual.
@@ -671,28 +710,28 @@
         \item La Administración Pública sanciona las siguientes conductas: sustraer, alterar, ocultar, destruir o inutilizar registros o documentos electrónicos confiados a la custodia de un funcionario público o de otra persona en interés del servicio público.
     \end{itemize} 
     \par Tomando como base lo expuesto en la ley mencionada. \cite{Ley26388}
-    \newline
+    \saltolinea
     \par \textbf{3. Ley N° 11.723 de Régimen de la Propiedad Intelectual} 
-    \newline
+    \saltolinea
     \par Es la protección que le da la ley al autor o autora de una obra científica, literaria, artística o didáctica por su creación intelectual que le permite exponerla o reproducirla por cualquier medio, traducirla, explotarla comercialmente o autorizar a otros a hacerlo. También le permite impedir que cualquier persona no autorizada ejerza estos derechos.
     \par Las obras protegidas son: libros y otros escritos, obras dramáticas, dibujos, pinturas, esculturas y obras de arquitectura, planos, mapas y maquetas, obras cinematográficas y audiovisuales, emisiones de radiodifusión, fotos, composiciones musicales, grabaciones y fonogramas, coreografías, programas de computación, bases de datos.\cite{Ley11723}
     \subsubsection{Términos y condiciones de la aplicación}
     \par Para aplicar las normativas anteriores y tomando de referencia, la información bibliográfica obtenida de aplicaciones de salud desarrolladas por el \textit{Gobierno de la Nación} \cite{TerminosCondiciones1} y empresas privadas (véase referencias \cite{TerminosCondiciones2} y \cite{TerminosCondiciones3}), describimos los siguientes términos y condiciones que los usuarios de la aplicación deberán aceptar para continuar con el uso de la misma. 
-    \newline
+    \saltolinea
     \par \textbf{1. Introducción} 
-    \newline
+    \saltolinea
     \par Estos términos y condiciones rigen el uso de nuestra aplicación y describen las reglas y regulaciones para el uso de los servicios de Bubisoft. Al acceder y usar esta aplicación, aceptas cumplir con estos términos y condiciones.
-    \newline
+    \saltolinea
     \par \textbf{2. Aceptación de los Términos} 
-    \newline
+    \saltolinea
     \par Al descargar, instalar o usar la aplicación, el Usuario acepta y se compromete a cumplir con estos términos y condiciones. Si el mismo no está de acuerdo con alguna parte de estos términos, no deberá utilizar la aplicación. 
-    \newline
+    \saltolinea
     \par \textbf{3. Licencia de Uso} 
-    \newline
+    \saltolinea
     \par La aplicación le otorga al Usuario una licencia limitada, no exclusiva, intransferible y revocable para usarla solo a fines personales y no comerciales. 
-    \newline
+    \saltolinea
     \par \textbf{4. Restricciones de Uso} 
-    \newline
+    \saltolinea
     \par El Usuario se compromete a no:
     \begin{itemize}
         \item Utilizar la aplicación para cualquier propósito ilegal o no autorizado.
@@ -701,34 +740,34 @@
         \item El Usuario declara y garantiza que todos los datos personales suministrados en el proceso de registro son verdaderos, completos y se encuentran actualizados. Será responsabilidad del mismo mantener actualizada la información que brinde.
     \end{itemize}
     \par \textbf{5. Privacidad y Protección de Datos} 
-    \newline
+    \saltolinea
     \par La protección de tus datos personales es importante para nosotros. El Usuario puede consultar nuestra \textit{Política de Privacidad} para entender cómo recopilamos, usamos y protegemos la información personal. 
-    \newline
+    \saltolinea
     \par \textbf{6. Propiedad Intelectual} 
-    \newline
+    \saltolinea
     \par Todos los derechos de propiedad intelectual sobre la aplicación y su contenido, excepto los que son proporcionados por los Usuarios, pertenecen a Bubisoft, quedando estrictamente prohibido al Usuario utilizar los contenidos, las categorías y/o cualquier información de la Aplicación con otra finalidad distinta a la indicada en los presentes \textit{Términos y Condiciones}. En el caso de que la Aplicación permita descargar contenido para su posterior lectura por el Usuario, Bubisoft otorga al Usuario una licencia de uso gratuita, no transferible, no exclusiva y para uso estrictamente personal. 
-    \newline
+    \saltolinea
     \par \textbf{7. Contenido del Usuario} 
-    \newline
+    \saltolinea
     \par El Usuario puede tener la posibilidad de cargar, publicar o transmitir contenido a través de la aplicación. Al hacerlo, el Usuario otorga a Bubisoft una licencia no exclusiva y libre de regalías para usar, reproducir, distribuir, y mostrar dicho contenido.
     \par Los datos proporcionados por el Usuario, las recomendaciones, lineamientos, sugerencias o guías que puedan encontrarse en la Aplicación no constituyen opinión médica ni deben utilizarse para realizar un diagnóstico ni iniciar un tratamiento médico sin la consulta de un profesional de la salud.
     \par \textit{LA APLICACIÓN NO SUSTITUYE LA OPINIÓN MÉDICA}. 
-    \newline
+    \saltolinea
     \par \textbf{8. Limitación de Responsabilidad} 
-    \newline
+    \saltolinea
     \par Bubisoft no será responsable de ningún daño directo, indirecto, incidental, especial o consecuente que resulte del uso o la imposibilidad de usar la aplicación. Tampoco asume responsabilidad por ningún mal funcionamiento, imposibilidad de acceso o malas condiciones de uso de la Aplicación debido al uso de equipos inadecuados, interrupciones relacionadas con proveedores de servicio de internet, la saturación de la red de internet y/o por cualquier otra razón.
     \par En la Aplicación podrían encontrarse enlaces a sitios web de terceros. En tal caso, Bubisoft no es responsable del contenido de dichos sitios web. Además, la existencia de un vínculo entre la Aplicación y cualquier sitio de terceros de ninguna manera implica que Bubisoft apruebe el contenido de dicho sitio, o, asimismo, cualquier uso que dicho contenido pueda tener. 
-    \newline
+    \saltolinea
     \par \textbf{9. Modificaciones a los Términos} 
-    \newline
+    \saltolinea
     \par Nos reservamos el derecho de modificar estos términos y condiciones en cualquier momento. Se notificará al Usuario sobre cualquier cambio publicando los nuevos términos en la aplicación. Es responsabilidad del Usuario revisar estos términos periódicamente para informarse respecto de cualquier cambio. 
-    \newline
+    \saltolinea
     \par \textbf{10. Ley Aplicable y Jurisdicción} 
-    \newline
+    \saltolinea
     \par Estos términos y condiciones se regirán e interpretarán de acuerdo con el ordenamiento jurídico vigente en la República Argentina, y según las pautas de conducta impuestas por la moral, las buenas costumbres y el debido respeto a los derechos de terceros. Cualquier disputa que surja en relación con estos términos se resolverá exclusivamente en los tribunales que correspondan de acuerdo a la jurisdicción aplicable. 
-    \newline
+    \saltolinea
     \par \textbf{11. Contacto} 
-    \newline
+    \saltolinea
     \par Ante alguna consulta sobre estos términos y condiciones, el Usuario puede contactarse al correo electrónico terminos\_condiciones@bubisoft.com.
     \subsubsection{Política de privacidad}
     \par Implementamos diferentes medidas de seguridad, tecnológicas y de procesos, para proteger los datos personales que gestionamos. Tiene por objeto proteger la confidencialidad, integridad y disponibilidad de los datos, de manera que solo sean accedidos o modificados por las personas autorizadas y se encuentren disponibles en tiempo y forma cuando sean requeridos.
@@ -767,7 +806,7 @@
         \item Analista.
         \item Tester.
     \end{itemize}
-    \par Los valores/hora de cada rol son los siguientes: \newline
+    \par Los valores/hora de cada rol son los siguientes: \saltolinea
     \begin{center}
         \begin{tabular}{ |c|c|c| }
             \hline
@@ -793,7 +832,7 @@
         \item \textbf{Fase 4:} Implementación.
         \item \textbf{Fase 5:} Seguimiento.
     \end{itemize}
-    \par Las horas requeridas por cada rol en cada fase son las siguientes: \newline
+    \par Las horas requeridas por cada rol en cada fase son las siguientes: \saltolinea
     \begin{center}
         \begin{adjustbox}{width=1\textwidth}
             \begin{tabular}{ |c|c|c|c|c|c|c|c| }
@@ -824,9 +863,9 @@
 % Análisis de Factibilidad
     \section{Análisis de datos}
     \par A modo de mostrar el análisis y modelado de datos, incluimos un diagrama preliminar elaborado en \textbf{SQL Server}.
-    \\
+    \saltolinea
     \subsection{Diagrama de datos}
-    \par \includegraphics[width=1\textwidth]{Imagenes/DER.png}
+    \par\noindent \includegraphics[width=1\textwidth]{Imagenes/DER.png}
 
     \newpage
 
@@ -834,8 +873,8 @@
     \section{Metodología a utilizar}
     \par La metodología que adoptaremos a lo largo del desarrollo del proyecto es la \textbf{Iterativa Incremental}. Resulta adecuada para el proyecto gracias a la flexibilidad y adaptabilidad que ofrece a lo largo del tiempo de vida del mismo. En ella descomponemos el desarrollo en ciclos donde se adicionan diferentes módulos y/o funcionalidades, obteniendo así las diferentes versiones.
     \par De esta forma el sistema se desarrolla poco a poco, permitiéndonos obtener un feedback continuo, responder a las posibles mejoras y reaccionar a los cambios en los requerimientos.
-    \\
-    \par \includegraphics[width=1\textwidth]{Imagenes/IterativoIncremental.png}
+    \saltolinea
+    \par\noindent \includegraphics[width=1\textwidth]{Imagenes/IterativoIncremental.png}
     
 
     \newpage
@@ -873,7 +912,7 @@
     \par Una vez procesado correctamente el alta, la cuenta queda creada pero en estado \textit{pendiente de validación}: antes de poder acceder, el usuario debe confirmar su dirección de correo electrónico mediante un código de verificación. Por ello, tras completar el registro el sistema conduce al usuario a la pantalla de verificación del código, tal como se detalla en la subsección \textit{Verificación de correo electrónico}. El registro no realiza un inicio de sesión automático: una vez verificada la cuenta, el usuario debe ingresar sus credenciales de forma manual desde la pantalla de login para acceder al sistema.
     \subsection{Validación de identidad}
     \par Dado que la aplicación custodia información personal y de salud, el sistema debe asegurarse de que quien crea una cuenta \textbf{es efectivamente la persona que dice ser}, y no un tercero que se apropia de la identidad ajena para acceder a datos sensibles. A tal fin incorpora una \textbf{validación de identidad} basada en el \textbf{documento nacional de identidad} del solicitante, asistida por un componente de \textbf{inteligencia artificial} de reconocimiento de texto sobre imágenes.
-    \par Es importante distinguir esta validación de la \textit{verificación de correo electrónico} descrita en la subsección siguiente: aquella confirma que el solicitante \textbf{controla la casilla de correo} declarada; esta confirma que el solicitante \textbf{es el titular de los datos personales} declarados. Ambas son complementarias y ambas deben superarse para operar con una cuenta.
+    \par Es importante distinguir esta validación de la \textit{verificación de correo elec\-tró\-ni\-co} descrita en la subsección siguiente: aquella confirma que el solicitante \textbf{controla la casilla de correo} declarada; esta confirma que el solicitante \textbf{es el titular de los datos personales} declarados. Ambas son complementarias y ambas deben superarse para operar con una cuenta.
     \par La validación se exige en los \textbf{dos flujos en los que nace una credencial de acceso}:
     \begin{itemize}
         \item \textbf{Registro de una cuenta nueva:} cuando una persona se da de alta por sus propios medios y declara sus datos personales.
@@ -1065,7 +1104,7 @@
     \end{itemize}
     \par Cada alerta se clasifica por \textbf{severidad} (\textit{Atención} o \textit{Informativa}) y se presenta con un mensaje redactado en términos de observación, sin afirmar causa ni diagnóstico clínico: son observaciones para que el cuidador esté atento, no conclusiones médicas. El siguiente cuadro resume el catálogo de alertas de esta versión:
     \begin{center}
-        \begin{tabular}{ |p{3.4cm}|p{2cm}|p{8.2cm}| }
+        \begin{tabular}{ |>{\raggedright\arraybackslash}p{3.4cm}|>{\raggedright\arraybackslash}p{2.2cm}|>{\raggedright\arraybackslash}p{6.7cm}| }
             \hline
             \rowcolor{lightgray} \textbf{Tipo de alerta} & \textbf{Severidad} & \textbf{Mensaje (con datos interpolados)} \\
             \hline
