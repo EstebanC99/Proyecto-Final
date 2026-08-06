@@ -94,10 +94,10 @@ namespace CareWell.Domain.Test.Agenda
             }
 
             [Fact]
-            public void Si_la_Duracion_es_menor_a_cero_o_igual_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Si_la_Duracion_es_menor_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearEventoAgenda = this.crearEventoAgenda with { Duracion = TimeSpan.Zero };
+                this.crearEventoAgenda = this.crearEventoAgenda with { Duracion = TimeSpan.MinValue };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -127,10 +127,10 @@ namespace CareWell.Domain.Test.Agenda
             }
 
             [Fact]
-            public void Si_los_MinutosAnticipacionRecordatorio_son_menor_o_igual_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Si_los_MinutosAnticipacionRecordatorio_son_menor_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.crearEventoAgenda = this.crearEventoAgenda with { MinutosAnticipacionRecordatorio = 0 };
+                this.crearEventoAgenda = this.crearEventoAgenda with { MinutosAnticipacionRecordatorio = -1 };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -426,10 +426,10 @@ namespace CareWell.Domain.Test.Agenda
             }
 
             [Fact]
-            public void Si_la_Duracion_es_menor_a_cero_o_igual_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Si_la_Duracion_es_menor_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.modificarEventoAgenda = this.modificarEventoAgenda with { Duracion = TimeSpan.Zero };
+                this.modificarEventoAgenda = this.modificarEventoAgenda with { Duracion = TimeSpan.MinValue };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
@@ -459,10 +459,10 @@ namespace CareWell.Domain.Test.Agenda
             }
 
             [Fact]
-            public void Si_los_MinutosAnticipacionRecordatorio_son_menor_o_igual_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Si_los_MinutosAnticipacionRecordatorio_son_menor_a_cero_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.modificarEventoAgenda = this.modificarEventoAgenda with { MinutosAnticipacionRecordatorio = 0 };
+                this.modificarEventoAgenda = this.modificarEventoAgenda with { MinutosAnticipacionRecordatorio = -1 };
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());

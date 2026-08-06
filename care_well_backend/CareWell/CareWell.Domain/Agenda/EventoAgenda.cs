@@ -137,7 +137,7 @@ namespace CareWell.Domain.Agenda
             if (crearEventoAgenda.FechaHoraInicio == default)
                 throw new ValidacionDominioException(Mensajes.FechaHoraInicioEventoRequerida);
 
-            if (crearEventoAgenda.Duracion <= TimeSpan.Zero)
+            if (crearEventoAgenda.Duracion < TimeSpan.Zero)
                 throw new ValidacionDominioException(Mensajes.DuracionEventoInvalida);
 
             if (crearEventoAgenda.Tipo is null)
@@ -146,7 +146,7 @@ namespace CareWell.Domain.Agenda
             if (!crearEventoAgenda.Tipo.Agendable)
                 throw new ValidacionDominioException(Mensajes.TipoEventoNoEsAgendable);
 
-            if (crearEventoAgenda.MinutosAnticipacionRecordatorio.HasValue && crearEventoAgenda.MinutosAnticipacionRecordatorio <= 0)
+            if (crearEventoAgenda.MinutosAnticipacionRecordatorio.HasValue && crearEventoAgenda.MinutosAnticipacionRecordatorio < default(int))
                 throw new ValidacionDominioException(Mensajes.AnticipacionRecordatorioInvalida);
         }
 
