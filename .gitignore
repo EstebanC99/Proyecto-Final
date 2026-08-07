@@ -401,3 +401,6 @@ FodyWeavers.xsd
 **/*firebase-adminsdk*.json
 **/google-services.json
 **/GoogleService-Info.plist
+
+# Propios del backend
+care_well_backend/CareWell/efbundle
