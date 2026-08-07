@@ -1,4 +1,7 @@
-﻿using CareWell.Global.Exceptions;
+﻿using CareWell.BusinessService.Abstractions.Auditoria;
+using CareWell.Commands.Auditoria;
+using CareWell.Global.Exceptions;
+using CareWell.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -6,11 +9,14 @@ namespace CareWell.API.Filters
 {
     public class ApiResultFilter : IActionFilter, IExceptionFilter
     {
-        private readonly ILogger<ApiResultFilter> _logger;
+        private readonly IRegistrarLogExcepcionBusinessService _registrarLogExcepcionBusinessService;
+        private readonly IUserContext _userContext;
 
-        public ApiResultFilter(ILogger<ApiResultFilter> logger)
+        public ApiResultFilter(IRegistrarLogExcepcionBusinessService registrarLogExcepcionBusinessService,
+                               IUserContext userContext)
         {
-            _logger = logger;
+            _registrarLogExcepcionBusinessService = registrarLogExcepcionBusinessService;
+            _userContext = userContext;
         }
 
         public void OnActionExecuting(ActionExecutingContext context) { }
@@ -38,13 +44,22 @@ namespace CareWell.API.Filters
                 RecursoNoEncontradoException ex => (StatusCodes.Status404NotFound, ex.Message),
                 CuentaExistenteException ex => (StatusCodes.Status409Conflict, ex.Message),
                 ServicioNoDisponibleException ex => (StatusCodes.Status503ServiceUnavailable, ex.Message),
-                
+
                 OperationCanceledException => (499, "La solicitud fue cancelada."),
                 _ => (StatusCodes.Status500InternalServerError, "Ocurrió un error inesperado.")
             };
 
-            if (statusCode == StatusCodes.Status500InternalServerError)
-                _logger.LogError(context.Exception, "Error inesperado: {Mensaje}", context.Exception.Message);
+            _registrarLogExcepcionBusinessService.Registrar(new RegistrarLogExcepcionCommand
+            {
+                Tipo = context.Exception.GetType().FullName ?? context.Exception.GetType().Name,
+                Controlada = statusCode != StatusCodes.Status500InternalServerError,
+                Mensaje = context.Exception.Message,
+                StackTrace = context.Exception.ToString(),
+                Ruta = context.HttpContext.Request.Path,
+                Verbo = context.HttpContext.Request.Method,
+                TraceIdentifier = context.HttpContext.TraceIdentifier,
+                UsuarioID = _userContext.HayUsuario ? _userContext.UsuarioID : (int?)null
+            });
 
             context.Result = new ObjectResult(new { mensaje }) { StatusCode = statusCode };
             context.ExceptionHandled = true;

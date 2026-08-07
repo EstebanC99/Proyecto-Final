@@ -66,6 +66,7 @@ builder.Services.AddOpenApi();
 var connectionString = builder.Configuration.GetConnectionString("CareWellDb");
 
 builder.Services.AddDbContext<CareWellDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
+builder.Services.AddDbContext<LogDbContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString, sql => sql.MigrationsHistoryTable("__EFMigrationsHistory_Log")));
 
 #endregion
 

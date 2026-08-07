@@ -31,6 +31,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+# Excepcion: no es una carpeta de logs de build, son las migraciones de EF Core del LogDbContext
+!care_well_backend/CareWell/CareWell.Repository/Migrations/Log/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

@@ -1,10 +1,12 @@
 ﻿using CareWell.BusinessService.Abstractions.Agenda;
+using CareWell.BusinessService.Abstractions.Auditoria;
 using CareWell.BusinessService.Abstractions.Auth;
 using CareWell.BusinessService.Abstractions.Emergencias;
 using CareWell.BusinessService.Abstractions.EquipoCuidado;
 using CareWell.BusinessService.Abstractions.General;
 using CareWell.BusinessService.Abstractions.Salud;
 using CareWell.BusinessService.Agenda;
+using CareWell.BusinessService.Auditoria;
 using CareWell.BusinessService.Auth;
 using CareWell.BusinessService.Emergencias;
 using CareWell.BusinessService.EquipoCuidado;
@@ -19,6 +21,7 @@ using CareWell.Domain.DomainServices.Salud;
 using CareWell.Domain.Factories;
 using CareWell.Domain.Salud.AlertasBienestar;
 using CareWell.Domain.Validadores;
+using CareWell.Logger;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CareWell.BusinessService
@@ -61,6 +64,8 @@ namespace CareWell.BusinessService
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
             services.AddScoped<IRecuperacionContrasenaBusinessService, RecuperacionContrasenaBusinessService>();
+            services.AddScoped<IRegistrarLogExcepcionBusinessService, RegistrarLogExcepcionBusinessService>();
+            services.AddScoped<IRegistradorLogServicioExterno, RegistradorLogServicioExternoBusinessService>();
             services.AddScoped<IResumenDiarioBusinessService, ResumenDiarioBusinessService>();
             services.AddScoped<IVerificacionEmailBusinessService, VerificacionEmailBusinessService>();
 

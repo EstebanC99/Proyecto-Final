@@ -1,3 +1,4 @@
+using CareWell.Repository.Config.Auditoria;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareWell.Repository
@@ -15,7 +16,7 @@ namespace CareWell.Repository
             // Aplica todas las IEntityTypeConfiguration<T> de este ensamblado
             // (carpeta Config). Cada entidad nueva queda configurada sola con
             // solo agregar su clase de configuración.
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(CareWellDbContext).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(CareWellDbContext).Assembly, t => t.Namespace != typeof(LogExcepcionConfig).Namespace);
         }
     }
 }

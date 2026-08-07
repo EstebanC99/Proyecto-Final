@@ -1,4 +1,5 @@
 ﻿using CareWell.Repository.Agenda;
+using CareWell.Repository.Auditoria;
 using CareWell.Repository.Auth;
 using CareWell.Repository.Emergencias;
 using CareWell.Repository.EquipoCuidado;
@@ -38,6 +39,14 @@ namespace CareWell.Repository
             services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
             services.AddScoped<ITipoHabitoVidaRepository, TipoHabitoVidaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+            #endregion
+
+            #region Logs
+
+            services.AddScoped<ILogExcepcionRepository, LogExcepcionRepository>();
+            services.AddScoped<ILogServicioExternoRepository, LogServicioExternoRepository>();
+            services.AddScoped<ILogUnitOfWork, LogUnitOfWork>();
 
             #endregion
 

@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CareWell.Global\CareWell.Global.csproj" />
+    <ProjectReference Include="..\CareWell.Logger\CareWell.Logger.csproj" />
   </ItemGroup>
 
 </Project>

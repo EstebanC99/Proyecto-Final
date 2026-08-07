@@ -1,5 +1,6 @@
 using CareWell.DocumentIntelligence.ReconocedorTexto;
 using CareWell.DocumentIntelligence.ResumidorDiario;
+using CareWell.Logger;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,10 +16,10 @@ namespace CareWell.DocumentIntelligence
         {
             #region Clientes de IA (Gemini, API nativa)
 
-            services.AddKeyedSingleton<IChatClient>(ClienteVision, (serviceProvider, _) =>
+            services.AddKeyedScoped<IChatClient>(ClienteVision, (serviceProvider, _) =>
                 CrearChatClient(serviceProvider, opciones => opciones.ModeloVision));
 
-            services.AddKeyedSingleton<IChatClient>(ClienteTexto, (serviceProvider, _) =>
+            services.AddKeyedScoped<IChatClient>(ClienteTexto, (serviceProvider, _) =>
                 CrearChatClient(serviceProvider, opciones => opciones.ModeloTexto));
 
             #endregion
@@ -36,11 +37,13 @@ namespace CareWell.DocumentIntelligence
         private static IChatClient CrearChatClient(IServiceProvider serviceProvider, Func<IAOptions, string> seleccionarModelo)
         {
             var opciones = serviceProvider.GetRequiredService<IOptions<IAOptions>>().Value;
+            var registradorLogServicioExterno = serviceProvider.GetRequiredService<IRegistradorLogServicioExterno>();
 
             return new GeminiChatClient(
                 opciones.ApiKey,
                 seleccionarModelo(opciones),
-                TimeSpan.FromSeconds(opciones.TimeoutSegundos));
+                TimeSpan.FromSeconds(opciones.TimeoutSegundos),
+                registradorLogServicioExterno);
         }
     }
 }

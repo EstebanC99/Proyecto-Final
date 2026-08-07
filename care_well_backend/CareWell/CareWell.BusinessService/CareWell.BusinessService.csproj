@@ -17,6 +17,7 @@
     <ProjectReference Include="..\CareWell.DataViews\CareWell.DataViews.csproj" />
     <ProjectReference Include="..\CareWell.DocumentIntelligence\CareWell.DocumentIntelligence.csproj" />
     <ProjectReference Include="..\CareWell.Domain\CareWell.Domain.csproj" />
+    <ProjectReference Include="..\CareWell.Logger\CareWell.Logger.csproj" />
     <ProjectReference Include="..\CareWell.Notifications\CareWell.Notifications.csproj" />
     <ProjectReference Include="..\CareWell.Queries\CareWell.Queries.csproj" />
     <ProjectReference Include="..\CareWell.Repository\CareWell.Repository.csproj" />

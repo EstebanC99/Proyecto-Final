@@ -1,6 +1,8 @@
+using CareWell.Logger;
 using Microsoft.Extensions.AI;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CareWell.DocumentIntelligence
@@ -21,12 +23,14 @@ namespace CareWell.DocumentIntelligence
         private readonly HttpClient httpClient;
         private readonly string apiKey;
         private readonly string model;
+        private readonly IRegistradorLogServicioExterno registradorLogServicioExterno;
 
-        public GeminiChatClient(string apiKey, string model, TimeSpan timeout)
+        public GeminiChatClient(string apiKey, string model, TimeSpan timeout, IRegistradorLogServicioExterno registradorLogServicioExterno)
         {
             this.apiKey = apiKey;
             this.model = model;
             this.httpClient = new HttpClient { Timeout = timeout };
+            this.registradorLogServicioExterno = registradorLogServicioExterno;
         }
 
         public async Task<ChatResponse> GetResponseAsync(
@@ -35,6 +39,7 @@ namespace CareWell.DocumentIntelligence
             CancellationToken cancellationToken = default)
         {
             var request = ConstruirRequest(messages, options);
+            var requestJson = JsonSerializer.Serialize(request);
             var url = $"{BaseUrl}/{model}:generateContent";
 
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
@@ -44,15 +49,17 @@ namespace CareWell.DocumentIntelligence
             httpRequest.Headers.Add("x-goog-api-key", this.apiKey);
 
             using var httpResponse = await this.httpClient.SendAsync(httpRequest, cancellationToken);
+            var cuerpoRespuesta = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+
+            this.registradorLogServicioExterno.Registrar("Gemini", requestJson, cuerpoRespuesta);
 
             if (!httpResponse.IsSuccessStatusCode)
             {
-                var cuerpoError = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
                 throw new HttpRequestException(
-                    $"Gemini respondió {(int)httpResponse.StatusCode} {httpResponse.StatusCode}: {cuerpoError}");
+                    $"Gemini respondió {(int)httpResponse.StatusCode} {httpResponse.StatusCode}: {cuerpoRespuesta}");
             }
 
-            var geminiResponse = await httpResponse.Content.ReadFromJsonAsync<GeminiResponse>(cancellationToken);
+            var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(cuerpoRespuesta);
             var texto = geminiResponse?.Candidates?
                 .FirstOrDefault()?.Content?.Parts?
                 .FirstOrDefault(p => p.Text is not null)?.Text

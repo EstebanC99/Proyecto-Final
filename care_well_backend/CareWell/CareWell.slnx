@@ -12,6 +12,7 @@
   <Project Path="CareWell.Domain.Test/CareWell.Domain.Test.csproj" Id="dacfa769-3e25-41d3-aca1-c28373f8dcd3" />
   <Project Path="CareWell.Domain/CareWell.Domain.csproj" />
   <Project Path="CareWell.Global/CareWell.Global.csproj" />
+  <Project Path="CareWell.Logger/CareWell.Logger.csproj" />
   <Project Path="CareWell.Notifications/CareWell.Notifications.csproj" Id="1d2a1645-ee4e-4ea3-8d77-53cf05e8f4fb" />
   <Project Path="CareWell.Queries/CareWell.Queries.csproj" />
   <Project Path="CareWell.Repository/CareWell.Repository.csproj" />

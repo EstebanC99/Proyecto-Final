@@ -23,5 +23,13 @@ namespace CareWell.Global.Extensions
 
             return builder.ToString().Normalize(NormalizationForm.FormC);
         }
+
+        public static string Truncate(this string text, int maxLength)
+        {
+            if (text.Length <= maxLength)
+                return text;
+
+            return text[..maxLength];
+        }
     }
 }
