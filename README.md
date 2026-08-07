@@ -15,10 +15,11 @@ Proyecto final de la carrera de Ingeniería en Sistemas de Información (UTN FRR
 - [Stack tecnológico](#stack-tecnológico)
 - [Puesta en marcha](#puesta-en-marcha)
   - [1. Base de datos (SQL Server)](#1-base-de-datos-sql-server)
-  - [2. Ollama (validación de identidad)](#2-ollama-validación-de-identidad)
+  - [2. IA (validación de identidad y resumen diario)](#2-ia-validación-de-identidad-y-resumen-diario)
   - [3. Backend (.NET 10)](#3-backend-net-10)
   - [4. Frontend (Flutter)](#4-frontend-flutter)
   - [5. Documentación (LaTeX)](#5-documentación-latex)
+- [Producción](#producción)
 - [Comandos útiles](#comandos-útiles)
 - [Documentación del proyecto](#documentación-del-proyecto)
 
@@ -101,13 +102,15 @@ PROYECTO-FINAL/
 │       ├── CareWell.Global                     # constantes, enumeraciones, mensajes, excepciones
 │       ├── CareWell.Notifications              # envío de emails (SMTP)
 │       ├── CareWell.Security                   # contexto del usuario autenticado (JWT)
-│       ├── CareWell.DocumentIntelligence       # cliente de IA (Ollama) para lectura de documentos
+│       ├── CareWell.DocumentIntelligence       # cliente de IA (Gemini) para OCR de documentos y resumen diario
 │       ├── CareWell.Domain.Test
 │       └── CareWell.BusinessService.Test
 ├── care_well_doc/
 │   ├── Diagramas/               # modelo de dominio (.drawio) y otros diagramas
 │   ├── Interfaces/              # diseño de pantallas por caso de uso
 │   ├── User Stories/
+│   ├── Specs/                   # specs técnicas puntuales (p. ej. plan de deploy a VPS)
+│   ├── Deploy/                  # runbooks y archivos de referencia del servidor de producción
 │   └── LATEX/                   # documento del proyecto (fuente .tex y PDF compilado)
 ├── care_well_sql/               # scripts SQL (creación de BD/usuario, datos de tablas fijas)
 ├── CLAUDE.md                    # guía del proyecto para Claude Code
@@ -137,8 +140,11 @@ PROYECTO-FINAL/
 **Infraestructura de apoyo**
 
 - SQL Server como motor de base de datos.
-- Ollama con un modelo de visión, para la validación de identidad contra documento.
+- Google Gemini, vía Vertex AI / Agent Platform (cliente propio de `IChatClient` en
+  `CareWell.DocumentIntelligence`, sin librerías de terceros) para la validación de identidad
+  contra documento y el resumen diario.
 - SMTP (Elastic Email) para el envío de códigos de verificación y recuperación.
+- Firebase Cloud Messaging para notificaciones push (aviso de emergencia).
 
 ## Puesta en marcha
 
@@ -148,7 +154,9 @@ Requisitos generales:
 - SQL Server (local o remoto)
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) con toolchain de Android
   (Android Studio / SDK + un emulador o dispositivo físico)
-- [Ollama](https://ollama.com/)
+- Una API key de Google Cloud con acceso a Vertex AI / Agent Platform, para la validación de
+  identidad y el resumen diario (ver sección siguiente — **no** uses una key de Google AI
+  Studio, tiene un bloqueo geográfico intermitente para tráfico de servidor/datacenter)
 
 ### 1. Base de datos (SQL Server)
 
@@ -161,26 +169,27 @@ En `care_well_sql/` hay scripts de apoyo:
    (tipos de evento, roles, estados, permisos, etc.). **Ejecutalo después de aplicar las
    migraciones**, ya que inserta sobre tablas que crea EF Core.
 
-### 2. Ollama (validación de identidad)
+### 2. IA (validación de identidad y resumen diario)
 
-El backend usa un modelo de visión servido por Ollama para leer el documento de identidad
-durante el registro y la creación de credenciales. **Sin Ollama corriendo, esos dos flujos
-responden 503** y no se puede crear una cuenta.
+El backend usa Google Gemini para leer el documento de identidad durante el registro y la
+creación de credenciales, y para generar el resumen diario inteligente. **Sin una API key de
+IA válida, esos flujos responden 503.**
 
-```bash
-ollama pull qwen2.5vl     # descarga el modelo de visión utilizado
-ollama serve              # levanta el servicio (si no corre como servicio del sistema)
-ollama list               # verifica que el modelo esté disponible
-```
+Se usa **Vertex AI / Agent Platform** (no Google AI Studio): la API de AI Studio
+(`generativelanguage.googleapis.com`) bloquea de forma intermitente el tráfico proveniente de
+IPs de datacenter/hosting como medida antiabuso — funciona bien desde una PC de desarrollo,
+pero falla desde cualquier VPS de forma impredecible, incluso con billing habilitado. Vertex AI
+está pensado para uso servidor-a-servidor y no tiene ese problema.
 
-Verificación rápida de que el servicio responde:
+1. En Google Cloud Console → tu proyecto → "Agent Platform" (o Vertex AI) → Claves de API,
+   generá una API key con scope "Gemini API"/Vertex, **no** una de "Agent Platform API" (son
+   productos distintos dentro del mismo menú).
+2. Cargala como user secret (ver punto siguiente): `IA:ApiKey`.
 
-```bash
-curl http://localhost:11434/api/tags
-```
-
-El modelo, la URL y el timeout se configuran en la sección `ReconocedorTexto` de
-`appsettings.json` (ver punto siguiente). Si usás otro modelo de visión, actualizá esa clave.
+No hace falta instalar ni correr nada localmente — es una API externa. El modelo de visión y
+el modelo de texto se configuran en la sección `IA` de `appsettings.json` (por defecto,
+`gemini-2.5-flash-lite` para ambos casos — evitá `gemini-2.5-flash` a secas para estos usos,
+tiene "thinking" activado por defecto y agrega latencia innecesaria).
 
 ### 3. Backend (.NET 10)
 
@@ -204,9 +213,11 @@ Claves necesarias:
 | `Jwt:Key` | Clave simétrica para firmar los tokens |
 | `Jwt:Issuer` / `Jwt:Audience` | Emisor y audiencia de los tokens |
 | `Email:*` | Host, puerto, usuario, contraseña y remitente SMTP (Elastic Email) |
-| `ReconocedorTexto:OllamaUrl` | URL del servicio Ollama (por defecto `http://localhost:11434`) |
-| `ReconocedorTexto:Modelo` | Modelo de visión a utilizar (`qwen2.5vl`) |
-| `ReconocedorTexto:TimeoutSegundos` | Timeout de la llamada al modelo |
+| `IA:ApiKey` | API key de Google Cloud (Vertex AI / Agent Platform, no AI Studio) |
+| `IA:ModeloVision` | Modelo usado para el OCR de documentos (`gemini-2.5-flash-lite`) |
+| `IA:ModeloTexto` | Modelo usado para el resumen diario (`gemini-2.5-flash-lite`) |
+| `IA:TimeoutSegundos` | Timeout de las llamadas al modelo |
+| `Push:RutaCredenciales` | Ruta al JSON de service account de Firebase (notificaciones push) |
 
 Ejemplo:
 
@@ -215,6 +226,7 @@ cd CareWell.API
 dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:CareWellDb" "Server=localhost;Database=CareWell;User ID=...;Password=...;TrustServerCertificate=True;"
 dotnet user-secrets set "Jwt:Key" "..."
+dotnet user-secrets set "IA:ApiKey" "..."
 ```
 
 **Migraciones.** Requiere la herramienta de EF Core (`dotnet tool install --global dotnet-ef`).
@@ -266,7 +278,7 @@ está de dónde bajarlo y cómo degrada la app cuando falta.
 `lib/domain/datasources/`, y la selección se resuelve mediante los providers de Riverpod en
 `lib/presentation/providers/`. Esto permite desarrollar y navegar la app sin levantar el
 backend. Tené en cuenta que los flujos que dependen de servicios externos (verificación de
-email por OTP y validación de identidad con Ollama) solo funcionan contra la API real.
+email por OTP y validación de identidad con IA) solo funcionan contra la API real.
 
 **Calidad de código:**
 
@@ -289,6 +301,29 @@ latexmk -pdf CuidadoPersonas.tex
 El PDF compilado (`CuidadoPersonas.pdf`) se versiona en el repositorio, así que solo
 necesitás compilarlo si modificás el `.tex`.
 
+## Producción
+
+El backend está desplegado en un VPS de DonWeb (Ubuntu 22.04 LTS), con esta arquitectura:
+
+- **Runtime:** ASP.NET Core Runtime 10 corriendo como servicio de `systemd` (`carewell-api`),
+  sin contenedores.
+- **Reverse proxy:** [Caddy](https://caddyserver.com/), con TLS automático (Let's Encrypt)
+  sobre `api.estecarsoft.com.ar`.
+- **Base de datos:** SQL Server 2022 Express, accesible solo desde localhost (no expuesta a
+  internet).
+- **IA:** Google Gemini vía Vertex AI / Agent Platform (`gemini-2.5-flash-lite`), igual que en
+  desarrollo — no hay diferencia de proveedor entre ambientes. **No** vía Google AI Studio (ver
+  sección 2 de "Puesta en marcha" — bloquea IPs de datacenter de forma intermitente).
+- **Notificaciones push:** Firebase Cloud Messaging.
+- **Seguridad:** acceso SSH solo por clave (sin login de `root` ni por contraseña), firewall
+  (`ufw`) restringido a los puertos necesarios, `fail2ban` contra fuerza bruta.
+
+La arquitectura completa del deploy (decisiones, alternativas evaluadas, checklist de
+seguridad) está documentada en
+[`care_well_doc/Specs/deploy-vps-donweb.md`](care_well_doc/Specs/deploy-vps-donweb.md).
+Los pasos para desplegar una nueva versión y administrar el servidor están en
+[`care_well_doc/Deploy/`](care_well_doc/Deploy/).
+
 ## Comandos útiles
 
 | Contexto | Comando |
@@ -302,7 +337,6 @@ necesitás compilarlo si modificás el `.tex`.
 | Frontend: análisis estático | `flutter analyze` |
 | Frontend: tests | `flutter test` |
 | Frontend: formato | `dart format .` |
-| Ollama: descargar modelo | `ollama pull qwen2.5vl` |
 | Documentación | `latexmk -pdf CuidadoPersonas.tex` |
 
 ## Documentación del proyecto

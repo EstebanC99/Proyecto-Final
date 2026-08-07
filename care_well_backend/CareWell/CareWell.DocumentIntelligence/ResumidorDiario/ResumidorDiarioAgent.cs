@@ -1,6 +1,7 @@
 ﻿using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -51,7 +52,8 @@ namespace CareWell.DocumentIntelligence.ResumidorDiario
 
         private IChatClient ChatClient { get; set; }
 
-        public ResumidorDiarioAgent(IChatClient chatClient)
+        public ResumidorDiarioAgent(
+            [FromKeyedServices(DocumentIntelligenceExtensions.ClienteTexto)] IChatClient chatClient)
         {
             this.ChatClient = chatClient;
         }

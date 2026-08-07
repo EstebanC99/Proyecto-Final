@@ -77,12 +77,16 @@ modifica la documentación en LaTeX.
     `UserContext`); proyecto hoja, poblado desde el JWT por un filtro de `API` y consumido por
     `BusinessService` para resolver el usuario actual (p. ej. en chequeos de permisos).
   - `CareWell.DocumentIntelligence` — integración con IA generativa vía `Microsoft.Extensions.AI`
-    (`IChatClient`) sobre un modelo autoalojado con **Ollama** (`OllamaSharp`). Proyecto hoja
+    (`IChatClient`), con **Google Gemini** (`gemini-2.5-flash-lite`) vía **Vertex AI / Agent
+    Platform** como proveedor (no Google AI Studio: bloquea IPs de datacenter de forma
+    intermitente, ver `care_well_doc/Deploy/administracion.md`). `GeminiChatClient` es un
+    cliente propio (sin SDK de terceros) que habla directo el REST de Vertex. Proyecto hoja
     (solo referencia a `Global`); expone *agents* (`IReconocedorTextoDocumentoAgent` para OCR de
-    DNI —modelo de visión— e `IResumidorDiarioAgent` para el Resumen inteligente
-    —modelo de texto liviano CPU-only, `qwen2.5:3b-instruct`—) y `AddDocumentIntelligences()` para DI.
-    Cada agent define su *system prompt*, sus `*Options` (URL/modelo/timeout) y traduce las fallas
-    del proveedor a `ServicioNoDisponibleException`.
+    DNI —modelo de visión— e `IResumidorDiarioAgent` para el Resumen inteligente —mismo modelo
+    liviano para ambos casos—) y `AddDocumentIntelligences()` para DI, con dos `IChatClient`
+    keyed (`vision`/`texto`) inyectados vía `[FromKeyedServices]`. Cada agent define su *system
+    prompt* y traduce las fallas del proveedor a `ServicioNoDisponibleException`; `IAOptions`
+    centraliza la config (API key, modelos, timeout).
 - **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain, Notifications, Security, DocumentIntelligence`.
 - **Convenciones:** nombres en español; un `*Config.cs` por entidad en `Repository/Config/`.
 

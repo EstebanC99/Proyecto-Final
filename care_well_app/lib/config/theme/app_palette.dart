@@ -156,6 +156,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   // Emergencia
   /// Acento del módulo Emergencia.
+  ///
+  /// Deliberadamente más intenso y cálido que [error]: [error] señala una
+  /// validación fallida, mientras que este token acompaña una acción de riesgo
+  /// que debe leerse como "peligroso" a primera vista. Por eso ambos tokens
+  /// dejaron de compartir valor.
   final Color emergencyRed;
 
   /// Estado presionado del botón de emergencia.
@@ -230,8 +235,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     moodScaleNeutral: Color(0xFFE0A100),
     moodScaleGood: Color(0xFF65A30D),
     moodScaleVeryGood: Color(0xFF2E9E5B),
-    emergencyRed: Color(0xFFD14343),
-    emergencyRedPressed: Color(0xFFB02F2F),
+    emergencyRed: Color(0xFFC0392B),
+    emergencyRedPressed: Color(0xFFA93226),
     emergencyContainer: Color(0xFFFEE2E2),
     onEmergency: Color(0xFFFFFFFF),
     aiAccent: Color(0xFF6366F1),
@@ -280,8 +285,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     moodScaleNeutral: Color(0xFFF0C05A),
     moodScaleGood: Color(0xFFC3DE7B),
     moodScaleVeryGood: Color(0xFF6FCB8E),
-    emergencyRed: Color(0xFFE2727A),
-    emergencyRedPressed: Color(0xFFEE8D94),
+    emergencyRed: Color(0xFFE17A70),
+    emergencyRedPressed: Color(0xFFE7968D),
     emergencyContainer: Color(0xFF3B1E20),
     onEmergency: Color(0xFF2A1012),
     aiAccent: Color(0xFFA5A8F5),

@@ -19,10 +19,18 @@ flutter run
 ### URL del backend
 
 La app toma la URL base desde la variable de compilación `API_BASE_URL`
-(ver `lib/infrastructure/http/api_config.dart`):
+(ver `lib/infrastructure/http/api_config.dart`). Por defecto (`flutter run` sin flags)
+apunta al dev tunnel de desarrollo. Hay dos archivos de ambiente:
+
+- `.env` — desarrollo (dev tunnel). Es el default, no hace falta pasar ningún flag.
+- `.env.production` — producción (`https://api.estecarsoft.com.ar`).
 
 ```bash
-flutter run --dart-define=API_BASE_URL=https://tu-backend
+# Desarrollo (equivalente al default)
+flutter run --dart-define-from-file=.env
+
+# Producción
+flutter run --dart-define-from-file=.env.production
 ```
 
 ### Notificaciones push: `google-services.json`

@@ -1,6 +1,8 @@
 ﻿using CareWell.Global.Exceptions;
 using CareWell.Global.Mensajes;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CareWell.DocumentIntelligence.ReconocedorTexto
 {
@@ -33,10 +35,14 @@ namespace CareWell.DocumentIntelligence.ReconocedorTexto
             """;
 
         private IChatClient ChatClient { get; set; }
+        private ILogger<ReconocedorTextoDocumentoAgent> Logger { get; set; }
 
-        public ReconocedorTextoDocumentoAgent(IChatClient chatClient)
+        public ReconocedorTextoDocumentoAgent(
+            [FromKeyedServices(DocumentIntelligenceExtensions.ClienteVision)] IChatClient chatClient,
+            ILogger<ReconocedorTextoDocumentoAgent> logger)
         {
             this.ChatClient = chatClient;
+            this.Logger = logger;
         }
 
         public ReconocedorTextoDocumentoAgentResponse? ExtraerTexto(byte[] imagenDocumento)
@@ -61,10 +67,12 @@ namespace CareWell.DocumentIntelligence.ReconocedorTexto
                                           or TaskCanceledException
                                           or OperationCanceledException)
             {
+                this.Logger.LogWarning(ex, "Servicio de reconocimiento de texto no disponible.");
                 throw new ServicioNoDisponibleException(Mensajes.ServicioReconocimientoNoDisponible);
             }
-            catch
+            catch (Exception ex)
             {
+                this.Logger.LogWarning(ex, "No se pudo extraer el texto del documento.");
                 return null;
             }
         }

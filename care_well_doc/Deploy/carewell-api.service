@@ -1,0 +1,26 @@
+# Copia de referencia de /etc/systemd/system/carewell-api.service en el VPS.
+# No se aplica sola: si la modificás acá, copiala al servidor y corré
+# `sudo systemctl daemon-reload && sudo systemctl restart carewell-api`.
+
+[Unit]
+Description=CareWell API
+After=network.target mssql-server.service
+
+[Service]
+WorkingDirectory=/var/www/carewell/api
+ExecStart=/usr/local/bin/dotnet /var/www/carewell/api/CareWell.API.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+User=carewell
+EnvironmentFile=/etc/carewell/carewell.env
+SyslogIdentifier=carewell-api
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/carewell /var/log/carewell
+
+[Install]
+WantedBy=multi-user.target

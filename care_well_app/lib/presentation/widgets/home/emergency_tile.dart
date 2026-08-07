@@ -5,7 +5,10 @@ import '../shared/full_width_action_tile.dart';
 
 /// Tile de emergencia full-width. Siempre visible y activo.
 ///
-/// Fondo [AppPalette.secondary] (coral), ícono de advertencia y texto blancos.
+/// Relleno sólido con [AppPalette.emergencyRed] para que se lea como acción de
+/// riesgo, en línea con el botón grande de la pantalla de Emergencia. La tinta
+/// es [AppPalette.onEmergency] y no `onPrimary`: en tema oscuro el rojo se
+/// aclara y el blanco no alcanzaría el contraste mínimo.
 /// Delega el layout y la animación en [FullWidthActionTile].
 class EmergencyTile extends StatelessWidget {
   const EmergencyTile({
@@ -24,7 +27,9 @@ class EmergencyTile extends StatelessWidget {
     return FullWidthActionTile(
       icon: Icons.warning_amber_rounded,
       label: 'Emergencia',
-      color: context.colors.secondary,
+      color: context.colors.emergencyRed,
+      foregroundColor: context.colors.onEmergency,
+      pressedColor: context.colors.emergencyRedPressed,
       onTap: onTap,
       delay: delay,
     );

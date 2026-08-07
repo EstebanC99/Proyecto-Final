@@ -133,6 +133,7 @@ class HealthScreen extends ConsumerWidget {
                         icon: Icons.timeline,
                         label: 'Línea de tiempo',
                         color: context.colors.healthAccent,
+                        style: FullWidthActionTileStyle.outlined,
                         onTap: () =>
                             context.pushNamed(AppRoutes.healthTimelineName),
                       ),

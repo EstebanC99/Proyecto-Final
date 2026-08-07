@@ -1,0 +1,16 @@
+# Copia de referencia de /etc/caddy/Caddyfile en el VPS.
+# No se aplica sola: si la modificás acá, copiala al servidor y corré
+# `sudo systemctl reload caddy`.
+
+api.estecarsoft.com.ar {
+    encode gzip
+    request_body {
+        max_size 12MB
+    }
+    reverse_proxy 127.0.0.1:5000 {
+        transport http {
+            read_timeout 120s
+            write_timeout 120s
+        }
+    }
+}

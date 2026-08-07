@@ -1,3 +1,4 @@
+import 'package:care_well_app/config/theme/app_palette.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/widgets/widgets.dart';
@@ -194,6 +195,30 @@ void main() {
         );
       },
     );
+
+    testWidgets('el banner se dibuja con borde primary sobre superficie', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(const ContextSelector(), overrides: _solaUnaOpcion()),
+      );
+      await tester.pumpAndSettle();
+
+      // Único contenedor rectangular con borde del árbol del banner.
+      final decoracion = tester
+          .widgetList<Container>(find.byType(Container))
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .singleWhere(
+            (d) => d.border != null && d.shape == BoxShape.rectangle,
+          );
+
+      expect(decoracion.color, AppPalette.light.surface);
+      expect(
+        decoracion.border,
+        Border.all(color: AppPalette.light.primary, width: 1.5),
+      );
+    });
 
     testWidgets('con persona nula no renderiza ningún chip', (tester) async {
       await tester.pumpWidget(

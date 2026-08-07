@@ -88,7 +88,9 @@ class ContextSelector extends ConsumerWidget {
 
 /// Banner horizontal que muestra la persona de contexto activa.
 ///
-/// Ocupa el ancho disponible; fondo [AppPalette.primaryContainer], radio 12.
+/// Ocupa el ancho disponible; fondo [AppPalette.surface] con borde de
+/// [AppPalette.primary] y radio 12. Se resuelve como contorno y no como bloque
+/// relleno para que no compita con los accesos de acción de la pantalla.
 /// La lógica de tap vive en el widget padre [ContextSelector].
 class _ContextBanner extends StatelessWidget {
   const _ContextBanner({
@@ -118,7 +120,8 @@ class _ContextBanner extends StatelessWidget {
         vertical: AppSpacing.sm + 4, // ~12dp vertical
       ),
       decoration: BoxDecoration(
-        color: context.colors.primaryContainer,
+        color: context.colors.surface,
+        border: Border.all(color: context.colors.primary, width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
