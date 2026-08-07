@@ -1,7 +1,21 @@
 class ApiConfig {
+  /// URL del backend en producción (VPS + Caddy, ver care_well_doc/Deploy/Caddyfile).
+  static const _prodBaseUrl = 'https://api.estecarsoft.com.ar/';
+
+  /// Dev tunnel usado durante el desarrollo local.
+  static const _devBaseUrl = 'https://36l71ck5-5094.brs.devtunnels.ms/';
+
+  /// `true` cuando el binario se compila con `--release`. Se usa
+  /// `bool.fromEnvironment` en lugar de `kReleaseMode` para que toda la
+  /// configuración siga siendo `const` y no dependa de Flutter.
+  static const _isRelease = bool.fromEnvironment('dart.vm.product');
+
+  /// Se puede pisar con `--dart-define=API_BASE_URL=...` o
+  /// `--dart-define-from-file=.env[.production]`. Sin flags: producción en
+  /// release, dev tunnel en debug.
   static const baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://36l71ck5-5094.brs.devtunnels.ms/',
+    defaultValue: _isRelease ? _prodBaseUrl : _devBaseUrl,
   );
 
   static const connectTimeout = Duration(seconds: 30);

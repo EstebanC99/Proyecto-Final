@@ -19,19 +19,67 @@ flutter run
 ### URL del backend
 
 La app toma la URL base desde la variable de compilación `API_BASE_URL`
-(ver `lib/infrastructure/http/api_config.dart`). Por defecto (`flutter run` sin flags)
-apunta al dev tunnel de desarrollo. Hay dos archivos de ambiente:
+(ver `lib/infrastructure/http/api_config.dart`). Es una constante resuelta **en tiempo de
+compilación**: queda embebida en el binario, no se lee en runtime.
 
-- `.env` — desarrollo (dev tunnel). Es el default, no hace falta pasar ningún flag.
-- `.env.production` — producción (`https://api.estecarsoft.com.ar`).
+Si no se pasa ningún flag, el valor por defecto depende del modo de compilación:
+
+| Modo | URL por defecto |
+|------|-----------------|
+| debug / `flutter run` | dev tunnel de desarrollo |
+| `--release` | producción (`https://api.estecarsoft.com.ar/`) |
+
+Así, un APK de release nunca queda apuntando por accidente al dev tunnel, que es efímero.
+El valor se puede pisar siempre con `--dart-define`, y hay dos archivos de ambiente:
+
+- `.env` — desarrollo (dev tunnel).
+- `.env.production` — producción.
 
 ```bash
-# Desarrollo (equivalente al default)
+# Desarrollo (equivalente al default en debug)
 flutter run --dart-define-from-file=.env
 
 # Producción
 flutter run --dart-define-from-file=.env.production
 ```
+
+### Generar el APK de release
+
+```bash
+flutter clean
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release --dart-define-from-file=.env.production
+```
+
+El artefacto queda en `build/app/outputs/flutter-apk/app-release.apk`. Es un APK **universal**
+(incluye todas las arquitecturas), así que se puede compartir tal cual y se instala en
+cualquier Android habilitando "Instalar apps de fuentes desconocidas" en el dispositivo destino.
+
+El `--dart-define-from-file` es redundante con el default de release, pero deja el comando
+autodocumentado. Para verificar qué URL quedó embebida:
+
+```bash
+unzip -p build/app/outputs/flutter-apk/app-release.apk lib/arm64-v8a/libapp.so \
+  | grep -a -o "https://api.estecarsoft.com.ar/" | head -1
+```
+
+Variante con APKs más chicos, uno por arquitectura (hay que elegir el correcto; casi todos los
+celulares actuales son `arm64-v8a`):
+
+```bash
+flutter build apk --release --split-per-abi --dart-define-from-file=.env.production
+```
+
+`flutter build appbundle` (`.aab`) **no** sirve para compartir directo: es solo para subir a
+Google Play.
+
+> **Firma.** Hoy el build de release se firma con la *debug key*
+> (`android/app/build.gradle.kts`). El APK se instala y funciona igual, pero esa clave es
+> propia de cada máquina: un APK futuro firmado con otra clave no podrá actualizar al
+> instalado (habrá que desinstalar, perdiendo los datos locales). Pendiente: keystore propio
+> con `key.properties`.
 
 ### Notificaciones push: `google-services.json`
 

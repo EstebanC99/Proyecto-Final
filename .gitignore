@@ -405,4 +405,4 @@ FodyWeavers.xsd
 **/GoogleService-Info.plist
 
 # Propios del backend
-care_well_backend/CareWell/efbundle
+care_well_backend/CareWell/efbundle*

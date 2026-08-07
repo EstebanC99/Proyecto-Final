@@ -259,12 +259,16 @@ flutter run
 ```
 
 **URL del backend.** La app toma la URL base desde la variable de compilación
-`API_BASE_URL` (definida en `lib/infrastructure/http/api_config.dart`). Para apuntar a tu
-backend local o a un túnel de desarrollo:
+`API_BASE_URL` (definida en `lib/infrastructure/http/api_config.dart`). Sin flags, el default
+depende del modo de compilación: **debug → dev tunnel**, **release → producción**
+(`https://api.estecarsoft.com.ar/`). Para apuntar a tu backend local o a otro túnel:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=https://tu-backend
 ```
+
+Para generar el APK de release ver
+[`care_well_app/README.md`](care_well_app/README.md#generar-el-apk-de-release).
 
 **Notificaciones push.** Requieren el archivo `android/app/google-services.json`, que **no
 está versionado** porque contiene las claves del proyecto Firebase. Sin él la app compila y
