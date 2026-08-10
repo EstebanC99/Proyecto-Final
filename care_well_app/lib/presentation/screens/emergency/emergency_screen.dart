@@ -59,7 +59,11 @@ class EmergencyScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // Selector de persona de contexto
-              if (persona != null) const ContextSelector(),
+              if (persona != null)
+                const ContextSelector(
+                  variant: ContextSelectorVariant.compact,
+                  eyebrow: 'Emergencia',
+                ),
               const SizedBox(height: AppSpacing.md),
 
               // Texto explicativo

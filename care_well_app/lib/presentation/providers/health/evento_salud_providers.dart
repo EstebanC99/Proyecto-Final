@@ -5,12 +5,49 @@ import 'package:flutter_riverpod/legacy.dart';
 
 //region Acciones de Consulta
 
-final mesEventosSaludProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, 1);
-});
+/// Trunca [fecha] a año-mes-día (medianoche local).
+DateTime _soloFecha(DateTime fecha) =>
+    DateTime(fecha.year, fecha.month, fecha.day);
 
-final eventosSaludDelMesProvider = FutureProvider<List<EventoSalud>>((
+/// Ventana hacia atrás en la que se busca el evento previo al día seleccionado
+/// (sección "Anteriormente"). Es más amplia que la de la agenda porque los
+/// eventos de salud son esporádicos.
+const _ventanaEventoAnterior = Duration(days: 90);
+
+/// Lunes de la semana actualmente visible en la tira de días de los eventos
+/// de salud.
+final semanaEventosSaludProvider = StateProvider<DateTime>(
+  (ref) => lunesDeLaSemana(DateTime.now()),
+);
+
+/// Día cuyo detalle se está mostrando (truncado a año-mes-día).
+final diaEventosSaludSeleccionadoProvider = StateProvider<DateTime>(
+  (ref) => _soloFecha(DateTime.now()),
+);
+
+/// Mueve la pantalla de eventos de salud al día indicado: lo selecciona y, si
+/// cae fuera de la semana visible, mueve también la semana.
+///
+/// El día se acota a hoy: los eventos de salud se registran después de ocurrir,
+/// así que nunca se selecciona un día futuro. Lo usan la pantalla (al tocar un
+/// día de la tira o "Anteriormente") y el formulario de alta, para que al
+/// volver quede a la vista el evento recién registrado.
+void seleccionarDiaEventosSalud(WidgetRef ref, DateTime dia) {
+  final hoy = _soloFecha(DateTime.now());
+  final pedido = _soloFecha(dia);
+  final objetivo = pedido.isAfter(hoy) ? hoy : pedido;
+
+  ref.read(diaEventosSaludSeleccionadoProvider.notifier).state = objetivo;
+
+  final lunes = lunesDeLaSemana(objetivo);
+  if (lunes != ref.read(semanaEventosSaludProvider)) {
+    ref.read(semanaEventosSaludProvider.notifier).state = lunes;
+  }
+}
+
+/// Eventos de salud de la persona de contexto dentro de la semana seleccionada
+/// (lunes a domingo), ordenados por fecha/hora ascendente.
+final eventosSaludDeSemanaProvider = FutureProvider<List<EventoSalud>>((
   ref,
 ) async {
   final persona = await ref.watch(
@@ -18,22 +55,56 @@ final eventosSaludDelMesProvider = FutureProvider<List<EventoSalud>>((
   );
   if (persona == null) return [];
 
-  final mes = ref.watch(mesEventosSaludProvider);
-  final desde = mes;
-  final hasta = DateTime(mes.year, mes.month + 1, 1);
+  final lunes = ref.watch(semanaEventosSaludProvider);
+
+  final eventos = await ref
+      .watch(eventoSaludRepositoryProvider)
+      .getEventosSaludDelMes(
+        personaId: persona.id,
+        desde: lunes,
+        hasta: lunes.add(const Duration(days: 7)),
+      );
+  eventos.sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
+  return eventos;
+});
+
+/// Evento de salud más reciente ANTERIOR al día seleccionado, dentro de los
+/// últimos 90 días. Alimenta la sección "Anteriormente".
+///
+/// Los eventos de salud se registran después de ocurrir, por lo que no existe
+/// un equivalente a "lo que sigue": la sección mira siempre hacia atrás.
+final eventoSaludAnteriorProvider = FutureProvider<EventoSalud?>((ref) async {
+  final persona = await ref.watch(
+    personaVisualizacionSeleccionadaProvider.future,
+  );
+  if (persona == null) return null;
+
+  // `hasta` es exclusivo: el evento previo nunca puede ser del día que ya se
+  // está viendo. El filtro posterior lo garantiza aunque el origen de datos
+  // interprete el límite como inclusivo.
+  final hasta = _soloFecha(ref.watch(diaEventosSaludSeleccionadoProvider));
+  final desde = hasta.subtract(_ventanaEventoAnterior);
+  final ahora = DateTime.now();
 
   final eventos = await ref
       .watch(eventoSaludRepositoryProvider)
       .getEventosSaludDelMes(personaId: persona.id, desde: desde, hasta: hasta);
-  eventos.sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
-  return eventos;
+
+  final anteriores =
+      eventos
+          .where(
+            (e) => e.fechaHora.isBefore(hasta) && !e.fechaHora.isAfter(ahora),
+          )
+          .toList()
+        ..sort((a, b) => b.fechaHora.compareTo(a.fechaHora));
+  return anteriores.firstOrNull;
 });
 
 final eventoSaludByIdProvider = FutureProvider.family<EventoSalud?, int>((
   ref,
   id,
 ) async {
-  final eventos = await ref.watch(eventosSaludDelMesProvider.future);
+  final eventos = await ref.watch(eventosSaludDeSemanaProvider.future);
   return eventos.where((e) => e.id == id).firstOrNull;
 });
 
@@ -41,7 +112,7 @@ final notasByEventoProvider = Provider.family<List<NotaEventoSalud>, int>((
   ref,
   eventoId,
 ) {
-  final eventos = ref.watch(eventosSaludDelMesProvider).value ?? [];
+  final eventos = ref.watch(eventosSaludDeSemanaProvider).value ?? [];
   final evento = eventos.where((e) => e.id == eventoId).firstOrNull;
   final notas = [...?evento?.notas];
   notas.sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
@@ -51,6 +122,12 @@ final notasByEventoProvider = Provider.family<List<NotaEventoSalud>, int>((
 //endregion
 
 //region Acciones Mutadoras
+
+/// Invalida todas las vistas de eventos de salud tras una mutación.
+void _invalidarEventosSalud(Ref ref) {
+  ref.invalidate(eventosSaludDeSemanaProvider);
+  ref.invalidate(eventoSaludAnteriorProvider);
+}
 
 final crearEventoSaludProvider =
     Provider<
@@ -78,7 +155,7 @@ final crearEventoSaludProvider =
               fechaHora: fechaHora,
               descripcion: descripcion,
             );
-        ref.invalidate(eventosSaludDelMesProvider);
+        _invalidarEventosSalud(ref);
       };
     });
 
@@ -88,7 +165,7 @@ final eliminarEventoSaludProvider =
         await ref
             .read(eventoSaludRepositoryProvider)
             .eliminarEventoSalud(eventoId);
-        ref.invalidate(eventosSaludDelMesProvider);
+        _invalidarEventosSalud(ref);
       };
     });
 
@@ -103,7 +180,7 @@ final agregarNotaEventoProvider =
         await ref
             .read(eventoSaludRepositoryProvider)
             .agregarNota(eventoSaludId: eventoSaludId, contenido: contenido);
-        ref.invalidate(eventosSaludDelMesProvider);
+        _invalidarEventosSalud(ref);
       };
     });
 
@@ -127,7 +204,7 @@ final modificarNotaEventoProvider =
               notaId: notaId,
               contenido: contenido,
             );
-        ref.invalidate(eventosSaludDelMesProvider);
+        _invalidarEventosSalud(ref);
       };
     });
 
@@ -139,7 +216,7 @@ final eliminarNotaEventoProvider =
         await ref
             .read(eventoSaludRepositoryProvider)
             .eliminarNota(eventoSaludId: eventoSaludId, notaId: notaId);
-        ref.invalidate(eventosSaludDelMesProvider);
+        _invalidarEventosSalud(ref);
       };
     });
 

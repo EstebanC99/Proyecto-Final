@@ -207,17 +207,35 @@ class _FakeHabitoVidaRepository implements HabitoVidaRepository {
 class _FakeEventoSaludRepository implements EventoSaludRepository {
   final List<EventoSalud> _eventos;
 
+  /// Rango de la última consulta, para verificar las ventanas que arman los
+  /// providers.
+  DateTime? ultimoDesde;
+  DateTime? ultimoHasta;
+  int consultasCount = 0;
+
   _FakeEventoSaludRepository({List<EventoSalud>? eventos})
     : _eventos = eventos != null ? List.of(eventos) : [];
 
-  // El rango [desde, hasta] se ignora en el fake: filtra solo por persona para
-  // mantener las fixtures deterministas independientemente del mes actual.
+  // Filtra por persona y por el rango [desde, hasta) —`hasta` exclusivo, igual
+  // que el contrato del backend.
   @override
   Future<List<EventoSalud>> getEventosSaludDelMes({
     required int personaId,
     required DateTime desde,
     required DateTime hasta,
-  }) async => _eventos.where((e) => e.persona.id == personaId).toList();
+  }) async {
+    consultasCount++;
+    ultimoDesde = desde;
+    ultimoHasta = hasta;
+    return _eventos
+        .where(
+          (e) =>
+              e.persona.id == personaId &&
+              !e.fechaHora.isBefore(desde) &&
+              e.fechaHora.isBefore(hasta),
+        )
+        .toList();
+  }
 
   @override
   Future<void> crearEventoSalud({
@@ -260,6 +278,8 @@ ProviderContainer _makeContainer({
   List<EventoSalud>? eventos,
   List<HabitoVida>? habitos,
   List<PersonaEstadoAnimo>? estadosAnimo,
+  _FakeEventoSaludRepository? eventoSaludRepo,
+  bool sinPersonaContexto = false,
 }) {
   return ProviderContainer(
     overrides: [
@@ -270,7 +290,7 @@ ProviderContainer _makeContainer({
       ),
       // Fija el contexto a Alicia (persona ajena) en ambas cadenas de providers.
       personaVisualizacionSeleccionadaProvider.overrideWith(
-        (ref) async => _personaAlicia,
+        (ref) async => sinPersonaContexto ? null : _personaAlicia,
       ),
       asignacionCuidadoRepositoryProvider.overrideWithValue(
         _FakeAsignacionCuidadoRepository(asignaciones),
@@ -282,7 +302,7 @@ ProviderContainer _makeContainer({
         _FakeHabitoVidaRepository(habitos: habitos),
       ),
       eventoSaludRepositoryProvider.overrideWithValue(
-        _FakeEventoSaludRepository(eventos: eventos),
+        eventoSaludRepo ?? _FakeEventoSaludRepository(eventos: eventos),
       ),
     ],
   );
@@ -325,21 +345,21 @@ ProviderContainer _makeContainerContextPropio({
 
 void main() {
   group('health_providers', () {
-    group('eventosSaludDelMesProvider', () {
+    group('eventosSaludDeSemanaProvider', () {
       test('retorna eventos ordenados ascendente por fecha', () async {
         final eventos = [
           EventoSalud(
             id: 1102,
             persona: refPersonaAlicia,
             tipo: tipoEventoSaludVacuna,
-            fechaHora: DateTime(2026, 6, 1),
+            fechaHora: DateTime(2026, 6, 3, 18),
             descripcion: 'Evento reciente',
           ),
           EventoSalud(
             id: 1101,
             persona: refPersonaAlicia,
             tipo: tipoEventoSaludCitaMedica,
-            fechaHora: DateTime(2026, 4, 1),
+            fechaHora: DateTime(2026, 6, 1, 9),
             descripcion: 'Evento antiguo',
           ),
         ];
@@ -349,8 +369,178 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final result = await container.read(eventosSaludDelMesProvider.future);
+        // Semana del lunes 01/06/2026.
+        container.read(semanaEventosSaludProvider.notifier).state = DateTime(
+          2026,
+          6,
+          1,
+        );
+
+        final result = await container.read(
+          eventosSaludDeSemanaProvider.future,
+        );
+        expect(result, hasLength(2));
         expect(result.first.fechaHora.isBefore(result.last.fechaHora), isTrue);
+      });
+
+      test('consulta la ventana de lunes a domingo de la semana', () async {
+        final repo = _FakeEventoSaludRepository();
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventoSaludRepo: repo,
+        );
+        addTearDown(container.dispose);
+
+        container.read(semanaEventosSaludProvider.notifier).state = DateTime(
+          2026,
+          6,
+          1,
+        );
+        await container.read(eventosSaludDeSemanaProvider.future);
+
+        expect(repo.ultimoDesde, DateTime(2026, 6, 1));
+        expect(repo.ultimoHasta, DateTime(2026, 6, 8));
+      });
+
+      test('excluye los eventos fuera de la semana visible', () async {
+        final eventos = [
+          EventoSalud(
+            id: 1101,
+            persona: refPersonaAlicia,
+            tipo: tipoEventoSaludCitaMedica,
+            fechaHora: DateTime(2026, 6, 3, 9),
+            descripcion: 'Dentro de la semana',
+          ),
+          EventoSalud(
+            id: 1102,
+            persona: refPersonaAlicia,
+            tipo: tipoEventoSaludVacuna,
+            fechaHora: DateTime(2026, 6, 9, 9),
+            descripcion: 'Semana siguiente',
+          ),
+        ];
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventos: eventos,
+        );
+        addTearDown(container.dispose);
+
+        container.read(semanaEventosSaludProvider.notifier).state = DateTime(
+          2026,
+          6,
+          1,
+        );
+
+        final result = await container.read(
+          eventosSaludDeSemanaProvider.future,
+        );
+        expect(result.map((e) => e.id), [1101]);
+      });
+    });
+
+    group('eventoSaludAnteriorProvider', () {
+      /// Evento de Alicia en [fechaHora].
+      EventoSalud evento(int id, DateTime fechaHora) => EventoSalud(
+        id: id,
+        persona: refPersonaAlicia,
+        tipo: tipoEventoSaludCitaMedica,
+        fechaHora: fechaHora,
+        descripcion: 'Evento $id',
+      );
+
+      test('consulta los 90 días previos al día seleccionado', () async {
+        final repo = _FakeEventoSaludRepository();
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventoSaludRepo: repo,
+        );
+        addTearDown(container.dispose);
+
+        container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
+            DateTime(2026, 6, 10);
+        await container.read(eventoSaludAnteriorProvider.future);
+
+        expect(repo.ultimoHasta, DateTime(2026, 6, 10));
+        expect(
+          repo.ultimoDesde,
+          DateTime(2026, 6, 10).subtract(const Duration(days: 90)),
+        );
+      });
+
+      test('devuelve el evento más reciente anterior al día', () async {
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventos: [
+            evento(1101, DateTime(2026, 5, 20, 10)),
+            evento(1102, DateTime(2026, 6, 8, 16)),
+            evento(1103, DateTime(2026, 4, 2, 8)),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
+            DateTime(2026, 6, 10);
+
+        final anterior = await container.read(
+          eventoSaludAnteriorProvider.future,
+        );
+        expect(anterior?.id, 1102);
+      });
+
+      test('no considera los eventos del día seleccionado', () async {
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventos: [
+            evento(1101, DateTime(2026, 6, 10)),
+            evento(1102, DateTime(2026, 6, 10, 23, 59)),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
+            DateTime(2026, 6, 10);
+
+        expect(
+          await container.read(eventoSaludAnteriorProvider.future),
+          isNull,
+        );
+      });
+
+      test(
+        'devuelve null si no hay eventos en la ventana de 90 días',
+        () async {
+          final container = _makeContainer(
+            asignaciones: [_asignacionMaria()],
+            eventos: [evento(1101, DateTime(2026, 1, 5))],
+          );
+          addTearDown(container.dispose);
+
+          container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
+              DateTime(2026, 6, 10);
+
+          expect(
+            await container.read(eventoSaludAnteriorProvider.future),
+            isNull,
+          );
+        },
+      );
+
+      test('devuelve null y no consulta cuando no hay persona', () async {
+        final repo = _FakeEventoSaludRepository(
+          eventos: [evento(1101, DateTime(2026, 6, 8))],
+        );
+        final container = _makeContainer(
+          asignaciones: [_asignacionMaria()],
+          eventoSaludRepo: repo,
+          sinPersonaContexto: true,
+        );
+        addTearDown(container.dispose);
+
+        expect(
+          await container.read(eventoSaludAnteriorProvider.future),
+          isNull,
+        );
+        expect(repo.consultasCount, 0);
       });
     });
 
@@ -534,15 +724,24 @@ void main() {
         );
         addTearDown(container.dispose);
 
+        // Semana del lunes 04/05/2026, que contiene al evento.
+        container.read(semanaEventosSaludProvider.notifier).state = DateTime(
+          2026,
+          5,
+          4,
+        );
+
         // Precondición: hay un evento.
-        final antes = await container.read(eventosSaludDelMesProvider.future);
+        final antes = await container.read(eventosSaludDeSemanaProvider.future);
         expect(antes, hasLength(1));
 
         // Ejecutar eliminación.
         await container.read(eliminarEventoSaludProvider)(eventoId: 1101);
 
         // El provider fue invalidado; al releer debe estar vacío.
-        final despues = await container.read(eventosSaludDelMesProvider.future);
+        final despues = await container.read(
+          eventosSaludDeSemanaProvider.future,
+        );
         expect(despues, isEmpty);
       });
     });

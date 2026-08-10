@@ -10,9 +10,10 @@ import '../../widgets/widgets.dart';
 /// Formulario de alta/edición de un evento de agenda (US-24).
 ///
 /// [eventId] identifica el evento a editar; `null` indica alta. En edición, los
-/// datos se precargan desde [ocurrenciasDelMesProvider] (limitación MVP: se toma
-/// la ocurrencia del mes visualizado). La recurrencia solo se configura al crear;
-/// al editar no se altera, en línea con [AgendaRepository.modificarEvento].
+/// datos se precargan desde [ocurrenciasDeSemanaProvider]: a la edición solo se
+/// llega tocando un evento del día visible en la agenda, que siempre pertenece
+/// a la semana cargada. La recurrencia solo se configura al crear; al editar no
+/// se altera, en línea con [AgendaRepository.modificarEvento].
 class AgendaEventScreen extends ConsumerStatefulWidget {
   const AgendaEventScreen({super.key, this.eventId});
 
@@ -135,6 +136,9 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
         );
       }
       if (mounted) {
+        // La agenda pasa a mostrar el día del evento guardado: si se creó (o se
+        // movió) a otra semana, igual queda a la vista al volver.
+        seleccionarDiaAgenda(ref, _fechaHoraInicio);
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -164,7 +168,7 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
 
     // Precarga de datos en edición (una sola vez, al disponer de las ocurrencias).
     if (_esEdicion && !_prefilled) {
-      final ocurrencias = ref.watch(ocurrenciasDelMesProvider).value;
+      final ocurrencias = ref.watch(ocurrenciasDeSemanaProvider).value;
       final ocu = ocurrencias
           ?.where((o) => o.eventoAgendaId == widget.eventId)
           .firstOrNull;

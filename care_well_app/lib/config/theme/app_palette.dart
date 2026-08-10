@@ -46,6 +46,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.habitsContainer,
     required this.moodAccent,
     required this.moodContainer,
+    required this.calendarAccent,
+    required this.careTeamAccent,
+    required this.dependentsAccent,
     required this.moodScaleVeryBad,
     required this.moodScaleBad,
     required this.moodScaleNeutral,
@@ -147,6 +150,20 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color moodAccent;
   final Color moodContainer;
 
+  // Acentos de los accesos del menú principal
+  /// Acento del acceso a Calendario (agenda).
+  final Color calendarAccent;
+
+  /// Acento del acceso a Equipo de cuidado.
+  final Color careTeamAccent;
+
+  /// Acento del acceso a Personas a cargo.
+  ///
+  /// El acceso a Salud no tiene token propio: reusa [healthAccent], el mismo
+  /// que el resto del módulo, para que el color del tile y el de la sección
+  /// coincidan.
+  final Color dependentsAccent;
+
   // Escala de estado de ánimo
   final Color moodScaleVeryBad;
   final Color moodScaleBad;
@@ -230,6 +247,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     habitsContainer: Color(0xFFFFEDD5),
     moodAccent: Color(0xFF7C3AED),
     moodContainer: Color(0xFFEDE9FE),
+    calendarAccent: Color(0xFF4A90D9),
+    careTeamAccent: Color(0xFFF5A623),
+    dependentsAccent: Color(0xFFF07844),
     moodScaleVeryBad: Color(0xFFD14343),
     moodScaleBad: Color(0xFFEA580C),
     moodScaleNeutral: Color(0xFFE0A100),
@@ -280,6 +300,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     habitsContainer: Color(0xFF3A2414),
     moodAccent: Color(0xFFB69CF0),
     moodContainer: Color(0xFF2A2140),
+    calendarAccent: Color(0xFF7FB6E5),
+    careTeamAccent: Color(0xFFF0BC63),
+    dependentsAccent: Color(0xFFF4996E),
     moodScaleVeryBad: Color(0xFFE2727A),
     moodScaleBad: Color(0xFFF0935F),
     moodScaleNeutral: Color(0xFFF0C05A),
@@ -330,6 +353,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? habitsContainer,
     Color? moodAccent,
     Color? moodContainer,
+    Color? calendarAccent,
+    Color? careTeamAccent,
+    Color? dependentsAccent,
     Color? moodScaleVeryBad,
     Color? moodScaleBad,
     Color? moodScaleNeutral,
@@ -378,6 +404,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
       habitsContainer: habitsContainer ?? this.habitsContainer,
       moodAccent: moodAccent ?? this.moodAccent,
       moodContainer: moodContainer ?? this.moodContainer,
+      calendarAccent: calendarAccent ?? this.calendarAccent,
+      careTeamAccent: careTeamAccent ?? this.careTeamAccent,
+      dependentsAccent: dependentsAccent ?? this.dependentsAccent,
       moodScaleVeryBad: moodScaleVeryBad ?? this.moodScaleVeryBad,
       moodScaleBad: moodScaleBad ?? this.moodScaleBad,
       moodScaleNeutral: moodScaleNeutral ?? this.moodScaleNeutral,
@@ -451,6 +480,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
       habitsContainer: Color.lerp(habitsContainer, other.habitsContainer, t)!,
       moodAccent: Color.lerp(moodAccent, other.moodAccent, t)!,
       moodContainer: Color.lerp(moodContainer, other.moodContainer, t)!,
+      calendarAccent: Color.lerp(calendarAccent, other.calendarAccent, t)!,
+      careTeamAccent: Color.lerp(careTeamAccent, other.careTeamAccent, t)!,
+      dependentsAccent: Color.lerp(
+        dependentsAccent,
+        other.dependentsAccent,
+        t,
+      )!,
       moodScaleVeryBad: Color.lerp(
         moodScaleVeryBad,
         other.moodScaleVeryBad,

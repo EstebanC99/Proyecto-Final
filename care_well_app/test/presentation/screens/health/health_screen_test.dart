@@ -64,6 +64,21 @@ void main() {
       expect(find.textContaining('Alicia Rodríguez'), findsOneWidget);
     });
 
+    testWidgets('el ContextSelector usa la variante compacta', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      // Elementos propios de la variante compacta: rótulo de sección y badge
+      // de rol de la persona de contexto.
+      expect(find.byType(ContextCompactBanner), findsOneWidget);
+      expect(find.text('SALUD'), findsOneWidget);
+      expect(find.text('Responsable'), findsOneWidget);
+      // Con dos personas seleccionables aparece el chevron y el mini-avatar
+      // de la otra persona (además del avatar de contexto).
+      expect(find.byIcon(Icons.expand_more), findsOneWidget);
+      expect(find.byType(PersonaAvatar), findsNWidgets(2));
+    });
+
     testWidgets('muestra tiles de categorías', (tester) async {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();

@@ -1,9 +1,7 @@
 // Barrel del módulo de widgets de Mi salud.
 export 'health_category_card.dart';
 export 'health_event_card.dart';
-export 'health_event_day_group_header.dart';
 export 'health_event_type_chip.dart';
-export 'health_events_month_list.dart';
 export 'health_timeline_view.dart';
 export 'health_timeline_tile.dart';
 export 'health_timeline_style.dart';
@@ -23,3 +21,6 @@ export 'item_form_bottom_sheet.dart';
 // Observaciones de bienestar (US-36)
 export 'wellbeing_observation_row.dart';
 export 'wellbeing_observations_banner.dart';
+// Tira de semana + encabezado de día, compartidos con la agenda.
+export '../shared/day_header.dart';
+export '../shared/week_strip.dart';

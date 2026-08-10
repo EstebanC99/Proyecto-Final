@@ -46,7 +46,10 @@ class HabitsScreen extends ConsumerWidget {
                       AppSpacing.lg,
                       AppSpacing.sm,
                     ),
-                    child: ContextSelector(),
+                    child: ContextSelector(
+                      variant: ContextSelectorVariant.compact,
+                      eyebrow: 'Hábitos de vida',
+                    ),
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),

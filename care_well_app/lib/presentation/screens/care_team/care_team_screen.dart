@@ -212,7 +212,10 @@ class _TeamBody extends ConsumerWidget {
               children: [
                 // Selector de contexto
                 const SizedBox(height: AppSpacing.lg),
-                const ContextSelector(),
+                const ContextSelector(
+                  variant: ContextSelectorVariant.compact,
+                  eyebrow: 'Equipo de cuidado',
+                ),
                 const SizedBox(height: AppSpacing.lg),
 
                 // Solicitudes pendientes (solo Responsables, si hay alguna).

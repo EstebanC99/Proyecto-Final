@@ -236,5 +236,121 @@ void main() {
 
       expect(find.byType(ContextChip), findsNothing);
     });
+
+    // ─── Variante compacta (Home y Agenda) ────────────────────────────────────
+
+    group('variant: compact', () {
+      const compacto = ContextSelector(variant: ContextSelectorVariant.compact);
+
+      testWidgets('smoke: renderiza el banner compacto con una sola persona', (
+        tester,
+      ) async {
+        await tester.pumpWidget(_wrap(compacto, overrides: _solaUnaOpcion()));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ContextCompactBanner), findsOneWidget);
+        expect(find.byType(ContextChip), findsNothing);
+      });
+
+      testWidgets('muestra el rótulo por defecto y el badge de rol "YO"', (
+        tester,
+      ) async {
+        await tester.pumpWidget(_wrap(compacto, overrides: _solaUnaOpcion()));
+        await tester.pumpAndSettle();
+
+        expect(find.text('ESTÁS VIENDO'), findsOneWidget);
+        expect(find.text('YO'), findsOneWidget);
+        expect(find.text('María García'), findsOneWidget);
+      });
+
+      testWidgets('el rótulo se puede personalizar por pantalla', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(
+            const ContextSelector(
+              variant: ContextSelectorVariant.compact,
+              eyebrow: 'Calendario',
+            ),
+            overrides: _solaUnaOpcion(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('CALENDARIO'), findsOneWidget);
+      });
+
+      testWidgets('con una sola opción no muestra chevron ni mini-avatares', (
+        tester,
+      ) async {
+        await tester.pumpWidget(_wrap(compacto, overrides: _solaUnaOpcion()));
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.expand_more), findsNothing);
+        // Solo el avatar de la persona de contexto.
+        expect(find.byType(PersonaAvatar), findsOneWidget);
+      });
+
+      testWidgets('con múltiples opciones muestra chevron y mini-avatares', (
+        tester,
+      ) async {
+        await tester.pumpWidget(_wrap(compacto, overrides: _variosOpciones()));
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.expand_more), findsOneWidget);
+        // Avatar de contexto + mini-avatar de la otra persona.
+        expect(find.byType(PersonaAvatar), findsNWidgets(2));
+      });
+
+      testWidgets('muestra el badge de rol de una persona a cargo', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(
+            compacto,
+            overrides: _variosOpciones(selectedId: _personaAlicia.id),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Responsable'), findsOneWidget);
+        expect(find.text('YO'), findsNothing);
+      });
+
+      testWidgets(
+        'al tap abre el mismo bottom sheet que la variante estándar',
+        (tester) async {
+          await tester.pumpWidget(
+            _wrap(compacto, overrides: _variosOpciones()),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.tap(find.byType(ContextSelector));
+          await tester.pumpAndSettle();
+
+          expect(find.text('Visualizando a'), findsOneWidget);
+          expect(find.text('Alicia Rodríguez'), findsAtLeastNWidgets(1));
+        },
+      );
+
+      testWidgets('con persona nula no renderiza el banner compacto', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(
+            compacto,
+            overrides: [
+              personaVisualizacionSeleccionadaProvider.overrideWith(
+                (ref) async => null,
+              ),
+              personasSeleccionablesProvider.overrideWith((ref) async => []),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ContextCompactBanner), findsNothing);
+      });
+    });
   });
 }

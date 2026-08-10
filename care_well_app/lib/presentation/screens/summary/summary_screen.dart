@@ -60,7 +60,10 @@ class SummaryScreen extends ConsumerWidget {
                       AppSpacing.lg,
                       0,
                     ),
-                    child: ContextSelector(),
+                    child: ContextSelector(
+                      variant: ContextSelectorVariant.compact,
+                      eyebrow: 'Resumen',
+                    ),
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),

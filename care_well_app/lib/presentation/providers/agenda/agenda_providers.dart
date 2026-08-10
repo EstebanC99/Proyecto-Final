@@ -12,38 +12,103 @@ final agendaPersonaContextProvider = FutureProvider<Persona?>(
   (ref) => ref.watch(personaVisualizacionSeleccionadaProvider.future),
 );
 
-// ─── Mes seleccionado y ocurrencias ─────────────────────────────────────────
+// ─── Semana y día seleccionados ─────────────────────────────────────────────
 
-/// Primer día del mes actualmente visualizado en la agenda.
-final mesSeleccionadoProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, 1);
-});
+/// Trunca [fecha] a año-mes-día (medianoche local).
+DateTime _soloFecha(DateTime fecha) =>
+    DateTime(fecha.year, fecha.month, fecha.day);
 
-/// Ocurrencias de la persona de contexto dentro del mes seleccionado,
-/// ordenadas por fecha/hora de inicio.
-final ocurrenciasDelMesProvider = FutureProvider<List<OcurrenciaEventoAgenda>>((
+/// Lunes (00:00) de la semana a la que pertenece [fecha].
+DateTime lunesDeLaSemana(DateTime fecha) =>
+    _soloFecha(fecha).subtract(Duration(days: fecha.weekday - 1));
+
+/// Lunes de la semana actualmente visible en la tira de días de la agenda.
+final semanaSeleccionadaProvider = StateProvider<DateTime>(
+  (ref) => lunesDeLaSemana(DateTime.now()),
+);
+
+/// Día cuyo detalle se está mostrando en la agenda (truncado a año-mes-día).
+final diaSeleccionadoProvider = StateProvider<DateTime>(
+  (ref) => _soloFecha(DateTime.now()),
+);
+
+/// Mueve la agenda al día indicado: lo selecciona y, si cae fuera de la semana
+/// visible, mueve también la semana.
+///
+/// Lo usan la pantalla de agenda (al tocar un día de la tira o "Lo que sigue")
+/// y el formulario de alta/edición, para que al volver quede a la vista el
+/// evento recién guardado aunque sea de otra semana.
+void seleccionarDiaAgenda(WidgetRef ref, DateTime dia) {
+  final diaTruncado = _soloFecha(dia);
+  ref.read(diaSeleccionadoProvider.notifier).state = diaTruncado;
+
+  final lunes = lunesDeLaSemana(diaTruncado);
+  if (lunes != ref.read(semanaSeleccionadaProvider)) {
+    ref.read(semanaSeleccionadaProvider.notifier).state = lunes;
+  }
+}
+
+/// Ocurrencias de la persona de contexto dentro de la semana seleccionada
+/// (lunes a domingo), ordenadas por fecha/hora de inicio.
+final ocurrenciasDeSemanaProvider =
+    FutureProvider<List<OcurrenciaEventoAgenda>>((ref) async {
+      final persona = await ref.watch(agendaPersonaContextProvider.future);
+      final personaId = persona?.id;
+      if (personaId == null) return [];
+
+      final lunes = ref.watch(semanaSeleccionadaProvider);
+
+      final ocurrencias = await ref
+          .watch(agendaRepositoryProvider)
+          .obtenerOcurrencias(
+            personaId: personaId,
+            desde: lunes,
+            hasta: lunes.add(const Duration(days: 7)),
+          );
+      ocurrencias.sort(
+        (a, b) => a.fechaHoraInicio.compareTo(b.fechaHoraInicio),
+      );
+      return ocurrencias;
+    });
+
+/// Primera ocurrencia posterior al día seleccionado, dentro de los 30 días
+/// siguientes. Alimenta la sección "Lo que sigue" de la agenda.
+///
+/// Se busca a partir del día siguiente al seleccionado (no a partir de "ahora")
+/// para que la sección siempre muestre algo distinto de lo que ya se ve en el
+/// detalle del día.
+final proximaOcurrenciaProvider = FutureProvider<OcurrenciaEventoAgenda?>((
   ref,
 ) async {
   final persona = await ref.watch(agendaPersonaContextProvider.future);
   final personaId = persona?.id;
-  if (personaId == null) return [];
+  if (personaId == null) return null;
 
-  final mes = ref.watch(mesSeleccionadoProvider);
-  final desde = mes;
-  final hasta = DateTime(mes.year, mes.month + 1, 1);
+  final dia = ref.watch(diaSeleccionadoProvider);
+  final desde = _soloFecha(dia).add(const Duration(days: 1));
 
   final ocurrencias = await ref
       .watch(agendaRepositoryProvider)
-      .obtenerOcurrencias(personaId: personaId, desde: desde, hasta: hasta);
+      .obtenerOcurrencias(
+        personaId: personaId,
+        desde: desde,
+        hasta: desde.add(const Duration(days: 30)),
+      );
+  if (ocurrencias.isEmpty) return null;
   ocurrencias.sort((a, b) => a.fechaHoraInicio.compareTo(b.fechaHoraInicio));
-  return ocurrencias;
+  return ocurrencias.first;
 });
 
 // ─── Mutadores ──────────────────────────────────────────────────────────────
 
+/// Invalida todas las vistas de ocurrencias tras una mutación.
+void _invalidarOcurrencias(Ref ref) {
+  ref.invalidate(ocurrenciasDeSemanaProvider);
+  ref.invalidate(proximaOcurrenciaProvider);
+}
+
 /// Crea un evento de agenda (opcionalmente recurrente), refresca las
-/// ocurrencias del mes y resincroniza las notificaciones locales.
+/// ocurrencias visibles y resincroniza las notificaciones locales.
 final crearEventoAgendaProvider =
     Provider<
       Future<void> Function({
@@ -90,7 +155,7 @@ final crearEventoAgendaProvider =
                   intervaloRecurrencia: intervaloRecurrencia,
                   fechaFinRecurrencia: fechaFinRecurrencia,
                 );
-            ref.invalidate(ocurrenciasDelMesProvider);
+            _invalidarOcurrencias(ref);
             try {
               await ref.read(sincronizarNotificacionesAgendaProvider)(
                 motivo: SyncMotivo.mutacion,
@@ -102,7 +167,7 @@ final crearEventoAgendaProvider =
     );
 
 /// Modifica un evento existente (sin alterar su recurrencia), refresca las
-/// ocurrencias del mes y resincroniza las notificaciones locales.
+/// ocurrencias visibles y resincroniza las notificaciones locales.
 final modificarEventoAgendaProvider =
     Provider<
       Future<void> Function({
@@ -140,7 +205,7 @@ final modificarEventoAgendaProvider =
                   minutosAnticipacionRecordatorio:
                       minutosAnticipacionRecordatorio,
                 );
-            ref.invalidate(ocurrenciasDelMesProvider);
+            _invalidarOcurrencias(ref);
             try {
               await ref.read(sincronizarNotificacionesAgendaProvider)(
                 motivo: SyncMotivo.mutacion,
@@ -151,13 +216,13 @@ final modificarEventoAgendaProvider =
           },
     );
 
-/// Elimina el evento con el id dado, refresca las ocurrencias del mes y
+/// Elimina el evento con el id dado, refresca las ocurrencias visibles y
 /// resincroniza las notificaciones locales.
 final eliminarEventoAgendaProvider =
     Provider<Future<void> Function(int eventoAgendaId)>(
       (ref) => (eventoAgendaId) async {
         await ref.read(agendaRepositoryProvider).eliminarEvento(eventoAgendaId);
-        ref.invalidate(ocurrenciasDelMesProvider);
+        _invalidarOcurrencias(ref);
         try {
           await ref.read(sincronizarNotificacionesAgendaProvider)(
             motivo: SyncMotivo.mutacion,
@@ -169,7 +234,7 @@ final eliminarEventoAgendaProvider =
     );
 
 /// Cancela una ocurrencia puntual de un evento recurrente, refresca las
-/// ocurrencias del mes y resincroniza las notificaciones locales.
+/// ocurrencias visibles y resincroniza las notificaciones locales.
 final cancelarOcurrenciaProvider =
     Provider<
       Future<void> Function({
@@ -184,7 +249,7 @@ final cancelarOcurrenciaProvider =
               eventoAgendaId: eventoAgendaId,
               fechaOcurrencia: fechaOcurrencia,
             );
-        ref.invalidate(ocurrenciasDelMesProvider);
+        _invalidarOcurrencias(ref);
         try {
           await ref.read(sincronizarNotificacionesAgendaProvider)(
             motivo: SyncMotivo.mutacion,

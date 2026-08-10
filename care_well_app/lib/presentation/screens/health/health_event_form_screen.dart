@@ -77,6 +77,9 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
         fechaHora: _fechaHora,
       );
       if (mounted) {
+        // La pantalla de eventos pasa a mostrar el día del evento registrado:
+        // si es de otra semana, igual queda a la vista al volver.
+        seleccionarDiaEventosSalud(ref, _fechaHora);
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Evento registrado correctamente')),

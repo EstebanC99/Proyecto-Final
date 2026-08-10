@@ -105,7 +105,10 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                       AppSpacing.lg,
                       AppSpacing.sm,
                     ),
-                    child: ContextSelector(),
+                    child: ContextSelector(
+                      variant: ContextSelectorVariant.compact,
+                      eyebrow: 'Estado de ánimo',
+                    ),
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),

@@ -107,6 +107,9 @@ Widget _wrap({
 }) {
   return ProviderScope(
     overrides: [
+      // Evita que los avatares (header y selector de contexto) golpeen el
+      // repositorio real: caen al fallback de iniciales.
+      personaImagenProvider.overrideWith((ref, id) async => null),
       authRepositoryProvider.overrideWithValue(
         _FakeAuthRepository(_testUsuario),
       ),
@@ -215,6 +218,18 @@ void main() {
       expect(find.text('Calendario'), findsOneWidget);
       expect(find.text('Equipo de cuidado'), findsOneWidget);
       expect(find.text('Salud'), findsOneWidget);
+    });
+
+    testWidgets('los tiles del grid muestran su descripción', (tester) async {
+      await tester.pumpWidget(
+        _wrap(asignaciones: [_asignacionDesde(_testDependiente)]),
+      );
+      await _settleAnimations(tester);
+
+      expect(find.text('Turnos y eventos'), findsOneWidget);
+      expect(find.text('Quién ayuda y cómo'), findsOneWidget);
+      expect(find.text('Perfiles que cuidás'), findsOneWidget);
+      expect(find.text('Registros y estado'), findsOneWidget);
     });
 
     testWidgets('badge de ánimo muestra "?" cuando no hay registro hoy', (

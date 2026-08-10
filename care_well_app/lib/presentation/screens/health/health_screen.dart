@@ -41,7 +41,10 @@ class HealthScreen extends ConsumerWidget {
                       AppSpacing.lg,
                       0,
                     ),
-                    child: ContextSelector(),
+                    child: ContextSelector(
+                      variant: ContextSelectorVariant.compact,
+                      eyebrow: 'Salud',
+                    ),
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),

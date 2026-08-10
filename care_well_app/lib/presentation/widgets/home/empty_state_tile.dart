@@ -53,7 +53,10 @@ class _EmptyStateTileState extends State<EmptyStateTile> {
             width: 1,
           ),
         ),
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.lg,
+        ),
         constraints: const BoxConstraints(minHeight: AppSpacing.minTapTarget),
         child: Stack(
           children: [
@@ -63,15 +66,15 @@ class _EmptyStateTileState extends State<EmptyStateTile> {
               children: [
                 // Círculo de color apagado con ícono blanco adentro (estado vacío)
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
                     color: widget.accentColor.withValues(alpha: 0.40),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.elderly,
-                    size: 28,
+                    size: 30,
                     color: context.colors.onPrimary,
                   ),
                 ),
@@ -82,7 +85,24 @@ class _EmptyStateTileState extends State<EmptyStateTile> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                    color: context.colors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                // Segunda línea de apoyo: iguala la estructura de [NavTile] con
+                // descripción, para que el grid no cambie de altura entre el
+                // estado vacío y el estado con datos.
+                Text(
+                  'Agregá a alguien para verlo acá',
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.25,
                     color: context.colors.textSecondary,
                   ),
                 ),

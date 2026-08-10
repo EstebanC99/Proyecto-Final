@@ -4,7 +4,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../providers/providers.dart';
+import 'context_selector_compact.dart';
 import 'persona_avatar.dart';
+
+/// Variante visual del [ContextSelector].
+enum ContextSelectorVariant {
+  /// Banner con recuadro y borde de marca.
+  ///
+  /// Es el default histórico y sigue siendo el valor por defecto para no
+  /// romper llamadas existentes, pero **ninguna pantalla lo usa ya**: todas
+  /// pasaron a [compact]. Se conserva como alternativa disponible.
+  standard,
+
+  /// Fila compacta sin recuadro, con rótulo de sección, badge de rol y
+  /// mini-avatares de las otras personas. Es la variante en uso en todas las
+  /// pantallas de la app.
+  compact,
+}
 
 /// Selector de persona de contexto global.
 ///
@@ -16,10 +32,25 @@ import 'persona_avatar.dart';
 /// Cuando solo hay una opción disponible, el banner se muestra sin el ícono
 /// de expansión y sin comportamiento de tap.
 ///
-/// La lógica de estado vive en [selectedPersonaIdProvider]; este widget es
-/// puramente presentacional respecto a su árbol de widgets hijo.
+/// [variant] solo cambia el widget hoja que pinta el banner: la resolución de
+/// la persona, el cálculo del rol y la apertura del bottom sheet son idénticos
+/// para todas las variantes.
+///
+/// La lógica de estado vive en [personaVisualizacionSeleccionadaIdProvider];
+/// este widget es puramente presentacional respecto a su árbol de widgets hijo.
 class ContextSelector extends ConsumerWidget {
-  const ContextSelector({super.key});
+  const ContextSelector({
+    super.key,
+    this.variant = ContextSelectorVariant.standard,
+    this.eyebrow,
+  });
+
+  /// Variante visual del banner.
+  final ContextSelectorVariant variant;
+
+  /// Rótulo superior de la variante [ContextSelectorVariant.compact]
+  /// (por defecto "Estás viendo"). Se ignora en la variante estándar.
+  final String? eyebrow;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,29 +67,58 @@ class ContextSelector extends ConsumerWidget {
         final opciones = opcionesAsync.value ?? [];
         final soloUnaOpcion = opciones.length <= 1;
 
-        // Determinar si la persona actual es el propio usuario.
-        final esPropio = opciones.any(
-          (o) =>
-              o.persona.id == persona.id && o.rol == PersonaContextRol.propio,
-        );
+        // Rol de la persona de contexto dentro de las opciones disponibles.
+        final rolActual = opciones
+            .where((o) => o.persona.id == persona.id)
+            .map((o) => o.rol)
+            .firstOrNull;
+        final esPropio = rolActual == PersonaContextRol.propio;
 
         final nombreCompleto = '${persona.nombre} ${persona.apellido}';
-        final subtitulo = esPropio ? 'Yo' : 'Visualizando a';
+
+        final banner = switch (variant) {
+          ContextSelectorVariant.standard => _ContextBanner(
+            personaId: persona.id,
+            nombreCompleto: nombreCompleto,
+            subtitulo: esPropio ? 'Yo' : 'Visualizando a',
+            interactivo: !soloUnaOpcion,
+          ),
+          ContextSelectorVariant.compact => ContextCompactBanner(
+            personaId: persona.id,
+            nombreCompleto: nombreCompleto,
+            eyebrow: eyebrow ?? 'Estás viendo',
+            rolLabel: rolActual != null ? _rolBadgeLabel(rolActual) : null,
+            interactivo: !soloUnaOpcion,
+            otrasPersonas: [
+              for (final o in opciones)
+                if (o.persona.id != persona.id)
+                  (
+                    id: o.persona.id,
+                    nombre: '${o.persona.nombre} ${o.persona.apellido}',
+                  ),
+            ],
+          ),
+        };
 
         return GestureDetector(
+          // opaque: la variante compacta no tiene fondo propio; sin esto los
+          // toques sobre los espacios vacíos de la fila no llegarían al gesto.
+          behavior: HitTestBehavior.opaque,
           onTap: soloUnaOpcion
               ? null
               : () => _showPersonaSelector(context, ref, opciones, selectedId),
-          child: _ContextBanner(
-            personaId: persona.id,
-            nombreCompleto: nombreCompleto,
-            subtitulo: subtitulo,
-            interactivo: !soloUnaOpcion,
-          ),
+          child: banner,
         );
       },
     );
   }
+
+  /// Etiqueta corta del rol para el badge de la variante compacta.
+  String _rolBadgeLabel(PersonaContextRol rol) => switch (rol) {
+    PersonaContextRol.propio => 'YO',
+    PersonaContextRol.responsable => 'Responsable',
+    PersonaContextRol.cuidador => 'Cuidador/a',
+  };
 
   void _showPersonaSelector(
     BuildContext context,

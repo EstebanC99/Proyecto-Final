@@ -6,5 +6,8 @@ export 'notification_status_chip.dart';
 export 'ocurrencia_action_sheet.dart';
 export 'ocurrencia_card.dart';
 export 'tipo_evento_theme.dart';
-// ContextChip movido a shared/; re-exportado para compatibilidad con imports existentes.
+// Widgets movidos a shared/ (los comparten agenda y eventos de salud);
+// re-exportados para compatibilidad con imports existentes.
 export '../shared/context_chip.dart';
+export '../shared/day_header.dart';
+export '../shared/week_strip.dart';

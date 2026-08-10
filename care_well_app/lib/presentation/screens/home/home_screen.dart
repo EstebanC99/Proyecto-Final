@@ -19,12 +19,6 @@ import '../../widgets/widgets.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  // Colores de acento para cada NavTile — basados en imagen del diseñador
-  static const Color _calendarColor = Color(0xFF4A90D9); // azul medio
-  static const Color _careTeamColor = Color(0xFFF5A623); // ámbar/amarillo
-  static const Color _dependentsColor = Color(0xFFF07844); // naranja
-  static const Color _healthColor = Color(0xFFE05C8A); // rosa/rojo
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
@@ -91,54 +85,93 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
 
                 // Selector de persona de contexto global
-                const ContextSelector(),
+                const ContextSelector(variant: ContextSelectorVariant.compact),
                 const SizedBox(height: AppSpacing.md),
 
-                // Acceso al Resumen inteligente (estático: no dispara la IA)
-                const SummaryEntryCard(delay: Duration(milliseconds: 50)),
-                const SizedBox(height: AppSpacing.md),
-
-                // Grid 2×2
-                GridView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisSpacing: AppSpacing.md,
+                // Acceso al Resumen inteligente (estático: no dispara la IA).
+                //
+                // El texto es de relleno: el hero todavía no está conectado al
+                // provider de IA. Cuando se conecte, solo cambia el `state`
+                // que se le pasa acá; el widget no se toca.
+                SummaryHeroCard(
+                  delay: const Duration(milliseconds: 50),
+                  state: const SummaryHeroContent(
+                    texto:
+                        'Acá va un texto breve acorde al resumen diario '
+                        'generado.',
                   ),
-                  children: [
-                    // Calendario
-                    NavTile(
-                      icon: Icons.calendar_month,
-                      label: 'Calendario',
-                      accentColor: _calendarColor,
-                      delay: Duration.zero,
-                      onTap: () => context.pushNamed(AppRoutes.agendaName),
-                    ),
+                  onTapVerCompleto: () =>
+                      context.pushNamed(AppRoutes.summaryName),
+                ),
+                const SizedBox(height: AppSpacing.md),
 
-                    // Equipo de cuidado
-                    NavTile(
-                      icon: Icons.groups,
-                      label: 'Equipo de cuidado',
-                      accentColor: _careTeamColor,
-                      delay: const Duration(milliseconds: 100),
-                      onTap: () => context.pushNamed(AppRoutes.careTeamName),
-                    ),
+                // Grid 2×2.
+                //
+                // Se arma con dos filas en IntrinsicHeight en lugar de un
+                // GridView de celdas cuadradas: la altura la define el
+                // contenido más alto de cada fila, así la descripción de dos
+                // líneas no desborda con escalas de fuente grandes.
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Calendario
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.calendar_month,
+                          label: 'Calendario',
+                          description: 'Turnos y eventos',
+                          accentColor: context.colors.calendarAccent,
+                          delay: Duration.zero,
+                          onTap: () => context.pushNamed(AppRoutes.agendaName),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
 
-                    // Personas a cargo — dinámico
-                    _buildDependentsTile(context, ref, dependentsAsync),
+                      // Equipo de cuidado
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.groups,
+                          label: 'Equipo de cuidado',
+                          description: 'Quién ayuda y cómo',
+                          accentColor: context.colors.careTeamAccent,
+                          delay: const Duration(milliseconds: 100),
+                          onTap: () =>
+                              context.pushNamed(AppRoutes.careTeamName),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Personas a cargo — dinámico
+                      Expanded(
+                        child: _buildDependentsTile(
+                          context,
+                          ref,
+                          dependentsAsync,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
 
-                    // Salud
-                    NavTile(
-                      icon: Icons.favorite,
-                      label: 'Salud',
-                      accentColor: _healthColor,
-                      delay: const Duration(milliseconds: 300),
-                      badge: animoBadge,
-                      onTap: () => context.pushNamed(AppRoutes.healthName),
-                    ),
-                  ],
+                      // Salud
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.favorite,
+                          label: 'Salud',
+                          description: 'Registros y estado',
+                          accentColor: context.colors.healthAccent,
+                          delay: const Duration(milliseconds: 300),
+                          badge: animoBadge,
+                          onTap: () => context.pushNamed(AppRoutes.healthName),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: AppSpacing.md),
@@ -167,14 +200,15 @@ class HomeScreen extends ConsumerWidget {
       error: (e, st) => NavTile(
         icon: Icons.error_outline,
         label: 'Personas a cargo',
-        accentColor: _dependentsColor,
+        description: 'Perfiles que cuidás',
+        accentColor: context.colors.dependentsAccent,
         delay: const Duration(milliseconds: 200),
         onTap: () => context.pushNamed(AppRoutes.dependentsName),
       ),
       data: (list) {
         if (list.isEmpty) {
           return EmptyStateTile(
-            accentColor: _dependentsColor,
+            accentColor: context.colors.dependentsAccent,
             onTap: () => context.pushNamed(AppRoutes.dependentsName),
             onTapAdd: () => context.pushNamed(AppRoutes.dependentsNewName),
           );
@@ -182,7 +216,8 @@ class HomeScreen extends ConsumerWidget {
         return NavTile(
           icon: Icons.elderly,
           label: 'Personas a cargo',
-          accentColor: _dependentsColor,
+          description: 'Perfiles que cuidás',
+          accentColor: context.colors.dependentsAccent,
           delay: const Duration(milliseconds: 200),
           onTap: () => context.pushNamed(AppRoutes.dependentsName),
         );
