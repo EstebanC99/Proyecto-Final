@@ -15,32 +15,10 @@ class MoodHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final estadosAsync = ref.watch(estadosAnimoProvider);
-    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
-    final nombrePersona = personaAsync.value?.nombre ?? 'la persona a cargo';
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Historial de ánimo'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-        actions: [
-          if (personaAsync.value != null)
-            Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.md),
-              child: Chip(
-                label: Text(nombrePersona),
-                backgroundColor: context.colors.moodContainer,
-                labelStyle: TextStyle(
-                  color: context.colors.moodAccent,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-        ],
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Historial de ánimo'),
       body: estadosAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(

@@ -32,11 +32,8 @@ class SummaryScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Resumen'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
+      appBar: ContextAppBar(
+        eyebrow: 'Resumen',
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -50,25 +47,6 @@ class SummaryScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto (solo si hay persona).
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      0,
-                    ),
-                    child: ContextSelector(
-                      variant: ContextSelectorVariant.compact,
-                      eyebrow: 'Resumen',
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (e, st) => const SizedBox.shrink(),
-          ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {

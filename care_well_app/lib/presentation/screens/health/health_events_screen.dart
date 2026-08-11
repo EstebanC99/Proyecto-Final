@@ -77,30 +77,10 @@ class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Eventos de salud'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Eventos de salud'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto (solo si hay persona).
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    child: ContextSelector(
-                      variant: ContextSelectorVariant.compact,
-                      eyebrow: 'Eventos de salud',
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
           // Tira de la semana. No se puede avanzar más allá de la semana
           // actual: los eventos de salud se registran después de ocurrir.
           WeekStrip(

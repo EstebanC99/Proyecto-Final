@@ -20,25 +20,17 @@ class EmergencyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final equipoAsync = ref.watch(equipoEmergenciaProvider);
     final puedeAsync = ref.watch(puedeActivarEmergenciaProvider);
-    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
     final puede = puedeAsync.value ?? false;
-    final persona = personaAsync.value;
 
     return Scaffold(
       backgroundColor: context.colors.surface,
-      appBar: AppBar(
-        title: Text(
-          'Emergencia',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: context.colors.emergencyRed,
-          ),
-        ),
-        backgroundColor: context.colors.surface,
-        iconTheme: IconThemeData(color: context.colors.emergencyRed),
-        elevation: 0,
+      appBar: ContextAppBar(
+        eyebrow: 'Emergencia',
+        // El rojo queda en la flecha de "atrás" y en el borde inferior: el
+        // rótulo y el nombre del selector usan siempre los colores de texto
+        // del tema, como en el resto de las pantallas.
+        foregroundColor: context.colors.emergencyRed,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: context.colors.outline),
@@ -57,14 +49,6 @@ class EmergencyScreen extends ConsumerWidget {
           child: Column(
             children: [
               const SizedBox(height: AppSpacing.xl),
-
-              // Selector de persona de contexto
-              if (persona != null)
-                const ContextSelector(
-                  variant: ContextSelectorVariant.compact,
-                  eyebrow: 'Emergencia',
-                ),
-              const SizedBox(height: AppSpacing.md),
 
               // Texto explicativo
               Text(

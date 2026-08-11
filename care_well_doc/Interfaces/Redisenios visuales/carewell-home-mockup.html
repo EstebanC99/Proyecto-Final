@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareWell · Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#00897B;--teal-dark:#00695C;--teal-soft:#E0F2F0;
+    --ink:#212121;--ink-2:#757575;--bg:#F4F7F6;--surface:#FFFFFF;--line:#E4E9E8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Roboto',system-ui,sans-serif;background:#DDE5E3;color:var(--ink);
+       display:flex;justify-content:center;padding:24px 12px;min-height:100vh}
+  .phone{width:100%;max-width:390px;background:var(--bg);border-radius:32px;overflow:hidden;
+         box-shadow:0 24px 60px rgba(0,60,55,.25);padding-bottom:22px}
+
+  .status{display:flex;justify-content:space-between;padding:13px 22px 6px;font-size:12.5px;font-weight:500;color:#4A4A4A;background:var(--surface)}
+
+  /* barra de marca */
+  .brand{display:flex;align-items:center;gap:9px;padding:6px 14px 12px;background:var(--surface)}
+  .logo{width:28px;height:28px;border-radius:9px;background:var(--teal-soft);display:grid;place-items:center;
+        color:var(--teal-dark);font-weight:700;font-size:15px}
+  .bname{font-size:16.5px;font-weight:700;letter-spacing:-.3px}
+  .bname span{color:var(--teal)}
+  .bell{margin-left:auto;font-size:17px;position:relative;color:#5C6C6A}
+  .bell:after{content:'';position:absolute;top:1px;right:0;width:7px;height:7px;border-radius:50%;background:#E5533D;border:1.5px solid #fff}
+  /* cuenta logueada: chico, plano, sin anillo */
+  .acct{display:flex;align-items:center;gap:8px;padding:3px 3px 3px 10px;border-radius:999px;background:#F2F5F4}
+  .acct .hi{font-size:12px;color:#6B7B79;font-weight:500}
+  .acct .aav{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;
+             color:#0A4F45;background:linear-gradient(150deg,#9FCBC4,#5FA79C)}
+
+  /* selector de contexto */
+  .ctx{display:flex;align-items:center;gap:12px;padding:12px 18px 14px;background:var(--surface);
+       border-top:1px solid var(--line)}
+  .av{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:15px;font-weight:700;
+      color:#0A4F45;background:linear-gradient(150deg,#9FCBC4,#5FA79C);
+      box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--teal)}
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#9E9E9E}
+  .nmrow{display:flex;align-items:center;gap:7px;min-width:0;margin-top:2px}
+  .nm{font-size:18px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rel{background:var(--teal-soft);color:var(--teal-dark);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;flex:none}
+  .cv{color:var(--teal);font-size:12px;flex:none}
+  .switch{margin-left:auto;display:flex;align-items:center;gap:-8px;flex:none}
+  .mini{width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:12px;margin-left:-9px;
+        background:#EDEFEE;color:#607D7A;font-weight:700}
+
+  /* resumen inteligente — hero */
+  .hero{margin:14px 16px 0;border-radius:18px;padding:16px 17px 14px;color:#fff;
+        background:linear-gradient(145deg,#00A392 0%,#00796B 55%,#00625A 100%);
+        box-shadow:0 8px 20px rgba(0,105,92,.28);position:relative;overflow:hidden}
+  .hero:before{content:'';position:absolute;right:-40px;top:-50px;width:150px;height:150px;border-radius:50%;
+               background:rgba(255,255,255,.07)}
+  .hrow{display:flex;align-items:center;gap:10px;position:relative}
+  .spark{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:16px}
+  .htitle{font-size:16px;font-weight:700;letter-spacing:-.2px}
+  .hupd{margin-left:auto;font-size:10.5px;font-weight:500;color:rgba(255,255,255,.75)}
+  .hprev{font-size:14px;line-height:1.5;margin:12px 0 13px;color:rgba(255,255,255,.94);position:relative}
+  .hstats{display:flex;gap:7px;position:relative}
+  .pill{background:rgba(255,255,255,.16);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:500}
+  .hcta{display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:12px;
+        border-top:1px solid rgba(255,255,255,.18);font-size:13.5px;font-weight:700;position:relative}
+  .hcta span{margin-left:auto}
+
+  /* grilla de módulos */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 16px 0}
+  .mod{border-radius:18px;padding:22px 14px 18px;text-align:center}
+  .mico{width:62px;height:62px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:26px;color:#fff;position:relative}
+  .mname{font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .mmeta{font-size:11.5px;color:#6D6D6D;margin-top:3px}
+  .m1{background:#D9E3EF}.m1 .mico{background:#3B82C4}
+  .m2{background:#F5EBD8}.m2 .mico{background:#F0A32B}
+  .m3{background:#F0DFD5}.m3 .mico{background:#ED7135}
+  .m4{background:#F1DCE6}.m4 .mico{background:#D6437E}
+  .face{position:absolute;top:-4px;right:-6px;width:26px;height:26px;border-radius:50%;background:#fff;
+        border:2px solid var(--teal);display:grid;place-items:center;font-size:13px}
+
+  .emg{margin:14px 16px 0;background:#C0392B;color:#fff;border-radius:14px;padding:16px;
+       display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;font-weight:700;
+       box-shadow:0 6px 16px rgba(192,57,43,.3)}
+
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .an{animation:up .42s cubic-bezier(.2,.7,.3,1) both}
+  .d1{animation-delay:.07s}.d2{animation-delay:.14s}.d3{animation-delay:.21s}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status"><span>12:38</span><span>&#9679;&#9679;&#9679;&nbsp;&#9679;&#9679;</span></div>
+
+  <div class="brand">
+    <div class="logo">C</div>
+    <div class="bname">Care<span>Well</span></div>
+    <div class="bell">&#128276;</div>
+    <div class="acct"><span class="hi">Hola, Esteban</span><div class="aav">EC</div></div>
+  </div>
+
+  <!-- SELECTOR DE CONTEXTO -->
+  <div class="ctx an">
+    <div class="av">EC</div>
+    <div style="min-width:0">
+      <div class="eyebrow">Estás viendo</div>
+      <div class="nmrow">
+        <span class="nm">Esteban Carignani</span>
+        <span class="rel">YO</span>
+        <span class="cv">&#9662;</span>
+      </div>
+    </div>
+    <div class="switch">
+      <div class="mini">&#128021;</div>
+      <div class="mini">MC</div>
+      <div class="mini">+2</div>
+    </div>
+  </div>
+
+  <!-- RESUMEN INTELIGENTE -->
+  <div class="hero an d1">
+    <div class="hrow">
+      <div class="spark">&#10024;</div>
+      <div class="htitle">Resumen del día</div>
+      <div class="hupd">12:30</div>
+    </div>
+    <div class="hprev">Buena mañana: entrenaste temprano y ya tomaste la medicación. Queda la competencia de natación a las 09:00 de mañana.</div>
+    <div class="hstats">
+      <span class="pill">&#9989; 4 de 6 hábitos</span>
+      <span class="pill">&#128197; 2 eventos</span>
+    </div>
+    <div class="hcta">Ver resumen completo <span>&#8594;</span></div>
+  </div>
+
+  <!-- MÓDULOS -->
+  <div class="grid an d2">
+    <div class="mod m1">
+      <div class="mico">&#128197;</div>
+      <div class="mname">Calendario</div>
+      <div class="mmeta">2 eventos mañana</div>
+    </div>
+    <div class="mod m2">
+      <div class="mico">&#128101;</div>
+      <div class="mname">Equipo de cuidado</div>
+      <div class="mmeta">4 integrantes</div>
+    </div>
+    <div class="mod m3">
+      <div class="mico">&#127939;</div>
+      <div class="mname">Personas a cargo</div>
+      <div class="mmeta">3 perfiles</div>
+    </div>
+    <div class="mod m4">
+      <div class="mico">&#10084;&#65039;<div class="face">&#128516;</div></div>
+      <div class="mname">Salud</div>
+      <div class="mmeta">Ánimo: alegre</div>
+    </div>
+  </div>
+
+  <div class="emg an d3">&#9888; Emergencia</div>
+</div>
+</body>
+</html>

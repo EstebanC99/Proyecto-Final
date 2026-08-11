@@ -351,6 +351,31 @@ void main() {
 
         expect(find.byType(ContextCompactBanner), findsNothing);
       });
+
+      testWidgets(
+        'con persona nula tampoco deja el rótulo suelto (regresión: el '
+        'fallback con eyebrow es exclusivo de la variante appBar)',
+        (tester) async {
+          await tester.pumpWidget(
+            _wrap(
+              const ContextSelector(
+                variant: ContextSelectorVariant.compact,
+                eyebrow: 'Estás viendo',
+              ),
+              overrides: [
+                personaVisualizacionSeleccionadaProvider.overrideWith(
+                  (ref) async => null,
+                ),
+                personasSeleccionablesProvider.overrideWith((ref) async => []),
+              ],
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('ESTÁS VIENDO'), findsNothing);
+          expect(find.byType(SizedBox), findsWidgets);
+        },
+      );
     });
   });
 }

@@ -23,39 +23,13 @@ class HabitsScreen extends ConsumerWidget {
     // permiso de ABM de hábitos.
     final esMiembroEquipo =
         ref.watch(esMiembroEquipoActivoProvider).value ?? false;
-    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Hábitos de vida'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Hábitos de vida'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(
-                      variant: ContextSelectorVariant.compact,
-                      eyebrow: 'Hábitos de vida',
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
           Expanded(
             child: habitosAsync.when(
               loading: () => _HabitosSkeleton(),

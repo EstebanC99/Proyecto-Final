@@ -26,6 +26,7 @@ class ContextCompactBanner extends StatelessWidget {
     required this.interactivo,
     this.rolLabel,
     this.otrasPersonas = const [],
+    this.denso = false,
   });
 
   /// Id de la persona de contexto, para resolver su foto de perfil.
@@ -47,13 +48,46 @@ class ContextCompactBanner extends StatelessWidget {
   /// más, un contador "+N".
   final List<PersonaMini> otrasPersonas;
 
+  /// Variante para AppBar: colapsa el padding vertical externo.
+  ///
+  /// El banner "suelto" reserva 8dp arriba y abajo para respirar dentro del
+  /// body (~64dp de alto total), que no entran en los 56dp de un AppBar. Con
+  /// `denso: true` la fila mide ~48dp y el aire lo aporta el propio toolbar.
+  final bool denso;
+
   /// Cantidad máxima de mini-avatares antes de agrupar en el contador.
   static const int _maxMiniAvatares = 3;
+
+  /// Tamaño de fuente del rótulo en versales.
+  static const double eyebrowFontSize = 10.5;
+
+  /// Tamaño de fuente del nombre de la persona de contexto.
+  static const double nombreFontSize = 18;
+
+  /// Interlineado de ambos textos de la columna.
+  static const double alturaLinea = 1.2;
+
+  /// Separación vertical entre el rótulo y el nombre.
+  static const double gapTextos = 2;
+
+  /// Estilo del rótulo en versales.
+  ///
+  /// Se expone para que los estados sin persona (ver `ContextSelector`) pinten
+  /// el mismo rótulo sin duplicar la tipografía.
+  static TextStyle eyebrowTextStyle(BuildContext context) => TextStyle(
+    fontSize: eyebrowFontSize,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.1,
+    height: alturaLinea,
+    color: context.colors.textSecondary,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: denso
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
           // Avatar con anillo de marca.
@@ -81,15 +115,9 @@ class ContextCompactBanner extends StatelessWidget {
                   eyebrow.toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.1,
-                    height: 1.2,
-                    color: context.colors.textSecondary,
-                  ),
+                  style: eyebrowTextStyle(context),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: gapTextos),
                 Row(
                   children: [
                     Flexible(
@@ -98,10 +126,10 @@ class ContextCompactBanner extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: nombreFontSize,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
-                          height: 1.2,
+                          height: alturaLinea,
                           color: context.colors.textPrimary,
                         ),
                       ),

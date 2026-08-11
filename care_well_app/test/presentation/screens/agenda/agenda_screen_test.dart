@@ -245,6 +245,10 @@ void main() {
         );
         await tester.pumpAndSettle();
         await scrollALoQueSigue(tester);
+        // El rótulo de la sección puede quedar visible con la card todavía
+        // por debajo del borde inferior: hay que asegurar la card en sí.
+        await tester.ensureVisible(find.text('Control clínico'));
+        await tester.pumpAndSettle();
 
         await tester.tap(find.text('Control clínico'));
         await tester.pumpAndSettle();

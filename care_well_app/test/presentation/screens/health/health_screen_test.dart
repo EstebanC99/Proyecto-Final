@@ -64,19 +64,22 @@ void main() {
       expect(find.textContaining('Alicia Rodríguez'), findsOneWidget);
     });
 
-    testWidgets('el ContextSelector usa la variante compacta', (tester) async {
+    testWidgets('el ContextSelector vive en el AppBar y usa su variante', (
+      tester,
+    ) async {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
 
-      // Elementos propios de la variante compacta: rótulo de sección y badge
-      // de rol de la persona de contexto.
+      // El selector es el título de la pantalla: rótulo de sección en versales
+      // y badge de rol abreviado.
+      expect(find.byType(ContextAppBar), findsOneWidget);
       expect(find.byType(ContextCompactBanner), findsOneWidget);
       expect(find.text('SALUD'), findsOneWidget);
-      expect(find.text('Responsable'), findsOneWidget);
-      // Con dos personas seleccionables aparece el chevron y el mini-avatar
-      // de la otra persona (además del avatar de contexto).
+      expect(find.text('RESP.'), findsOneWidget);
+      // Con dos personas seleccionables aparece el chevron, pero en el AppBar
+      // no hay mini-avatares: solo el avatar de la persona de contexto.
       expect(find.byIcon(Icons.expand_more), findsOneWidget);
-      expect(find.byType(PersonaAvatar), findsNWidgets(2));
+      expect(find.byType(PersonaAvatar), findsOneWidget);
     });
 
     testWidgets('muestra tiles de categorías', (tester) async {

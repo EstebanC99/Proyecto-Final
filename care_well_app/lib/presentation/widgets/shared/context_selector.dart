@@ -20,6 +20,14 @@ enum ContextSelectorVariant {
   /// mini-avatares de las otras personas. Es la variante en uso en todas las
   /// pantallas de la app.
   compact,
+
+  /// Variante para usar como `title` de un AppBar (ver `ContextAppBar`).
+  ///
+  /// Es la [compact] densa: sin padding vertical propio, sin mini-avatares
+  /// (el ancho del toolbar es escaso) y con el badge de rol abreviado. Como
+  /// acá el selector *es* el título de la pantalla, los estados sin persona
+  /// no se colapsan: siempre se pinta el rótulo de sección.
+  appBar,
 }
 
 /// Selector de persona de contexto global.
@@ -48,8 +56,9 @@ class ContextSelector extends ConsumerWidget {
   /// Variante visual del banner.
   final ContextSelectorVariant variant;
 
-  /// Rótulo superior de la variante [ContextSelectorVariant.compact]
-  /// (por defecto "Estás viendo"). Se ignora en la variante estándar.
+  /// Rótulo superior de las variantes [ContextSelectorVariant.compact] y
+  /// [ContextSelectorVariant.appBar] (por defecto "Estás viendo"). Se ignora
+  /// en la variante estándar.
   final String? eyebrow;
 
   @override
@@ -59,10 +68,10 @@ class ContextSelector extends ConsumerWidget {
     final selectedId = ref.watch(personaVisualizacionSeleccionadaIdProvider);
 
     return personaAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (e, _) => const SizedBox.shrink(),
+      loading: () => _sinPersona(cargando: true),
+      error: (e, _) => _sinPersona(cargando: false),
       data: (persona) {
-        if (persona == null) return const SizedBox.shrink();
+        if (persona == null) return _sinPersona(cargando: false);
 
         final opciones = opcionesAsync.value ?? [];
         final soloUnaOpcion = opciones.length <= 1;
@@ -98,6 +107,17 @@ class ContextSelector extends ConsumerWidget {
                   ),
             ],
           ),
+          // Sin mini-avatares: en el AppBar el ancho es escaso y el chevron
+          // ya comunica que el contexto se puede cambiar.
+          ContextSelectorVariant.appBar => ContextCompactBanner(
+            personaId: persona.id,
+            nombreCompleto: nombreCompleto,
+            eyebrow: eyebrow ?? 'Estás viendo',
+            rolLabel: rolActual != null ? _rolBadgeLabelCorto(rolActual) : null,
+            interactivo: !soloUnaOpcion,
+            denso: true,
+            otrasPersonas: const [],
+          ),
         };
 
         return GestureDetector(
@@ -107,10 +127,39 @@ class ContextSelector extends ConsumerWidget {
           onTap: soloUnaOpcion
               ? null
               : () => _showPersonaSelector(context, ref, opciones, selectedId),
-          child: banner,
+          // El label explícito reemplaza la lectura suelta de rótulo, nombre y
+          // badge; la acción de tap la sigue aportando el GestureDetector.
+          child: Semantics(
+            label: _semanticsLabel(nombreCompleto, rolActual),
+            button: !soloUnaOpcion,
+            excludeSemantics: true,
+            child: banner,
+          ),
         );
       },
     );
+  }
+
+  /// Render de los estados en los que no hay persona de contexto resuelta
+  /// (cargando, error o usuario sin personas a cargo).
+  ///
+  /// Las variantes [ContextSelectorVariant.standard] y
+  /// [ContextSelectorVariant.compact] se colapsan, como siempre: son un
+  /// adorno del body. En [ContextSelectorVariant.appBar] el selector *es* el
+  /// título de la pantalla, así que se conserva el rótulo de sección para no
+  /// dejar la barra vacía.
+  Widget _sinPersona({required bool cargando}) {
+    if (variant != ContextSelectorVariant.appBar) {
+      return const SizedBox.shrink();
+    }
+    return _EyebrowSolo(eyebrow: eyebrow ?? 'Estás viendo', cargando: cargando);
+  }
+
+  /// Etiqueta accesible del selector: sección, persona y rol.
+  String _semanticsLabel(String nombreCompleto, PersonaContextRol? rol) {
+    final seccion = eyebrow ?? 'Estás viendo';
+    final rolLabel = rol == null ? null : _rolSemanticsLabel(rol);
+    return [seccion, 'viendo a $nombreCompleto', ?rolLabel].join(', ');
   }
 
   /// Etiqueta corta del rol para el badge de la variante compacta.
@@ -118,6 +167,21 @@ class ContextSelector extends ConsumerWidget {
     PersonaContextRol.propio => 'YO',
     PersonaContextRol.responsable => 'Responsable',
     PersonaContextRol.cuidador => 'Cuidador/a',
+  };
+
+  /// Etiqueta abreviada del rol para el badge dentro del AppBar, donde el
+  /// ancho disponible para el nombre es mínimo.
+  String _rolBadgeLabelCorto(PersonaContextRol rol) => switch (rol) {
+    PersonaContextRol.propio => 'YO',
+    PersonaContextRol.responsable => 'RESP.',
+    PersonaContextRol.cuidador => 'CUID.',
+  };
+
+  /// Rol en palabras completas, para lectores de pantalla.
+  String _rolSemanticsLabel(PersonaContextRol rol) => switch (rol) {
+    PersonaContextRol.propio => 'vos',
+    PersonaContextRol.responsable => 'responsable',
+    PersonaContextRol.cuidador => 'cuidador/a',
   };
 
   void _showPersonaSelector(
@@ -140,6 +204,54 @@ class ContextSelector extends ConsumerWidget {
           Navigator.pop(context);
         },
       ),
+    );
+  }
+}
+
+// ─── Rótulo sin persona (solo variante appBar) ───────────────────────────────
+
+/// Rótulo de sección sin persona de contexto.
+///
+/// Mantiene el título de la pantalla visible mientras se resuelve la persona,
+/// cuando falla la consulta o cuando el usuario todavía no tiene personas a
+/// cargo. Durante la carga muestra además un placeholder del nombre.
+class _EyebrowSolo extends StatelessWidget {
+  const _EyebrowSolo({required this.eyebrow, required this.cargando});
+
+  final String eyebrow;
+
+  /// `true` mientras se resuelve la persona: agrega la barra de placeholder.
+  final bool cargando;
+
+  /// Ancho del placeholder del nombre, del orden de un nombre y apellido.
+  static const double _anchoPlaceholder = 140;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          eyebrow.toUpperCase(),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: ContextCompactBanner.eyebrowTextStyle(context),
+        ),
+        if (cargando) ...[
+          const SizedBox(height: ContextCompactBanner.gapTextos),
+          Container(
+            width: _anchoPlaceholder,
+            height: MediaQuery.textScalerOf(
+              context,
+            ).scale(ContextCompactBanner.nombreFontSize),
+            decoration: BoxDecoration(
+              color: context.colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(AppSpacing.xs),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
