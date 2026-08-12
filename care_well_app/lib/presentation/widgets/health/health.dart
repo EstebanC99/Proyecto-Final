@@ -10,6 +10,8 @@ export 'mood_dial_selector.dart';
 export 'mood_bar_chart.dart';
 export 'note_card.dart';
 export 'habito_realizacion_sheet.dart';
+export 'tipo_habito_theme.dart';
+export 'ultimo_registro_format.dart';
 // Ficha de salud (US-35)
 export 'ficha_salud_list_type.dart';
 export 'persona_context_header_card.dart';

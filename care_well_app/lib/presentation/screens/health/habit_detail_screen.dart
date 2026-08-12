@@ -20,21 +20,6 @@ class HabitDetailScreen extends ConsumerWidget {
 
   static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
 
-  static IconData _iconTipo(TipoHabitoVida tipo) {
-    switch (tipo.id) {
-      case TiposHabitoConst.actividadFisica:
-        return Icons.directions_run;
-      case TiposHabitoConst.alimentacion:
-        return Icons.restaurant;
-      case TiposHabitoConst.sueno:
-        return Icons.bedtime_outlined;
-      case TiposHabitoConst.hidratacion:
-        return Icons.water_drop_outlined;
-      default:
-        return Icons.self_improvement;
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitoAsync = ref.watch(habitoByIdProvider(habitId));
@@ -124,7 +109,7 @@ class HabitDetailScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        _iconTipo(habito.tipo),
+                        TipoHabitoTheme.iconFor(habito.tipo.id),
                         size: 36,
                         color: context.colors.habitsAccent,
                       ),
