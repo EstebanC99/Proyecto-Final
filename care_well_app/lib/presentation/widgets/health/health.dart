@@ -1,5 +1,6 @@
 // Barrel del módulo de widgets de Mi salud.
-export 'health_category_card.dart';
+export 'health_metric_card.dart';
+export 'health_record_highlight_card.dart';
 export 'health_event_card.dart';
 export 'health_event_type_chip.dart';
 export 'health_timeline_view.dart';
