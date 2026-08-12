@@ -24,7 +24,7 @@ class _FakeSummaryRepository implements SummaryRepository {
   }) async {
     llamadas++;
     return ResumenInteligente(
-      texto: 'Resumen #$llamadas para $personaId.',
+      resumenAcotado: 'Resumen #$llamadas para $personaId.',
       tieneDatos: true,
       generadoEn: DateTime(2026, 7, 30, 10),
     );
@@ -65,7 +65,7 @@ void main() {
         final res = await container.read(resumenInteligenteProvider.future);
         expect(res, isNotNull);
         expect(res!.tieneDatos, isTrue);
-        expect(res.texto, contains('para 2'));
+        expect(res.resumenAcotado, contains('para 2'));
         expect(repo.llamadas, 1);
       },
     );

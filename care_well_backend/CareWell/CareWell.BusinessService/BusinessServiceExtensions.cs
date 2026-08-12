@@ -57,6 +57,7 @@ namespace CareWell.BusinessService
             services.AddScoped<IAdministrarTipoEventoBusinessService, AdministrarTipoEventoBusinessService>();
             services.AddScoped<IAdministrarTipoHabitoVidaBusinessService, AdministrarTipoHabitoVidaBusinessService>();
             services.AddScoped<IAlertaBienestarBusinessService, AlertaBienestarBusinessService>();
+            services.AddScoped<IArmarResumenDiarioBusinessService, ArmarResumenDiarioBusinessService>();
             services.AddScoped<ICrearCredencialesBusinessService, CrearCredencialesBusinessService>();
             services.AddScoped<ICrearCuentaBusinessService, CrearCuentaBusinessService>();
             services.AddScoped<IEliminarCuentaBusinessService, EliminarCuentaBusinessService>();
@@ -74,7 +75,6 @@ namespace CareWell.BusinessService
             #region Domain Services
 
             services.AddScoped<IAdministrarDispositivoDomainService, AdministrarDispositivoBusinessService>();
-            services.AddScoped<IArmarResumenDiarioDomainService, ArmarResumenDiarioBusinessService>();
             services.AddScoped<IDetectorAlertasBienestarDomainService, DetectorAlertasBienestarBusinessService>();
             services.AddScoped<IEvaluadorIdentidadPersonaDomainService, EvaluadorIdentidadPersonaBusinessService>();
             services.AddScoped<IExpansorRecurrenciaDomainService, ExpansorRecurrenciaBusinessService>();

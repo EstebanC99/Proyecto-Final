@@ -111,31 +111,46 @@ Si editás `carewell.env`, hace falta reiniciar el servicio para que tome los ca
 sudo systemctl restart carewell-api
 ```
 
-## Problemas conocidos
+### Proveedor de IA: configuración por ambiente
 
-### Historia: por qué el backend usa Vertex AI y no Google AI Studio
+El backend le habla directo al **REST nativo de Gemini** (`GeminiChatClient.cs` en
+`CareWell.DocumentIntelligence`, sin SDK de terceros) y soporta **dos proveedores**, que se
+seleccionan con la variable `IA__Proveedor`:
 
-En el primer deploy, la API de Gemini vía **Google AI Studio** (`generativelanguage.googleapis.com`)
-funcionaba perfecto desde una PC de escritorio pero fallaba desde el VPS con
-`400 FAILED_PRECONDITION — "User location is not supported for the API use"`, pese a que la
-IP del VPS geolocaliza al mismo país que la PC. Es un bloqueo de Google a IPs de
-datacenter/hosting como medida antiabuso — le pasa a cualquier VPS (Hetzner, OVH, InterServer,
-DonWeb...), no es algo puntual de esta infraestructura.
+| `IA__Proveedor` | URL base | Dónde se usa |
+| --- | --- | --- |
+| `VertexAI` (default) | `https://aiplatform.googleapis.com/v1/publishers/google/models` | **Producción** (este VPS) |
+| `AIStudio` | `https://generativelanguage.googleapis.com/v1beta/models` | **Desarrollo** local, con API key de nivel gratuito (sin costo) |
 
-Se probó habilitar billing + generar una key nueva (arregla el caso en algunos reportes) y
-funcionó un rato, pero **el bloqueo volvió a aparecer más tarde con la misma key**, incluso
-contra el endpoint nativo que ya había respondido bien antes. Es decir: **no es un problema
-resoluble de forma estable desde el lado de AI Studio**, es intermitente por diseño para ese
-producto.
+Los dos hablan el **mismo protocolo REST** y se autentican igual —la key va en el header
+`x-goog-api-key`, no como query param `?key=`—, y difieren **únicamente en la URL base**, que
+resuelve `DocumentIntelligenceExtensions.ResolverBaseUrl`. Por eso hay un único
+`GeminiChatClient`, sin ramas por ambiente. El valor lo fija `appsettings.{Ambiente}.json`
+(`VertexAI` en `Production`, `AIStudio` en `Development`) y en el VPS puede pisarse desde
+`carewell.env`. Existe además `IA__BaseUrlPersonalizada`, que permite fijar la URL base a mano
+(proxy, otra versión de la API) y tiene precedencia sobre el proveedor elegido.
 
-**Solución final: usar Vertex AI / Agent Platform en vez de AI Studio.** Es el producto de
-Google pensado específicamente para uso servidor-a-servidor y no aplica esa restricción. El
-backend le habla directo (`GeminiChatClient.cs` en `CareWell.DocumentIntelligence`, sin SDK de
-terceros) al endpoint `https://aiplatform.googleapis.com/v1/publishers/google/models/{modelo}:generateContent`,
-con la key en el header `x-goog-api-key` (no como query param `?key=`, así se autentica AI
-Studio).
+> ⚠️ **Advertencia de datos.** El **nivel gratuito de AI Studio emplea las consignas enviadas
+> para entrenar los modelos de Google**. Por eso `AIStudio` es exclusivamente para desarrollo y
+> **solo con datos ficticios**: nunca datos reales de personas y mucho menos datos de salud. Las
+> garantías de no-entrenamiento y el *Cloud Data Processing Addendum* en los que se apoya el
+> documento del proyecto son propias de la **plataforma empresarial** (Vertex AI) y no del
+> servicio gratuito de uso general — ver `CuidadoPersonas.tex`, subsecciones "Componente de
+> inteligencia artificial" y "Resumen diario de la persona a cargo". **Producción va siempre por
+> `VertexAI`.**
 
-**Gotchas al generar la API key en Google Cloud Console:**
+**`IA__EnviarResponseSchema` (default `true`) — interruptor de rollback.** Con el valor por
+defecto, el cliente le manda al modelo el JSON Schema de la respuesta esperada (previamente
+saneado al subconjunto de keywords que Gemini acepta) dentro de
+`generationConfig.responseJsonSchema`, forzando una salida estructurada. Si un cambio de esquema
+—una entidad nueva, un tipo distinto en un *response*— hace que Gemini empiece a devolver
+`400 INVALID_ARGUMENT`, ponerlo en `false` es la vía rápida de rollback: se sigue pidiendo
+`application/json`, pero sin esquema, y la respuesta se parsea igual desde el texto quedando la
+estructura a cargo del *system prompt*. Es un mitigante temporal: la corrección de fondo es
+identificar el keyword culpable —se ve en el request guardado en `LogServicioExterno`— y
+agregarlo a `KeywordsNoSoportados` en `GeminiChatClient`.
+
+**Gotchas al generar la API key de Vertex AI en Google Cloud Console:**
 - El menú "Agent Platform" tiene varias claves con distinto scope. Hace falta una con
   restricción **"Gemini API"** (o Vertex AI) — una con restricción "Agent Platform API" a
   secas es *otro producto* y da `403 PERMISSION_DENIED / API_KEY_SERVICE_BLOCKED`.
@@ -146,18 +161,58 @@ Studio).
 - `gemini-2.5-flash` (sin `-lite`) tiene "thinking" activado por defecto y agrega latencia
   innecesaria para estas tareas de extracción simple — usar la variante `-lite`.
 
-Test rápido para diagnosticar esto (sin exponer la key en la terminal más de lo necesario):
+**Test rápido del proveedor** (sin exponer la key en la terminal más de lo necesario). Como el
+protocolo es el mismo para los dos proveedores, alcanza con cambiar `BASE_URL` para probar uno u
+otro:
 ```bash
 API_KEY=$(sudo grep '^IA__ApiKey=' /etc/carewell/carewell.env | cut -d= -f2-)
+
+# Vertex AI (producción)
+BASE_URL=https://aiplatform.googleapis.com/v1/publishers/google/models
+# AI Studio (desarrollo): BASE_URL=https://generativelanguage.googleapis.com/v1beta/models
+
 curl -s -o /tmp/gemini-test.json -w "HTTP %{http_code}\n" \
-  -X POST "https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash-lite:generateContent" \
+  -X POST "$BASE_URL/gemini-2.5-flash-lite:generateContent" \
   -H "x-goog-api-key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"contents":[{"role":"user","parts":[{"text":"Respondé con la palabra OK."}]}]}'
 cat /tmp/gemini-test.json
 rm /tmp/gemini-test.json
 ```
-`HTTP 200` con una respuesta = todo bien.
+`HTTP 200` con una respuesta = todo bien. Un `400`/`403` acá, con la misma key que usa el
+servicio, indica que el problema es de la **key** (proyecto, facturación o restricciones) y no
+del backend — ver el registro de diagnóstico en "Problemas conocidos".
+
+## Problemas conocidos
+
+### El `400 FAILED_PRECONDITION` del primer deploy (diagnóstico corregido)
+
+Se conserva el registro porque explica por qué el proyecto terminó con dos proveedores
+soportados, y para no volver a diagnosticar mal el mismo error.
+
+**Síntoma.** En el primer deploy, las llamadas a Gemini vía **AI Studio**
+(`generativelanguage.googleapis.com`) funcionaban desde una PC de escritorio pero fallaban desde
+el VPS con `400 FAILED_PRECONDITION — "User location is not supported for the API use"`, pese a
+que la IP del VPS geolocaliza al mismo país que la PC. Se probó habilitar billing y generar una
+key nueva: funcionó un rato y volvió a fallar.
+
+**Diagnóstico original — incorrecto.** Se atribuyó la falla a un bloqueo antiabuso de Google a
+las IPs de datacenter/hosting y se concluyó que no era un problema "resoluble de forma estable
+desde el lado de AI Studio". Sobre esa base se migró a Vertex AI.
+
+**Corrección.** Esa causa raíz **no era la correcta**: el `FAILED_PRECONDITION` provenía de la
+**API key utilizada** —su proyecto, facturación y restricciones asociadas—, no de la IP de
+origen. Con una key correctamente configurada, el endpoint de AI Studio responde con normalidad;
+de hecho el ambiente de desarrollo lo usa hoy de forma habitual. Lo que desorientó el
+diagnóstico fue que la key nueva "funcionó un rato": esa intermitencia se leyó como un bloqueo
+por IP cuando era un problema de la propia key.
+
+**Qué sigue en pie.** Usar **Vertex AI en producción continúa siendo la decisión correcta**,
+pero por motivos distintos de los que se creyó en su momento: es el producto pensado para uso
+servidor-a-servidor y, sobre todo, **es el que ofrece las garantías de tratamiento de datos**
+—no entrenamiento con las consignas y *Cloud Data Processing Addendum*— que el proyecto exige
+para manejar datos de salud. Dejó de ser un rodeo técnico para pasar a ser una decisión de
+privacidad. Los *gotchas* de Vertex documentados más arriba siguen todos vigentes.
 
 ## Zona horaria
 

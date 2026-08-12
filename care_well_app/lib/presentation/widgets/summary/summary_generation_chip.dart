@@ -41,6 +41,11 @@ class SummaryGenerationChip extends StatelessWidget {
 
   /// Devuelve una etiqueta de tiempo relativo simple para el momento de
   /// generación (siempre en el pasado o "recién").
+  ///
+  /// El backend sella la fecha con la hora del servidor, que puede no coincidir
+  /// con la del teléfono (distinta zona horaria o reloj desfasado). Por eso las
+  /// diferencias negativas —fechas "en el futuro"— también se muestran como
+  /// "recién" en lugar de un texto absurdo.
   static String _relativo(DateTime momento) {
     final diff = DateTime.now().difference(momento);
     if (diff.inMinutes < 1) return 'recién';

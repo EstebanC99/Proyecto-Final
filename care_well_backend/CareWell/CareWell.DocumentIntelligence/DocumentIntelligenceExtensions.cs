@@ -1,5 +1,6 @@
 using CareWell.DocumentIntelligence.ReconocedorTexto;
 using CareWell.DocumentIntelligence.ResumidorDiario;
+using CareWell.Global.Enumeraciones.IA;
 using CareWell.Logger;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,10 +41,25 @@ namespace CareWell.DocumentIntelligence
             var registradorLogServicioExterno = serviceProvider.GetRequiredService<IRegistradorLogServicioExterno>();
 
             return new GeminiChatClient(
+                ResolverBaseUrl(opciones),
                 opciones.ApiKey,
                 seleccionarModelo(opciones),
                 TimeSpan.FromSeconds(opciones.TimeoutSegundos),
+                opciones.EnviarResponseSchema,
                 registradorLogServicioExterno);
+        }
+
+        private static string ResolverBaseUrl(IAOptions opciones)
+        {
+            if (!string.IsNullOrWhiteSpace(opciones.BaseUrlPersonalizada))
+                return opciones.BaseUrlPersonalizada.TrimEnd('/');
+
+            return opciones.Proveedor switch
+            {
+                ProveedoresIAEnum.VertexAI => "https://aiplatform.googleapis.com/v1/publishers/google/models",
+                ProveedoresIAEnum.AIStudio => "https://generativelanguage.googleapis.com/v1beta/models",
+                _ => throw new InvalidOperationException($"Proveedor de IA no soportado: {opciones.Proveedor}.")
+            };
         }
     }
 }

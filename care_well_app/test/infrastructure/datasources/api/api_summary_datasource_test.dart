@@ -49,9 +49,28 @@ class _StubAdapter implements HttpClientAdapter {
 }
 
 const _bodyConDatos = {
-  'texto': 'Hoy Alicia tuvo una jornada tranquila.',
-  'tieneDatos': true,
+  'resumenAcotado': 'Hoy Alicia tuvo una jornada tranquila.',
+  'estadoAnimo': 'Tranquila',
+  'resumenHabitos': 'Cumplió con casi toda la rutina.',
+  'habitos': [
+    {'descripcion': 'Caminata matutina', 'completado': true},
+    {'descripcion': 'Cena liviana', 'completado': false},
+  ],
+  'eventosSalud': [
+    {
+      'descripcion': 'Control de presión',
+      'hora': '08:45:00',
+      'actividadHabitoAsociado': 'Durante el desayuno',
+    },
+  ],
+  'recomendaciones': ['Registrar la cena cuando ocurra.'],
+  'recordatoriosHoy': ['Turno con la kinesióloga a las 18:00'],
+  'recordatoriosManana': ['Análisis de sangre en ayunas'],
+  'habitosManana': [
+    {'descripcion': 'Caminata matutina', 'completado': false},
+  ],
   'generadoEn': '2026-07-31T14:32:10',
+  'tieneDatos': true,
 };
 
 void main() {
@@ -89,23 +108,44 @@ void main() {
 
       final resultado = await datasource.obtenerResumen(personaId: 7);
 
-      expect(resultado.texto, 'Hoy Alicia tuvo una jornada tranquila.');
+      expect(
+        resultado.resumenAcotado,
+        'Hoy Alicia tuvo una jornada tranquila.',
+      );
+      expect(resultado.estadoAnimo, 'Tranquila');
+      expect(resultado.habitos, hasLength(2));
+      expect(resultado.habitosCompletados, 1);
+      expect(resultado.eventosSalud.single.hora, '08:45');
+      expect(resultado.recomendaciones, hasLength(1));
+      expect(resultado.recordatoriosHoy, hasLength(1));
+      expect(resultado.recordatoriosManana, hasLength(1));
+      expect(resultado.habitosManana, hasLength(1));
       expect(resultado.tieneDatos, isTrue);
       expect(resultado.generadoEn, DateTime(2026, 7, 31, 14, 32, 10));
     });
 
-    test('mapea el caso sin datos (texto null, tieneDatos false)', () async {
+    test('mapea el caso sin datos (listas vacías, tieneDatos false)', () async {
       final responseBody = jsonEncode({
-        'texto': null,
-        'tieneDatos': false,
+        'resumenAcotado': null,
+        'estadoAnimo': 'Sin registros',
+        'resumenHabitos': 'Sin registros',
+        'habitos': [],
+        'eventosSalud': [],
+        'recomendaciones': [],
+        'recordatoriosHoy': [],
+        'recordatoriosManana': [],
+        'habitosManana': [],
         'generadoEn': '2026-07-31T14:32:10',
+        'tieneDatos': false,
       });
       final (dio, _) = _buildDio(responseBody: responseBody);
       final datasource = ApiSummaryDatasource(dio);
 
       final resultado = await datasource.obtenerResumen(personaId: 7);
 
-      expect(resultado.texto, isNull);
+      expect(resultado.resumenAcotado, isNull);
+      expect(resultado.estadoAnimo, isNull);
+      expect(resultado.habitos, isEmpty);
       expect(resultado.tieneDatos, isFalse);
     });
 

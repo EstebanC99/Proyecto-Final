@@ -1,8 +1,8 @@
-﻿using CareWell.BusinessService.General;
+﻿using CareWell.BusinessService.Abstractions.General;
+using CareWell.BusinessService.General;
 using CareWell.DataViews.General;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
-using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.General;
 using CareWell.Domain.Validadores;
 using CareWell.Queries.General;
@@ -16,7 +16,7 @@ namespace CareWell.BusinessService.Test.General
         private Mock<IUserContext> userContext;
         private Mock<IEntityLoaderDomainService> entityLoaderDomainService;
         private Mock<IValidadorPermisoAccion> validadorPermisoAccion;
-        private Mock<IArmarResumenDiarioDomainService> armarResumenDiarioDomainService;
+        private Mock<IArmarResumenDiarioBusinessService> armarResumenDiarioBusinessService;
 
         protected override void InitializeTest()
         {
@@ -25,14 +25,14 @@ namespace CareWell.BusinessService.Test.General
             this.userContext = new Mock<IUserContext>();
             this.entityLoaderDomainService = new Mock<IEntityLoaderDomainService>();
             this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
-            this.armarResumenDiarioDomainService = new Mock<IArmarResumenDiarioDomainService>();
+            this.armarResumenDiarioBusinessService = new Mock<IArmarResumenDiarioBusinessService>();
 
             this.Target = new ResumenDiarioBusinessService(
                 this.unitOfWork.Object,
                 this.userContext.Object,
                 this.entityLoaderDomainService.Object,
                 this.validadorPermisoAccion.Object,
-                this.armarResumenDiarioDomainService.Object
+                this.armarResumenDiarioBusinessService.Object
             );
         }
 
@@ -53,6 +53,8 @@ namespace CareWell.BusinessService.Test.General
                 this.usuario.Setup(s => s.Persona).Returns(Mock.Of<Persona>());
 
                 this.personaCuidada = new Mock<Persona>();
+                this.personaCuidada.Setup(s => s.ID).Returns(this.query.PersonaCuidadaID);
+                this.personaCuidada.Setup(s => s.Nombre).Returns("Persona X");
 
                 this.userContext.Setup(s => s.UsuarioID).Returns(this.usuario.Object.ID);
 
@@ -114,7 +116,7 @@ namespace CareWell.BusinessService.Test.General
             }
 
             [Fact]
-            public void Llama_una_vez_al_metodo_Armar_del_ArmarResumenDiarioDomainService()
+            public void Llama_una_vez_al_metodo_Armar_del_ArmarResumenDiarioBusinessService()
             {
                 // Arrange
 
@@ -122,59 +124,7 @@ namespace CareWell.BusinessService.Test.General
                 this.Action();
 
                 // Assert
-                this.armarResumenDiarioDomainService.Verify(v => v.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>()), Times.Once);
-            }
-
-            [Fact]
-            public void Setea_el_Resumen_obtenido_en_la_respuesta()
-            {
-                // Arrange
-                var resumen = "Resumen generado";
-                this.armarResumenDiarioDomainService.Setup(s => s.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>())).ReturnsAsync(resumen);
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.Equal(resumen, respuesta.Texto);
-            }
-
-            [Fact]
-            public void Setea_TieneDatos_en_true_si_el_resumen_contiene_texto()
-            {
-                // Arrange
-                this.armarResumenDiarioDomainService.Setup(s => s.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>())).ReturnsAsync("resumen");
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.True(respuesta.TieneDatos);
-            }
-
-            [Fact]
-            public void Setea_TieneDatos_en_false_si_el_resumen_contiene_texto()
-            {
-                // Arrange
-                this.armarResumenDiarioDomainService.Setup(s => s.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>())).ReturnsAsync((string?)null);
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.False(respuesta.TieneDatos);
-            }
-
-            [Fact]
-            public void Retorna_una_instancia_del_tipo_ResumenDiarioDataView()
-            {
-                // Arrange
-
-                // Action
-                var respuesta = this.Action();
-
-                // Assert
-                Assert.IsType<ResumenDiarioDataView>(respuesta);
+                this.armarResumenDiarioBusinessService.Verify(v => v.Armar(this.personaCuidada.Object.ID, this.personaCuidada.Object.Nombre, It.IsAny<CancellationToken>()), Times.Once);
             }
         }
     }

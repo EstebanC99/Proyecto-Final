@@ -27,6 +27,8 @@ export 'health/tipo_evento_salud.dart';
 export 'health/tipo_habito_vida.dart';
 export 'settings/aceptacion_terminos.dart';
 export 'settings/configuracion.dart';
+export 'summary/evento_salud_resumen.dart';
+export 'summary/habito_resumen.dart';
 export 'summary/resumen_inteligente.dart';
 export 'shared/entidad_basica.dart';
 export 'shared/persona.dart';

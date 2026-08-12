@@ -2,6 +2,6 @@
 {
     public interface IResumidorDiarioAgent
     {
-        Task<string?> ArmarResumen(ResumidorTextoAgentRequest request, CancellationToken cancellationToken);
+        Task<ResumidorDiarioAgentResponse> ArmarResumen(ResumidorTextoAgentRequest request, CancellationToken cancellationToken);
     }
 }

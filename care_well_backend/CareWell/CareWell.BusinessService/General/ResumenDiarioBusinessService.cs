@@ -2,7 +2,6 @@
 using CareWell.DataViews.General;
 using CareWell.Domain.Auth;
 using CareWell.Domain.DomainServices;
-using CareWell.Domain.DomainServices.General;
 using CareWell.Domain.General;
 using CareWell.Domain.Validadores;
 using CareWell.Queries.General;
@@ -16,19 +15,19 @@ namespace CareWell.BusinessService.General
         private IUserContext UserContext { get; set; }
         private IEntityLoaderDomainService EntityLoaderDomainService { get; set; }
         private IValidadorPermisoAccion ValidadorPermisoAccion { get; set; }
-        private IArmarResumenDiarioDomainService ArmarResumenDiarioDomainService { get; set; }
+        private IArmarResumenDiarioBusinessService ArmarResumenDiarioBusinessService { get; set; }
 
         public ResumenDiarioBusinessService(IUnitOfWork unitOfWork,
                                             IUserContext userContext,
                                             IEntityLoaderDomainService entityLoaderDomainService,
                                             IValidadorPermisoAccion validadorPermisoAccion,
-                                            IArmarResumenDiarioDomainService armarResumenDiarioDomainService)
+                                            IArmarResumenDiarioBusinessService armarResumenDiarioBusinessService)
             : base(unitOfWork)
         {
             this.UserContext = userContext;
             this.EntityLoaderDomainService = entityLoaderDomainService;
             this.ValidadorPermisoAccion = validadorPermisoAccion;
-            this.ArmarResumenDiarioDomainService = armarResumenDiarioDomainService;
+            this.ArmarResumenDiarioBusinessService = armarResumenDiarioBusinessService;
         }
 
         public async Task<ResumenDiarioDataView> Generar(GenerarResumenDiarioQuery query, CancellationToken cancellationToken)
@@ -38,14 +37,7 @@ namespace CareWell.BusinessService.General
 
             this.ValidadorPermisoAccion.ValidarVisualizacion(personaCuidada, usuario.Persona);
 
-            var resumen = await this.ArmarResumenDiarioDomainService.Armar(personaCuidada, cancellationToken);
-
-            return new ResumenDiarioDataView
-            {
-                Texto = resumen,
-                TieneDatos = !string.IsNullOrEmpty(resumen),
-                GeneradoEn = DateTime.Now
-            };
+            return await this.ArmarResumenDiarioBusinessService.Armar(personaCuidada.ID, personaCuidada.Nombre, cancellationToken);
         }
     }
 }

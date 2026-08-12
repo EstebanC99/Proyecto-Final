@@ -4,12 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 /// Pantalla de Resumen inteligente (US 9.16).
 ///
-/// Genera on-demand un resumen narrativo de la persona de contexto al abrirse y
+/// Genera on-demand el resumen del día de la persona de contexto al abrirse y
 /// al cambiar de persona (el provider observa
 /// [personaVisualizacionSeleccionadaProvider]). El botón de la AppBar y el
 /// pull-to-refresh fuerzan una regeneración invalidando
@@ -102,13 +103,18 @@ class SummaryScreen extends ConsumerWidget {
           child: SummaryLoadingSkeleton(),
         ),
       ),
+      // El `Align` afloja el `minHeight` que impone `_scrollable`: sin él, el
+      // banner —que no tiene alto propio— se estira a la pantalla completa.
       error: (err, _) => _scrollable(
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: InlineErrorBanner(
-            message: 'No se pudo generar el resumen. $err',
-            actionLabel: 'Reintentar',
-            onAction: () => ref.invalidate(resumenInteligenteProvider),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: InlineErrorBanner(
+              message: _mensajeDeError(err),
+              actionLabel: 'Reintentar',
+              onAction: () => ref.invalidate(resumenInteligenteProvider),
+            ),
           ),
         ),
       ),
@@ -118,8 +124,11 @@ class SummaryScreen extends ConsumerWidget {
           return _scrollable(const SizedBox.shrink());
         }
 
-        // Éxito sin datos: empty state neutro, sin narrativa ni disclaimer.
-        if (!resumen.tieneDatos || resumen.texto == null) {
+        // Éxito sin nada que pintar: empty state neutro. Se decide por
+        // `hayContenidoVisible` y no por `tieneDatos`, porque el backend puede
+        // informar datos que esta pantalla no muestra (p. ej. solo el
+        // `resumenAcotado`, que alimenta el hero del Home).
+        if (!resumen.hayContenidoVisible) {
           return _scrollable(
             const Padding(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
@@ -128,37 +137,75 @@ class SummaryScreen extends ConsumerWidget {
           );
         }
 
-        // Éxito con datos.
+        // Éxito con datos: cada sección se pinta solo si tiene contenido, con
+        // la entrada escalonada del mockup (60/130/200/270 ms).
         return _scrollable(
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SummaryGenerationChip(generadoEn: resumen.generadoEn),
+                SummaryDayBand(
+                  fecha: resumen.generadoEn ?? DateTime.now(),
+                  estadoAnimo: resumen.estadoAnimo,
+                  generadoEn: resumen.generadoEn,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                const AiDisclaimerCard(),
-                const SizedBox(height: AppSpacing.md),
-                SummaryNarrativeCard(texto: resumen.texto!),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Este resumen no reemplaza las pantallas de detalle de cada '
-                  'módulo.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 1.4,
-                    color: context.colors.textSecondary,
+                if (resumen.hayHabitos) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  SummaryHabitsCard(
+                    habitos: resumen.habitos,
+                    completados: resumen.habitosCompletados,
+                    progreso: resumen.progresoHabitos,
+                    resumen: resumen.resumenHabitos,
+                    delay: const Duration(milliseconds: 60),
                   ),
-                ),
+                ],
+                if (resumen.eventosSalud.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  SummaryHealthTimelineCard(
+                    eventos: resumen.eventosSalud,
+                    delay: const Duration(milliseconds: 130),
+                  ),
+                ],
+                if (resumen.hayAtencion) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  SummaryAttentionCard(
+                    recomendaciones: resumen.recomendaciones,
+                    recordatoriosHoy: resumen.recordatoriosHoy,
+                    delay: const Duration(milliseconds: 200),
+                  ),
+                ],
+                if (resumen.hayManana) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  SummaryTomorrowCard(
+                    recordatorios: resumen.recordatoriosManana,
+                    habitos: resumen.habitosManana,
+                    delay: const Duration(milliseconds: 270),
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.md),
+                const SummaryFooterDisclaimer(),
               ],
             ),
           ),
         );
       },
     );
+  }
+
+  /// Texto del banner de error, siempre redactado para el usuario.
+  ///
+  /// Las excepciones de dominio ya traen un mensaje pensado para mostrar, así
+  /// que se usa tal cual. Cualquier otra falla (un error de parseo, un bug) se
+  /// resume en una frase genérica: volcar su `toString()` llenaría la pantalla
+  /// de detalle técnico. El error completo sigue quedando en el log de Riverpod.
+  String _mensajeDeError(Object err) {
+    if (err is SinConexionException ||
+        err is ServicioNoDisponibleException ||
+        err is ServidorException) {
+      return err.toString();
+    }
+    return 'No se pudo generar el resumen. Intentá de nuevo en unos minutos.';
   }
 
   /// Envuelve el contenido en un scroll con física "always" para que el

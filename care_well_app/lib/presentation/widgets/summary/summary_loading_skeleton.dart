@@ -5,9 +5,10 @@ import '../../../config/theme/app_spacing.dart';
 
 /// Skeleton de carga de la pantalla de Resumen (US 9.16).
 ///
-/// Muestra 4-5 barras con el mismo pulso de opacidad que [NavTileSkeleton] y el
-/// texto "Redactando tu resumen…" en [AppPalette.aiAccent]. Se usa en lugar de
-/// un spinner genérico, para reforzar que el contenido se está "escribiendo".
+/// Reproduce la silueta del contenido real —franja del día y tres cards con
+/// encabezado— con el mismo pulso de opacidad que [NavTileSkeleton], y anuncia
+/// "Armando el resumen del día…" en [AppPalette.aiAccent] para que la espera de
+/// la IA se lea como trabajo en curso y no como una demora sin explicación.
 class SummaryLoadingSkeleton extends StatefulWidget {
   const SummaryLoadingSkeleton({super.key});
 
@@ -19,9 +20,6 @@ class _SummaryLoadingSkeletonState extends State<SummaryLoadingSkeleton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _opacity;
-
-  /// Anchos relativos de cada barra, para que el bloque parezca un párrafo real.
-  static const List<double> _anchos = [1.0, 0.95, 0.88, 0.97, 0.6];
 
   @override
   void initState() {
@@ -48,54 +46,111 @@ class _SummaryLoadingSkeletonState extends State<SummaryLoadingSkeleton>
       animation: _opacity,
       builder: (context, _) => Opacity(
         opacity: _opacity.value,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            boxShadow: AppSpacing.elev1,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    size: 16,
-                    color: context.colors.aiAccent,
-                  ),
-                  SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Redactando tu resumen…',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Aviso + franja del día.
+            Row(
+              children: [
+                Icon(
+                  Icons.auto_awesome,
+                  size: 16,
+                  color: context.colors.aiAccent,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    'Armando el resumen del día…',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: context.colors.aiAccent,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              for (final ancho in _anchos) ...[
-                FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: ancho,
-                  child: Container(
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceVariant,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    ),
-                  ),
                 ),
-                if (ancho != _anchos.last)
-                  const SizedBox(height: AppSpacing.md),
+                const _Barra(width: 120, height: 26, radius: 999),
               ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            // Cards: la primera más alta (anillo + pills de hábitos).
+            const _CardEsqueleto(lineas: [1.0, 0.7], alturaBloque: 82),
+            const SizedBox(height: AppSpacing.md),
+            const _CardEsqueleto(lineas: [0.95, 0.6]),
+            const SizedBox(height: AppSpacing.md),
+            const _CardEsqueleto(lineas: [0.9]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Silueta de una card: caja de ícono, título y algunas líneas de contenido.
+class _CardEsqueleto extends StatelessWidget {
+  const _CardEsqueleto({required this.lineas, this.alturaBloque});
+
+  /// Anchos relativos de las líneas de contenido.
+  final List<double> lineas;
+
+  /// Alto de un bloque destacado antes de las líneas (ej. el anillo).
+  final double? alturaBloque;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        boxShadow: AppSpacing.elev1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const _Barra(width: 44, height: 44, radius: AppSpacing.radiusMd),
+              const SizedBox(width: AppSpacing.md),
+              const _Barra(width: 140, height: 14),
+              const Spacer(),
+              const _Barra(width: 48, height: 12),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.lg),
+          if (alturaBloque != null) ...[
+            _Barra(width: alturaBloque!, height: alturaBloque!, radius: 999),
+            const SizedBox(height: AppSpacing.md),
+          ],
+          for (final (indice, ancho) in lineas.indexed) ...[
+            if (indice > 0) const SizedBox(height: AppSpacing.sm),
+            FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: ancho,
+              child: const _Barra(height: 12),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Bloque gris del skeleton.
+class _Barra extends StatelessWidget {
+  const _Barra({this.width, required this.height, this.radius});
+
+  final double? width;
+  final double height;
+  final double? radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: context.colors.surfaceVariant,
+        borderRadius: BorderRadius.circular(radius ?? AppSpacing.radiusSm),
       ),
     );
   }

@@ -1,15 +1,14 @@
-﻿using CareWell.DocumentIntelligence.ResumidorDiario;
+﻿using CareWell.BusinessService.Abstractions.General;
+using CareWell.DataViews.General;
+using CareWell.DocumentIntelligence.ResumidorDiario;
 using CareWell.Domain.Agenda;
 using CareWell.Domain.DomainServices.Agenda;
-using CareWell.Domain.DomainServices.General;
-using CareWell.Domain.General;
-using CareWell.Domain.Salud;
 using CareWell.Repository.Agenda;
 using CareWell.Repository.Salud;
 
 namespace CareWell.BusinessService.General
 {
-    public class ArmarResumenDiarioBusinessService : IArmarResumenDiarioDomainService
+    public class ArmarResumenDiarioBusinessService : IArmarResumenDiarioBusinessService
     {
         private IEventoAgendaRepository EventoAgendaRepository { get; set; }
         private IEventoSaludRepository EventoSaludRepository { get; set; }
@@ -33,24 +32,24 @@ namespace CareWell.BusinessService.General
             this.ResumidorDiarioAgent = resumidorDiarioAgent;
         }
 
-        public async Task<string?> Armar(Persona personaCuidada, CancellationToken cancellationToken)
+        public async Task<ResumenDiarioDataView> Armar(int personaCuidadaID, string personaCuidadaNombre, CancellationToken cancellationToken)
         {
             var fechaDesde = DateTime.Now;
             var fechaHasta = DateTime.Today.AddDays(1);
 
-            var eventosAgenda = this.EventoAgendaRepository.GetAllByPersonaEnRango(personaCuidada.ID, fechaDesde, fechaHasta.AddDays(1));
-            var eventosSalud = this.EventoSaludRepository.GetByFechas(personaCuidada.ID, fechaDesde.Date, fechaHasta);
-            var habitosVida = this.HabitoVidaRepository.GetByPersona(personaCuidada.ID);
-            var estadosAnimo = this.PersonaEstadoAnimoRepository.GetByFechas(personaCuidada.ID, fechaDesde.Date, fechaHasta);
+            var eventosAgenda = this.EventoAgendaRepository.GetAllByPersonaEnRango(personaCuidadaID, fechaDesde, fechaHasta.AddDays(1));
+            var eventosSalud = this.EventoSaludRepository.GetByFechas(personaCuidadaID, fechaDesde.Date, fechaHasta);
+            var habitosVida = this.HabitoVidaRepository.GetByPersona(personaCuidadaID);
+            var estadosAnimo = this.PersonaEstadoAnimoRepository.GetByFechas(personaCuidadaID, fechaDesde.Date, fechaHasta);
 
             var eventosRegistrados = eventosAgenda.Count + eventosSalud.Count + habitosVida.Count + estadosAnimo.Count;
 
             if (eventosRegistrados == default)
-                return null;
+                return new ResumenDiarioDataView { GeneradoEn = DateTime.Now };
 
             var request = new ResumidorTextoAgentRequest
             {
-                NombrePersona = personaCuidada.Nombre,
+                NombrePersona = personaCuidadaNombre,
                 FechaHoy = fechaDesde,
                 FechaManana = fechaHasta,
                 EventosAgenda = this.ObtenerEventosAgenda(eventosAgenda, fechaDesde, fechaHasta.AddDays(1)),
@@ -81,7 +80,39 @@ namespace CareWell.BusinessService.General
                 }).ToList()
             };
 
-            return await this.ResumidorDiarioAgent.ArmarResumen(request, cancellationToken);
+            var response = await this.ResumidorDiarioAgent.ArmarResumen(request, cancellationToken);
+
+            var resumenDiario = new ResumenDiarioDataView
+            {
+                ResumenAcotado = response.ResumenAcotado,
+                EstadoAnimo = response.EstadoAnimo,
+
+                ResumenHabitos = response.ResumenHabitos,
+                Habitos = response.Habitos.Select(h => new ResumenDiarioHabitosDataView
+                {
+                    Descripcion = h.Descripcion,
+                    Completado = h.Completado,
+                }).ToList(),
+
+                EventosSalud = response.EventosSalud.Select(e => new ResumenDiarioEventosSaludDataView
+                {
+                    Descripcion = e.Descripcion,
+                    Hora = e.Hora,
+                    ActividadHabitoAsociado = e.ActividadHabitoAsociado
+                }).ToList(),
+
+                Recomendaciones = response.Recomendaciones,
+                RecordatoriosHoy = response.RecordatoriosHoy,
+                RecordatoriosManana = response.RecordatoriosManana,
+                HabitosManana = response.HabitosManana.Select(h => new ResumenDiarioHabitosDataView
+                {
+                    Descripcion = h.Descripcion,
+                    Completado = h.Completado,
+                }).ToList(),
+                GeneradoEn = DateTime.Now
+            };
+
+            return resumenDiario;
         }
 
         private List<EventoRequest> ObtenerEventosAgenda(List<EventoAgenda> eventosAgenda, DateTime fechaDesde, DateTime fechaHasta)

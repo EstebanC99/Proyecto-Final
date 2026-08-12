@@ -24,14 +24,8 @@ namespace CareWell.DocumentIntelligence.ReconocedorTexto
             - El apellido está bajo el título "Apellido / Surname".
             - El nombre está bajo el título "Nombre / Name".
 
-            Devolvé el resultado únicamente como un objeto JSON con esta forma exacta:
-            {
-              "DNI": número entero sin puntos,
-              "Nombre": "nombre o nombres",
-              "Apellido": "apellido o apellidos"
-            }
-
-            Si algún dato no es legible en la imagen, devolvé 0 para DNI y una cadena vacía para Nombre o Apellido. No incluyas texto adicional, explicaciones ni marcas de formato como ```json.
+            La estructura de la respuesta está definida por el esquema; no la repitas.
+            Si algún dato no es legible, devolvé 0 en DNI y una cadena vacía en Nombre o Apellido.
             """;
 
         private IChatClient ChatClient { get; set; }
