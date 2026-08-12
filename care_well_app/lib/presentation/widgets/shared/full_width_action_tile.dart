@@ -16,10 +16,10 @@ enum FullWidthActionTileStyle {
 
 /// Tile de acción full-width con ícono + texto.
 ///
-/// Layout de 72 dp de alto, animación de entrada [FadeInUp] y estado pressed.
-/// Reutilizado por accesos destacados como el tile de emergencia (variante
-/// [FullWidthActionTileStyle.filled]) y el acceso a la línea de tiempo de salud
-/// (variante [FullWidthActionTileStyle.outlined]).
+/// Alto mínimo de 72 dp —crece si el contenido lo necesita—, animación de
+/// entrada [FadeInUp] y estado pressed. Reutilizado por accesos destacados como
+/// el tile de emergencia y el acceso a la línea de tiempo de salud (ambos en la
+/// variante [FullWidthActionTileStyle.filled]).
 class FullWidthActionTile extends StatefulWidget {
   const FullWidthActionTile({
     super.key,
@@ -108,7 +108,9 @@ class _FullWidthActionTileState extends State<FullWidthActionTile> {
         onTapCancel: () => setState(() => _pressed = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          height: 72,
+          // Alto mínimo, no fijo: con escalas tipográficas grandes el tile
+          // crece en lugar de recortar el contenido.
+          constraints: const BoxConstraints(minHeight: 72),
           decoration: BoxDecoration(
             color: _resolveBackground(context),
             border: _isOutlined
@@ -116,21 +118,37 @@ class _FullWidthActionTileState extends State<FullWidthActionTile> {
                 : null,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(widget.icon, size: 32, color: foreground),
-                const SizedBox(width: AppSpacing.md),
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          // El Align estira el tile a todo el ancho disponible; `heightFactor`
+          // evita que además estire el alto, que lo define el contenido (con
+          // el mínimo de 72 dp del contenedor).
+          child: Align(
+            heightFactor: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(widget.icon, size: 32, color: foreground),
+                  const SizedBox(width: AppSpacing.md),
+                  // Flexible: en pantallas angostas o con tipografía grande el
+                  // label cede espacio en lugar de desbordar la fila.
+                  Flexible(
+                    child: Text(
+                      widget.label,
+                      style: TextStyle(
+                        color: foreground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
