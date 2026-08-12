@@ -14,6 +14,9 @@ DateTime _soloFecha(DateTime fecha) =>
 /// eventos de salud son esporádicos.
 const _ventanaEventoAnterior = Duration(days: 90);
 
+/// Ventana hacia atrás en la que el hub de Salud busca el último evento.
+const _ventanaUltimoEvento = Duration(days: 90);
+
 /// Lunes de la semana actualmente visible en la tira de días de los eventos
 /// de salud.
 final semanaEventosSaludProvider = StateProvider<DateTime>(
@@ -100,6 +103,38 @@ final eventoSaludAnteriorProvider = FutureProvider<EventoSalud?>((ref) async {
   return anteriores.firstOrNull;
 });
 
+/// Último evento de salud registrado (hasta hoy inclusive) de la persona de
+/// contexto, dentro de los últimos 90 días. Alimenta la tarjeta "Eventos de
+/// salud" del hub de Mi salud.
+///
+/// A diferencia de [eventoSaludAnteriorProvider], no está anclado al día
+/// seleccionado en la pantalla de eventos: el hub siempre mira desde hoy hacia
+/// atrás. Es `autoDispose` porque el hub es transitorio y conviene refrescar el
+/// dato al entrar.
+final ultimoEventoSaludProvider = FutureProvider.autoDispose<EventoSalud?>((
+  ref,
+) async {
+  final persona = await ref.watch(
+    personaVisualizacionSeleccionadaProvider.future,
+  );
+  if (persona == null) return null;
+
+  final ahora = DateTime.now();
+  final hoy = _soloFecha(ahora);
+  final desde = hoy.subtract(_ventanaUltimoEvento);
+  // `hasta` incluye todo el día de hoy, sin importar cómo interprete el límite
+  // el origen de datos; el filtro posterior descarta lo que todavía no ocurrió.
+  final hasta = hoy.add(const Duration(days: 1));
+
+  final eventos = await ref
+      .watch(eventoSaludRepositoryProvider)
+      .getEventosSaludDelMes(personaId: persona.id, desde: desde, hasta: hasta);
+
+  final ocurridos = eventos.where((e) => !e.fechaHora.isAfter(ahora)).toList()
+    ..sort((a, b) => b.fechaHora.compareTo(a.fechaHora));
+  return ocurridos.firstOrNull;
+});
+
 final eventoSaludByIdProvider = FutureProvider.family<EventoSalud?, int>((
   ref,
   id,
@@ -127,6 +162,7 @@ final notasByEventoProvider = Provider.family<List<NotaEventoSalud>, int>((
 void _invalidarEventosSalud(Ref ref) {
   ref.invalidate(eventosSaludDeSemanaProvider);
   ref.invalidate(eventoSaludAnteriorProvider);
+  ref.invalidate(ultimoEventoSaludProvider);
 }
 
 final crearEventoSaludProvider =

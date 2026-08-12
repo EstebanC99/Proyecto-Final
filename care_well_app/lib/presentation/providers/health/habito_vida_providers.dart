@@ -14,6 +14,26 @@ final habitosProvider = FutureProvider<List<HabitoVida>>((ref) async {
       .getHabitosByPersona(persona.id);
 });
 
+/// Progreso de hábitos del día: cuántos hay y cuántos están realizados.
+typedef ProgresoHabitos = ({int total, int completados});
+
+/// Progreso de hábitos del día derivado de [habitosProvider]: no hace I/O
+/// propio, así que las dos pantallas que lo consumen (el hub de Salud y la
+/// banda de progreso de Hábitos) comparten la misma consulta.
+///
+/// `habito.realizacion` ya viene acotada al día por el origen de datos: acá no
+/// se filtra por fecha.
+final progresoHabitosHoyProvider = Provider<AsyncValue<ProgresoHabitos>>((ref) {
+  return ref
+      .watch(habitosProvider)
+      .whenData(
+        (habitos) => (
+          total: habitos.length,
+          completados: habitos.where((h) => h.realizacion != null).length,
+        ),
+      );
+});
+
 final habitoByIdProvider = FutureProvider.family<HabitoVida?, int>((
   ref,
   id,
