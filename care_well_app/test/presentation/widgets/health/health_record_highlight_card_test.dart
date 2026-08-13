@@ -71,11 +71,35 @@ void main() {
       expect(find.textContaining('antecedente'), findsNothing);
     });
 
-    testWidgets('sin ficha cargada muestra el chip de grupo vacío', (
+    testWidgets('con factor cargado antepone el rótulo "Grupo"', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(factorSanguineo: 'AB-'));
+
+      final chip = tester.widget<Text>(find.textContaining('AB-'));
+      expect(chip.textSpan!.toPlainText(), 'Grupo AB-');
+    });
+
+    // El rótulo "Grupo" sólo acompaña a un valor real: sin factor el chip es
+    // únicamente el copy de vacío (antes decía "Grupo Sin grupo cargado").
+    testWidgets('sin ficha cargada muestra sólo el copy de vacío', (
       tester,
     ) async {
       await tester.pumpWidget(_wrap(factorSanguineo: null));
-      expect(find.textContaining('Sin grupo cargado'), findsOneWidget);
+
+      final chip = tester.widget<Text>(
+        find.textContaining('Sin grupo cargado'),
+      );
+      expect(chip.textSpan!.toPlainText(), 'Sin grupo cargado');
+    });
+
+    testWidgets('un factor vacío se trata como ausente', (tester) async {
+      await tester.pumpWidget(_wrap(factorSanguineo: '   '));
+
+      final chip = tester.widget<Text>(
+        find.textContaining('Sin grupo cargado'),
+      );
+      expect(chip.textSpan!.toPlainText(), 'Sin grupo cargado');
     });
 
     testWidgets('sin datos disponibles no dibuja la fila de chips', (

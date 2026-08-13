@@ -41,6 +41,48 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
   final _observacionesCtrl = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // La ficha puede venir YA resuelta de otra pantalla que la haya observado
+    // antes (el hub de Salud la usa para sus chips). En ese caso no hay
+    // transición de estado y `ref.listen` nunca dispara, así que la siembra
+    // inicial se hace acá; el listener cubre el caso contrario.
+    final fichaAsync = ref.read(fichaSaludProvider);
+    if (fichaAsync case AsyncData(:final value)) {
+      _sembrarBorrador(value, notificar: false);
+    }
+  }
+
+  /// Siembra el borrador editable a partir de [ficha] (o de su ausencia).
+  ///
+  /// No hace nada si ya se sembró para la persona de contexto actual, para no
+  /// pisar las ediciones en curso. [notificar] queda en `false` cuando se llama
+  /// antes del primer build, donde `setState` todavía no corresponde.
+  void _sembrarBorrador(FichaSalud? ficha, {bool notificar = true}) {
+    final persona = ref.read(personaVisualizacionSeleccionadaProvider).value;
+    if (persona == null) return;
+    if (_seededPersonaId == persona.id) return;
+
+    final seeded = ficha != null
+        ? FichaSaludFormState.fromFicha(ficha)
+        : FichaSaludFormState.empty(persona);
+
+    void aplicar() {
+      _form = seeded;
+      _seededPersonaId = persona.id;
+      _dirty = false;
+      _obraSocialCtrl.text = seeded.obraSocial;
+      _observacionesCtrl.text = seeded.observaciones;
+    }
+
+    if (notificar) {
+      setState(aplicar);
+    } else {
+      aplicar();
+    }
+  }
+
+  @override
   void dispose() {
     _obraSocialCtrl.dispose();
     _observacionesCtrl.dispose();
@@ -133,25 +175,10 @@ class _FichaSaludScreenState extends ConsumerState<FichaSaludScreen> {
     final puedeEditar =
         ref.watch(puedeAdministrarFichaSaludProvider).value ?? false;
 
-    // Siembra el borrador cuando llega la ficha (o su ausencia).
+    // Siembra el borrador cuando llega la ficha (o su ausencia). Si ya venía
+    // resuelta, la siembra inicial la hizo `initState`.
     ref.listen<AsyncValue<FichaSalud?>>(fichaSaludProvider, (prev, next) {
-      next.whenData((ficha) {
-        final persona = ref
-            .read(personaVisualizacionSeleccionadaProvider)
-            .value;
-        if (persona == null) return;
-        if (_seededPersonaId == persona.id) return;
-        final seeded = ficha != null
-            ? FichaSaludFormState.fromFicha(ficha)
-            : FichaSaludFormState.empty(persona);
-        setState(() {
-          _form = seeded;
-          _seededPersonaId = persona.id;
-          _dirty = false;
-          _obraSocialCtrl.text = seeded.obraSocial;
-          _observacionesCtrl.text = seeded.observaciones;
-        });
-      });
+      next.whenData(_sembrarBorrador);
     });
 
     // Fuerza la resolución del provider de ficha (dispara el listener).

@@ -97,11 +97,12 @@ class HealthRecordHighlightCard extends StatelessWidget {
   /// "0 alergias" es ruido, no información.
   List<Widget> _chips(BuildContext context) {
     return [
-      _FichaChip(
-        prefijo: 'Grupo ',
-        valor: _tieneFactor ? factorSanguineo! : null,
-        textoAlternativo: 'Sin grupo cargado',
-      ),
+      // Sin factor cargado el chip es sólo el copy de vacío: el prefijo
+      // "Grupo " únicamente acompaña a un valor real.
+      if (_tieneFactor)
+        _FichaChip(prefijo: 'Grupo ', valor: factorSanguineo!)
+      else
+        const _FichaChip(valor: null, textoAlternativo: 'Sin grupo cargado'),
       if (cantidadAlergias > 0)
         _FichaChip(
           valor: _pluralizar(cantidadAlergias, 'alergia', 'alergias'),

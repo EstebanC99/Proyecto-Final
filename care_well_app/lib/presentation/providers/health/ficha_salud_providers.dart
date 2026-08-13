@@ -15,5 +15,10 @@ final guardarFichaSaludProvider = Provider<Future<void> Function(FichaSalud)>((
   ref,
 ) {
   final repo = ref.watch(fichaSaludRepositoryProvider);
-  return (FichaSalud ficha) => repo.guardarFichaSalud(ficha);
+  return (FichaSalud ficha) async {
+    await repo.guardarFichaSalud(ficha);
+    // La ficha se muestra fuera de su pantalla (chips del hub de Salud): sin
+    // invalidar, esas vistas quedan con los datos previos al guardado.
+    ref.invalidate(fichaSaludProvider);
+  };
 });
