@@ -48,6 +48,17 @@ void seleccionarDiaAgenda(WidgetRef ref, DateTime dia) {
   }
 }
 
+/// Devuelve la agenda al día de hoy.
+///
+/// La selección de día y semana vive en providers globales, que sobreviven al
+/// cierre de la pantalla. La agenda la llama al montarse para que cada entrada
+/// arranque en el presente y no donde quedó la visita anterior.
+void reiniciarSeleccionAgenda(WidgetRef ref) {
+  final hoy = _soloFecha(DateTime.now());
+  ref.read(diaSeleccionadoProvider.notifier).state = hoy;
+  ref.read(semanaSeleccionadaProvider.notifier).state = lunesDeLaSemana(hoy);
+}
+
 /// Ocurrencias de la persona de contexto dentro de la semana seleccionada
 /// (lunes a domingo), ordenadas por fecha/hora de inicio.
 final ocurrenciasDeSemanaProvider =

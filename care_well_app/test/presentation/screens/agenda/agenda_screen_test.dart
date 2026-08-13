@@ -278,5 +278,43 @@ void main() {
         expect(find.byType(FloatingActionButton), findsNothing);
       });
     });
+
+    // La selección de día y semana vive en providers globales: sin reinicio, la
+    // agenda se reabría donde había quedado la visita anterior.
+    group('reinicio de la selección', () {
+      final haceUnMes = _lunes.subtract(const Duration(days: 28));
+
+      testWidgets('al abrirse vuelve al día de hoy', (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            overrides: [
+              diaSeleccionadoProvider.overrideWith((ref) => haceUnMes),
+              semanaSeleccionadaProvider.overrideWith((ref) => haceUnMes),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('HOY'), findsOneWidget);
+      });
+
+      testWidgets('la semana visible también vuelve a la actual', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(
+            overrides: [
+              semanaSeleccionadaProvider.overrideWith((ref) => haceUnMes),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(AgendaScreen)),
+        );
+        expect(container.read(semanaSeleccionadaProvider), _lunes);
+      });
+    });
   });
 }

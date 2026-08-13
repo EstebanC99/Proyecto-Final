@@ -24,6 +24,26 @@ class AgendaScreen extends ConsumerStatefulWidget {
 }
 
 class _AgendaScreenState extends ConsumerState<AgendaScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Cada entrada a la agenda arranca en el presente: la selección de día y
+    // semana vive en providers globales y, si no se reinicia, la pantalla se
+    // abre donde quedó la visita anterior.
+    //
+    // El reinicio va en un microtask porque Riverpod prohíbe modificar un
+    // provider dentro de un ciclo de vida del widget. Se resuelve antes del
+    // primer frame, así que no se llega a ver la semana vieja.
+    //
+    // No se resuelve marcando los providers como `autoDispose` porque el
+    // formulario de alta se apila encima de esta pantalla sin desmontarla: eso
+    // los mantendría vivos igual, y además rompería el salto al día del evento
+    // recién guardado.
+    Future.microtask(() {
+      if (mounted) reiniciarSeleccionAgenda(ref);
+    });
+  }
+
   /// Trunca una fecha a año-mes-día.
   DateTime _soloFecha(DateTime fecha) =>
       DateTime(fecha.year, fecha.month, fecha.day);

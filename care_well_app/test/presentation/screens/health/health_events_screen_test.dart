@@ -4,6 +4,7 @@ import 'package:care_well_app/presentation/screens/screens.dart';
 import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -54,6 +55,7 @@ Widget _wrap({
   List<EventoSalud>? eventos,
   EventoSalud? anterior,
   bool puedeRegistrar = true,
+  List<Override> overrides = const [],
 }) {
   return ProviderScope(
     overrides: [
@@ -70,6 +72,7 @@ Widget _wrap({
       // El banner del ContextSelector renderiza un PersonaAvatar; se evita que
       // golpee el repositorio real cayendo al fallback de iniciales.
       personaImagenProvider.overrideWith((ref, id) async => null),
+      ...overrides,
     ],
     child: const MaterialApp(home: HealthEventsScreen()),
   );
@@ -201,6 +204,53 @@ void main() {
 
         // El encabezado deja de mostrar HOY: se saltó al día del evento previo.
         expect(find.text('HOY'), findsNothing);
+      });
+    });
+
+    // La selección de día y semana vive en providers globales: sin reinicio, la
+    // pantalla se reabría donde había quedado la visita anterior.
+    group('reinicio de la selección', () {
+      testWidgets('al abrirse vuelve al día de hoy', (tester) async {
+        final haceUnMes = _inicioDeHoy.subtract(const Duration(days: 30));
+
+        await tester.pumpWidget(
+          _wrap(
+            overrides: [
+              diaEventosSaludSeleccionadoProvider.overrideWith(
+                (ref) => haceUnMes,
+              ),
+              semanaEventosSaludProvider.overrideWith(
+                (ref) =>
+                    haceUnMes.subtract(Duration(days: haceUnMes.weekday - 1)),
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('HOY'), findsOneWidget);
+      });
+
+      testWidgets('la semana visible también vuelve a la actual', (
+        tester,
+      ) async {
+        final haceUnMes = _inicioDeHoy.subtract(const Duration(days: 30));
+
+        await tester.pumpWidget(
+          _wrap(
+            overrides: [
+              semanaEventosSaludProvider.overrideWith(
+                (ref) =>
+                    haceUnMes.subtract(Duration(days: haceUnMes.weekday - 1)),
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final contexto = tester.element(find.byType(HealthEventsScreen));
+        final container = ProviderScope.containerOf(contexto);
+        expect(container.read(semanaEventosSaludProvider), _lunesDeEstaSemana);
       });
     });
   });

@@ -45,6 +45,17 @@ void seleccionarDiaEventosSalud(WidgetRef ref, DateTime dia) {
   }
 }
 
+/// Devuelve la pantalla de eventos de salud al día de hoy.
+///
+/// La selección de día y semana vive en providers globales, que sobreviven al
+/// cierre de la pantalla. La pantalla la llama al montarse para que cada
+/// entrada arranque en el presente y no donde quedó la visita anterior.
+void reiniciarSeleccionEventosSalud(WidgetRef ref) {
+  final hoy = _soloFecha(DateTime.now());
+  ref.read(diaEventosSaludSeleccionadoProvider.notifier).state = hoy;
+  ref.read(semanaEventosSaludProvider.notifier).state = lunesDeLaSemana(hoy);
+}
+
 /// Eventos de salud de la persona de contexto dentro de la semana seleccionada
 /// (lunes a domingo), ordenados por fecha/hora ascendente.
 final eventosSaludDeSemanaProvider = FutureProvider<List<EventoSalud>>((
