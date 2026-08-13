@@ -33,6 +33,9 @@ class HealthRecordHighlightCard extends StatelessWidget {
 
   /// Cuando es `false` la card se muestra atenuada, con candado y sin tap
   /// (el usuario no tiene permiso para ver la ficha).
+  ///
+  /// Los chips de resumen se muestran igual: son datos agregados, sin detalle
+  /// clínico, y lo que el permiso protege es el acceso a la ficha completa.
   final bool enabled;
 
   /// Cuando es `true` el estado todavía se está resolviendo: se muestra un
@@ -47,7 +50,8 @@ class HealthRecordHighlightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final habilitada = !loading && enabled;
-    final chips = habilitada && datosDisponibles ? _chips(context) : const [];
+    // Los chips no dependen del permiso: sólo de que el resumen haya llegado.
+    final chips = !loading && datosDisponibles ? _chips(context) : const [];
 
     final card = Container(
       clipBehavior: Clip.antiAlias,
@@ -135,10 +139,14 @@ class HealthRecordHighlightCard extends StatelessWidget {
 
   String _semanticsLabel() {
     if (loading) return 'Ficha de salud, cargando';
-    if (!enabled) return 'Ficha de salud, sin permiso para verla';
-    if (!datosDisponibles) return 'Ficha de salud';
+    if (!datosDisponibles) {
+      return enabled
+          ? 'Ficha de salud'
+          : 'Ficha de salud, sin permiso para verla';
+    }
 
     final partes = <String>[
+      if (!enabled) 'sin permiso para ver el detalle',
       _tieneFactor ? 'grupo $factorSanguineo' : 'sin grupo cargado',
       if (cantidadAlergias > 0)
         _pluralizar(cantidadAlergias, 'alergia', 'alergias'),

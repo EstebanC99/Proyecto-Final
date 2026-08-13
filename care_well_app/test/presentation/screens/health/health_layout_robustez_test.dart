@@ -96,13 +96,21 @@ Widget _app({
           estado: estadoAnimoMuyBien,
         ),
       ),
-      ultimoEventoSaludProvider.overrideWith(
-        (ref) async => EventoSalud(
-          id: 1,
-          persona: refPersonaAlicia,
-          tipo: TipoEventoSalud(id: 1, descripcion: 'Dolor de garganta'),
-          fechaHora: DateTime.now().subtract(const Duration(days: 3)),
-          descripcion: 'Molestia al tragar',
+      // Textos largos a propósito: el tipo de evento y los chips de la ficha
+      // son lo que más empuja el layout con tipografías grandes.
+      resumenSaludProvider.overrideWith(
+        (ref) async => ResumenSalud(
+          grupoSanguineo: 'AB-',
+          cantidadAlergias: 2,
+          cantidadAntecedentes: 1,
+          cantidadEnfermedades: 3,
+          cantidadHabitosCompletados: habitos
+              .where((h) => h.realizacion != null)
+              .length,
+          cantidadHabitos: habitos.length,
+          estadoAnimoId: estadoAnimoMuyBien.id,
+          ultimoEventoSalud: 'Dolor de garganta persistente',
+          diasDesdeUltimoEvento: 3,
         ),
       ),
     ],

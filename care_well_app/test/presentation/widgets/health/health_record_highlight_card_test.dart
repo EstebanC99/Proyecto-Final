@@ -123,12 +123,22 @@ void main() {
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
       expect(find.byIcon(Icons.chevron_right), findsNothing);
       expect(find.byType(Opacity), findsOneWidget);
-      // Sin permiso tampoco se filtran los datos de la ficha.
-      expect(find.textContaining('alergias'), findsNothing);
 
       await tester.tap(find.text('Ficha de salud'));
       await tester.pumpAndSettle();
       expect(taps, 0);
+    });
+
+    // El permiso protege el detalle clínico, no el resumen: los chips son
+    // datos agregados y se muestran igual a todo el equipo de cuidado.
+    testWidgets('sin permiso los chips se siguen mostrando', (tester) async {
+      await tester.pumpWidget(
+        _wrap(enabled: false, alergias: 2, antecedentes: 1),
+      );
+
+      expect(find.textContaining('0+'), findsOneWidget);
+      expect(find.textContaining('2 alergias'), findsOneWidget);
+      expect(find.textContaining('1 antecedente'), findsOneWidget);
     });
 
     testWidgets('cargando muestra el indicador y no atenúa la card', (

@@ -51,12 +51,8 @@ class _HealthHubBody extends ConsumerWidget {
     return RefreshIndicator(
       color: context.colors.healthAccent,
       onRefresh: () async {
-        ref
-          ..invalidate(fichaSaludProvider)
-          ..invalidate(habitosProvider)
-          ..invalidate(animoHoyProvider)
-          ..invalidate(ultimoEventoSaludProvider);
-        await ref.read(habitosProvider.future);
+        ref.invalidate(resumenSaludProvider);
+        await ref.read(resumenSaludProvider.future);
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -101,10 +97,11 @@ class _HealthHubBody extends ConsumerWidget {
 
 // ─── Ficha de salud ───────────────────────────────────────────────────────────
 
-/// Card destacada de la ficha, gateada por permiso.
+/// Card destacada de la ficha.
 ///
-/// La consulta de la ficha sólo se dispara cuando el permiso ya resolvió que
-/// se puede ver: así el hub no provoca un 403 para quien no tiene acceso.
+/// Los chips de resumen se muestran a cualquier miembro del equipo: son datos
+/// agregados, sin detalle clínico. El permiso sólo bloquea la navegación a la
+/// ficha completa (candado, card atenuada y sin tap).
 class _FichaSaludCard extends ConsumerWidget {
   const _FichaSaludCard();
 
@@ -113,28 +110,33 @@ class _FichaSaludCard extends ConsumerWidget {
     final puedeVerAsync = ref.watch(puedeVerSaludProvider);
     final puedeVer = puedeVerAsync.value ?? false;
 
-    final fichaAsync = puedeVer ? ref.watch(fichaSaludProvider) : null;
-    final ficha = switch (fichaAsync) {
-      AsyncData(:final value) => value,
-      _ => null,
-    };
-    final fichaResuelta = fichaAsync is AsyncData;
+    final resumen = _resumen(ref);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: HealthRecordHighlightCard(
         enabled: puedeVer,
         loading: puedeVerAsync.isLoading,
-        datosDisponibles: fichaResuelta,
-        factorSanguineo: ficha?.factorSanguineo,
-        cantidadAlergias: ficha?.alergias.length ?? 0,
-        cantidadEnfermedades: ficha?.enfermedades.length ?? 0,
-        cantidadAntecedentes: ficha?.antecedentes.length ?? 0,
+        datosDisponibles: resumen?.tieneFicha ?? false,
+        factorSanguineo: resumen?.grupoSanguineo,
+        cantidadAlergias: resumen?.cantidadAlergias ?? 0,
+        cantidadEnfermedades: resumen?.cantidadEnfermedades ?? 0,
+        cantidadAntecedentes: resumen?.cantidadAntecedentes ?? 0,
         onTap: () => context.pushNamed(AppRoutes.healthRecordName),
       ),
     );
   }
 }
+
+/// Resumen ya resuelto, o `null` si todavía carga o falló.
+///
+/// Cada tarjeta degrada por su cuenta: sin resumen se dibuja sin métrica, nunca
+/// un error a pantalla completa.
+ResumenSalud? _resumen(WidgetRef ref) =>
+    switch (ref.watch(resumenSaludProvider)) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
 
 // ─── Hábitos ──────────────────────────────────────────────────────────────────
 
@@ -143,11 +145,8 @@ class _HabitosCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progreso = switch (ref.watch(progresoHabitosHoyProvider)) {
-      AsyncData(:final value) => value,
-      _ => null,
-    };
-    final hayHabitos = progreso != null && progreso.total > 0;
+    final resumen = _resumen(ref);
+    final hayHabitos = resumen?.tieneHabitos ?? false;
 
     return HealthMetricCard(
       icon: Icons.self_improvement,
@@ -155,9 +154,10 @@ class _HabitosCard extends ConsumerWidget {
       containerColor: context.colors.habitsContainer,
       label: 'Hábitos de vida',
       metricValue: hayHabitos
-          ? '${progreso.completados} de ${progreso.total}'
+          ? '${resumen!.cantidadHabitosCompletados ?? 0} de '
+                '${resumen.cantidadHabitos}'
           : null,
-      metricSuffix: progreso == null
+      metricSuffix: resumen == null
           ? null
           : (hayHabitos ? ' completados hoy' : 'Sin hábitos cargados'),
       onTap: () => context.pushNamed(AppRoutes.healthHabitsName),
@@ -172,11 +172,11 @@ class _AnimoCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final animoAsync = ref.watch(animoHoyProvider);
-    final PersonaEstadoAnimo? animo = switch (animoAsync) {
-      AsyncData(:final value) => value,
-      _ => null,
-    };
+    final resumen = _resumen(ref);
+    // El resumen manda sólo el id del estado: la descripción y el emoji salen
+    // del catálogo local, espejo del de backend.
+    final animoId = resumen?.estadoAnimoId;
+    final descripcion = animoId == null ? null : moodLabelForLevel(animoId);
 
     return HealthMetricCard(
       icon: Icons.mood,
@@ -184,10 +184,10 @@ class _AnimoCard extends ConsumerWidget {
       containerColor: context.colors.moodContainer,
       label: 'Estado de ánimo',
       metricPrefix: 'Hoy: ',
-      metricValue: animo == null
+      metricValue: descripcion == null
           ? null
-          : '${moodEmoji(animo.estado)} ${animo.estado.descripcion}',
-      metricSuffix: animoAsync is AsyncData && animo == null
+          : '${moodEmojiForLevel(animoId!)} $descripcion',
+      metricSuffix: resumen != null && descripcion == null
           ? 'Sin registro hoy'
           : null,
       delay: const Duration(milliseconds: 60),
@@ -203,11 +203,8 @@ class _EventosCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventoAsync = ref.watch(ultimoEventoSaludProvider);
-    final EventoSalud? evento = switch (eventoAsync) {
-      AsyncData(:final value) => value,
-      _ => null,
-    };
+    final resumen = _resumen(ref);
+    final hayEvento = resumen?.tieneEventos ?? false;
 
     return HealthMetricCard(
       icon: Icons.event_note_outlined,
@@ -216,10 +213,12 @@ class _EventosCard extends ConsumerWidget {
       label: 'Eventos de salud',
       layout: HealthMetricCardLayout.wide,
       metricPrefix: 'Último: ',
-      metricValue: evento == null ? null : textoRelativoDesde(evento.fechaHora),
-      metricSuffix: evento != null
-          ? ' · ${evento.tipo.descripcion}'
-          : (eventoAsync is AsyncData ? 'Sin eventos registrados' : null),
+      metricValue: hayEvento
+          ? textoRelativoEnDias(resumen!.diasDesdeUltimoEvento ?? 0)
+          : null,
+      metricSuffix: hayEvento
+          ? ' · ${resumen!.ultimoEventoSalud}'
+          : (resumen != null ? 'Sin eventos registrados' : null),
       delay: const Duration(milliseconds: 120),
       onTap: () => context.pushNamed(AppRoutes.healthEventsName),
     );

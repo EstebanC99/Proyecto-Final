@@ -9,8 +9,15 @@
 String textoRelativoDesde(DateTime fecha, {DateTime? ahora}) {
   final hoy = _soloFecha(ahora ?? DateTime.now());
   final dia = _soloFecha(fecha);
-  final dias = hoy.difference(dia).inDays;
+  return textoRelativoEnDias(hoy.difference(dia).inDays);
+}
 
+/// Rótulo relativo a partir de una cantidad de [dias] ya calculada.
+///
+/// Lo usa el resumen de salud, donde el backend manda los días transcurridos en
+/// lugar de la fecha del registro. Los valores negativos (futuro) se tratan
+/// como "hoy".
+String textoRelativoEnDias(int dias) {
   if (dias <= 0) return 'hoy';
   if (dias == 1) return 'ayer';
   if (dias < 7) return 'hace $dias días';

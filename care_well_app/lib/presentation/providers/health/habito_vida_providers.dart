@@ -46,6 +46,17 @@ final habitoByIdProvider = FutureProvider.family<HabitoVida?, int>((
 
 //region Acciones Mutadoras
 
+/// Invalida todas las vistas que dependen de los hábitos tras una mutación.
+///
+/// [habitoId] refresca además el detalle de ese hábito. El resumen de salud
+/// entra siempre: el hub muestra el progreso del día tomado de ahí, y si no se
+/// invalida queda con el número anterior al marcar o desmarcar.
+void _invalidarHabitos(Ref ref, {int? habitoId}) {
+  ref.invalidate(habitosProvider);
+  if (habitoId != null) ref.invalidate(habitoByIdProvider(habitoId));
+  ref.invalidate(resumenSaludProvider);
+}
+
 final modificarHabitoProvider =
     Provider<
       Future<void> Function({
@@ -66,8 +77,7 @@ final modificarHabitoProvider =
               tipoId: tipoId,
               descripcion: descripcion,
             );
-        ref.invalidate(habitosProvider);
-        ref.invalidate(habitoByIdProvider(habitoId));
+        _invalidarHabitos(ref, habitoId: habitoId);
       };
     });
 
@@ -75,7 +85,7 @@ final eliminarHabitoProvider =
     Provider<Future<void> Function({required int habitoId})>((ref) {
       return ({required habitoId}) async {
         await ref.read(habitoVidaRepositoryProvider).eliminarHabito(habitoId);
-        ref.invalidate(habitosProvider);
+        _invalidarHabitos(ref);
       };
     });
 
@@ -95,7 +105,7 @@ final crearHabitoProvider =
               tipoId: tipoId,
               descripcion: descripcion,
             );
-        ref.invalidate(habitosProvider);
+        _invalidarHabitos(ref);
       };
     });
 
@@ -107,8 +117,7 @@ final crearRealizacionProvider =
         await ref
             .read(habitoVidaRepositoryProvider)
             .crearRealizacion(habitoId: habitoId, comentarios: comentarios);
-        ref.invalidate(habitosProvider);
-        ref.invalidate(habitoByIdProvider(habitoId));
+        _invalidarHabitos(ref, habitoId: habitoId);
       };
     });
 
@@ -128,8 +137,7 @@ final modificarRealizacionProvider =
               realizacionId: realizacionId,
               comentarios: comentarios,
             );
-        ref.invalidate(habitosProvider);
-        ref.invalidate(habitoByIdProvider(habitoId));
+        _invalidarHabitos(ref, habitoId: habitoId);
       };
     });
 
@@ -144,8 +152,7 @@ final eliminarRealizacionProvider =
               habitoId: habitoId,
               realizacionId: realizacionId,
             );
-        ref.invalidate(habitosProvider);
-        ref.invalidate(habitoByIdProvider(habitoId));
+        _invalidarHabitos(ref, habitoId: habitoId);
       };
     });
 

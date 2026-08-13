@@ -62,4 +62,23 @@ void main() {
       );
     });
   });
+
+  // El resumen de salud del hub recibe los días ya calculados por el backend,
+  // sin la fecha del registro.
+  group('textoRelativoEnDias', () {
+    test('cubre los mismos cortes que la variante por fecha', () {
+      expect(textoRelativoEnDias(0), 'hoy');
+      expect(textoRelativoEnDias(1), 'ayer');
+      expect(textoRelativoEnDias(6), 'hace 6 días');
+      expect(textoRelativoEnDias(7), 'hace 1 semana');
+      expect(textoRelativoEnDias(14), 'hace 2 semanas');
+      expect(textoRelativoEnDias(30), 'hace 1 mes');
+      expect(textoRelativoEnDias(60), 'hace 2 meses');
+      expect(textoRelativoEnDias(365), 'hace más de un año');
+    });
+
+    test('un valor negativo se trata como hoy', () {
+      expect(textoRelativoEnDias(-5), 'hoy');
+    });
+  });
 }

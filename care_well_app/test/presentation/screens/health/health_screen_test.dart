@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../_fakes/test_fixtures.dart';
-
 final _personaMaria = Persona(
   id: 1,
   nombre: 'María',
@@ -24,65 +22,29 @@ final _personaAlicia = Persona(
   fechaNacimiento: DateTime(1943, 7, 22),
 );
 
-final _habitoPendiente = HabitoVida(
-  id: 901,
-  persona: refPersonaAlicia,
-  tipo: tipoHabitoActividadFisica,
-  descripcion: 'Caminata diaria',
+/// Resumen con datos en las cuatro tarjetas.
+const _resumenCompleto = ResumenSalud(
+  grupoSanguineo: '0+',
+  cantidadAlergias: 2,
+  cantidadAntecedentes: 1,
+  cantidadEnfermedades: 0,
+  cantidadHabitosCompletados: 1,
+  cantidadHabitos: 2,
+  estadoAnimoId: EstadosAnimoConst.bien,
+  ultimoEventoSalud: 'Dolor de garganta',
+  diasDesdeUltimoEvento: 3,
 );
 
-final _habitoRealizado = HabitoVida(
-  id: 902,
-  persona: refPersonaAlicia,
-  tipo: tipoHabitoAlimentacion,
-  descripcion: 'Desayuno completo',
-  realizacion: RealizacionHabitoVida(
-    id: 1,
-    habitoId: 902,
-    fechaHora: DateTime.now(),
-  ),
-);
-
-final _ficha = FichaSalud(
-  id: 1,
-  persona: _personaAlicia,
-  factorSanguineo: '0+',
-  alergias: [
-    FichaSaludAlergia(id: 1, nombre: 'Polen', reaccion: 'Estornudos'),
-    FichaSaludAlergia(id: 2, nombre: 'Penicilina', reaccion: 'Urticaria'),
-  ],
-  antecedentes: [
-    FichaSaludAntecedente(
-      id: 1,
-      nombre: 'Diabetes',
-      descripcion: 'Tipo 2',
-      vinculoFamiliar: 'Madre',
-    ),
-  ],
-);
-
-PersonaEstadoAnimo _animoHoy() => PersonaEstadoAnimo(
-  id: 1,
-  persona: _personaAlicia,
-  fecha: DateTime.now(),
-  estado: estadoAnimoBien,
-);
-
-EventoSalud _eventoHace3Dias() => EventoSalud(
-  id: 1,
-  persona: refPersonaAlicia,
-  tipo: TipoEventoSalud(id: 1, descripcion: 'Dolor de garganta'),
-  fechaHora: DateTime.now().subtract(const Duration(days: 3)),
-  descripcion: 'Molestia al tragar',
+/// Persona sin ficha, sin hábitos, sin ánimo de hoy y sin eventos.
+const _resumenVacio = ResumenSalud(
+  cantidadHabitosCompletados: 0,
+  cantidadHabitos: 0,
 );
 
 Widget _wrap({
   Persona? persona,
   bool puedeVerFicha = true,
-  FichaSalud? ficha,
-  List<HabitoVida>? habitos,
-  PersonaEstadoAnimo? animoHoy,
-  EventoSalud? ultimoEvento,
+  ResumenSalud? resumen = _resumenVacio,
 }) {
   final personaEfectiva = persona ?? _personaAlicia;
   return ProviderScope(
@@ -104,10 +66,7 @@ Widget _wrap({
         ],
       ),
       puedeVerSaludProvider.overrideWith((ref) async => puedeVerFicha),
-      fichaSaludProvider.overrideWith((ref) async => ficha),
-      habitosProvider.overrideWith((ref) async => habitos ?? []),
-      animoHoyProvider.overrideWith((ref) async => animoHoy),
-      ultimoEventoSaludProvider.overrideWith((ref) async => ultimoEvento),
+      resumenSaludProvider.overrideWith((ref) async => resumen),
     ],
     child: const MaterialApp(home: HealthScreen()),
   );
@@ -166,27 +125,21 @@ void main() {
     testWidgets('muestra las métricas del día cuando hay datos', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        _wrap(
-          ficha: _ficha,
-          habitos: [_habitoPendiente, _habitoRealizado],
-          animoHoy: _animoHoy(),
-          ultimoEvento: _eventoHace3Dias(),
-        ),
-      );
+      await tester.pumpWidget(_wrap(resumen: _resumenCompleto));
       await tester.pumpAndSettle();
 
       // Hábitos: 1 de 2 completados.
       expect(find.textContaining('1 de 2'), findsOneWidget);
-      // Ánimo de hoy.
+      // Ánimo de hoy, resuelto por id contra el catálogo local.
       expect(find.textContaining('Bien'), findsOneWidget);
-      // Último evento con su tipo.
+      // Último evento: días relativos + tipo.
       expect(find.textContaining('hace 3 días'), findsOneWidget);
       expect(find.textContaining('Dolor de garganta'), findsOneWidget);
-      // Chips de la ficha.
+      // Chips de la ficha (las enfermedades en cero no se muestran).
       expect(find.textContaining('0+'), findsOneWidget);
       expect(find.textContaining('2 alergias'), findsOneWidget);
       expect(find.textContaining('1 antecedente'), findsOneWidget);
+      expect(find.textContaining('enfermedad'), findsNothing);
     });
 
     testWidgets('sin datos cada tarjeta muestra su copy de vacío', (
@@ -198,19 +151,30 @@ void main() {
       expect(find.textContaining('Sin hábitos cargados'), findsOneWidget);
       expect(find.textContaining('Sin registro hoy'), findsOneWidget);
       expect(find.textContaining('Sin eventos registrados'), findsOneWidget);
-      expect(find.textContaining('Sin grupo cargado'), findsOneWidget);
+      // Sin ficha cargada no se dibujan chips: ni siquiera el de grupo.
+      expect(find.textContaining('Sin grupo cargado'), findsNothing);
     });
 
-    testWidgets('sin permiso la ficha se bloquea y no muestra chips', (
+    // El permiso protege el detalle clínico, no el resumen agregado.
+    testWidgets('sin permiso muestra los chips igual, pero con candado', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap(puedeVerFicha: false, ficha: _ficha));
+      await tester.pumpWidget(
+        _wrap(puedeVerFicha: false, resumen: _resumenCompleto),
+      );
       await tester.pumpAndSettle();
 
+      expect(find.textContaining('2 alergias'), findsOneWidget);
+      expect(find.textContaining('0+'), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget); // solo eventos
-      expect(find.textContaining('alergias'), findsNothing);
+      // El chevron de la ficha no está; el único que queda es el de eventos.
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
     });
+
+    // La degradación mientras el resumen carga (tarjeta sin métrica) se cubre
+    // en `health_metric_card_test.dart`: a nivel de pantalla haría falta un
+    // provider que nunca resuelve, y eso choca con la descarga de la imagen de
+    // PersonaAvatar, que deja timers pendientes.
 
     testWidgets('sin persona muestra mensaje de estado vacío', (tester) async {
       await tester.pumpWidget(
