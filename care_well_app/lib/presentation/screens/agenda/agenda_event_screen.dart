@@ -47,6 +47,22 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
   bool get _esEdicion => widget.eventId != null;
 
   @override
+  void initState() {
+    super.initState();
+    // El alta arranca en el día que el usuario tiene abierto en la tira, no en
+    // hoy: si vino mirando otra semana, ofrecerle la fecha de hoy es engañoso.
+    // En edición manda la ocurrencia, que se precarga en `build`.
+    if (!_esEdicion) {
+      final seleccionado = ref.read(diaSeleccionadoProvider);
+      final hoy = DateTime.now();
+      final inicioDeHoy = DateTime(hoy.year, hoy.month, hoy.day);
+      // La agenda no admite eventos pasados (ver `firstDate` del selector de
+      // fecha): parado en una semana anterior, el alta cae en hoy.
+      _fecha = seleccionado.isBefore(inicioDeHoy) ? inicioDeHoy : seleccionado;
+    }
+  }
+
+  @override
   void dispose() {
     _tituloCtrl.dispose();
     _descripcionCtrl.dispose();

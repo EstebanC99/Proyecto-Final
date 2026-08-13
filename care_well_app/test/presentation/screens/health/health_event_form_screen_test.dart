@@ -92,17 +92,54 @@ void main() {
     ) async {
       final container = _container();
 
-      // La pantalla de eventos está mirando una semana lejana.
+      // La pantalla de eventos está mirando el día de hoy, pero con la semana
+      // desincronizada (estado que deja un salto previo): al registrar, la
+      // semana debe recalcularse a partir de la fecha del evento.
       container.read(semanaEventosSaludProvider.notifier).state = _lunesLejano;
-      container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
-          _lunesLejano;
+      container.read(diaEventosSaludSeleccionadoProvider.notifier).state = _hoy;
 
       await _pushForm(tester, container);
-      // El formulario arranca con la fecha de hoy.
       await _registrar(tester, 'Control de presión');
 
       expect(container.read(diaEventosSaludSeleccionadoProvider), _hoy);
       expect(container.read(semanaEventosSaludProvider), _lunesDeEstaSemana);
+    });
+
+    // El alta debe ofrecer el día que el usuario está mirando en la tira; con
+    // la fecha de hoy fija resultaba engañoso. Acá se verifica sobre el payload
+    // que se manda a crear, no sólo sobre el texto en pantalla.
+    testWidgets('el alta arranca en el día seleccionado, no en hoy', (
+      tester,
+    ) async {
+      DateTime? fechaEnviada;
+      final container = _container(
+        crear:
+            ({
+              required tipoId,
+              required descripcion,
+              required fechaHora,
+            }) async {
+              fechaEnviada = fechaHora;
+            },
+      );
+
+      final diaPasado = _hoy.subtract(const Duration(days: 5));
+      container.read(diaEventosSaludSeleccionadoProvider.notifier).state =
+          diaPasado;
+      container.read(semanaEventosSaludProvider.notifier).state = diaPasado
+          .subtract(Duration(days: diaPasado.weekday - 1));
+
+      await _pushForm(tester, container);
+
+      // Lo que se ve en el formulario…
+      expect(
+        find.text('${diaPasado.day}/${diaPasado.month}/${diaPasado.year}'),
+        findsOneWidget,
+      );
+
+      // …y lo que efectivamente se registra.
+      await _registrar(tester, 'Control de presión');
+      expect(_soloFecha(fechaEnviada!), diaPasado);
     });
 
     testWidgets('no mueve la pantalla si el registro falla', (tester) async {

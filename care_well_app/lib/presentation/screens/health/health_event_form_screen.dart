@@ -35,6 +35,16 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
       DateTime(_fecha.year, _fecha.month, _fecha.day, _hora.hour, _hora.minute);
 
   @override
+  void initState() {
+    super.initState();
+    // El alta arranca en el día que el usuario tiene abierto en la tira, no en
+    // hoy: si vino mirando otro día, ofrecerle la fecha de hoy es engañoso.
+    // La selección nunca es futura (la pantalla de eventos la acota a hoy), así
+    // que siempre cae dentro del rango admitido por el selector de fecha.
+    _fecha = ref.read(diaEventosSaludSeleccionadoProvider);
+  }
+
+  @override
   void dispose() {
     _descripcionCtrl.dispose();
     super.dispose();

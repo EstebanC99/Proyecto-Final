@@ -130,7 +130,7 @@ void main() {
 
       await _pushForm(tester, container);
 
-      // El formulario arranca con la fecha de hoy.
+      // El día seleccionado es pasado, así que el alta cae en hoy.
       await tester.enterText(
         find.byType(TextFormField).first,
         'Control cardiológico',
@@ -140,6 +140,40 @@ void main() {
 
       expect(container.read(diaSeleccionadoProvider), _hoy);
       expect(container.read(semanaSeleccionadaProvider), _lunesDeEstaSemana);
+    });
+
+    // El alta debe ofrecer el día que el usuario está mirando en la tira; con
+    // la fecha de hoy fija resultaba engañoso.
+    group('fecha inicial del alta', () {
+      String fechaVisible(DateTime f) => '${f.day}/${f.month}/${f.year}';
+
+      testWidgets('toma el día seleccionado cuando es futuro', (tester) async {
+        final enDiezDias = _hoy.add(const Duration(days: 10));
+        final container = _container();
+        container.read(diaSeleccionadoProvider.notifier).state = enDiezDias;
+        container.read(semanaSeleccionadaProvider.notifier).state =
+            lunesDeLaSemana(enDiezDias);
+
+        await _pushForm(tester, container);
+
+        expect(find.text(fechaVisible(enDiezDias)), findsOneWidget);
+      });
+
+      // La agenda no admite eventos pasados: parado en una semana anterior, el
+      // alta cae en hoy en lugar de proponer una fecha inválida.
+      testWidgets('cae en hoy cuando el día seleccionado es pasado', (
+        tester,
+      ) async {
+        final container = _container();
+        container.read(diaSeleccionadoProvider.notifier).state = _lunesLejano;
+        container.read(semanaSeleccionadaProvider.notifier).state =
+            _lunesLejano;
+
+        await _pushForm(tester, container);
+
+        expect(find.text(fechaVisible(_hoy)), findsOneWidget);
+        expect(find.text(fechaVisible(_lunesLejano)), findsNothing);
+      });
     });
 
     testWidgets('al editar un evento se salta al día que tiene cargado', (
