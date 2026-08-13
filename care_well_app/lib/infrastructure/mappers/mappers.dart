@@ -17,6 +17,7 @@ export 'health/ficha_salud_mapper.dart';
 export 'health/habito_vida_mapper.dart';
 export 'health/nota_evento_salud_mapper.dart';
 export 'health/realizacion_habito_mapper.dart';
+export 'health/resumen_salud_mapper.dart';
 export 'health/tipo_evento_salud_mapper.dart';
 export 'health/tipo_habito_mapper.dart';
 export 'settings_mapper.dart';

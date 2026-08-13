@@ -113,6 +113,8 @@ class ApiConfig {
 
   static const obtenerAlertasBienestarPath = '/api/AlertaBienestar/obtener';
 
+  static const obtenerResumenSaludPath = '/api/ResumenSalud/obtener';
+
   static const obtenerResumenInteligentePath = '/api/ResumenDiario/generar';
 
   static const registrarDispositivoPath = '/api/Dispositivo/registrar';

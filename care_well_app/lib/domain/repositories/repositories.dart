@@ -12,6 +12,7 @@ export 'ficha_salud_repository.dart';
 export 'habito_vida_repository.dart';
 export 'linea_tiempo_salud_repository.dart';
 export 'persona_repository.dart';
+export 'resumen_salud_repository.dart';
 export 'settings_repository.dart';
 export 'summary_repository.dart';
 export 'tipo_habito_vida_repository.dart';

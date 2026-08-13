@@ -23,6 +23,7 @@ export 'health/habito_vida.dart';
 export 'health/nota_evento.dart';
 export 'health/persona_estado_animo.dart';
 export 'health/realizacion_habito_vida.dart';
+export 'health/resumen_salud.dart';
 export 'health/tipo_evento_salud.dart';
 export 'health/tipo_habito_vida.dart';
 export 'settings/aceptacion_terminos.dart';

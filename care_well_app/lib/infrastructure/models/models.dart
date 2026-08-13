@@ -19,6 +19,7 @@ export 'health/habito_vida_model.dart';
 export 'health/habito_vida_realizacion_model.dart';
 export 'health/nota_evento_salud_model.dart';
 export 'health/persona_estado_animo_model.dart';
+export 'health/resumen_salud_model.dart';
 export 'health/tipo_evento_salud_model.dart';
 export 'settings/configuracion_model.dart';
 export 'summary/resumen_inteligente_model.dart';
