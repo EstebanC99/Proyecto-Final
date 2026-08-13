@@ -14,7 +14,7 @@
 
 ## 0. Resumen ejecutivo
 
-| Pantalla | Archivo | Que cambia |
+| Pantalla | Archivo | Que cambiImplementá el rediseño visual de Mi salud y Hábitos siguiendo care_well_doc/Specs/redisenio-visual-salud-habitos.md. Las decisiones D1–D5 están confirmadas, no hay nada abierto. Presentá primero el plan numerado por commits (1 a 4) y esperá confirmación antes de codificar. Los dots de "hábitos realizados anteriormente" del mockup no se implementan.a |
 |---|---|---|
 | Mi salud (hub) | `presentation/screens/health/health_screen.dart` | Ficha de salud pasa a card destacada con chips de resumen; grid 2x2 de 4 tarjetas iguales pasa a 2 tarjetas con metrica + 1 tile ancho de Eventos; "Linea de tiempo" pasa a boton solido |
 | Habitos de vida | `presentation/screens/health/habits_screen.dart` | Header de progreso del dia; agrupacion Pendientes/Completados; card de habito con color por tipo y check circular en lugar del chip "Pendiente/Realizado" |
