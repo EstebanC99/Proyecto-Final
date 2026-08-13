@@ -205,7 +205,7 @@ namespace CareWell.BusinessService.Test.General
             }
 
             [Fact]
-            public void Retorna_null_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
+            public void Retorna_un_ResumenDiarioDataView_con_fecha_actual_y_sin_datos_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
             {
                 // Arrange
                 this.eventoAgendaRepository
@@ -224,11 +224,15 @@ namespace CareWell.BusinessService.Test.General
                     .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(new List<PersonaEstadoAnimo>());
 
+                var fechaHoraInicioEjecucion = DateTime.Now;
+
                 // Action
                 var resultado = this.Action();
 
                 // Assert
-                Assert.Null(resultado);
+                var fechaHoraFinEjecucion = DateTime.Now;
+                Assert.True(resultado.GeneradoEn >= fechaHoraInicioEjecucion && resultado.GeneradoEn <= fechaHoraFinEjecucion && !resultado.TieneDatos);
+                Assert.IsType<ResumenDiarioDataView>(resultado);
             }
 
             [Fact]

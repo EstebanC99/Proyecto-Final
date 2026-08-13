@@ -65,9 +65,10 @@ namespace CareWell.BusinessService
             services.AddScoped<IGenerarEventoSaludBusinessService, GenerarEventoSaludBusinessService>();
             services.AddScoped<ILineaTiempoSaludBusinessService, LineaTiempoSaludBusinessService>();
             services.AddScoped<IRecuperacionContrasenaBusinessService, RecuperacionContrasenaBusinessService>();
-            services.AddScoped<IRegistrarLogExcepcionBusinessService, RegistrarLogExcepcionBusinessService>();
             services.AddScoped<IRegistradorLogServicioExterno, RegistradorLogServicioExternoBusinessService>();
+            services.AddScoped<IRegistrarLogExcepcionBusinessService, RegistrarLogExcepcionBusinessService>();
             services.AddScoped<IResumenDiarioBusinessService, ResumenDiarioBusinessService>();
+            services.AddScoped<IResumenSaludBusinessService, ResumenSaludBusinessService>();
             services.AddScoped<IVerificacionEmailBusinessService, VerificacionEmailBusinessService>();
 
             #endregion

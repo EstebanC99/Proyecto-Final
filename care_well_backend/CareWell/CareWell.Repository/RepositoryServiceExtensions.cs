@@ -36,6 +36,7 @@ namespace CareWell.Repository
             services.AddScoped<ILineaTiempoSaludRepository, LineaTiempoSaludRepository>();
             services.AddScoped<IPersonaEstadoAnimoRepository, PersonaEstadoAnimoRepository>();
             services.AddScoped<IPersonaRepository, PersonaRepository>();
+            services.AddScoped<IResumenSaludRepository, ResumenSaludRepository>();
             services.AddScoped<ITipoEventoRepository, TipoEventoRepository>();
             services.AddScoped<ITipoHabitoVidaRepository, TipoHabitoVidaRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
