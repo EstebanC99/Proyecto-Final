@@ -32,9 +32,19 @@ class SummaryHeroContent extends SummaryHeroState {
   final List<String> pills;
 }
 
+/// El resumen se está generando (o consultando) en este momento.
+class SummaryHeroLoading extends SummaryHeroState {
+  const SummaryHeroLoading();
+}
+
+/// No se pudo obtener el resumen (backend caído, timeout, sin conexión).
+class SummaryHeroError extends SummaryHeroState {
+  const SummaryHeroError();
+}
+
 /// Motivo por el que no hay resumen para mostrar.
 enum SummaryHeroEmptyReason {
-  /// Todavía no se generó (el Home no dispara la IA).
+  /// No hay persona de contexto elegida, así que no hay resumen que pedir.
   noGenerado,
 
   /// Se generó, pero no había nada que resumir en el día.
@@ -52,13 +62,15 @@ class SummaryHeroEmpty extends SummaryHeroState {
 ///
 /// Bloque destacado con gradiente de marca que adelanta el resumen del día y
 /// lleva a la pantalla dedicada mediante [onTapVerCompleto]. Es puramente
-/// presentacional: no dispara la generación de IA ni lee providers.
+/// presentacional: no dispara la generación de IA ni lee providers; la pantalla
+/// que la usa traduce el estado del resumen a un [SummaryHeroState].
 class SummaryHeroCard extends StatelessWidget {
   const SummaryHeroCard({
     super.key,
     required this.state,
     this.delay = Duration.zero,
     this.onTapVerCompleto,
+    this.onRetry,
   });
 
   /// Contenido a mostrar.
@@ -69,6 +81,18 @@ class SummaryHeroCard extends StatelessWidget {
 
   /// Callback del CTA. Si es `null`, la card no es interactiva.
   final VoidCallback? onTapVerCompleto;
+
+  /// Callback del CTA "Reintentar", usado sólo en [SummaryHeroError]. Si es
+  /// `null`, en ese estado la card no es interactiva.
+  final VoidCallback? onRetry;
+
+  /// Acción del tap según el estado: en error se reintenta, mientras se genera
+  /// no hay nada que abrir todavía y en el resto se abre el resumen completo.
+  VoidCallback? get _onTap => switch (state) {
+    SummaryHeroError() => onRetry,
+    SummaryHeroLoading() => null,
+    _ => onTapVerCompleto,
+  };
 
   String _formatHora(DateTime dt) =>
       '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
@@ -84,7 +108,7 @@ class SummaryHeroCard extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         child: InkWell(
-          onTap: onTapVerCompleto,
+          onTap: _onTap,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
           child: Ink(
             decoration: BoxDecoration(
@@ -199,14 +223,16 @@ class _Cuerpo extends StatelessWidget {
   Widget build(BuildContext context) {
     final texto = switch (state) {
       SummaryHeroContent(:final texto) => texto,
+      SummaryHeroLoading() => 'Generando el resumen del día…',
+      SummaryHeroError() => 'No pudimos generar el resumen ahora.',
       SummaryHeroEmpty(reason: SummaryHeroEmptyReason.noGenerado) =>
-        'Todavía no generamos tu resumen de hoy.',
+        'Elegí una persona a cargo para ver su resumen del día.',
       SummaryHeroEmpty(reason: SummaryHeroEmptyReason.sinDatos) =>
         'Nada para resumir todavía: registrá eventos de salud, hábitos o '
             'estados de ánimo del día.',
     };
 
-    return Text(
+    final contenido = Text(
       texto,
       style: TextStyle(
         fontSize: 14,
@@ -215,6 +241,27 @@ class _Cuerpo extends StatelessWidget {
       ),
       maxLines: 4,
       overflow: TextOverflow.ellipsis,
+    );
+
+    // Mientras se genera, el copy va acompañado de un indicador sutil: la card
+    // no se reemplaza por un esqueleto para que se siga entendiendo qué es lo
+    // que está trabajando.
+    if (state is! SummaryHeroLoading) return contenido;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 3),
+          child: SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2, color: onHero),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(child: contenido),
+      ],
     );
   }
 }
@@ -255,11 +302,13 @@ class _Cta extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = switch (state) {
       SummaryHeroContent() => 'Ver resumen completo',
-      SummaryHeroEmpty(reason: SummaryHeroEmptyReason.noGenerado) =>
-        'Generar resumen',
-      SummaryHeroEmpty(reason: SummaryHeroEmptyReason.sinDatos) =>
-        'Ver resumen',
+      SummaryHeroLoading() => 'Generando…',
+      SummaryHeroError() => 'Reintentar',
+      SummaryHeroEmpty() => 'Ver resumen',
     };
+
+    // Mientras se genera no hay adónde ir todavía: sin flecha.
+    final mostrarFlecha = state is! SummaryHeroLoading;
 
     return Container(
       padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -280,7 +329,8 @@ class _Cta extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Icon(Icons.arrow_forward_rounded, size: 18, color: onHero),
+          if (mostrarFlecha)
+            Icon(Icons.arrow_forward_rounded, size: 18, color: onHero),
         ],
       ),
     );

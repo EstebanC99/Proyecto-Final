@@ -92,7 +92,7 @@ void main() {
     });
 
     group('estados vacíos', () {
-      testWidgets('noGenerado muestra su copy y el CTA de generación', (
+      testWidgets('noGenerado invita a elegir una persona a cargo', (
         tester,
       ) async {
         await tester.pumpWidget(
@@ -107,10 +107,10 @@ void main() {
         await _drainAnimations(tester);
 
         expect(
-          find.text('Todavía no generamos tu resumen de hoy.'),
+          find.text('Elegí una persona a cargo para ver su resumen del día.'),
           findsOneWidget,
         );
-        expect(find.text('Generar resumen'), findsOneWidget);
+        expect(find.text('Ver resumen'), findsOneWidget);
       });
 
       testWidgets('sinDatos muestra un copy distinto al de noGenerado', (
@@ -129,7 +129,7 @@ void main() {
           find.textContaining('Nada para resumir todavía'),
           findsOneWidget,
         );
-        expect(find.text('Generar resumen'), findsNothing);
+        expect(find.textContaining('Elegí una persona'), findsNothing);
       });
 
       testWidgets('el reason por defecto es noGenerado', (tester) async {
@@ -139,9 +139,85 @@ void main() {
         await _drainAnimations(tester);
 
         expect(
-          find.text('Todavía no generamos tu resumen de hoy.'),
+          find.text('Elegí una persona a cargo para ver su resumen del día.'),
           findsOneWidget,
         );
+      });
+    });
+
+    group('estado de carga', () {
+      testWidgets('muestra el copy, el indicador y oculta la flecha', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(const SummaryHeroCard(state: SummaryHeroLoading())),
+        );
+        await tester.pump(Duration.zero);
+        await tester.pump(const Duration(milliseconds: 500));
+
+        expect(find.text('Generando el resumen del día…'), findsOneWidget);
+        expect(find.text('Generando…'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
+        // Sigue siendo la card del resumen, no un esqueleto.
+        expect(find.text('Resumen del día'), findsOneWidget);
+      });
+
+      testWidgets('no navega mientras se genera', (tester) async {
+        var tapped = false;
+        await tester.pumpWidget(
+          _wrap(
+            SummaryHeroCard(
+              state: const SummaryHeroLoading(),
+              onTapVerCompleto: () => tapped = true,
+            ),
+          ),
+        );
+        await tester.pump(Duration.zero);
+        await tester.pump(const Duration(milliseconds: 500));
+
+        await tester.tap(find.text('Generando…'));
+        await tester.pump();
+
+        expect(tapped, isFalse);
+      });
+    });
+
+    group('estado de error', () {
+      testWidgets('muestra el copy y el CTA de reintento', (tester) async {
+        await tester.pumpWidget(
+          _wrap(const SummaryHeroCard(state: SummaryHeroError())),
+        );
+        await _drainAnimations(tester);
+
+        expect(
+          find.text('No pudimos generar el resumen ahora.'),
+          findsOneWidget,
+        );
+        expect(find.text('Reintentar'), findsOneWidget);
+      });
+
+      testWidgets('el tap dispara onRetry y no onTapVerCompleto', (
+        tester,
+      ) async {
+        var reintentos = 0;
+        var navegaciones = 0;
+        await tester.pumpWidget(
+          _wrap(
+            SummaryHeroCard(
+              state: const SummaryHeroError(),
+              onTapVerCompleto: () => navegaciones++,
+              onRetry: () => reintentos++,
+            ),
+          ),
+        );
+        await _drainAnimations(tester);
+
+        await tester.tap(find.text('Reintentar'));
+        await tester.pump();
+
+        expect(reintentos, 1);
+        expect(navegaciones, 0);
       });
     });
   });
