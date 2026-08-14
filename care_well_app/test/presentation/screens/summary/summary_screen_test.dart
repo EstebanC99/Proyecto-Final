@@ -20,6 +20,9 @@ final _personaAlicia = Persona(
 
 /// Fake de [SummaryRepository] que devuelve un resumen fijo, falla o se queda
 /// colgado, según cómo se lo construya.
+///
+/// Registra el flag de cada llamada para verificar qué disparadores fuerzan la
+/// regeneración.
 class _FakeSummaryRepository implements SummaryRepository {
   _FakeSummaryRepository.conResumen(this._resumen)
     : _falla = null,
@@ -41,11 +44,15 @@ class _FakeSummaryRepository implements SummaryRepository {
   final Object? _falla;
   final bool _colgado;
 
+  /// Flag recibido en cada invocación, en orden.
+  final List<bool> forzados = [];
+
   @override
   Future<ResumenInteligente> obtenerResumen({
     required int personaId,
     bool forzarActualizacion = false,
   }) {
+    forzados.add(forzarActualizacion);
     if (_colgado) return Completer<ResumenInteligente>().future;
     if (_falla != null) return Future.error(_falla);
     return Future.value(_resumen!);
@@ -199,6 +206,71 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('la carga inicial no fuerza la regeneración', (tester) async {
+      final repo = _FakeSummaryRepository.conResumen(_resumenCompleto);
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      expect(repo.forzados, [false]);
+    });
+
+    testWidgets('el botón Actualizar fuerza la regeneración', (tester) async {
+      final repo = _FakeSummaryRepository.conResumen(_resumenCompleto);
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Actualizar'));
+      await tester.pumpAndSettle();
+
+      expect(repo.forzados, [false, true]);
+    });
+
+    testWidgets('el pull-to-refresh fuerza la regeneración', (tester) async {
+      final repo = _FakeSummaryRepository.conResumen(_resumenCompleto);
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.fling(
+        find.byType(SingleChildScrollView),
+        const Offset(0, 400),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.forzados, [false, true]);
+    });
+
+    testWidgets(
+      'con una generación en curso no se encadena un segundo pedido',
+      (tester) async {
+        final repo = _FakeSummaryRepository.queNuncaResponde();
+        await tester.pumpWidget(_wrap(repo));
+        await tester.pump();
+        await tester.pump();
+
+        // El botón queda deshabilitado mientras se genera.
+        final boton = tester.widget<IconButton>(
+          find.widgetWithIcon(IconButton, Icons.refresh),
+        );
+        expect(boton.onPressed, isNull);
+
+        // Y el pull-to-refresh sólo espera a la generación en curso.
+        await tester.fling(
+          find.byType(SingleChildScrollView),
+          const Offset(0, 400),
+          1000,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        expect(repo.forzados, [false]);
+
+        // El pedido nunca resuelve: se desmonta el árbol y se dejan correr los
+        // temporizadores pendientes.
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump(const Duration(seconds: 1));
+      },
+    );
 
     testWidgets('mientras se genera muestra el esqueleto', (tester) async {
       await tester.pumpWidget(_wrap(_FakeSummaryRepository.queNuncaResponde()));

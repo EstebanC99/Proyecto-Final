@@ -10,11 +10,14 @@ import '../../widgets/widgets.dart';
 
 /// Pantalla de Resumen inteligente (US 9.16).
 ///
-/// Genera on-demand el resumen del día de la persona de contexto al abrirse y
+/// Muestra el resumen del día de la persona de contexto: se pide al abrirse y
 /// al cambiar de persona (el provider observa
-/// [personaVisualizacionSeleccionadaProvider]). El botón de la AppBar y el
-/// pull-to-refresh fuerzan una regeneración invalidando
-/// [resumenInteligenteProvider]. No hay caché.
+/// [personaVisualizacionSeleccionadaProvider]), reutilizando el que el backend
+/// tenga vigente. El botón de la AppBar y el pull-to-refresh sí fuerzan una
+/// regeneración real contra el modelo de IA con
+/// [SummaryNotifier.refrescar]; el "Reintentar" del banner de error, en
+/// cambio, sólo vuelve a consultar: si hay un resumen vigente corresponde
+/// mostrarlo en vez de gastar otra inferencia.
 ///
 /// Ambos disparadores están guardados contra pedidos duplicados: mientras haya
 /// una generación en curso, el botón queda deshabilitado y el pull-to-refresh
@@ -41,7 +44,8 @@ class SummaryScreen extends ConsumerWidget {
             tooltip: 'Actualizar',
             onPressed: cargando
                 ? null
-                : () => ref.invalidate(resumenInteligenteProvider),
+                : () =>
+                      ref.read(resumenInteligenteProvider.notifier).refrescar(),
           ),
         ],
       ),
@@ -52,14 +56,20 @@ class SummaryScreen extends ConsumerWidget {
             child: RefreshIndicator(
               onRefresh: () async {
                 // Guard equivalente al del botón "Actualizar": si ya hay una
-                // generación en curso no se invalida (una segunda petición
-                // desperdiciaría otra inferencia de IA en CPU). Igual se
-                // espera al future en curso para que el spinner del pull
-                // acompañe a la generación y el usuario tenga feedback.
-                if (!ref.read(resumenInteligenteProvider).isLoading) {
-                  ref.invalidate(resumenInteligenteProvider);
+                // generación en curso no se pide otra (desperdiciaría una
+                // inferencia de IA en CPU). Igual se espera al future en curso
+                // para que el spinner del pull acompañe a la generación y el
+                // usuario tenga feedback.
+                if (ref.read(resumenInteligenteProvider).isLoading) {
+                  // La falla ya la pinta el banner de error de esta pantalla:
+                  // acá sólo interesa saber cuándo terminó, para cerrar el
+                  // indicador del pull.
+                  try {
+                    await ref.read(resumenInteligenteProvider.future);
+                  } catch (_) {}
+                  return;
                 }
-                await ref.read(resumenInteligenteProvider.future);
+                await ref.read(resumenInteligenteProvider.notifier).refrescar();
               },
               child: _buildBody(context, ref, personaAsync, resumenAsync),
             ),
