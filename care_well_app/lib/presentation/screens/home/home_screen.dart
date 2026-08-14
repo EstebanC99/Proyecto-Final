@@ -16,6 +16,11 @@ import '../../widgets/widgets.dart';
 /// y el tile de emergencia siempre visible.
 /// El tile de "Personas a cargo" alterna entre skeleton, empty state y tile
 /// normal según el estado de [allActiveAssignmentsProvider].
+///
+/// Al abrirse pide el resumen inteligente del día de la persona de contexto
+/// (US 9.16) para la card hero. Es una carga en segundo plano: la pantalla
+/// nunca se bloquea esperándola y cualquier falla queda contenida dentro de la
+/// card, sin snackbars ni banners globales.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -33,6 +38,17 @@ class HomeScreen extends ConsumerWidget {
     final animoHoy = switch (animoHoyAsync) {
       AsyncData(:final value) => value,
       _ => null,
+    };
+
+    // Resumen inteligente del día para la card hero. El provider es el mismo
+    // que usa /summary: si el usuario abre el resumen completo mientras se
+    // genera, se engancha a la generación en curso en vez de disparar otra.
+    final SummaryHeroState estadoResumen = switch (ref.watch(
+      resumenInteligenteProvider,
+    )) {
+      AsyncLoading() => const SummaryHeroLoading(),
+      AsyncError() => const SummaryHeroError(),
+      AsyncData(:final value) => _heroDesdeResumen(value),
     };
 
     // Badge de estado de ánimo para el NavTile de Salud.
@@ -88,20 +104,15 @@ class HomeScreen extends ConsumerWidget {
                 const ContextSelector(variant: ContextSelectorVariant.compact),
                 const SizedBox(height: AppSpacing.md),
 
-                // Acceso al Resumen inteligente (estático: no dispara la IA).
-                //
-                // El texto es de relleno: el hero todavía no está conectado al
-                // provider de IA. Cuando se conecte, solo cambia el `state`
-                // que se le pasa acá; el widget no se toca.
+                // Acceso al Resumen inteligente del día.
                 SummaryHeroCard(
                   delay: const Duration(milliseconds: 50),
-                  state: const SummaryHeroContent(
-                    texto:
-                        'Acá va un texto breve acorde al resumen diario '
-                        'generado.',
-                  ),
+                  state: estadoResumen,
                   onTapVerCompleto: () =>
                       context.pushNamed(AppRoutes.summaryName),
+                  // Reintentar es volver a consultar, no regenerar: si el
+                  // backend tiene un resumen vigente, corresponde mostrarlo.
+                  onRetry: () => ref.invalidate(resumenInteligenteProvider),
                 ),
                 const SizedBox(height: AppSpacing.md),
 
@@ -187,6 +198,24 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Traduce un resumen ya resuelto al estado de la card hero.
+  ///
+  /// Sin persona de contexto el provider resuelve a `null`; sin registros del
+  /// día (o sin `resumenAcotado`, que es lo único que muestra el hero) el
+  /// resumen existe pero no hay nada que adelantar.
+  SummaryHeroState _heroDesdeResumen(ResumenInteligente? resumen) {
+    if (resumen == null) {
+      return const SummaryHeroEmpty(reason: SummaryHeroEmptyReason.noGenerado);
+    }
+
+    final acotado = resumen.resumenAcotado;
+    if (!resumen.tieneDatos || acotado == null || acotado.isEmpty) {
+      return const SummaryHeroEmpty(reason: SummaryHeroEmptyReason.sinDatos);
+    }
+
+    return SummaryHeroContent(texto: acotado, generadoEn: resumen.generadoEn);
   }
 
   /// Construye el tile de personas a cargo según el estado del provider.

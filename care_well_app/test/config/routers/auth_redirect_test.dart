@@ -77,6 +77,19 @@ class _FakeAsignacionCuidadoRepository implements AsignacionCuidadoRepository {
   }) => throw UnimplementedError();
 }
 
+/// Fake de [SummaryRepository] que resuelve al instante.
+///
+/// Igual que el de asignaciones: [HomeScreen] pide el resumen del día al
+/// abrirse y, sin este fake, la llamada real dejaría la card en estado de
+/// carga —con su indicador animado— y `pumpAndSettle` no terminaría nunca.
+class _FakeSummaryRepository implements SummaryRepository {
+  @override
+  Future<ResumenInteligente> obtenerResumen({
+    required int personaId,
+    bool forzarActualizacion = false,
+  }) async => const ResumenInteligente(tieneDatos: false);
+}
+
 void main() {
   group('Router — redirecciones de autenticación', () {
     testWidgets('sin sesión activa → muestra LoginScreen', (tester) async {
@@ -110,6 +123,7 @@ void main() {
           asignacionCuidadoRepositoryProvider.overrideWithValue(
             _FakeAsignacionCuidadoRepository(),
           ),
+          summaryRepositoryProvider.overrideWithValue(_FakeSummaryRepository()),
         ],
       );
       addTearDown(container.dispose);
