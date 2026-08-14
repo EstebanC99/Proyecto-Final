@@ -8,9 +8,12 @@ import 'package:dio/dio.dart';
 
 /// Implementación contra la API del [SummaryDatasource] (US 9.16).
 ///
-/// La generación del resumen la resuelve el backend invocando al modelo de IA
-/// en el momento (sin caché), por lo que puede demorar bastante más que el
-/// resto de los endpoints: se usa un `receiveTimeout` propio y más generoso.
+/// El backend persiste un resumen por persona cuidada y lo reutiliza mientras
+/// sea del mismo día y tenga menos de 3 horas, así que muchas consultas
+/// resuelven en milisegundos. Pero el primer pedido del día —y cualquiera con
+/// [obtenerResumen] forzado— sí invoca al modelo de IA y puede demorar bastante
+/// más que el resto de los endpoints: por eso se usa un `receiveTimeout` propio
+/// y más generoso.
 class ApiSummaryDatasource implements SummaryDatasource {
   final Dio _dio;
 
@@ -19,13 +22,18 @@ class ApiSummaryDatasource implements SummaryDatasource {
   @override
   Future<ResumenInteligente> obtenerResumen({
     required int personaId,
-    // Se ignora a propósito: el backend no cachea el resumen en el MVP.
     bool forzarActualizacion = false,
   }) async {
     try {
       final response = await _dio.post(
         ApiConfig.obtenerResumenInteligentePath,
-        data: {'personaCuidadaID': personaId},
+        data: {
+          'personaCuidadaID': personaId,
+          // OJO: la clave que espera el backend es 'actualizar'
+          // (GenerarResumenDiarioQuery.Actualizar). Con cualquier otro nombre,
+          // el binding la descarta en silencio y nunca se regenera.
+          'actualizar': forzarActualizacion,
+        },
         options: Options(
           receiveTimeout: ApiConfig.receiveTimeoutResumenInteligente,
         ),

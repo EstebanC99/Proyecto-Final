@@ -90,6 +90,34 @@ void main() {
       expect(body['personaCuidadaID'], 7);
     });
 
+    test(
+      'sin forzar, envía actualizar en false (aprovecha la caché)',
+      () async {
+        final (dio, adapter) = _buildDio(
+          responseBody: jsonEncode(_bodyConDatos),
+        );
+        final datasource = ApiSummaryDatasource(dio);
+
+        await datasource.obtenerResumen(personaId: 7);
+
+        final body = adapter.lastRequest!.data as Map<String, dynamic>;
+        expect(body['actualizar'], isFalse);
+      },
+    );
+
+    test('al forzar, envía actualizar en true con esa clave exacta', () async {
+      final (dio, adapter) = _buildDio(responseBody: jsonEncode(_bodyConDatos));
+      final datasource = ApiSummaryDatasource(dio);
+
+      await datasource.obtenerResumen(personaId: 7, forzarActualizacion: true);
+
+      final body = adapter.lastRequest!.data as Map<String, dynamic>;
+      expect(body['actualizar'], isTrue);
+      // La clave la define el backend (GenerarResumenDiarioQuery.Actualizar):
+      // con otro nombre se descarta en silencio y nunca regenera.
+      expect(body.containsKey('forzarActualizacion'), isFalse);
+    });
+
     test('aplica el receiveTimeout propio del resumen inteligente', () async {
       final (dio, adapter) = _buildDio(responseBody: jsonEncode(_bodyConDatos));
       final datasource = ApiSummaryDatasource(dio);

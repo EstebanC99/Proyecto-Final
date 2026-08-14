@@ -5,8 +5,10 @@ import 'package:care_well_app/domain/entities/entities.dart';
 /// salud, los hábitos de vida, los estados de ánimo y la agenda.
 ///
 /// No extiende `BaseEntity` a propósito (mismo criterio que [AlertaBienestar]):
-/// es un read-model **efímero**, generado on-demand y **no persistido**. No
-/// tiene identidad propia. Es inmutable.
+/// es un **read-model** sin identidad propia para la app. El backend guarda el
+/// último resumen de cada persona para reutilizarlo unas horas, pero eso es un
+/// detalle de su implementación: acá sigue siendo una foto inmutable del día,
+/// fechada en [generadoEn].
 ///
 /// Los campos de texto son `null` cuando el backend no tenía nada que reportar
 /// para ese origen: el mapper traduce ahí los "Sin registros" y las cadenas
