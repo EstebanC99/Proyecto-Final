@@ -32,7 +32,7 @@
 
         public DateTime GeneradoEn { get; set; }
 
-        public bool TieneDatos
+        public virtual bool TieneDatos
         {
             get
             {

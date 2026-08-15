@@ -2,7 +2,12 @@
 
 > **Destinatario:** desarrollador backend (.NET)
 > **Autor:** `arquitecto-software`
-> **Estado:** pendiente de implementar
+> **Estado:** **IMPLEMENTADO** (2026-08-13) — build limpio y tests en verde.
+> **Desvíos respecto de esta spec, ya aplicados y revisados:** (a) el flag del query se llama
+> `Actualizar`, **no** `ForzarActualizacion`, por lo que la clave JSON del body es `"actualizar"`;
+> (b) el fallo de deserialización del contenido persistido se trata como *cache miss* y regenera;
+> (c) la carrera contra el índice único se resuelve con `catch (DbUpdateException) { }` sin log
+> (decisión del cliente: no se implementa el logueo sugerido en la revisión).
 > **Alcance:** `care_well_backend/CareWell/` — `Global`, `Domain`, `Repository`, `Queries`, `BusinessService(.Abstractions)`, tests y migración.
 > **Specs hermanas:** `resumen-diario-persistencia-frontend.md` (dev-flutter) · `resumen-diario-persistencia-modelo-doc.md` (analista-funcional)
 

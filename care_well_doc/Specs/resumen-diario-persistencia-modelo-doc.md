@@ -2,7 +2,9 @@
 
 > **Destinatario:** `analista-funcional` (documentación LaTeX) y `arquitecto-software` (diagrama)
 > **Autor:** `arquitecto-software`
-> **Estado:** pendiente de aplicar
+> **Estado:** **§2 (diagrama de dominio) APLICADO** el 2026-08-13 por `arquitecto-software` —
+> `ResumenDiario` ya está en `CareWell-modelo-dominio.drawio` (XML validado).
+> **§3 (LaTeX) y §4 (CLAUDE.md) siguen pendientes**, a cargo de `analista-funcional`.
 > **Alcance:** `care_well_doc/Diagramas/CareWell-modelo-dominio.drawio`, `care_well_doc/LATEX/CuidadoPersonas.tex` y `CLAUDE.md`.
 > **Specs hermanas:** `resumen-diario-persistencia-backend.md` · `resumen-diario-persistencia-frontend.md`
 
@@ -86,6 +88,15 @@ Agregar antes de `</root>` (la zona `x≈1060, y≈690` está libre; reubicar a 
 Agregar además las dos etiquetas de cardinalidad con el mismo estilo que usan las demás aristas del
 diagrama: **`1`** del lado de `Persona` y **`0..1`** del lado de `ResumenDiario` (mismo criterio que
 las relaciones `Persona — Usuario` y `Persona — FichaSalud`, que ya usan `1` / `0..1`).
+
+> **Aplicado con dos ajustes sobre el XML propuesto arriba** (2026-08-13):
+> 1. La entidad se dibuja con **borde punteado** (`dashed=1;dashPattern=8 4`) para distinguir
+>    visualmente que no es fuente de verdad sino una caché de un read-model derivado. El relleno se
+>    mantiene en el azul de `Persona` (`#dae8fc`/`#6c8ebf`), que es su dueña.
+> 2. Se agregó una nota `nota_resumendiario` (mismo estilo que `nota_emergencia` y `nota_dispositivo`)
+>    explicando: caché y no historial, contenido serializado, cardinalidad `0..1`, regla de vigencia y
+>    baja en cascada. Los ids reales son `resumendiario`, `e_resumendiario`, `e_resumendiario_s`,
+>    `e_resumendiario_t` y `nota_resumendiario`.
 
 ### 2.3 Verificación
 

@@ -187,10 +187,15 @@ Reservado a futuro — integraciones con apps de terceros:
 ## 9. Conceptos / features
 Subcarpetas por concepto dentro de cada capa, alineadas al MVP (nombres en inglés):
 `auth`, `profile`, `settings`, `dependents` (personas a cargo), `care_team` (mi equipo),
-`agenda`, `health` (mi salud), `emergency`, `summary` (resumen inteligente de la persona a cargo — read model efímero
-generado por IA, US-9.16; compila 3 fuentes: eventos de salud, hábitos de vida y estados de ánimo
-—la Agenda queda para una mejora futura—; sin caché en el MVP: cada apertura de pantalla o "Actualizar"
-invoca al modelo). Lo común y reutilizable va en `shared/`.
+`agenda`, `health` (mi salud), `emergency`, `summary` (resumen inteligente de la persona a cargo — read model
+generado por IA, US-9.16; compila 4 fuentes: eventos de salud, hábitos de vida y estados de ánimo del día,
+más las ocurrencias de agenda pendientes —lo que resta de hoy y todo mañana—. **Se persiste** en
+`t_ResumenDiario` (entidad `ResumenDiario`: persona, fecha y hora de generación, contenido JSON), **un único
+registro por persona que se sobrescribe en cada generación**: una consulta reutiliza el resumen si fue
+generado el mismo día y hace menos de 3 horas; el botón "Actualizar" y el pull-to-refresh fuerzan la
+regeneración, con un piso de 1 minuto. Los resúmenes sin datos no se cachean. Se muestra en el Home
+—card con el resumen acotado y la hora de generación— y en la pantalla `/summary`).
+Lo común y reutilizable va en `shared/`.
 
 ## 10. Flujo de trabajo con los agentes
 - `arquitecto-software`: decisiones de arquitectura tanto del frontend Flutter como del backend
