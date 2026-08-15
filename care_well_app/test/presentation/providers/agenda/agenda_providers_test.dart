@@ -163,59 +163,65 @@ ProviderContainer _makeContainer({
 
 void main() {
   group('agenda_providers', () {
-    group('ocurrenciasDelMesProvider', () {
-      test(
-        'calcula el rango [primer día del mes, primer día del mes siguiente)',
-        () async {
-          final repo = _FakeAgendaRepository();
-          final container = _makeContainer(
-            repo: repo,
-            scheduler: FakeNotificationScheduler(),
-            persona: _persona,
-          );
-          addTearDown(container.dispose);
+    group('semanaSeleccionadaProvider / diaSeleccionadoProvider', () {
+      test('por defecto apuntan al lunes de esta semana y a hoy', () async {
+        final container = _makeContainer(
+          repo: _FakeAgendaRepository(),
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
 
-          container.read(mesSeleccionadoProvider.notifier).state = DateTime(
-            2026,
-            7,
-            1,
-          );
+        final hoy = DateTime.now();
+        final hoyTruncado = DateTime(hoy.year, hoy.month, hoy.day);
+        final lunes = hoyTruncado.subtract(Duration(days: hoy.weekday - 1));
 
-          await container.read(ocurrenciasDelMesProvider.future);
+        expect(container.read(semanaSeleccionadaProvider), lunes);
+        expect(container.read(diaSeleccionadoProvider), hoyTruncado);
+      });
 
-          expect(repo.ultimoDesde, DateTime(2026, 7, 1));
-          expect(repo.ultimoHasta, DateTime(2026, 8, 1));
-        },
-      );
+      test('lunesDeLaSemana trunca la hora y retrocede al lunes', () {
+        // Jueves 13/08/2026 a las 21:45.
+        expect(
+          lunesDeLaSemana(DateTime(2026, 8, 13, 21, 45)),
+          DateTime(2026, 8, 10),
+        );
+        // Un lunes se devuelve a sí mismo.
+        expect(
+          lunesDeLaSemana(DateTime(2026, 8, 10, 3)),
+          DateTime(2026, 8, 10),
+        );
+        // Un domingo pertenece a la semana que empezó el lunes anterior.
+        expect(lunesDeLaSemana(DateTime(2026, 8, 16)), DateTime(2026, 8, 10));
+      });
+    });
 
-      test(
-        'el rango de diciembre pasa correctamente a enero del año siguiente',
-        () async {
-          final repo = _FakeAgendaRepository();
-          final container = _makeContainer(
-            repo: repo,
-            scheduler: FakeNotificationScheduler(),
-            persona: _persona,
-          );
-          addTearDown(container.dispose);
+    group('ocurrenciasDeSemanaProvider', () {
+      test('calcula el rango [lunes, lunes + 7 días)', () async {
+        final repo = _FakeAgendaRepository();
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
 
-          container.read(mesSeleccionadoProvider.notifier).state = DateTime(
-            2026,
-            12,
-            1,
-          );
+        container.read(semanaSeleccionadaProvider.notifier).state = DateTime(
+          2026,
+          8,
+          10,
+        );
 
-          await container.read(ocurrenciasDelMesProvider.future);
+        await container.read(ocurrenciasDeSemanaProvider.future);
 
-          expect(repo.ultimoDesde, DateTime(2026, 12, 1));
-          expect(repo.ultimoHasta, DateTime(2027, 1, 1));
-        },
-      );
+        expect(repo.ultimoDesde, DateTime(2026, 8, 10));
+        expect(repo.ultimoHasta, DateTime(2026, 8, 17));
+      });
 
       test('retorna lista vacía cuando no hay persona de contexto', () async {
         final repo = _FakeAgendaRepository(
           ocurrencias: [
-            _ocurrencia(eventoAgendaId: 1, inicio: DateTime(2026, 7, 10)),
+            _ocurrencia(eventoAgendaId: 1, inicio: DateTime(2026, 8, 11)),
           ],
         );
         final container = _makeContainer(
@@ -225,27 +231,19 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final result = await container.read(ocurrenciasDelMesProvider.future);
+        final result = await container.read(ocurrenciasDeSemanaProvider.future);
 
         expect(result, isEmpty);
         expect(repo.obtenerOcurrenciasCount, 0);
       });
 
       test('ordena las ocurrencias por fechaHoraInicio ascendente', () async {
-        final tarde = _ocurrencia(
-          eventoAgendaId: 2,
-          inicio: DateTime(2026, 7, 20, 15),
-        );
-        final temprano = _ocurrencia(
-          eventoAgendaId: 1,
-          inicio: DateTime(2026, 7, 5, 9),
-        );
-        final medio = _ocurrencia(
-          eventoAgendaId: 3,
-          inicio: DateTime(2026, 7, 12, 12),
-        );
         final repo = _FakeAgendaRepository(
-          ocurrencias: [tarde, temprano, medio],
+          ocurrencias: [
+            _ocurrencia(eventoAgendaId: 2, inicio: DateTime(2026, 8, 14, 15)),
+            _ocurrencia(eventoAgendaId: 1, inicio: DateTime(2026, 8, 11, 9)),
+            _ocurrencia(eventoAgendaId: 3, inicio: DateTime(2026, 8, 12, 12)),
+          ],
         );
         final container = _makeContainer(
           repo: repo,
@@ -254,9 +252,111 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final result = await container.read(ocurrenciasDelMesProvider.future);
+        final result = await container.read(ocurrenciasDeSemanaProvider.future);
 
         expect(result.map((o) => o.eventoAgendaId).toList(), [1, 3, 2]);
+      });
+
+      test('se recalcula al cambiar de semana', () async {
+        final repo = _FakeAgendaRepository();
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
+
+        await container.read(ocurrenciasDeSemanaProvider.future);
+        final antes = repo.obtenerOcurrenciasCount;
+
+        container.read(semanaSeleccionadaProvider.notifier).state = DateTime(
+          2026,
+          8,
+          17,
+        );
+        await container.read(ocurrenciasDeSemanaProvider.future);
+
+        expect(repo.obtenerOcurrenciasCount, greaterThan(antes));
+        expect(repo.ultimoDesde, DateTime(2026, 8, 17));
+      });
+    });
+
+    group('proximaOcurrenciaProvider', () {
+      test(
+        'consulta desde el día siguiente al seleccionado y por 30 días',
+        () async {
+          final repo = _FakeAgendaRepository();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: FakeNotificationScheduler(),
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
+
+          container.read(diaSeleccionadoProvider.notifier).state = DateTime(
+            2026,
+            8,
+            13,
+          );
+
+          await container.read(proximaOcurrenciaProvider.future);
+
+          expect(repo.ultimoDesde, DateTime(2026, 8, 14));
+          expect(repo.ultimoHasta, DateTime(2026, 9, 13));
+        },
+      );
+
+      test('devuelve la ocurrencia más próxima', () async {
+        final repo = _FakeAgendaRepository(
+          ocurrencias: [
+            _ocurrencia(eventoAgendaId: 9, inicio: DateTime(2026, 8, 20, 10)),
+            _ocurrencia(eventoAgendaId: 7, inicio: DateTime(2026, 8, 15, 16)),
+          ],
+        );
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
+
+        container.read(diaSeleccionadoProvider.notifier).state = DateTime(
+          2026,
+          8,
+          13,
+        );
+
+        final proxima = await container.read(proximaOcurrenciaProvider.future);
+
+        expect(proxima?.eventoAgendaId, 7);
+      });
+
+      test('devuelve null cuando no hay ocurrencias posteriores', () async {
+        final container = _makeContainer(
+          repo: _FakeAgendaRepository(),
+          scheduler: FakeNotificationScheduler(),
+          persona: _persona,
+        );
+        addTearDown(container.dispose);
+
+        expect(await container.read(proximaOcurrenciaProvider.future), isNull);
+      });
+
+      test('devuelve null cuando no hay persona de contexto', () async {
+        final repo = _FakeAgendaRepository(
+          ocurrencias: [
+            _ocurrencia(eventoAgendaId: 1, inicio: DateTime(2026, 8, 15)),
+          ],
+        );
+        final container = _makeContainer(
+          repo: repo,
+          scheduler: FakeNotificationScheduler(),
+          persona: null,
+        );
+        addTearDown(container.dispose);
+
+        expect(await container.read(proximaOcurrenciaProvider.future), isNull);
+        expect(repo.obtenerOcurrenciasCount, 0);
       });
     });
 
@@ -294,8 +394,9 @@ void main() {
           );
           addTearDown(container.dispose);
 
-          // Precarga las ocurrencias del mes para poder observar la invalidación.
-          await container.read(ocurrenciasDelMesProvider.future);
+          // Precarga las vistas de ocurrencias para observar la invalidación.
+          await container.read(ocurrenciasDeSemanaProvider.future);
+          await container.read(proximaOcurrenciaProvider.future);
           final llamadasPrevias = repo.obtenerOcurrenciasCount;
 
           await container.read(eliminarEventoAgendaProvider)(77);
@@ -306,10 +407,11 @@ void main() {
           expect(scheduler.cancelAllCount, 1);
           expect(repo.obtenerOcurrenciasCount, greaterThan(llamadasPrevias));
 
-          // Al releer, ocurrenciasDelMesProvider vuelve a consultar (fue invalidado).
+          // Al releer, ambas vistas vuelven a consultar (fueron invalidadas).
           final antes = repo.obtenerOcurrenciasCount;
-          await container.read(ocurrenciasDelMesProvider.future);
-          expect(repo.obtenerOcurrenciasCount, greaterThan(antes));
+          await container.read(ocurrenciasDeSemanaProvider.future);
+          await container.read(proximaOcurrenciaProvider.future);
+          expect(repo.obtenerOcurrenciasCount, antes + 2);
         },
       );
     });

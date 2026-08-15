@@ -32,6 +32,19 @@ void main() {
       expect(find.textContaining('no tenés'), findsOneWidget);
     });
 
+    testWidgets('muestra la línea de apoyo secundaria', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          EmptyStateTile(
+            accentColor: Colors.orange,
+            onTap: () {},
+            onTapAdd: () {},
+          ),
+        ),
+      );
+      expect(find.text('Agregá a alguien para verlo acá'), findsOneWidget);
+    });
+
     testWidgets('muestra el ícono elderly', (tester) async {
       await tester.pumpWidget(
         _wrap(

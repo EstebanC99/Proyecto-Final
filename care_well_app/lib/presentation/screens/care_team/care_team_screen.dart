@@ -75,9 +75,8 @@ class CareTeamScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        backgroundColor: context.colors.surface,
-        title: const Text('Equipo de cuidado'),
+      appBar: ContextAppBar(
+        eyebrow: 'Equipo de cuidado',
         actions: [
           puedeAdministrarAsync.when(
             loading: () => const SizedBox.shrink(),
@@ -210,9 +209,6 @@ class _TeamBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Selector de contexto
-                const SizedBox(height: AppSpacing.lg),
-                const ContextSelector(),
                 const SizedBox(height: AppSpacing.lg),
 
                 // Solicitudes pendientes (solo Responsables, si hay alguna).

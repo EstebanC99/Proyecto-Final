@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,12 +13,20 @@ import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 /// Pantalla de lista de hábitos de vida (US-28).
+///
+/// Bajo el AppBar hay una banda fija con el progreso del día; el listado agrupa
+/// los hábitos en pendientes y completados, sin reordenar dentro de cada grupo.
 class HabitsScreen extends ConsumerWidget {
   const HabitsScreen({super.key});
+
+  /// Cantidad de items que reciben delay escalonado en la animación de entrada.
+  /// Más allá de eso la cascada se percibe como lentitud.
+  static const int _maxItemsAnimados = 6;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitosAsync = ref.watch(habitosProvider);
+    final progresoAsync = ref.watch(progresoHabitosHoyProvider);
     final puedeRegistrarAsync = ref.watch(puedeRegistrarHabitosProvider);
     final puedeRegistrar = puedeRegistrarAsync.value ?? false;
     // El registro de cumplimiento diario (marcar realizado / comentar) está
@@ -23,39 +34,28 @@ class HabitsScreen extends ConsumerWidget {
     // permiso de ABM de hábitos.
     final esMiembroEquipo =
         ref.watch(esMiembroEquipoActivoProvider).value ?? false;
-    final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
+
+    final progreso = switch (progresoAsync) {
+      AsyncData(:final value) when value.total > 0 => value,
+      _ => null,
+    };
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Hábitos de vida'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Hábitos de vida'),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Selector de persona de contexto
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
+          if (habitosAsync.isLoading)
+            const _ProgressHeaderSkeleton()
+          else if (progreso != null)
+            HabitsDayProgressHeader(
+              completados: progreso.completados,
+              total: progreso.total,
+            ),
           Expanded(
             child: habitosAsync.when(
-              loading: () => _HabitosSkeleton(),
+              loading: () => const _HabitosSkeleton(),
               error: (err, _) => Center(
                 child: InlineErrorBanner(
                   message: 'No se pudieron cargar los hábitos. $err',
@@ -63,39 +63,7 @@ class HabitsScreen extends ConsumerWidget {
               ),
               data: (habitos) {
                 if (habitos.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.self_improvement,
-                            size: 64,
-                            color: context.colors.textDisabled,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Text(
-                            'Sin hábitos registrados',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: context.colors.textSecondary,
-                            ),
-                          ),
-                          SizedBox(height: AppSpacing.sm),
-                          Text(
-                            'Empezá a registrar hábitos con el botón +',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: context.colors.textDisabled,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return _EmptyState(puedeRegistrar: puedeRegistrar);
                 }
                 return RefreshIndicator(
                   color: context.colors.habitsAccent,
@@ -103,23 +71,9 @@ class HabitsScreen extends ConsumerWidget {
                     ref.invalidate(habitosProvider);
                     await ref.read(habitosProvider.future);
                   },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    itemCount: habitos.length,
-                    itemBuilder: (context, i) => _HabitoCard(
-                      habito: habitos[i],
-                      onTap: () => context.pushNamed(
-                        AppRoutes.healthHabitDetailName,
-                        pathParameters: {'id': habitos[i].id.toString()},
-                      ),
-                      onToggleRealizacion: esMiembroEquipo
-                          ? () => HabitoRealizacionSheet.show(
-                              context,
-                              ref,
-                              habito: habitos[i],
-                            )
-                          : null,
-                    ),
+                  child: _HabitosList(
+                    habitos: habitos,
+                    esMiembroEquipo: esMiembroEquipo,
                   ),
                 );
               },
@@ -132,6 +86,9 @@ class HabitsScreen extends ConsumerWidget {
               onPressed: () => context.pushNamed(AppRoutes.healthHabitsNewName),
               tooltip: 'Nuevo hábito',
               backgroundColor: context.colors.habitsAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              ),
               child: Icon(Icons.add, color: context.colors.onPrimary),
             )
           : null,
@@ -139,99 +96,117 @@ class HabitsScreen extends ConsumerWidget {
   }
 }
 
-// ─── HabitoCard ───────────────────────────────────────────────────────────────
+// ─── Listado agrupado ─────────────────────────────────────────────────────────
 
-class _HabitoCard extends StatelessWidget {
-  const _HabitoCard({
-    required this.habito,
-    required this.onTap,
-    this.onToggleRealizacion,
-  });
+/// Listado de hábitos agrupado en pendientes y completados.
+///
+/// El orden dentro de cada grupo es el que devuelve el provider: marcar un
+/// hábito lo mueve de sección, pero no reordena a sus compañeros.
+class _HabitosList extends ConsumerWidget {
+  const _HabitosList({required this.habitos, required this.esMiembroEquipo});
 
-  final HabitoVida habito;
-  final VoidCallback onTap;
+  final List<HabitoVida> habitos;
+  final bool esMiembroEquipo;
 
-  /// Callback para marcar/desmarcar la realización. Null si el usuario no tiene
-  /// permiso (el chip se muestra pero no es accionable).
-  final VoidCallback? onToggleRealizacion;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pendientes = habitos.where((h) => h.realizacion == null).toList();
+    final completados = habitos.where((h) => h.realizacion != null).toList();
 
-  static String _labelTipo(TipoHabitoVida tipo) => tipo.descripcion;
+    // Contador global de items para escalonar la animación de entrada a lo
+    // largo de las dos secciones.
+    var indice = 0;
+    Widget card(HabitoVida habito) => _buildCard(
+      context,
+      ref,
+      habito,
+      math.min(indice++, HabitsScreen._maxItemsAnimados),
+    );
 
-  static IconData _iconTipo(TipoHabitoVida tipo) {
-    switch (tipo.id) {
-      case TiposHabitoConst.actividadFisica:
-        return Icons.directions_run;
-      case TiposHabitoConst.alimentacion:
-        return Icons.restaurant;
-      case TiposHabitoConst.sueno:
-        return Icons.bedtime_outlined;
-      case TiposHabitoConst.hidratacion:
-        return Icons.water_drop_outlined;
-      default:
-        return Icons.self_improvement;
-    }
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.xxxl,
+      ),
+      children: [
+        if (pendientes.isNotEmpty) ...[
+          SectionLabel(text: 'Pendientes', count: pendientes.length),
+          for (final habito in pendientes) card(habito),
+        ],
+        if (completados.isNotEmpty) ...[
+          SectionLabel(text: 'Completados', count: completados.length),
+          for (final habito in completados) card(habito),
+        ],
+      ],
+    );
   }
+
+  Widget _buildCard(
+    BuildContext context,
+    WidgetRef ref,
+    HabitoVida habito,
+    int posicionAnimada,
+  ) {
+    return FadeInUp(
+      duration: const Duration(milliseconds: 300),
+      delay: Duration(milliseconds: 50 * posicionAnimada),
+      child: HabitoCard(
+        habito: habito,
+        onTap: () => context.pushNamed(
+          AppRoutes.healthHabitDetailName,
+          pathParameters: {'id': habito.id.toString()},
+        ),
+        onToggleRealizacion: esMiembroEquipo
+            ? () => HabitoRealizacionSheet.show(context, ref, habito: habito)
+            : null,
+      ),
+    );
+  }
+}
+
+// ─── Estado vacío ─────────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.puedeRegistrar});
+
+  final bool puedeRegistrar;
 
   @override
   Widget build(BuildContext context) {
-    final realizado = habito.realizacion != null;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: context.colors.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          boxShadow: AppSpacing.elev1,
-        ),
-        child: Row(
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: context.colors.habitsContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _iconTipo(habito.tipo),
-                size: 20,
-                color: context.colors.habitsAccent,
-              ),
+            Icon(
+              Icons.self_improvement,
+              size: 64,
+              color: context.colors.habitsAccent.withValues(alpha: 0.4),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _labelTipo(habito.tipo),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: context.colors.habitsAccent,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    habito.descripcion,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: context.colors.textPrimary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Sin hábitos registrados',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: context.colors.textSecondary,
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            GestureDetector(
-              onTap: onToggleRealizacion,
-              child: _RealizacionChip(realizado: realizado),
-            ),
+            // La ayuda menciona el botón +, que sólo existe con permiso de ABM.
+            if (puedeRegistrar) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Empezá a registrar hábitos con el botón +',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textDisabled,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -239,43 +214,37 @@ class _HabitoCard extends StatelessWidget {
   }
 }
 
-// ─── Chip de estado de realización ───────────────────────────────────────────
+// ─── Skeletons ────────────────────────────────────────────────────────────────
 
-class _RealizacionChip extends StatelessWidget {
-  const _RealizacionChip({required this.realizado});
-  final bool realizado;
+/// Placeholder de la banda de progreso mientras cargan los hábitos.
+class _ProgressHeaderSkeleton extends StatelessWidget {
+  const _ProgressHeaderSkeleton();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: realizado
-            ? context.colors.successContainer
-            : context.colors.surfaceVariant,
-        borderRadius: BorderRadius.circular(20),
+        color: context.colors.surface,
+        border: Border(bottom: BorderSide(color: context.colors.outline)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            realizado
-                ? Icons.check_circle_outline
-                : Icons.radio_button_unchecked,
-            size: 13,
-            color: realizado
-                ? context.colors.success
-                : context.colors.textDisabled,
+          Container(
+            width: 160,
+            height: 22,
+            decoration: BoxDecoration(
+              color: context.colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
           ),
-          const SizedBox(width: 4),
-          Text(
-            realizado ? 'Realizado' : 'Pendiente',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: realizado
-                  ? context.colors.success
-                  : context.colors.textDisabled,
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            height: 8,
+            decoration: BoxDecoration(
+              color: context.colors.surfaceVariant,
+              borderRadius: BorderRadius.circular(4),
             ),
           ),
         ],
@@ -284,9 +253,9 @@ class _RealizacionChip extends StatelessWidget {
   }
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
-
 class _HabitosSkeleton extends StatelessWidget {
+  const _HabitosSkeleton();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -299,7 +268,7 @@ class _HabitosSkeleton extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               color: context.colors.surfaceVariant,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             ),
           ),
         ),

@@ -16,8 +16,11 @@ export 'shared/confirm_dialog.dart';
 export 'shared/success_view.dart';
 export 'shared/context_chip.dart';
 export 'shared/context_selector.dart';
+export 'shared/context_selector_compact.dart';
+export 'shared/context_app_bar.dart';
 export 'shared/deleted_assignment_chip.dart';
 export 'shared/full_width_action_tile.dart';
+export 'shared/section_label.dart';
 
 export 'home/home_header.dart';
 export 'home/nav_tile.dart';

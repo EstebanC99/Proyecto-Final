@@ -8,9 +8,9 @@ import 'tipo_evento_theme.dart';
 
 /// Card de una ocurrencia de evento de agenda.
 ///
-/// Muestra la hora de inicio, un ícono coloreado según el tipo de evento, el
-/// título, la descripción del tipo y, cuando la ocurrencia es futura, el chip
-/// de recordatorio. Las ocurrencias ya iniciadas ([OcurrenciaEventoAgenda.esEditable]
+/// Muestra la hora de inicio y su duración, un ícono coloreado según el tipo
+/// de evento, el título, la descripción del tipo y, cuando la ocurrencia es
+/// futura, el chip de recordatorio. Las ocurrencias ya iniciadas ([OcurrenciaEventoAgenda.esEditable]
 /// `== false`) se atenúan y muestran un candado.
 ///
 /// Es puramente presentacional: la lógica de acciones la resuelve el contenedor
@@ -26,6 +26,22 @@ class OcurrenciaCard extends StatelessWidget {
   String _formatHora(DateTime dt) =>
       '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
+  /// Duración en formato corto ("45 min", "1 h", "1 h 30 min").
+  ///
+  /// Devuelve `null` para duraciones nulas o negativas, para no mostrar un
+  /// dato sin sentido si los datos vinieran inconsistentes.
+  String? _formatDuracion() {
+    final minutos = ocurrencia.fechaHoraFin
+        .difference(ocurrencia.fechaHoraInicio)
+        .inMinutes;
+    if (minutos <= 0) return null;
+    if (minutos < 60) return '$minutos min';
+
+    final horas = minutos ~/ 60;
+    final resto = minutos % 60;
+    return resto == 0 ? '$horas h' : '$horas h $resto min';
+  }
+
   @override
   Widget build(BuildContext context) {
     final editable = ocurrencia.esEditable();
@@ -38,6 +54,7 @@ class OcurrenciaCard extends StatelessWidget {
         : context.colors.surfaceVariant;
     final tieneRecordatorio =
         ocurrencia.minutosAnticipacionRecordatorio != null;
+    final duracion = _formatDuracion();
 
     final card = Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -89,6 +106,18 @@ class OcurrenciaCard extends StatelessWidget {
                                 : context.colors.textDisabled,
                           ),
                         ),
+                        if (duracion != null) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            duracion,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: editable
+                                  ? context.colors.textSecondary
+                                  : context.colors.textDisabled,
+                            ),
+                          ),
+                        ],
                         if (ocurrencia.esRecurrente) ...[
                           const SizedBox(width: 6),
                           Icon(

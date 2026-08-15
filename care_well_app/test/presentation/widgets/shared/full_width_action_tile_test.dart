@@ -99,5 +99,56 @@ void main() {
       expect(tester.widget<Icon>(find.byType(Icon)).color, tinta);
       expect(tester.widget<Text>(find.text('Acción')).style?.color, tinta);
     });
+
+    testWidgets('mide al menos 72 dp de alto', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          FullWidthActionTile(
+            icon: Icons.timeline,
+            label: 'Acción',
+            color: accent,
+            onTap: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getSize(find.byType(AnimatedContainer)).height,
+        greaterThanOrEqualTo(72),
+      );
+    });
+
+    // El tile vive en pantallas angostas (360 dp) y con tipografía ampliada:
+    // el label debe ceder espacio en vez de desbordar la fila.
+    for (final escala in [1.0, 1.5, 2.0]) {
+      testWidgets('no desborda en 360 dp con escala $escala', (tester) async {
+        tester.view.physicalSize = const Size(360, 740);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(escala)),
+              child: Scaffold(
+                body: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: FullWidthActionTile(
+                    icon: Icons.timeline,
+                    label: 'Ver línea de tiempo',
+                    color: accent,
+                    onTap: () {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 }

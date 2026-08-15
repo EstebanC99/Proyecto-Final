@@ -9,77 +9,109 @@ import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
-/// Lista mensual de eventos de salud agrupada por día (US-30).
+/// Eventos de salud de la persona de contexto (US-30).
 ///
-/// Muestra los eventos del mes seleccionado para la persona de contexto,
-/// agrupados por día en orden ascendente. Permite navegar entre meses y —para
-/// usuarios con permiso [PermisosCuidadoConst.registrarEventosSalud]—
-/// registrar nuevos eventos mediante el FAB.
-class HealthEventsScreen extends ConsumerWidget {
+/// Muestra una tira con los siete días de la semana seleccionada y el detalle
+/// del día elegido, más una sección "Anteriormente" con el último evento
+/// registrado antes de ese día. Como los eventos de salud se registran después
+/// de ocurrir, no se puede navegar a semanas futuras ni seleccionar días
+/// posteriores a hoy. Para usuarios con permiso
+/// [PermisosCuidadoConst.registrarEventosSalud] permite registrar nuevos
+/// eventos mediante el FAB.
+class HealthEventsScreen extends ConsumerStatefulWidget {
   const HealthEventsScreen({super.key});
 
-  /// `true` si [mes] es el mes actual (no hay meses futuros que mostrar).
-  bool _esUltimoMes(DateTime mes) {
-    final ahora = DateTime.now();
-    return mes.year == ahora.year && mes.month == ahora.month;
+  @override
+  ConsumerState<HealthEventsScreen> createState() => _HealthEventsScreenState();
+}
+
+class _HealthEventsScreenState extends ConsumerState<HealthEventsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Cada entrada arranca en el presente: la selección de día y semana vive
+    // en providers globales y, si no se reinicia, la pantalla se abre donde
+    // quedó la visita anterior.
+    //
+    // El reinicio va en un microtask porque Riverpod prohíbe modificar un
+    // provider dentro de un ciclo de vida del widget. Se resuelve antes del
+    // primer frame, así que no se llega a ver la semana vieja.
+    //
+    // No se resuelve marcando los providers como `autoDispose` porque el
+    // formulario de alta se apila encima de esta pantalla sin desmontarla: eso
+    // los mantendría vivos igual, y además rompería el salto al día del evento
+    // recién registrado.
+    Future.microtask(() {
+      if (mounted) reiniciarSeleccionEventosSalud(ref);
+    });
+  }
+
+  /// Trunca una fecha a año-mes-día.
+  DateTime _soloFecha(DateTime fecha) =>
+      DateTime(fecha.year, fecha.month, fecha.day);
+
+  /// Selecciona un día y, si cae fuera de la semana visible, mueve también la
+  /// semana. Permite saltar al evento de "Anteriormente" sin pasos extra.
+  void _seleccionarDia(DateTime dia) => seleccionarDiaEventosSalud(ref, dia);
+
+  void _irASemanaAnterior() {
+    final lunes = ref.read(semanaEventosSaludProvider);
+    ref.read(semanaEventosSaludProvider.notifier).state = lunes.subtract(
+      const Duration(days: 7),
+    );
+  }
+
+  void _irASemanaSiguiente() {
+    final lunes = ref.read(semanaEventosSaludProvider);
+    ref.read(semanaEventosSaludProvider.notifier).state = lunes.add(
+      const Duration(days: 7),
+    );
+  }
+
+  /// Agrupa la cantidad de eventos por día, para los pips de la tira.
+  Map<DateTime, int> _cantidadPorDia(List<EventoSalud> eventos) {
+    final Map<DateTime, int> conteo = {};
+    for (final e in eventos) {
+      final dia = _soloFecha(e.fechaHora.toLocal());
+      conteo[dia] = (conteo[dia] ?? 0) + 1;
+    }
+    return conteo;
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final eventosAsync = ref.watch(eventosSaludDelMesProvider);
+  Widget build(BuildContext context) {
+    final eventosAsync = ref.watch(eventosSaludDeSemanaProvider);
     final puede = ref.watch(puedeRegistrarEventosSaludProvider).value ?? false;
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
-    final mes = ref.watch(mesEventosSaludProvider);
+    final lunesSemana = ref.watch(semanaEventosSaludProvider);
+    final diaSeleccionado = ref.watch(diaEventosSaludSeleccionadoProvider);
 
-    void irMesAnterior() {
-      ref.read(mesEventosSaludProvider.notifier).state = DateTime(
-        mes.year,
-        mes.month - 1,
-        1,
-      );
-    }
+    final ahora = DateTime.now();
+    final hoy = _soloFecha(ahora);
+    final esSemanaActual = lunesSemana == lunesDeLaSemana(ahora);
 
-    void irMesSiguiente() {
-      ref.read(mesEventosSaludProvider.notifier).state = DateTime(
-        mes.year,
-        mes.month + 1,
-        1,
-      );
-    }
+    // Filtro defensivo: nunca mostrar eventos con fecha futura.
+    final eventosSemana = (eventosAsync.value ?? const <EventoSalud>[])
+        .where((e) => !e.fechaHora.isAfter(ahora))
+        .toList();
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Eventos de salud'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Eventos de salud'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
-          // Navegación mensual — no se permite avanzar a meses futuros.
-          MonthNavHeader(
-            mes: mes,
-            onPrevious: irMesAnterior,
-            onNext: _esUltimoMes(mes) ? null : irMesSiguiente,
+          // Tira de la semana. No se puede avanzar más allá de la semana
+          // actual: los eventos de salud se registran después de ocurrir.
+          WeekStrip(
+            lunesSemana: lunesSemana,
+            diaSeleccionado: diaSeleccionado,
+            cantidadPorDia: _cantidadPorDia(eventosSemana),
+            onSelectDia: _seleccionarDia,
+            onPreviousWeek: _irASemanaAnterior,
+            onNextWeek: esSemanaActual ? null : _irASemanaSiguiente,
+            accentColor: context.colors.healthAccent,
+            maxDiaSeleccionable: hoy,
           ),
 
           Expanded(
@@ -93,7 +125,7 @@ class HealthEventsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              data: (eventos) {
+              data: (_) {
                 if (personaAsync.value == null) {
                   return Center(
                     child: Padding(
@@ -111,30 +143,64 @@ class HealthEventsScreen extends ConsumerWidget {
                   );
                 }
 
-                // Filtro defensivo: nunca mostrar eventos con fecha futura.
-                final ahora = DateTime.now();
-                final eventosFiltrados = eventos
-                    .where((e) => !e.fechaHora.isAfter(ahora))
+                final delDia = eventosSemana
+                    .where(
+                      (e) =>
+                          _soloFecha(e.fechaHora.toLocal()) ==
+                          _soloFecha(diaSeleccionado),
+                    )
                     .toList();
 
-                if (eventosFiltrados.isEmpty) {
-                  return _EmptyMonthState(puede: puede);
-                }
+                return RefreshIndicator(
+                  color: context.colors.healthAccent,
+                  onRefresh: () async {
+                    ref.invalidate(eventosSaludDeSemanaProvider);
+                    ref.invalidate(eventoSaludAnteriorProvider);
+                    await ref.read(eventosSaludDeSemanaProvider.future);
+                  },
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xxxl),
+                    children: [
+                      DayHeader(
+                        dia: diaSeleccionado,
+                        cantidadEventos: delDia.length,
+                      ),
 
-                onTap(EventoSalud e) => context.pushNamed(
-                  AppRoutes.healthEventDetailName,
-                  pathParameters: {'id': e.id.toString()},
-                );
-                Future<void> onRefresh() async {
-                  ref.invalidate(eventosSaludDelMesProvider);
-                  await ref.read(eventosSaludDelMesProvider.future);
-                }
+                      // Sin eventos en toda la semana se muestra el estado
+                      // vacío completo (con CTA); si solo está vacío el día,
+                      // alcanza un mensaje breve que no tape la tira ni la
+                      // sección "Anteriormente".
+                      if (delDia.isEmpty && eventosSemana.isEmpty)
+                        _EmptyWeekState(puede: puede)
+                      else if (delDia.isEmpty)
+                        _SinEventosEnElDia(puede: puede)
+                      else
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (final e in delDia)
+                                HealthEventCard(
+                                  evento: e,
+                                  mostrarFecha: false,
+                                  tieneNotas: e.tieneNotas,
+                                  onTap: () => context.pushNamed(
+                                    AppRoutes.healthEventDetailName,
+                                    pathParameters: {'id': e.id.toString()},
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
 
-                return HealthEventsMonthList(
-                  eventos: eventosFiltrados,
-                  puedeRegistrar: puede,
-                  onRefresh: onRefresh,
-                  onEventoTap: onTap,
+                      // "Anteriormente": último evento previo al día visible.
+                      _EventoAnteriorSection(onVerDia: _seleccionarDia),
+                    ],
+                  ),
                 );
               },
             ),
@@ -153,47 +219,213 @@ class HealthEventsScreen extends ConsumerWidget {
   }
 }
 
-// ─── Estado vacío del mes ─────────────────────────────────────────────────────
+// ─── Sección "Anteriormente" ─────────────────────────────────────────────────
 
-class _EmptyMonthState extends StatelessWidget {
-  const _EmptyMonthState({required this.puede});
+/// Muestra el último evento de salud anterior al día seleccionado.
+///
+/// Es informativa: al tocarla se salta a ese día en lugar de abrir el detalle,
+/// que se accede desde las cards del día que se está viendo.
+class _EventoAnteriorSection extends ConsumerWidget {
+  const _EventoAnteriorSection({required this.onVerDia});
+
+  final ValueChanged<DateTime> onVerDia;
+
+  static const _nombresDiaCorto = [
+    'LUN',
+    'MAR',
+    'MIÉ',
+    'JUE',
+    'VIE',
+    'SÁB',
+    'DOM',
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final anterior = ref.watch(eventoSaludAnteriorProvider).value;
+    if (anterior == null) return const SizedBox.shrink();
+
+    final fechaHora = anterior.fechaHora.toLocal();
+    final hora =
+        '${fechaHora.hour.toString().padLeft(2, '0')}:'
+        '${fechaHora.minute.toString().padLeft(2, '0')}';
+    final acento = healthEventColor(context, anterior.tipo);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(color: context.colors.outline, height: 1),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'ANTERIORMENTE',
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+              color: context.colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          InkWell(
+            onTap: () => onVerDia(fechaHora),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: acento.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                    child: Text(
+                      '${_nombresDiaCorto[fechaHora.weekday - 1]} '
+                      '${fechaHora.day}',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: acento,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Flexible(
+                    child: Text(
+                      anterior.descripcion,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    ' · $hora',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Estado vacío de la semana ───────────────────────────────────────────────
+
+class _EmptyWeekState extends StatelessWidget {
+  const _EmptyWeekState({required this.puede});
 
   final bool puede;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.favorite_outline,
-              size: 64,
-              color: context.colors.textDisabled,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.favorite_outline,
+            size: 64,
+            color: context.colors.textDisabled,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Sin eventos en esta semana.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: context.colors.textSecondary,
             ),
-            const SizedBox(height: AppSpacing.md),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          if (puede)
             Text(
-              'Sin eventos en este mes.',
+              'Usá el botón + para registrar un evento.',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: context.colors.textDisabled,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Estado vacío del día ────────────────────────────────────────────────────
+
+/// Mensaje breve cuando el día seleccionado no tiene eventos.
+///
+/// Se prefiere al estado vacío completo porque acá siempre queda visible la
+/// tira de días y la sección "Anteriormente".
+class _SinEventosEnElDia extends StatelessWidget {
+  const _SinEventosEnElDia({required this.puede});
+
+  final bool puede;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.favorite_outline,
+            size: 40,
+            color: context.colors.textDisabled,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'No hay eventos este día',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: context.colors.textSecondary,
+            ),
+          ),
+          if (puede) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Usá el botón + para registrar uno.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
                 color: context.colors.textSecondary,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            if (puede)
-              Text(
-                'Usá el botón + para registrar el primer evento.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.colors.textDisabled,
-                ),
-              ),
           ],
-        ),
+        ],
       ),
     );
   }

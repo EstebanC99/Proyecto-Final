@@ -77,16 +77,21 @@ modifica la documentación en LaTeX.
     `UserContext`); proyecto hoja, poblado desde el JWT por un filtro de `API` y consumido por
     `BusinessService` para resolver el usuario actual (p. ej. en chequeos de permisos).
   - `CareWell.DocumentIntelligence` — integración con IA generativa vía `Microsoft.Extensions.AI`
-    (`IChatClient`), con **Google Gemini** (`gemini-2.5-flash-lite`) vía **Vertex AI / Agent
-    Platform** como proveedor (no Google AI Studio: bloquea IPs de datacenter de forma
-    intermitente, ver `care_well_doc/Deploy/administracion.md`). `GeminiChatClient` es un
-    cliente propio (sin SDK de terceros) que habla directo el REST de Vertex. Proyecto hoja
-    (solo referencia a `Global`); expone *agents* (`IReconocedorTextoDocumentoAgent` para OCR de
-    DNI —modelo de visión— e `IResumidorDiarioAgent` para el Resumen inteligente —mismo modelo
-    liviano para ambos casos—) y `AddDocumentIntelligences()` para DI, con dos `IChatClient`
-    keyed (`vision`/`texto`) inyectados vía `[FromKeyedServices]`. Cada agent define su *system
-    prompt* y traduce las fallas del proveedor a `ServicioNoDisponibleException`; `IAOptions`
-    centraliza la config (API key, modelos, timeout).
+    (`IChatClient`), con **Google Gemini** (`gemini-2.5-flash-lite`) como modelo. El proveedor es
+    configurable por ambiente vía `IA:Proveedor` (`ProveedoresIAEnum`): **AI Studio** en desarrollo
+    (API key de nivel gratuito; sólo con datos ficticios, porque Google entrena sus modelos con esos
+    prompts) y **Vertex AI / Agent Platform** en producción. Ambos hablan el mismo REST nativo de
+    Gemini y se autentican con el header `x-goog-api-key`; difieren sólo en la URL base, que resuelve
+    `DocumentIntelligenceExtensions.ResolverBaseUrl` (ver `care_well_doc/Deploy/administracion.md`).
+    `GeminiChatClient` es un cliente propio (sin SDK de terceros) que habla directo ese REST y sanea
+    el JSON Schema al subconjunto que acepta Gemini. Proyecto hoja (solo referencia a `Global` y
+    `Logger`); expone *agents* (`IReconocedorTextoDocumentoAgent` para OCR de DNI —modelo de visión—
+    e `IResumidorDiarioAgent` para el Resumen inteligente —mismo modelo liviano para ambos casos—) y
+    `AddDocumentIntelligences()` para DI, con dos `IChatClient` keyed (`vision`/`texto`) inyectados
+    vía `[FromKeyedServices]`. Cada agent define su *system prompt* (el del resumidor es un recurso
+    embebido, leído con `RecursosEmbebidos`) y traduce las fallas del proveedor a
+    `ServicioNoDisponibleException`; `IAOptions` centraliza la config (proveedor, API key, modelos,
+    timeout, `EnviarResponseSchema`).
 - **Dependencias:** `API → Repository → Domain`; `BusinessService → Abstractions, Repository, Domain, Notifications, Security, DocumentIntelligence`.
 - **Convenciones:** nombres en español; un `*Config.cs` por entidad en `Repository/Config/`.
 
@@ -182,10 +187,15 @@ Reservado a futuro — integraciones con apps de terceros:
 ## 9. Conceptos / features
 Subcarpetas por concepto dentro de cada capa, alineadas al MVP (nombres en inglés):
 `auth`, `profile`, `settings`, `dependents` (personas a cargo), `care_team` (mi equipo),
-`agenda`, `health` (mi salud), `emergency`, `summary` (resumen inteligente de la persona a cargo — read model efímero
-generado por IA, US-9.16; compila 3 fuentes: eventos de salud, hábitos de vida y estados de ánimo
-—la Agenda queda para una mejora futura—; sin caché en el MVP: cada apertura de pantalla o "Actualizar"
-invoca al modelo). Lo común y reutilizable va en `shared/`.
+`agenda`, `health` (mi salud), `emergency`, `summary` (resumen inteligente de la persona a cargo — read model
+generado por IA, US-9.16; compila 4 fuentes: eventos de salud, hábitos de vida y estados de ánimo del día,
+más las ocurrencias de agenda pendientes —lo que resta de hoy y todo mañana—. **Se persiste** en
+`t_ResumenDiario` (entidad `ResumenDiario`: persona, fecha y hora de generación, contenido JSON), **un único
+registro por persona que se sobrescribe en cada generación**: una consulta reutiliza el resumen si fue
+generado el mismo día y hace menos de 3 horas; el botón "Actualizar" y el pull-to-refresh fuerzan la
+regeneración, con un piso de 1 minuto. Los resúmenes sin datos no se cachean. Se muestra en el Home
+—card con el resumen acotado y la hora de generación— y en la pantalla `/summary`).
+Lo común y reutilizable va en `shared/`.
 
 ## 10. Flujo de trabajo con los agentes
 - `arquitecto-software`: decisiones de arquitectura tanto del frontend Flutter como del backend

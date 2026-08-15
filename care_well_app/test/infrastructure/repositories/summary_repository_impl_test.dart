@@ -24,7 +24,7 @@ class _FakeSummaryDatasource implements SummaryDatasource {
 void main() {
   group('SummaryRepositoryImpl', () {
     final resultado = ResumenInteligente(
-      texto: 'Resumen de prueba.',
+      resumenAcotado: 'Resumen de prueba.',
       tieneDatos: true,
       generadoEn: DateTime(2026, 7, 30, 10),
     );

@@ -441,6 +441,33 @@ namespace CareWell.Repository.Migrations
                     b.ToTable("t_Persona", (string)null);
                 });
 
+            modelBuilder.Entity("CareWell.Domain.General.ResumenDiario", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID_ResumenDiario");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaHoraGeneracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ID_Persona")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ID_Persona")
+                        .IsUnique();
+
+                    b.ToTable("t_ResumenDiario", (string)null);
+                });
+
             modelBuilder.Entity("CareWell.Domain.General.TipoEvento", b =>
                 {
                     b.Property<int>("ID")
@@ -966,6 +993,17 @@ namespace CareWell.Repository.Migrations
                     b.Navigation("PersonaCuidada");
 
                     b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("CareWell.Domain.General.ResumenDiario", b =>
+                {
+                    b.HasOne("CareWell.Domain.General.Persona", "Persona")
+                        .WithMany()
+                        .HasForeignKey("ID_Persona")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Persona");
                 });
 
             modelBuilder.Entity("CareWell.Domain.Salud.EventoSalud", b =>

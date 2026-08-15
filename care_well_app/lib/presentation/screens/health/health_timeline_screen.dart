@@ -46,32 +46,10 @@ class HealthTimelineScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Línea de tiempo'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Línea de tiempo'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
           // Navegación mensual — no se permite avanzar a meses futuros.
           MonthNavHeader(
             mes: mes,

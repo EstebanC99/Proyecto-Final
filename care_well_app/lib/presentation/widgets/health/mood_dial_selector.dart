@@ -221,7 +221,20 @@ Color moodLevelColor(AppPalette palette, int level) => switch (level) {
 int moodLevel(EstadoAnimo e) => e.id;
 
 /// Devuelve el emoji asociado a un [EstadoAnimo], resuelto por id.
-String moodEmoji(EstadoAnimo e) {
-  final found = _levels.where((l) => l.level == e.id).firstOrNull;
+String moodEmoji(EstadoAnimo e) => moodEmojiForLevel(e.id);
+
+/// Devuelve el emoji asociado a un nivel (1–5) del catálogo de ánimo.
+///
+/// Variante por id para los casos en que el origen de datos manda el nivel
+/// suelto, sin la entidad (por ejemplo el resumen de salud del hub).
+String moodEmojiForLevel(int level) {
+  final found = _levels.where((l) => l.level == level).firstOrNull;
   return found?.emoji ?? '😐';
 }
+
+/// Devuelve la descripción de un nivel (1–5) del catálogo de ánimo.
+///
+/// Espejo local del catálogo del backend (ver `EstadosAnimoConst`): lo usa el
+/// hub, que recibe sólo el id del estado registrado.
+String? moodLabelForLevel(int level) =>
+    _levels.where((l) => l.level == level).firstOrNull?.label;

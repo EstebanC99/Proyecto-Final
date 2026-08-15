@@ -16,14 +16,13 @@ import '../../widgets/widgets.dart';
 /// y el tile de emergencia siempre visible.
 /// El tile de "Personas a cargo" alterna entre skeleton, empty state y tile
 /// normal según el estado de [allActiveAssignmentsProvider].
+///
+/// Al abrirse pide el resumen inteligente del día de la persona de contexto
+/// (US 9.16) para la card hero. Es una carga en segundo plano: la pantalla
+/// nunca se bloquea esperándola y cualquier falla queda contenida dentro de la
+/// card, sin snackbars ni banners globales.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-
-  // Colores de acento para cada NavTile — basados en imagen del diseñador
-  static const Color _calendarColor = Color(0xFF4A90D9); // azul medio
-  static const Color _careTeamColor = Color(0xFFF5A623); // ámbar/amarillo
-  static const Color _dependentsColor = Color(0xFFF07844); // naranja
-  static const Color _healthColor = Color(0xFFE05C8A); // rosa/rojo
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,6 +38,17 @@ class HomeScreen extends ConsumerWidget {
     final animoHoy = switch (animoHoyAsync) {
       AsyncData(:final value) => value,
       _ => null,
+    };
+
+    // Resumen inteligente del día para la card hero. El provider es el mismo
+    // que usa /summary: si el usuario abre el resumen completo mientras se
+    // genera, se engancha a la generación en curso en vez de disparar otra.
+    final SummaryHeroState estadoResumen = switch (ref.watch(
+      resumenInteligenteProvider,
+    )) {
+      AsyncLoading() => const SummaryHeroLoading(),
+      AsyncError() => const SummaryHeroError(),
+      AsyncData(:final value) => _heroDesdeResumen(value),
     };
 
     // Badge de estado de ánimo para el NavTile de Salud.
@@ -91,54 +101,88 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
 
                 // Selector de persona de contexto global
-                const ContextSelector(),
+                const ContextSelector(variant: ContextSelectorVariant.compact),
                 const SizedBox(height: AppSpacing.md),
 
-                // Acceso al Resumen inteligente (estático: no dispara la IA)
-                const SummaryEntryCard(delay: Duration(milliseconds: 50)),
+                // Acceso al Resumen inteligente del día.
+                SummaryHeroCard(
+                  delay: const Duration(milliseconds: 50),
+                  state: estadoResumen,
+                  onTapVerCompleto: () =>
+                      context.pushNamed(AppRoutes.summaryName),
+                  // Reintentar es volver a consultar, no regenerar: si el
+                  // backend tiene un resumen vigente, corresponde mostrarlo.
+                  onRetry: () => ref.invalidate(resumenInteligenteProvider),
+                ),
                 const SizedBox(height: AppSpacing.md),
 
-                // Grid 2×2
-                GridView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisSpacing: AppSpacing.md,
+                // Grid 2×2.
+                //
+                // Se arma con dos filas en IntrinsicHeight en lugar de un
+                // GridView de celdas cuadradas: la altura la define el
+                // contenido más alto de cada fila, así la descripción de dos
+                // líneas no desborda con escalas de fuente grandes.
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Calendario
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.calendar_month,
+                          label: 'Calendario',
+                          description: 'Turnos y eventos',
+                          accentColor: context.colors.calendarAccent,
+                          delay: Duration.zero,
+                          onTap: () => context.pushNamed(AppRoutes.agendaName),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+
+                      // Equipo de cuidado
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.groups,
+                          label: 'Equipo de cuidado',
+                          description: 'Quién ayuda y cómo',
+                          accentColor: context.colors.careTeamAccent,
+                          delay: const Duration(milliseconds: 100),
+                          onTap: () =>
+                              context.pushNamed(AppRoutes.careTeamName),
+                        ),
+                      ),
+                    ],
                   ),
-                  children: [
-                    // Calendario
-                    NavTile(
-                      icon: Icons.calendar_month,
-                      label: 'Calendario',
-                      accentColor: _calendarColor,
-                      delay: Duration.zero,
-                      onTap: () => context.pushNamed(AppRoutes.agendaName),
-                    ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Personas a cargo — dinámico
+                      Expanded(
+                        child: _buildDependentsTile(
+                          context,
+                          ref,
+                          dependentsAsync,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
 
-                    // Equipo de cuidado
-                    NavTile(
-                      icon: Icons.groups,
-                      label: 'Equipo de cuidado',
-                      accentColor: _careTeamColor,
-                      delay: const Duration(milliseconds: 100),
-                      onTap: () => context.pushNamed(AppRoutes.careTeamName),
-                    ),
-
-                    // Personas a cargo — dinámico
-                    _buildDependentsTile(context, ref, dependentsAsync),
-
-                    // Salud
-                    NavTile(
-                      icon: Icons.favorite,
-                      label: 'Salud',
-                      accentColor: _healthColor,
-                      delay: const Duration(milliseconds: 300),
-                      badge: animoBadge,
-                      onTap: () => context.pushNamed(AppRoutes.healthName),
-                    ),
-                  ],
+                      // Salud
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.favorite,
+                          label: 'Salud',
+                          description: 'Registros y estado',
+                          accentColor: context.colors.healthAccent,
+                          delay: const Duration(milliseconds: 300),
+                          badge: animoBadge,
+                          onTap: () => context.pushNamed(AppRoutes.healthName),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: AppSpacing.md),
@@ -156,6 +200,24 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// Traduce un resumen ya resuelto al estado de la card hero.
+  ///
+  /// Sin persona de contexto el provider resuelve a `null`; sin registros del
+  /// día (o sin `resumenAcotado`, que es lo único que muestra el hero) el
+  /// resumen existe pero no hay nada que adelantar.
+  SummaryHeroState _heroDesdeResumen(ResumenInteligente? resumen) {
+    if (resumen == null) {
+      return const SummaryHeroEmpty(reason: SummaryHeroEmptyReason.noGenerado);
+    }
+
+    final acotado = resumen.resumenAcotado;
+    if (!resumen.tieneDatos || acotado == null || acotado.isEmpty) {
+      return const SummaryHeroEmpty(reason: SummaryHeroEmptyReason.sinDatos);
+    }
+
+    return SummaryHeroContent(texto: acotado, generadoEn: resumen.generadoEn);
+  }
+
   /// Construye el tile de personas a cargo según el estado del provider.
   Widget _buildDependentsTile(
     BuildContext context,
@@ -167,14 +229,15 @@ class HomeScreen extends ConsumerWidget {
       error: (e, st) => NavTile(
         icon: Icons.error_outline,
         label: 'Personas a cargo',
-        accentColor: _dependentsColor,
+        description: 'Perfiles que cuidás',
+        accentColor: context.colors.dependentsAccent,
         delay: const Duration(milliseconds: 200),
         onTap: () => context.pushNamed(AppRoutes.dependentsName),
       ),
       data: (list) {
         if (list.isEmpty) {
           return EmptyStateTile(
-            accentColor: _dependentsColor,
+            accentColor: context.colors.dependentsAccent,
             onTap: () => context.pushNamed(AppRoutes.dependentsName),
             onTapAdd: () => context.pushNamed(AppRoutes.dependentsNewName),
           );
@@ -182,7 +245,8 @@ class HomeScreen extends ConsumerWidget {
         return NavTile(
           icon: Icons.elderly,
           label: 'Personas a cargo',
-          accentColor: _dependentsColor,
+          description: 'Perfiles que cuidás',
+          accentColor: context.colors.dependentsAccent,
           delay: const Duration(milliseconds: 200),
           onTap: () => context.pushNamed(AppRoutes.dependentsName),
         );

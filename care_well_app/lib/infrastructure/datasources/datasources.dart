@@ -6,6 +6,7 @@ export 'demo/demo_settings_datasource.dart';
 export 'api/api_auth_datasource.dart';
 export 'api/api_alerta_bienestar_datasource.dart';
 export 'api/api_persona_datasource.dart';
+export 'api/api_resumen_salud_datasource.dart';
 export 'api/api_asignacion_cuidado_datasource.dart';
 export 'api/api_agenda_datasource.dart';
 export 'api/api_estado_animo_datasource.dart';

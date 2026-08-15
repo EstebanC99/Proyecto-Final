@@ -63,8 +63,13 @@ class _ShimmerBoxState extends State<_ShimmerBox>
             color: context.colors.surfaceVariant,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           ),
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          // Contenido simplificado: representa el ícono y el label con bloques grises
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.lg,
+          ),
+          // Contenido simplificado: representa el ícono, el label y la línea de
+          // descripción con bloques grises, para que la transición
+          // loading → data no cambie la altura del tile.
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -89,6 +94,16 @@ class _ShimmerBoxState extends State<_ShimmerBox>
               Container(
                 height: 14,
                 width: 60,
+                decoration: BoxDecoration(
+                  color: context.colors.outline,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              // Línea de descripción
+              Container(
+                height: 12,
+                width: 80,
                 decoration: BoxDecoration(
                   color: context.colors.outline,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),

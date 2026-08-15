@@ -50,6 +50,8 @@ final registrarAnimoProvider =
             );
         ref.invalidate(animoHoyProvider);
         ref.invalidate(estadosAnimoProvider);
+        // El hub de Salud muestra el ánimo de hoy desde el resumen agregado.
+        ref.invalidate(resumenSaludProvider);
       };
     });
 

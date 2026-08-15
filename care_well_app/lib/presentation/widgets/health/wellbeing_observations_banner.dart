@@ -18,9 +18,9 @@ import 'wellbeing_observation_row.dart';
 /// la consulta está cargando/falla (invisibilidad silenciosa, decisión D2).
 ///
 /// Arranca **colapsado** (banner compacto con contador y severidad agregada) y
-/// se expande/colapsa in-place con [AnimatedSize] (mismo patrón que
-/// [HealthEventsMonthList]). El estado de expansión es presentación local, no
-/// persistida, y se reinicia al cambiar de persona de contexto.
+/// se expande/colapsa in-place con [AnimatedSize]. El estado de expansión es
+/// presentación local, no persistida, y se reinicia al cambiar de persona de
+/// contexto.
 class WellbeingObservationsBanner extends ConsumerStatefulWidget {
   const WellbeingObservationsBanner({super.key});
 

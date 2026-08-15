@@ -86,32 +86,10 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Estado de ánimo'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Estado de ánimo'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.lg),

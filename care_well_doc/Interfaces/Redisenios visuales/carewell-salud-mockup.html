@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareWell · Salud</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--pri:#00897B;--pri-d:#00695C;--pri-s:#E0F2F0;--ink:#212121;--ink-2:#757575;
+        --bg:#F4F7F6;--surface:#FFF;--line:#E5EAE6;--red:#D63B57}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Roboto',system-ui,sans-serif;background:#DDE5E3;color:var(--ink);display:flex;justify-content:center;padding:24px 12px}
+  .phone{width:100%;max-width:390px;background:var(--bg);border-radius:32px;overflow:hidden;
+         box-shadow:0 24px 60px rgba(0,60,55,.25);padding-bottom:26px}
+  .status{display:flex;justify-content:space-between;padding:13px 22px 6px;font-size:12.5px;font-weight:500;color:#4A4A4A;background:#FFF}
+  .appbar{display:flex;align-items:center;gap:10px;padding:4px 14px 14px;background:#FFF}
+  .back{font-size:20px;width:26px;text-align:center}
+  .ctx{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:14px;font-weight:700;
+      color:#0A4F45;background:linear-gradient(150deg,#9FCBC4,#5FA79C);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--pri)}
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#9E9E9E}
+  .nmrow{display:flex;align-items:center;gap:7px;margin-top:1px;min-width:0}
+  .nm{font-size:17px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rel{background:var(--pri-s);color:var(--pri-d);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700}
+  .cv{color:var(--pri);font-size:12px}
+  .other{width:34px;height:34px;border-radius:50%;background:linear-gradient(150deg,#FFE2BC,#F3C285);display:grid;place-items:center;font-size:17px;flex:none;opacity:.85}
+
+  /* ficha destacada */
+  .ficha{margin:14px 16px 0;background:#FFF;border-radius:16px;padding:15px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);
+         border-left:4px solid var(--red)}
+  .frow{display:flex;align-items:center;gap:12px}
+  .fic{width:42px;height:42px;border-radius:12px;background:#FDE7EB;display:grid;place-items:center;font-size:19px;flex:none}
+  .ft{font-size:16px;font-weight:700;letter-spacing:-.2px}
+  .fs{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+  .farr{margin-left:auto;color:#BFC7C3;font-size:15px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+  .chip{border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;background:#F3F5F3;color:#4C5A55}
+  .chip b{font-weight:700;color:var(--ink)}
+  .chip.al{background:#FDE7EB;color:#9C2A3E}
+
+  .sec{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#9AA5A0;padding:22px 20px 10px}
+
+  /* grilla */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:0 16px}
+  .card{background:#FFF;border-radius:16px;padding:15px 14px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .cic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:19px;margin-bottom:11px}
+  .g1{background:#FFEDD5}.g2{background:#E1F1F7}.g3{background:#E9EAF7}
+  .ct{font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .cm{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.35}
+  .cm b{color:var(--pri-d);font-weight:700}
+
+  /* linea de tiempo */
+  .wide{display:flex;align-items:center;gap:13px;background:#FFF;border-radius:16px;margin:11px 16px 0;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .wide{display:flex;align-items:center;gap:13px;background:#FFF;border-radius:16px;margin:11px 16px 0;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .tl{margin:14px 16px 0;background:var(--pri);color:#fff;border-radius:14px;padding:15px;
+      display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:700;
+      box-shadow:0 6px 16px rgba(0,137,123,.3)}
+
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .an{animation:up .4s cubic-bezier(.2,.7,.3,1) both}
+  .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}
+</style></head>
+<body><div class="phone">
+  <div class="status"><span>11:52</span><span>&#9679;&#9679;&#9679;&nbsp;&#9679;&#9679;</span></div>
+  <div class="appbar">
+    <div class="back">&#8592;</div>
+    <div class="ctx">
+      <div class="av">EC</div>
+      <div style="min-width:0">
+        <div class="eyebrow">Salud</div>
+        <div class="nmrow"><span class="nm">Esteban Carignani</span><span class="rel">YO</span><span class="cv">&#9662;</span></div>
+      </div>
+    </div>
+    <div class="other">&#128021;</div>
+  </div>
+
+  <!-- FICHA DE SALUD -->
+  <div class="ficha an">
+    <div class="frow">
+      <div class="fic">&#127973;</div>
+      <div>
+        <div class="ft">Ficha de salud</div>
+        <div class="fs">Datos clínicos para una emergencia</div>
+      </div>
+      <div class="farr">&#8250;</div>
+    </div>
+    <div class="chips">
+      <span class="chip">Grupo <b>0+</b></span>
+      <span class="chip al">2 alergias</span>
+      <span class="chip">1 antecedente</span>
+    </div>
+  </div>
+
+  <div class="sec an d1">Seguimiento</div>
+
+  <div class="grid an d1">
+    <div class="card">
+      <div class="cic g1">&#129496;</div>
+      <div class="ct">Hábitos de vida</div>
+      <div class="cm"><b>2 de 5</b> completados hoy</div>
+    </div>
+    <div class="card">
+      <div class="cic g3">&#128512;</div>
+      <div class="ct">Estado de ánimo</div>
+      <div class="cm">Hoy: <b>alegre</b></div>
+    </div>
+  </div>
+
+  <div class="wide an d2">
+    <div class="cic g2" style="margin:0">&#128203;</div>
+    <div style="flex:1;min-width:0">
+      <div class="ct">Eventos de salud</div>
+      <div class="cm">Último: <b>hace 3 días</b> · Dolor de garganta</div>
+    </div>
+    <div class="farr">&#8250;</div>
+  </div>
+
+  <div class="tl an d3">&#128200; Ver línea de tiempo</div>
+</div></body></html>

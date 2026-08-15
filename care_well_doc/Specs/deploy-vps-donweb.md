@@ -36,8 +36,12 @@ Con IA externa (sin Ollama local), el presupuesto de RAM es holgado: API (~0.5GB
 > bloqueo antiabuso conocido de Google a IPs de datacenter/hosting, no arreglable de forma
 > confiable desde ese lado. **Se migró a Vertex AI / Agent Platform** (mismo modelo Gemini,
 > pero el producto de Google pensado para uso servidor-a-servidor, sin esa restricción).
-> Detalle completo, incluidos los gotchas de autenticación y nombres de modelo, en
-> `care_well_doc/Deploy/administracion.md` → "Problemas conocidos". El resto de este documento
+> **Corrección posterior:** ese diagnóstico resultó equivocado —la falla era de la API key, no
+> de la IP del VPS— y hoy se soportan los dos proveedores (`IA__Proveedor`), aunque producción
+> sigue yendo por Vertex AI por las garantías de tratamiento de datos. Detalle completo,
+> incluidos los gotchas de autenticación y nombres de modelo, en
+> `care_well_doc/Deploy/administracion.md` → "Proveedor de IA: configuración por ambiente" y
+> "Problemas conocidos". El resto de este documento
 > (por qué Gemini como familia de modelos, en vez de otro proveedor) sigue siendo válido; lo
 > que cambió es *cómo* se accede a Gemini, no la elección de Gemini en sí.
 

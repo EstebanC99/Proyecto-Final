@@ -1,4 +1,5 @@
 using CareWell.BusinessService.General;
+using CareWell.DataViews.General;
 using CareWell.DocumentIntelligence.ResumidorDiario;
 using CareWell.Domain.Agenda;
 using CareWell.Domain.DomainServices.Agenda;
@@ -42,9 +43,10 @@ namespace CareWell.BusinessService.Test.General
 
         public class ElMetodo_Armar : ArmarResumenDiarioBusinessTest
         {
-            private readonly string resumenGenerado = "Resumen del día de Alicia.";
+            private ResumidorDiarioAgentResponse resumenGenerado;
 
-            private Mock<Persona> personaCuidada;
+            private int personaCuidadaID;
+            private string personaCuidadaNombre;
 
             private Mock<EventoAgenda> eventoAgenda;
             private DateTime fechaOcurrenciaAgenda;
@@ -60,9 +62,17 @@ namespace CareWell.BusinessService.Test.General
             {
                 base.InitializeTest();
 
-                this.personaCuidada = new Mock<Persona>();
-                this.personaCuidada.Setup(s => s.ID).Returns(7);
-                this.personaCuidada.Setup(s => s.Nombre).Returns("Alicia");
+                this.resumenGenerado = Mock.Of<ResumidorDiarioAgentResponse>(r =>
+                    r.Habitos == new List<ResumidorDiarioAgentResponseHabito>() &&
+                    r.EventosSalud == new List<ResumidorDiarioAgentResponseEventoSalud>() &&
+                    r.Recomendaciones == new List<string>() &&
+                    r.RecordatoriosHoy == new List<string>() &&
+                    r.RecordatoriosManana == new List<string>() &&
+                    r.HabitosManana == new List<ResumidorDiarioAgentResponseHabito>()
+                );
+
+                this.personaCuidadaID = 7;
+                this.personaCuidadaNombre = "Alicia";
 
                 #region Evento Agenda
 
@@ -133,9 +143,9 @@ namespace CareWell.BusinessService.Test.General
                 this.resumidorDiarioAgent.Setup(s => s.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(this.resumenGenerado);
             }
 
-            private string? Action()
+            private ResumenDiarioDataView Action()
             {
-                return this.Target.Armar(this.personaCuidada.Object, It.IsAny<CancellationToken>()).Result;
+                return this.Target.Armar(this.personaCuidadaID, this.personaCuidadaNombre, It.IsAny<CancellationToken>()).Result;
             }
 
             [Fact]
@@ -149,7 +159,7 @@ namespace CareWell.BusinessService.Test.General
 
                 // Assert
                 var fin = DateTime.Now;
-                this.eventoAgendaRepository.Verify(v => v.GetAllByPersonaEnRango(this.personaCuidada.Object.ID,
+                this.eventoAgendaRepository.Verify(v => v.GetAllByPersonaEnRango(this.personaCuidadaID,
                                                                                  It.Is<DateTime>(d => d >= inicio && d <= fin),
                                                                                  DateTime.Today.AddDays(2)), Times.Once);
             }
@@ -163,7 +173,7 @@ namespace CareWell.BusinessService.Test.General
                 this.Action();
 
                 // Assert
-                this.eventoSaludRepository.Verify(v => v.GetByFechas(this.personaCuidada.Object.ID,
+                this.eventoSaludRepository.Verify(v => v.GetByFechas(this.personaCuidadaID,
                                                                      DateTime.Today,
                                                                      DateTime.Today.AddDays(1)), Times.Once);
             }
@@ -177,7 +187,7 @@ namespace CareWell.BusinessService.Test.General
                 this.Action();
 
                 // Assert
-                this.habitoVidaRepository.Verify(v => v.GetByPersona(this.personaCuidada.Object.ID), Times.Once);
+                this.habitoVidaRepository.Verify(v => v.GetByPersona(this.personaCuidadaID), Times.Once);
             }
 
             [Fact]
@@ -189,13 +199,13 @@ namespace CareWell.BusinessService.Test.General
                 this.Action();
 
                 // Assert
-                this.personaEstadoAnimoRepository.Verify(v => v.GetByFechas(this.personaCuidada.Object.ID,
+                this.personaEstadoAnimoRepository.Verify(v => v.GetByFechas(this.personaCuidadaID,
                                                                             DateTime.Today,
                                                                             DateTime.Today.AddDays(1)), Times.Once);
             }
 
             [Fact]
-            public void Retorna_null_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
+            public void Retorna_un_ResumenDiarioDataView_con_fecha_actual_y_sin_datos_si_no_hay_datos_en_ninguna_de_las_cuatro_fuentes()
             {
                 // Arrange
                 this.eventoAgendaRepository
@@ -214,11 +224,15 @@ namespace CareWell.BusinessService.Test.General
                     .Setup(s => s.GetByFechas(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                     .Returns(new List<PersonaEstadoAnimo>());
 
+                var fechaHoraInicioEjecucion = DateTime.Now;
+
                 // Action
                 var resultado = this.Action();
 
                 // Assert
-                Assert.Null(resultado);
+                var fechaHoraFinEjecucion = DateTime.Now;
+                Assert.True(resultado.GeneradoEn >= fechaHoraInicioEjecucion && resultado.GeneradoEn <= fechaHoraFinEjecucion && !resultado.TieneDatos);
+                Assert.IsType<ResumenDiarioDataView>(resultado);
             }
 
             [Fact]
@@ -372,7 +386,7 @@ namespace CareWell.BusinessService.Test.General
 
                 // Assert
                 this.resumidorDiarioAgent.Verify(v => v.ArmarResumen(It.Is<ResumidorTextoAgentRequest>(r =>
-                    r.NombrePersona == this.personaCuidada.Object.Nombre &&
+                    r.NombrePersona == this.personaCuidadaNombre &&
                     r.FechaHoy >= fechaDesde && r.FechaHoy <= DateTime.Now &&
                     r.FechaManana == DateTime.Today.AddDays(1) &&
                     r.EventosAgenda.Any(e =>
@@ -405,30 +419,150 @@ namespace CareWell.BusinessService.Test.General
             }
 
             [Fact]
-            public void Retorna_el_texto_devuelto_por_el_ResumidorDiarioAgent()
+            public void Setea_el_ResumenAcotado_en_la_respuesta()
             {
                 // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.ResumenAcotado).Returns("Valor de prueba");
 
                 // Action
                 var resultado = this.Action();
 
                 // Assert
-                Assert.Equal(this.resumenGenerado, resultado);
+                Assert.Equal(this.resumenGenerado.ResumenAcotado, resultado.ResumenAcotado);
             }
 
             [Fact]
-            public void Retorna_null_si_el_ResumidorDiarioAgent_devuelve_null()
+            public void Setea_el_EstadoAnimo_en_la_respuesta()
             {
                 // Arrange
-                this.resumidorDiarioAgent
-                    .Setup(s => s.ArmarResumen(It.IsAny<ResumidorTextoAgentRequest>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync((string?)null);
+                Mock.Get(this.resumenGenerado).Setup(s => s.EstadoAnimo).Returns("Valor de prueba");
 
                 // Action
                 var resultado = this.Action();
 
                 // Assert
-                Assert.Null(resultado);
+                Assert.Equal(this.resumenGenerado.EstadoAnimo, resultado.EstadoAnimo);
+            }
+
+            [Fact]
+            public void Setea_el_ResumenHabitos_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.ResumenHabitos).Returns("Valor de prueba");
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equal(this.resumenGenerado.ResumenHabitos, resultado.ResumenHabitos);
+            }
+
+            [Fact]
+            public void Setea_los_Habitos_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.Habitos).Returns(new List<ResumidorDiarioAgentResponseHabito>
+                {
+                    new ResumidorDiarioAgentResponseHabito{ Descripcion = "Descripcion", Completado = true }
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.Habitos, resultado.Habitos);
+            }
+
+            [Fact]
+            public void Setea_los_EventosSalud_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.EventosSalud).Returns(new List<ResumidorDiarioAgentResponseEventoSalud>
+                {
+                    new ResumidorDiarioAgentResponseEventoSalud{ Descripcion = "Descripcion", Hora = "08:45", ActividadHabitoAsociado = "Actividad X" }
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.EventosSalud, resultado.EventosSalud);
+            }
+
+            [Fact]
+            public void Setea_las_Recomendaciones_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.Recomendaciones).Returns(new List<string>
+                {
+                    "Dato Random 1"
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.Recomendaciones, resultado.Recomendaciones);
+            }
+
+            [Fact]
+            public void Setea_los_RecordatoriosHoy_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.RecordatoriosHoy).Returns(new List<string>
+                {
+                    "Dato Random 1"
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.RecordatoriosHoy, resultado.RecordatoriosHoy);
+            }
+
+            [Fact]
+            public void Setea_los_RecordatoriosManana_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.RecordatoriosManana).Returns(new List<string>
+                {
+                    "Dato Random 1"
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.RecordatoriosManana, resultado.RecordatoriosManana);
+            }
+
+            [Fact]
+            public void Setea_los_HabitosManana_en_la_respuesta()
+            {
+                // Arrange
+                Mock.Get(this.resumenGenerado).Setup(s => s.HabitosManana).Returns(new List<ResumidorDiarioAgentResponseHabito>
+                {
+                    new ResumidorDiarioAgentResponseHabito{Descripcion = "Descripcion", Completado = false }
+                });
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Equivalent(this.resumenGenerado.HabitosManana, resultado.HabitosManana);
+            }
+
+            [Fact]
+            public void Retorna_una_instancia_del_tipo_ResumenDiarioDataView()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.IsType<ResumenDiarioDataView>(resultado);
             }
         }
     }

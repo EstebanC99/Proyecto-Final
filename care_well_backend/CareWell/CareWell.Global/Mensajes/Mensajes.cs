@@ -66,6 +66,8 @@
         public const string PlataformaDispositivoInvalida = "La plataforma del dispositivo no es válida.";
         public const string ReaccionAlergiaRequerido = "La reacción que produce la alergia es requerida.";
         public const string ReglaRecurrenciaInvalida = "La regla de recurrencia elegida para el evento no es válida.";
+        public const string ResumenDiarioContenidoRequerido = "El contenido del resumen diario es requerido.";
+        public const string ResumenDiarioFechaGeneracionRequerida = "La fecha de generación del resumen diario es requerida.";
         public const string RolCuidadoRequerido = "Debe especificar un rol para la persona a asignar.";
         public const string ServicioDeNotificacionesPushNoDisponible = "El servicio de notificaciones no está disponible en este momento.";
         public const string ServicioDeResumenDiarioNoDisponible = "El servicio de generación de resumen diario no está disponible en este momento. Reintentá en unos minutos.";

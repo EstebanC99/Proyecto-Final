@@ -200,12 +200,14 @@ void main() {
       expect(find.byType(CareTeamMemberScreen), findsOneWidget);
     });
 
-    testWidgets('CareTeamScreen muestra título "Equipo de cuidado"', (
+    testWidgets('CareTeamScreen muestra el rótulo "EQUIPO DE CUIDADO"', (
       tester,
     ) async {
       await tester.pumpWidget(_wrap(const CareTeamScreen()));
       await tester.pump();
-      expect(find.text('Equipo de cuidado'), findsOneWidget);
+      // El título vive en el ContextAppBar, en versales junto al selector de
+      // persona de contexto.
+      expect(find.text('EQUIPO DE CUIDADO'), findsOneWidget);
     });
 
     testWidgets('CareTeamFormScreen responsable muestra sección de permisos', (

@@ -140,9 +140,9 @@ PROYECTO-FINAL/
 **Infraestructura de apoyo**
 
 - SQL Server como motor de base de datos.
-- Google Gemini, vía Vertex AI / Agent Platform (cliente propio de `IChatClient` en
-  `CareWell.DocumentIntelligence`, sin librerías de terceros) para la validación de identidad
-  contra documento y el resumen diario.
+- Google Gemini (cliente propio de `IChatClient` en `CareWell.DocumentIntelligence`, sin
+  librerías de terceros) para la validación de identidad contra documento y el resumen diario;
+  vía Vertex AI / Agent Platform en producción y AI Studio en desarrollo.
 - SMTP (Elastic Email) para el envío de códigos de verificación y recuperación.
 - Firebase Cloud Messaging para notificaciones push (aviso de emergencia).
 
@@ -154,9 +154,9 @@ Requisitos generales:
 - SQL Server (local o remoto)
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) con toolchain de Android
   (Android Studio / SDK + un emulador o dispositivo físico)
-- Una API key de Google Cloud con acceso a Vertex AI / Agent Platform, para la validación de
-  identidad y el resumen diario (ver sección siguiente — **no** uses una key de Google AI
-  Studio, tiene un bloqueo geográfico intermitente para tráfico de servidor/datacenter)
+- Una API key de Gemini para la validación de identidad y el resumen diario: en desarrollo
+  alcanza con una gratuita de Google AI Studio; producción va por Vertex AI / Agent Platform
+  (ver sección siguiente)
 
 ### 1. Base de datos (SQL Server)
 
@@ -175,16 +175,35 @@ El backend usa Google Gemini para leer el documento de identidad durante el regi
 creación de credenciales, y para generar el resumen diario inteligente. **Sin una API key de
 IA válida, esos flujos responden 503.**
 
-Se usa **Vertex AI / Agent Platform** (no Google AI Studio): la API de AI Studio
-(`generativelanguage.googleapis.com`) bloquea de forma intermitente el tráfico proveniente de
-IPs de datacenter/hosting como medida antiabuso — funciona bien desde una PC de desarrollo,
-pero falla desde cualquier VPS de forma impredecible, incluso con billing habilitado. Vertex AI
-está pensado para uso servidor-a-servidor y no tiene ese problema.
+Hay **dos proveedores soportados**, que se eligen con `IA:Proveedor`:
+
+| `IA:Proveedor` | Plataforma | Dónde se usa |
+|---|---|---|
+| `AIStudio` | Google AI Studio (`generativelanguage.googleapis.com`) | **Desarrollo local**, con API key de nivel gratuito (sin costo) |
+| `VertexAI` (default) | Vertex AI / Agent Platform (`aiplatform.googleapis.com`) | **Producción** |
+
+Los dos hablan el mismo REST nativo de Gemini, se autentican con el header `x-goog-api-key` y
+difieren únicamente en la URL base, así que el cliente (`GeminiChatClient`) es uno solo, sin
+ramas por ambiente. `appsettings.Development.json` ya viene con `AIStudio` y
+`appsettings.Production.json` con `VertexAI`: para desarrollar alcanza con cargar la key.
+
+> ⚠️ **En desarrollo, sólo datos ficticios.** El nivel gratuito de AI Studio **emplea las
+> consignas enviadas para entrenar los modelos de Google**. No le mandes datos reales de
+> personas y mucho menos datos de salud: las garantías de no-entrenamiento y el *Cloud Data
+> Processing Addendum* son propias de Vertex AI, que es lo que corre en producción.
+
+**Para desarrollo (AI Studio):** generá una API key gratuita en
+[Google AI Studio](https://aistudio.google.com/apikey) y cargala como user secret `IA:ApiKey`
+(ver punto siguiente).
+
+**Para producción (Vertex AI):**
 
 1. En Google Cloud Console → tu proyecto → "Agent Platform" (o Vertex AI) → Claves de API,
    generá una API key con scope "Gemini API"/Vertex, **no** una de "Agent Platform API" (son
    productos distintos dentro del mismo menú).
-2. Cargala como user secret (ver punto siguiente): `IA:ApiKey`.
+2. Cargala como `IA__ApiKey` en el `carewell.env` del VPS — ver
+   `care_well_doc/Deploy/administracion.md`, sección "Proveedor de IA: configuración por
+   ambiente", que además lista los *gotchas* de Vertex y un `curl` de diagnóstico.
 
 No hace falta instalar ni correr nada localmente — es una API externa. El modelo de visión y
 el modelo de texto se configuran en la sección `IA` de `appsettings.json` (por defecto,
@@ -213,10 +232,12 @@ Claves necesarias:
 | `Jwt:Key` | Clave simétrica para firmar los tokens |
 | `Jwt:Issuer` / `Jwt:Audience` | Emisor y audiencia de los tokens |
 | `Email:*` | Host, puerto, usuario, contraseña y remitente SMTP (Elastic Email) |
-| `IA:ApiKey` | API key de Google Cloud (Vertex AI / Agent Platform, no AI Studio) |
+| `IA:Proveedor` | `AIStudio` (desarrollo) o `VertexAI` (producción, default). Ya viene fijado por ambiente en los `appsettings` |
+| `IA:ApiKey` | API key de Gemini, emitida por el proveedor configurado en `IA:Proveedor` |
 | `IA:ModeloVision` | Modelo usado para el OCR de documentos (`gemini-2.5-flash-lite`) |
 | `IA:ModeloTexto` | Modelo usado para el resumen diario (`gemini-2.5-flash-lite`) |
 | `IA:TimeoutSegundos` | Timeout de las llamadas al modelo |
+| `IA:EnviarResponseSchema` | Envía el JSON Schema de la respuesta al modelo (default `true`); `false` es el rollback si un cambio de esquema provoca `400 INVALID_ARGUMENT` |
 | `Push:RutaCredenciales` | Ruta al JSON de service account de Firebase (notificaciones push) |
 
 Ejemplo:
@@ -315,9 +336,11 @@ El backend está desplegado en un VPS de DonWeb (Ubuntu 22.04 LTS), con esta arq
   sobre `api.estecarsoft.com.ar`.
 - **Base de datos:** SQL Server 2022 Express, accesible solo desde localhost (no expuesta a
   internet).
-- **IA:** Google Gemini vía Vertex AI / Agent Platform (`gemini-2.5-flash-lite`), igual que en
-  desarrollo — no hay diferencia de proveedor entre ambientes. **No** vía Google AI Studio (ver
-  sección 2 de "Puesta en marcha" — bloquea IPs de datacenter de forma intermitente).
+- **IA:** Google Gemini (`gemini-2.5-flash-lite`) vía **Vertex AI / Agent Platform**, elegido por
+  las garantías de tratamiento de datos que exige el manejo de información de salud (las
+  consignas no se usan para entrenar los modelos y rige el *Cloud Data Processing Addendum*). En
+  desarrollo, en cambio, se usa AI Studio con key de nivel gratuito y sólo con datos ficticios
+  (ver sección 2 de "Puesta en marcha").
 - **Notificaciones push:** Firebase Cloud Messaging.
 - **Seguridad:** acceso SSH solo por clave (sin login de `root` ni por contraseña), firewall
   (`ufw`) restringido a los puertos necesarios, `fail2ban` contra fuerza bruta.

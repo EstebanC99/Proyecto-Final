@@ -8,14 +8,14 @@ import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
-import '../shared/initial_day_scroll_mixin.dart';
 
 /// Pantalla principal de la agenda (US-23 / US-27).
 ///
-/// Muestra las ocurrencias de eventos del mes seleccionado para la persona de
-/// contexto, agrupadas por día. Permite navegar entre meses y, para usuarios
-/// con permiso [PermisosCuidadoConst.gestionarAgenda], crear, editar, cancelar
-/// y eliminar eventos.
+/// Muestra una tira con los siete días de la semana seleccionada y el detalle
+/// del día elegido, más una sección "Lo que sigue" con la próxima ocurrencia
+/// posterior a ese día. Para usuarios con permiso
+/// [PermisosCuidadoConst.gestionarAgenda] permite crear, editar, cancelar y
+/// eliminar eventos.
 class AgendaScreen extends ConsumerStatefulWidget {
   const AgendaScreen({super.key});
 
@@ -23,48 +23,57 @@ class AgendaScreen extends ConsumerStatefulWidget {
   ConsumerState<AgendaScreen> createState() => _AgendaScreenState();
 }
 
-class _AgendaScreenState extends ConsumerState<AgendaScreen>
-    with InitialDayScrollMixin {
-  /// Días actualmente expandidos (fecha truncada a año-mes-día).
-  late Set<DateTime> _expandedDias;
-
+class _AgendaScreenState extends ConsumerState<AgendaScreen> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    _expandedDias = {today, today.add(const Duration(days: 1))};
+    // Cada entrada a la agenda arranca en el presente: la selección de día y
+    // semana vive en providers globales y, si no se reinicia, la pantalla se
+    // abre donde quedó la visita anterior.
+    //
+    // El reinicio va en un microtask porque Riverpod prohíbe modificar un
+    // provider dentro de un ciclo de vida del widget. Se resuelve antes del
+    // primer frame, así que no se llega a ver la semana vieja.
+    //
+    // No se resuelve marcando los providers como `autoDispose` porque el
+    // formulario de alta se apila encima de esta pantalla sin desmontarla: eso
+    // los mantendría vivos igual, y además rompería el salto al día del evento
+    // recién guardado.
+    Future.microtask(() {
+      if (mounted) reiniciarSeleccionAgenda(ref);
+    });
   }
 
-  /// Agrupa las ocurrencias por día (fecha truncada a año-mes-día).
-  Map<DateTime, List<OcurrenciaEventoAgenda>> _agruparPorDia(
-    List<OcurrenciaEventoAgenda> ocurrencias,
-  ) {
-    final Map<DateTime, List<OcurrenciaEventoAgenda>> grupos = {};
+  /// Trunca una fecha a año-mes-día.
+  DateTime _soloFecha(DateTime fecha) =>
+      DateTime(fecha.year, fecha.month, fecha.day);
+
+  /// Selecciona un día y, si cae fuera de la semana visible, mueve también la
+  /// semana. Permite saltar a la ocurrencia de "Lo que sigue" sin pasos extra.
+  void _seleccionarDia(DateTime dia) => seleccionarDiaAgenda(ref, dia);
+
+  void _irASemanaAnterior() {
+    final lunes = ref.read(semanaSeleccionadaProvider);
+    ref.read(semanaSeleccionadaProvider.notifier).state = lunes.subtract(
+      const Duration(days: 7),
+    );
+  }
+
+  void _irASemanaSiguiente() {
+    final lunes = ref.read(semanaSeleccionadaProvider);
+    ref.read(semanaSeleccionadaProvider.notifier).state = lunes.add(
+      const Duration(days: 7),
+    );
+  }
+
+  /// Agrupa la cantidad de ocurrencias por día, para los pips de la tira.
+  Map<DateTime, int> _cantidadPorDia(List<OcurrenciaEventoAgenda> ocurrencias) {
+    final Map<DateTime, int> conteo = {};
     for (final o in ocurrencias) {
-      final dt = o.fechaHoraInicio.toLocal();
-      final dia = DateTime(dt.year, dt.month, dt.day);
-      grupos.putIfAbsent(dia, () => []).add(o);
+      final dia = _soloFecha(o.fechaHoraInicio.toLocal());
+      conteo[dia] = (conteo[dia] ?? 0) + 1;
     }
-    return grupos;
-  }
-
-  void _irAMesAnterior() {
-    final mes = ref.read(mesSeleccionadoProvider);
-    ref.read(mesSeleccionadoProvider.notifier).state = DateTime(
-      mes.year,
-      mes.month - 1,
-      1,
-    );
-  }
-
-  void _irAMesSiguiente() {
-    final mes = ref.read(mesSeleccionadoProvider);
-    ref.read(mesSeleccionadoProvider.notifier).state = DateTime(
-      mes.year,
-      mes.month + 1,
-      1,
-    );
+    return conteo;
   }
 
   Future<void> _resolverAccion(
@@ -132,52 +141,26 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
   @override
   Widget build(BuildContext context) {
     final personaAsync = ref.watch(agendaPersonaContextProvider);
-    final ocurrenciasAsync = ref.watch(ocurrenciasDelMesProvider);
-    final mes = ref.watch(mesSeleccionadoProvider);
-
-    // Cada vez que se recargan las ocurrencias (entrar, cambiar de mes o de
-    // persona, refrescar) se habilita nuevamente el scroll inicial.
-    ref.listen(ocurrenciasDelMesProvider, (previous, next) {
-      if (next.hasValue) {
-        reiniciarScrollInicial();
-      }
-    });
+    final ocurrenciasAsync = ref.watch(ocurrenciasDeSemanaProvider);
+    final lunesSemana = ref.watch(semanaSeleccionadaProvider);
+    final diaSeleccionado = ref.watch(diaSeleccionadoProvider);
     final puedeGestionar =
         ref.watch(puedeGestionarAgendaProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: const Text('Calendario'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
+      appBar: const ContextAppBar(eyebrow: 'Calendario'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de persona de contexto (solo si hay persona).
-          personaAsync.when(
-            data: (persona) => persona != null
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: ContextSelector(),
-                  )
-                : const SizedBox.shrink(),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
-          // Navegación mensual.
-          MonthNavHeader(
-            mes: mes,
-            onPrevious: _irAMesAnterior,
-            onNext: _irAMesSiguiente,
+          // Tira de la semana con los pips de cantidad de eventos.
+          WeekStrip(
+            lunesSemana: lunesSemana,
+            diaSeleccionado: diaSeleccionado,
+            cantidadPorDia: _cantidadPorDia(ocurrenciasAsync.value ?? const []),
+            onSelectDia: _seleccionarDia,
+            onPreviousWeek: _irASemanaAnterior,
+            onNextWeek: _irASemanaSiguiente,
           ),
 
           Expanded(
@@ -209,85 +192,71 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
                   );
                 }
 
-                if (ocurrencias.isEmpty) {
-                  return AgendaEmptyState(
-                    puedeGestionar: puedeGestionar,
-                    onCrear: puedeGestionar
-                        ? () => context.pushNamed(AppRoutes.agendaNewName)
-                        : null,
-                  );
-                }
-
-                final grupos = _agruparPorDia(ocurrencias);
-                final dias = grupos.keys.toList()..sort();
-
-                // Scroll automático (una sola vez por carga) al día objetivo
-                // del mes actual, alineándolo arriba del viewport.
-                final diaObjetivo = calcularDiaObjetivo(dias, mes);
-                scrollAlDiaObjetivoUnaVez(diaObjetivo);
+                final delDia = ocurrencias
+                    .where(
+                      (o) =>
+                          _soloFecha(o.fechaHoraInicio.toLocal()) ==
+                          _soloFecha(diaSeleccionado),
+                    )
+                    .toList();
 
                 return RefreshIndicator(
                   color: context.colors.primary,
                   onRefresh: () async {
-                    ref.invalidate(ocurrenciasDelMesProvider);
-                    await ref.read(ocurrenciasDelMesProvider.future);
+                    ref.invalidate(ocurrenciasDeSemanaProvider);
+                    ref.invalidate(proximaOcurrenciaProvider);
+                    await ref.read(ocurrenciasDeSemanaProvider.future);
                   },
-                  child: ListView.builder(
+                  child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                      AppSpacing.lg,
-                      AppSpacing.xxxl,
-                    ),
-                    itemCount: dias.length,
-                    itemBuilder: (context, i) {
-                      final dia = dias[i];
-                      final ocurrenciasDelDia = grupos[dia]!;
-                      final expandido = _expandedDias.contains(dia);
-                      return Column(
-                        key: dia == diaObjetivo ? diaObjetivoKey : null,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _DayGroupHeader(
-                            fecha: dia,
-                            count: ocurrenciasDelDia.length,
-                            expanded: expandido,
-                            onTap: () => setState(() {
-                              if (_expandedDias.contains(dia)) {
-                                _expandedDias.remove(dia);
-                              } else {
-                                _expandedDias.add(dia);
-                              }
-                            }),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xxxl),
+                    children: [
+                      DayHeader(
+                        dia: diaSeleccionado,
+                        cantidadEventos: delDia.length,
+                      ),
+
+                      // Sin eventos en toda la semana se muestra el estado
+                      // vacío completo (con CTA); si solo está vacío el día,
+                      // alcanza un mensaje breve que no tape la tira ni la
+                      // sección "Lo que sigue".
+                      if (delDia.isEmpty && ocurrencias.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
                           ),
-                          AnimatedSize(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeInOut,
-                            child: expandido
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: ocurrenciasDelDia
-                                        .map(
-                                          (o) => OcurrenciaCard(
-                                            ocurrencia: o,
-                                            onTap:
-                                                puedeGestionar && o.esEditable()
-                                                ? () => _resolverAccion(
-                                                    context,
-                                                    o,
-                                                  )
-                                                : null,
-                                          ),
-                                        )
-                                        .toList(),
-                                  )
-                                : const SizedBox.shrink(),
+                          child: AgendaEmptyState(
+                            puedeGestionar: puedeGestionar,
+                            onCrear: puedeGestionar
+                                ? () =>
+                                      context.pushNamed(AppRoutes.agendaNewName)
+                                : null,
                           ),
-                        ],
-                      );
-                    },
+                        )
+                      else if (delDia.isEmpty)
+                        _SinEventosEnElDia(puedeGestionar: puedeGestionar)
+                      else
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (final o in delDia)
+                                OcurrenciaCard(
+                                  ocurrencia: o,
+                                  onTap: puedeGestionar && o.esEditable()
+                                      ? () => _resolverAccion(context, o)
+                                      : null,
+                                ),
+                            ],
+                          ),
+                        ),
+
+                      // "Lo que sigue": próxima ocurrencia posterior al día.
+                      _ProximaOcurrenciaSection(onVerDia: _seleccionarDia),
+                    ],
                   ),
                 );
               },
@@ -300,9 +269,175 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen>
               onPressed: () => context.pushNamed(AppRoutes.agendaNewName),
               tooltip: 'Nuevo evento',
               backgroundColor: context.colors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
               child: Icon(Icons.add, color: context.colors.onPrimary),
             )
           : null,
+    );
+  }
+}
+
+// ─── Sección "Lo que sigue" ───────────────────────────────────────────────────
+
+/// Muestra la próxima ocurrencia posterior al día seleccionado.
+///
+/// Es informativa: al tocarla se salta a ese día en la agenda en lugar de
+/// abrir las acciones de edición, que solo se ofrecen sobre los eventos del
+/// día que se está viendo.
+class _ProximaOcurrenciaSection extends ConsumerWidget {
+  const _ProximaOcurrenciaSection({required this.onVerDia});
+
+  final ValueChanged<DateTime> onVerDia;
+
+  static const _nombresDiaCorto = [
+    'LUN',
+    'MAR',
+    'MIÉ',
+    'JUE',
+    'VIE',
+    'SÁB',
+    'DOM',
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final proxima = ref.watch(proximaOcurrenciaProvider).value;
+    if (proxima == null) return const SizedBox.shrink();
+
+    final inicio = proxima.fechaHoraInicio.toLocal();
+    final hora =
+        '${inicio.hour.toString().padLeft(2, '0')}:'
+        '${inicio.minute.toString().padLeft(2, '0')}';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(color: context.colors.outline, height: 1),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'LO QUE SIGUE',
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+              color: context.colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          InkWell(
+            onTap: () => onVerDia(inicio),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colors.primaryContainer,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                    child: Text(
+                      '${_nombresDiaCorto[inicio.weekday - 1]} ${inicio.day}',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Flexible(
+                    child: Text(
+                      proxima.titulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    ' · $hora',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Estado vacío del día ─────────────────────────────────────────────────────
+
+/// Mensaje breve cuando el día seleccionado no tiene eventos.
+///
+/// Se prefiere a [AgendaEmptyState] (que ocupa la pantalla completa) porque
+/// acá siempre queda visible la tira de días y la sección "Lo que sigue".
+class _SinEventosEnElDia extends StatelessWidget {
+  const _SinEventosEnElDia({required this.puedeGestionar});
+
+  final bool puedeGestionar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.event_available_outlined,
+            size: 40,
+            color: context.colors.textDisabled,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'No hay eventos este día',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: context.colors.textSecondary,
+            ),
+          ),
+          if (puedeGestionar) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Usá el botón + para agendar uno.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -317,7 +452,7 @@ class _OcurrenciasSkeleton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        AppSpacing.md,
+        AppSpacing.xl,
         AppSpacing.lg,
         0,
       ),
@@ -333,100 +468,6 @@ class _OcurrenciasSkeleton extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Encabezado de grupo por día (colapsable) ─────────────────────────────────
-
-class _DayGroupHeader extends StatelessWidget {
-  const _DayGroupHeader({
-    required this.fecha,
-    required this.count,
-    required this.expanded,
-    required this.onTap,
-  });
-
-  final DateTime fecha;
-  final int count;
-  final bool expanded;
-  final VoidCallback onTap;
-
-  static const _meses = [
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre',
-  ];
-  static const _diasSemana = [
-    'lunes',
-    'martes',
-    'miércoles',
-    'jueves',
-    'viernes',
-    'sábado',
-    'domingo',
-  ];
-
-  String _label() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
-    final day = DateTime(fecha.year, fecha.month, fecha.day);
-    if (day == today) return 'HOY';
-    if (day == tomorrow) return 'MAÑANA';
-    return '${_diasSemana[fecha.weekday - 1]} ${fecha.day} de ${_meses[fecha.month - 1]}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16, bottom: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                _label().toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: context.colors.textSecondary,
-                ),
-              ),
-            ),
-            if (!expanded) ...[
-              Text(
-                '$count ${count == 1 ? "evento" : "eventos"}',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: context.colors.textSecondary,
-                ),
-              ),
-              const SizedBox(width: 4),
-            ],
-            Icon(
-              expanded
-                  ? Icons.expand_more_rounded
-                  : Icons.chevron_right_rounded,
-              size: 18,
-              color: context.colors.textSecondary,
-            ),
-          ],
         ),
       ),
     );

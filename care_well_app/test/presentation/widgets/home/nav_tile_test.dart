@@ -103,6 +103,85 @@ void main() {
       expect(find.byType(Positioned), findsNothing);
     });
 
+    testWidgets('no renderiza descripción cuando description == null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          NavTile(
+            icon: Icons.calendar_month,
+            label: 'Calendario',
+            accentColor: Colors.blue,
+            onTap: () {},
+          ),
+        ),
+      );
+      await _drainAnimations(tester);
+      // Solo el label: no debe haber una segunda línea de texto.
+      expect(find.byType(Text), findsOneWidget);
+    });
+
+    testWidgets('muestra la descripción cuando se provee', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          NavTile(
+            icon: Icons.calendar_month,
+            label: 'Calendario',
+            description: 'Turnos y eventos',
+            accentColor: Colors.blue,
+            onTap: () {},
+          ),
+        ),
+      );
+      await _drainAnimations(tester);
+      expect(find.text('Calendario'), findsOneWidget);
+      expect(find.text('Turnos y eventos'), findsOneWidget);
+    });
+
+    testWidgets(
+      'con descripción y escala de fuente grande no desborda dentro de una fila',
+      (tester) async {
+        // Reproduce el layout real del home: dos tiles en una fila de ancho
+        // acotado, con la altura igualada por IntrinsicHeight.
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
+              child: Scaffold(
+                body: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.groups,
+                          label: 'Equipo de cuidado',
+                          description: 'Quién ayuda y cómo',
+                          accentColor: Colors.orange,
+                          onTap: () {},
+                        ),
+                      ),
+                      Expanded(
+                        child: NavTile(
+                          icon: Icons.calendar_month,
+                          label: 'Calendario',
+                          description: 'Turnos y eventos',
+                          accentColor: Colors.blue,
+                          onTap: () {},
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await _drainAnimations(tester);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('renderiza badge cuando se provee', (tester) async {
       const badgeKey = Key('test-badge');
       await tester.pumpWidget(

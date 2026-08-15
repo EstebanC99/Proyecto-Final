@@ -83,6 +83,10 @@ final alertaBienestarDatasourceProvider = Provider<AlertaBienestarDatasource>(
   (ref) => ApiAlertaBienestarDatasource(ref.watch(dioClientProvider)),
 );
 
+final resumenSaludDatasourceProvider = Provider<ResumenSaludDatasource>(
+  (ref) => ApiResumenSaludDatasource(ref.watch(dioClientProvider)),
+);
+
 final eventoSaludDatasourceProvider = Provider<EventoSaludDatasource>((ref) {
   return ApiEventoSaludDatasource(ref.watch(dioClientProvider));
 });
@@ -156,6 +160,11 @@ final alertaBienestarRepositoryProvider = Provider<AlertaBienestarRepository>(
   (ref) => AlertaBienestarRepositoryImpl(
     ref.watch(alertaBienestarDatasourceProvider),
   ),
+);
+
+final resumenSaludRepositoryProvider = Provider<ResumenSaludRepository>(
+  (ref) =>
+      ResumenSaludRepositoryImpl(ref.watch(resumenSaludDatasourceProvider)),
 );
 
 final eventoSaludRepositoryProvider = Provider<EventoSaludRepository>(
