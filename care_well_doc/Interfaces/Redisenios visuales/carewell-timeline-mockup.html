@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>CareWell</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--pri:#00897B;--pri-d:#00695C;--pri-s:#E0F2F0;--ink:#212121;--ink-2:#757575;
+        --bg:#F4F7F6;--line:#E5EAE6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Roboto',system-ui,sans-serif;background:#DDE5E3;color:var(--ink);display:flex;justify-content:center;padding:24px 12px}
+  .phone{width:100%;max-width:390px;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;
+         box-shadow:0 24px 60px rgba(0,60,55,.25);padding-bottom:26px}
+  .status{display:flex;justify-content:space-between;padding:13px 22px 6px;font-size:12.5px;font-weight:500;color:#4A4A4A;background:#FFF}
+  .appbar{display:flex;align-items:center;gap:10px;padding:4px 14px 14px;background:#FFF}
+  .back{font-size:20px;width:26px;text-align:center}
+  .ctx{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:19px;
+      background:linear-gradient(150deg,#FFE2BC,#F3C285);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--pri)}
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#9E9E9E}
+  .nmrow{display:flex;align-items:center;gap:7px;margin-top:1px;min-width:0}
+  .nm{font-size:17px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rel{background:var(--pri-s);color:var(--pri-d);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;flex:none}
+  .cv{color:var(--pri);font-size:12px}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .an{animation:up .4s cubic-bezier(.2,.7,.3,1) both}
+  .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+
+  .filters{display:flex;gap:7px;padding:0 16px 12px;background:#FFF;border-bottom:1px solid var(--line);overflow:hidden}
+  .f{border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;background:#F1F4F3;color:#5C6C6A;white-space:nowrap}
+  .f.on{background:var(--pri);color:#fff}
+  .mrow{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#FFF;border-bottom:1px solid var(--line)}
+  .arr{color:var(--pri);font-size:19px;font-weight:700;width:26px;text-align:center}
+  .month{font-size:15px;font-weight:700}
+  .daygrp{margin:16px 16px 0}
+  .dlabel{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .dnum{width:38px;height:38px;border-radius:12px;background:#FFF;border:1px solid var(--line);display:grid;place-items:center;line-height:1;flex:none}
+  .dnum b{font-size:15px;font-weight:700}
+  .dnum small{font-size:8.5px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.4px;display:block;margin-top:1px}
+  .dmeta{font-size:12.5px;color:var(--ink-2)}
+  .dmeta b{color:var(--ink);font-weight:700;font-size:13.5px;display:block}
+  .today{background:var(--pri);border-color:var(--pri)}
+  .today b,.today small{color:#fff}
+  .grp{background:#FFF;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #F0F3F2}
+  .row:last-child{border-bottom:0}
+  .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:15px;flex:none}
+  .hb{background:#FFEDD5}.mo{background:#EDE9FB}.ev{background:#FDE7EB}
+  .rt{flex:1;min-width:0}
+  .rt .t{font-size:14px;font-weight:500;line-height:1.3}
+  .rt .s{font-size:11.5px;color:#9AA5A0;margin-top:2px}
+  .hh{font-size:12px;font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums;flex:none}
+</style></head><body><div class="phone">
+  <div class="status"><span>15:22</span><span>&#9679;&#9679;&#9679;&nbsp;&#9679;&#9679;</span></div>
+  <div class="appbar">
+    <div class="back">&#8592;</div>
+    <div class="ctx"><div class="av">&#128021;</div>
+      <div style="min-width:0"><div class="eyebrow">Línea de tiempo</div>
+      <div class="nmrow"><span class="nm">Thor Eto</span><span class="rel">MASCOTA</span><span class="cv">&#9662;</span></div></div>
+    </div>
+  </div>
+  <div class="mrow"><div class="arr">&#8249;</div><div class="month">Agosto 2026</div><div class="arr">&#8250;</div></div>
+  <div class="filters"><span class="f on">Todo</span><span class="f">Hábitos</span><span class="f">Ánimo</span><span class="f">Eventos</span></div>
+
+  <div class="daygrp an">
+    <div class="dlabel"><div class="dnum today"><b>17</b><small>Lun</small></div>
+      <div class="dmeta"><b>Hoy</b>3 registros</div></div>
+    <div class="grp">
+      <div class="row"><div class="ic hb">&#127860;</div><div class="rt"><div class="t">Desayuno entre las 9 y las 11</div><div class="s">Hábito</div></div><div class="hh">15:20</div></div>
+      <div class="row"><div class="ic hb">&#127769;</div><div class="rt"><div class="t">Siesta nocturna de corrido</div><div class="s">Hábito</div></div><div class="hh">15:21</div></div>
+      <div class="row"><div class="ic mo">&#128512;</div><div class="rt"><div class="t">Muy bien</div><div class="s">Estado de ánimo</div></div><div class="hh">15:21</div></div>
+    </div>
+  </div>
+
+  <div class="daygrp an d1">
+    <div class="dlabel"><div class="dnum"><b>16</b><small>Dom</small></div>
+      <div class="dmeta"><b>Ayer</b>3 registros</div></div>
+    <div class="grp">
+      <div class="row"><div class="ic hb">&#127769;</div><div class="rt"><div class="t">Siesta nocturna de corrido</div><div class="s">Hábito</div></div><div class="hh">10:29</div></div>
+      <div class="row"><div class="ic mo">&#128512;</div><div class="rt"><div class="t">Muy bien</div><div class="s">Estado de ánimo</div></div><div class="hh">10:46</div></div>
+      <div class="row"><div class="ic hb">&#127860;</div><div class="rt"><div class="t">Desayuno entre las 9 y las 11</div><div class="s">Hábito</div></div><div class="hh">12:49</div></div>
+    </div>
+  </div>
+
+  <div class="daygrp an d2">
+    <div class="dlabel"><div class="dnum"><b>15</b><small>Sáb</small></div>
+      <div class="dmeta"><b>Sábado</b>2 registros</div></div>
+    <div class="grp">
+      <div class="row"><div class="ic ev">&#127973;</div><div class="rt"><div class="t">Comió un pedazo de paloma</div><div class="s">Evento de salud</div></div><div class="hh">08:45</div></div>
+      <div class="row"><div class="ic mo">&#128512;</div><div class="rt"><div class="t">Muy bien</div><div class="s">Estado de ánimo</div></div><div class="hh">21:15</div></div>
+    </div>
+  </div>
+</div></body></html>
