@@ -40,6 +40,7 @@ Widget _wrap({
   String eyebrow = 'Salud',
   List<Widget> actions = const [],
   ThemeMode themeMode = ThemeMode.light,
+  bool seleccionable = true,
 }) {
   return ProviderScope(
     overrides: [
@@ -51,7 +52,11 @@ Widget _wrap({
       theme: AppTheme().light,
       darkTheme: AppTheme().dark,
       home: Scaffold(
-        appBar: ContextAppBar(eyebrow: eyebrow, actions: actions),
+        appBar: ContextAppBar(
+          eyebrow: eyebrow,
+          actions: actions,
+          seleccionable: seleccionable,
+        ),
         body: const SizedBox.expand(),
       ),
     ),
@@ -261,6 +266,24 @@ void main() {
       );
 
       handle.dispose();
+    });
+
+    testWidgets('con seleccionable: false el título queda inerte', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(overrides: _variosOpciones(), seleccionable: false),
+      );
+      await tester.pumpAndSettle();
+
+      // Sigue mostrando a la persona, pero sin chevron ni bottom sheet.
+      expect(find.text('María García'), findsOneWidget);
+      expect(find.byIcon(Icons.expand_more), findsNothing);
+
+      await tester.tap(find.byType(ContextSelector));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Visualizando a'), findsNothing);
     });
   });
 }

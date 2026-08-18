@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
+import 'date_labels.dart';
 
 /// Encabezado del día seleccionado en una vista de tira semanal.
 ///
@@ -25,52 +26,14 @@ class DayHeader extends StatelessWidget {
   /// Fecha considerada "hoy". Inyectable para tests.
   final DateTime? hoy;
 
-  static const _nombresDia = [
-    'lunes',
-    'martes',
-    'miércoles',
-    'jueves',
-    'viernes',
-    'sábado',
-    'domingo',
-  ];
-
-  static const _nombresMes = [
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre',
-  ];
-
-  /// Rótulo relativo del día ("Hoy", "Mañana", "Ayer" o el día de la semana).
-  String _rotulo(DateTime hoyTruncado, DateTime diaTruncado) {
-    final diferencia = diaTruncado.difference(hoyTruncado).inDays;
-    return switch (diferencia) {
-      0 => 'Hoy',
-      1 => 'Mañana',
-      -1 => 'Ayer',
-      _ => _nombresDia[diaTruncado.weekday - 1],
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
-    final ahora = hoy ?? DateTime.now();
-    final hoyTruncado = DateTime(ahora.year, ahora.month, ahora.day);
     final diaTruncado = DateTime(dia.year, dia.month, dia.day);
 
-    final rotulo = _rotulo(hoyTruncado, diaTruncado);
+    final rotulo = rotuloRelativoDia(diaTruncado, hoy: hoy);
     final fechaLarga =
-        '${_nombresDia[diaTruncado.weekday - 1]} ${diaTruncado.day} '
-        'de ${_nombresMes[diaTruncado.month - 1]}';
+        '${nombresDia[diaTruncado.weekday - 1]} ${diaTruncado.day} '
+        'de ${nombresMes[diaTruncado.month - 1]}';
     final eventos = cantidadEventos == 1
         ? '1 evento'
         : '$cantidadEventos eventos';

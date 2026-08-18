@@ -51,6 +51,7 @@ class ContextSelector extends ConsumerWidget {
     super.key,
     this.variant = ContextSelectorVariant.standard,
     this.eyebrow,
+    this.seleccionable = true,
   });
 
   /// Variante visual del banner.
@@ -60,6 +61,13 @@ class ContextSelector extends ConsumerWidget {
   /// [ContextSelectorVariant.appBar] (por defecto "Estás viendo"). Se ignora
   /// en la variante estándar.
   final String? eyebrow;
+
+  /// Habilita el cambio de persona de contexto. En `false` el banner se
+  /// muestra igual pero queda inerte: sin chevron y sin abrir el selector.
+  ///
+  /// Lo usan los formularios, donde cambiar de persona a mitad de la carga
+  /// dejaría los datos ya escritos apuntando a otra persona.
+  final bool seleccionable;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -76,6 +84,10 @@ class ContextSelector extends ConsumerWidget {
         final opciones = opcionesAsync.value ?? [];
         final soloUnaOpcion = opciones.length <= 1;
 
+        // El banner es interactivo sólo si hay a dónde cambiar y la pantalla
+        // lo permite.
+        final interactivo = !soloUnaOpcion && seleccionable;
+
         // Rol de la persona de contexto dentro de las opciones disponibles.
         final rolActual = opciones
             .where((o) => o.persona.id == persona.id)
@@ -90,14 +102,14 @@ class ContextSelector extends ConsumerWidget {
             personaId: persona.id,
             nombreCompleto: nombreCompleto,
             subtitulo: esPropio ? 'Yo' : 'Visualizando a',
-            interactivo: !soloUnaOpcion,
+            interactivo: interactivo,
           ),
           ContextSelectorVariant.compact => ContextCompactBanner(
             personaId: persona.id,
             nombreCompleto: nombreCompleto,
             eyebrow: eyebrow ?? 'Estás viendo',
             rolLabel: rolActual != null ? _rolBadgeLabel(rolActual) : null,
-            interactivo: !soloUnaOpcion,
+            interactivo: interactivo,
             otrasPersonas: [
               for (final o in opciones)
                 if (o.persona.id != persona.id)
@@ -114,7 +126,7 @@ class ContextSelector extends ConsumerWidget {
             nombreCompleto: nombreCompleto,
             eyebrow: eyebrow ?? 'Estás viendo',
             rolLabel: rolActual != null ? _rolBadgeLabelCorto(rolActual) : null,
-            interactivo: !soloUnaOpcion,
+            interactivo: interactivo,
             denso: true,
             otrasPersonas: const [],
           ),
@@ -124,14 +136,14 @@ class ContextSelector extends ConsumerWidget {
           // opaque: la variante compacta no tiene fondo propio; sin esto los
           // toques sobre los espacios vacíos de la fila no llegarían al gesto.
           behavior: HitTestBehavior.opaque,
-          onTap: soloUnaOpcion
-              ? null
-              : () => _showPersonaSelector(context, ref, opciones, selectedId),
+          onTap: interactivo
+              ? () => _showPersonaSelector(context, ref, opciones, selectedId)
+              : null,
           // El label explícito reemplaza la lectura suelta de rótulo, nombre y
           // badge; la acción de tap la sigue aportando el GestureDetector.
           child: Semantics(
             label: _semanticsLabel(nombreCompleto, rolActual),
-            button: !soloUnaOpcion,
+            button: interactivo,
             excludeSemantics: true,
             child: banner,
           ),

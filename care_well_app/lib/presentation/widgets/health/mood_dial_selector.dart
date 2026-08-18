@@ -2,32 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_palette.dart';
-import '../../../domain/entities/entities.dart';
-
-/// Datos visuales de un nivel de estado de ánimo.
-class _MoodLevel {
-  const _MoodLevel({
-    required this.level,
-    required this.emoji,
-    required this.label,
-  });
-
-  final int level;
-  final String emoji;
-  final String label;
-}
-
-/// Niveles ordenados de peor a mejor (izquierda → derecha en el dial).
-///
-/// Se usan los ids de [EstadosAnimoConst] (muyBien = 1 … muyMal = 5) para que
-/// el color y el emoji se resuelvan siempre por id, sin depender del orden.
-const _levels = [
-  _MoodLevel(level: EstadosAnimoConst.muyMal, emoji: '😞', label: 'Muy mal'),
-  _MoodLevel(level: EstadosAnimoConst.mal, emoji: '😕', label: 'Mal'),
-  _MoodLevel(level: EstadosAnimoConst.regular, emoji: '😐', label: 'Regular'),
-  _MoodLevel(level: EstadosAnimoConst.bien, emoji: '🙂', label: 'Bien'),
-  _MoodLevel(level: EstadosAnimoConst.muyBien, emoji: '😄', label: 'Muy bien'),
-];
+import 'mood_scale.dart';
 
 /// Selector tipo dial/carrusel de estado de ánimo (US-31).
 ///
@@ -48,16 +23,16 @@ class MoodDialSelector extends StatelessWidget {
   final ValueChanged<int> onChanged;
 
   int get _index {
-    final i = _levels.indexWhere((l) => l.level == selectedLevel);
+    final i = moodLevels.indexWhere((l) => l.level == selectedLevel);
     return i < 0 ? 2 : i; // por defecto "Regular" (posición central)
   }
 
   @override
   Widget build(BuildContext context) {
     final index = _index;
-    final current = _levels[index];
+    final current = moodLevels[index];
     final canPrev = index > 0;
-    final canNext = index < _levels.length - 1;
+    final canNext = index < moodLevels.length - 1;
 
     return Column(
       children: [
@@ -69,7 +44,7 @@ class MoodDialSelector extends StatelessWidget {
               enabled: canPrev,
               semanticLabel: 'Empeorar el estado, tocá para cambiar.',
               onPressed: canPrev
-                  ? () => onChanged(_levels[index - 1].level)
+                  ? () => onChanged(moodLevels[index - 1].level)
                   : null,
             ),
             const SizedBox(width: 16),
@@ -80,7 +55,7 @@ class MoodDialSelector extends StatelessWidget {
               enabled: canNext,
               semanticLabel: 'Mejorar el estado, tocá para cambiar.',
               onPressed: canNext
-                  ? () => onChanged(_levels[index + 1].level)
+                  ? () => onChanged(moodLevels[index + 1].level)
                   : null,
             ),
           ],
@@ -101,7 +76,7 @@ class MoodDialSelector extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            for (var i = 0; i < _levels.length; i++)
+            for (var i = 0; i < moodLevels.length; i++)
               _Dot(
                 active: i == index,
                 color: moodLevelColor(context.colors, current.level),
@@ -118,7 +93,7 @@ class MoodDialSelector extends StatelessWidget {
 class _MoodBlob extends StatelessWidget {
   const _MoodBlob({required this.level});
 
-  final _MoodLevel level;
+  final MoodLevel level;
 
   @override
   Widget build(BuildContext context) {
@@ -200,41 +175,3 @@ class _Dot extends StatelessWidget {
     );
   }
 }
-
-/// Devuelve el color de escala asociado a un nivel (1–5) dentro de [palette].
-/// Si el nivel no existe en el catálogo, cae a un gris neutro.
-///
-/// Recibe la paleta en vez del `BuildContext` para poder resolverse también
-/// fuera del árbol de widgets (y para poder testearse sin montar uno).
-Color moodLevelColor(AppPalette palette, int level) => switch (level) {
-  EstadosAnimoConst.muyMal => palette.moodScaleVeryBad,
-  EstadosAnimoConst.mal => palette.moodScaleBad,
-  EstadosAnimoConst.regular => palette.moodScaleNeutral,
-  EstadosAnimoConst.bien => palette.moodScaleGood,
-  EstadosAnimoConst.muyBien => palette.moodScaleVeryGood,
-  _ => palette.textDisabled,
-};
-
-/// Convierte un [EstadoAnimo] a un nivel entero (1–5).
-///
-/// El [id] de la entidad catálogo coincide con el nivel numérico.
-int moodLevel(EstadoAnimo e) => e.id;
-
-/// Devuelve el emoji asociado a un [EstadoAnimo], resuelto por id.
-String moodEmoji(EstadoAnimo e) => moodEmojiForLevel(e.id);
-
-/// Devuelve el emoji asociado a un nivel (1–5) del catálogo de ánimo.
-///
-/// Variante por id para los casos en que el origen de datos manda el nivel
-/// suelto, sin la entidad (por ejemplo el resumen de salud del hub).
-String moodEmojiForLevel(int level) {
-  final found = _levels.where((l) => l.level == level).firstOrNull;
-  return found?.emoji ?? '😐';
-}
-
-/// Devuelve la descripción de un nivel (1–5) del catálogo de ánimo.
-///
-/// Espejo local del catálogo del backend (ver `EstadosAnimoConst`): lo usa el
-/// hub, que recibe sólo el id del estado registrado.
-String? moodLabelForLevel(int level) =>
-    _levels.where((l) => l.level == level).firstOrNull?.label;

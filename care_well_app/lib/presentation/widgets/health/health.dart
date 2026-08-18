@@ -7,6 +7,7 @@ export 'health_timeline_view.dart';
 export 'health_timeline_tile.dart';
 export 'health_timeline_style.dart';
 export 'health_disclaimer_banner.dart';
+export 'mood_scale.dart';
 export 'mood_dial_selector.dart';
 export 'mood_bar_chart.dart';
 export 'note_card.dart';
