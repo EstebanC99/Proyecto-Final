@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:care_well_app/config/theme/app_theme.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
@@ -5,6 +7,7 @@ import 'package:care_well_app/presentation/screens/health/habit_form_screen.dart
 import 'package:care_well_app/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -58,6 +61,24 @@ Future<void> _modificarNoop({
   required String descripcion,
 }) async {}
 
+/// Overrides que necesita la pantalla más allá del caso bajo prueba: el
+/// ContextAppBar resuelve persona, opciones y avatar por su cuenta.
+List<Override> _overridesBase({List<TipoHabitoVida>? tipos}) => [
+  personaVisualizacionSeleccionadaProvider.overrideWith(
+    (ref) async => _persona,
+  ),
+  personasSeleccionablesProvider.overrideWith(
+    (ref) async => [
+      PersonaContextOption(
+        persona: _persona,
+        rol: PersonaContextRol.responsable,
+      ),
+    ],
+  ),
+  personaImagenProvider.overrideWith((ref, id) async => null),
+  tiposHabitoVidaProvider.overrideWith((ref) async => tipos ?? _tipos),
+];
+
 ProviderContainer _container({
   List<TipoHabitoVida>? tipos,
   Future<void> Function({required int tipoId, required String descripcion})?
@@ -71,20 +92,7 @@ ProviderContainer _container({
 }) {
   final container = ProviderContainer(
     overrides: [
-      // El ContextAppBar resuelve persona, opciones y avatar por su cuenta.
-      personaVisualizacionSeleccionadaProvider.overrideWith(
-        (ref) async => _persona,
-      ),
-      personasSeleccionablesProvider.overrideWith(
-        (ref) async => [
-          PersonaContextOption(
-            persona: _persona,
-            rol: PersonaContextRol.responsable,
-          ),
-        ],
-      ),
-      personaImagenProvider.overrideWith((ref, id) async => null),
-      tiposHabitoVidaProvider.overrideWith((ref) async => tipos ?? _tipos),
+      ..._overridesBase(tipos: tipos),
       habitoByIdProvider(
         _habitoExistente.id,
       ).overrideWith((ref) async => _habitoExistente),
@@ -286,6 +294,76 @@ void main() {
   });
 
   group('HabitFormScreen · edición', () {
+    testWidgets('no preselecciona ningún tipo antes de que precargue', (
+      tester,
+    ) async {
+      // La precarga se controla a mano para poder mirar el frame intermedio.
+      final precarga = Completer<HabitoVida?>();
+      final container = ProviderContainer(
+        overrides: [
+          ..._overridesBase(),
+          habitoByIdProvider(
+            _habitoExistente.id,
+          ).overrideWith((ref) => precarga.future),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final navKey = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            navigatorKey: navKey,
+            theme: AppTheme().light,
+            home: const Scaffold(body: SizedBox.shrink()),
+          ),
+        ),
+      );
+      navKey.currentState!.push(
+        MaterialPageRoute(
+          builder: (_) => HabitFormScreen(habitId: _habitoExistente.id),
+        ),
+      );
+
+      // Catálogo ya resuelto, precarga todavía en vuelo: la grilla no debe
+      // mostrar nada elegido, o el usuario ve saltar la selección cuando
+      // llega el hábito.
+      await tester.pump();
+      await tester.pump();
+      expect(find.byType(TypeTileGrid), findsOneWidget);
+      final grilla = tester.widget<TypeTileGrid>(find.byType(TypeTileGrid));
+      expect(grilla.selectedId, isNull);
+
+      precarga.complete(_habitoExistente);
+      await tester.pumpAndSettle();
+      final yaPrecargado = tester.widget<TypeTileGrid>(
+        find.byType(TypeTileGrid),
+      );
+      expect(yaPrecargado.selectedId, TiposHabitoConst.hidratacion);
+    });
+
+    testWidgets('si el hábito no existe cae al primer tipo del catálogo', (
+      tester,
+    ) async {
+      // Sin este fallback, una precarga fallida dejaría el formulario sin tipo
+      // y con el botón de guardar bloqueado para siempre.
+      final container = ProviderContainer(
+        overrides: [
+          ..._overridesBase(),
+          habitoByIdProvider(999).overrideWith((ref) async => null),
+          crearHabitoProvider.overrideWithValue(_crearNoop),
+          modificarHabitoProvider.overrideWithValue(_modificarNoop),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await _pushForm(tester, container, habitId: 999);
+
+      final grilla = tester.widget<TypeTileGrid>(find.byType(TypeTileGrid));
+      expect(grilla.selectedId, TiposHabitoConst.actividadFisica);
+    });
+
     testWidgets('precarga el tipo y la descripción del hábito', (tester) async {
       await _pushForm(tester, _container(), habitId: _habitoExistente.id);
 

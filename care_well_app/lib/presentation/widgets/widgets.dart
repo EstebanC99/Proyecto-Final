@@ -23,6 +23,8 @@ export 'shared/full_width_action_tile.dart';
 export 'shared/section_label.dart';
 export 'shared/picker_field.dart';
 export 'shared/type_tile_grid.dart';
+export 'shared/form_bottom_bar.dart';
+export 'shared/description_field.dart';
 export 'shared/date_labels.dart';
 
 export 'home/home_header.dart';
