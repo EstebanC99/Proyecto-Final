@@ -72,6 +72,23 @@ class SettingsScreen extends ConsumerWidget {
                 label: 'Términos y condiciones',
                 onTap: () => context.pushNamed(AppRoutes.settingsTermsName),
               ),
+              SettingsItem(
+                icon: Icons.privacy_tip_outlined,
+                label: 'Política de privacidad',
+                onTap: () => context.pushNamed(AppRoutes.settingsPrivacyName),
+              ),
+              SettingsItem(
+                icon: Icons.info_outline,
+                label: 'Acerca de CareWell',
+                onTap: () async {
+                  // Sin manejo de error: la lectura del paquete instalado no
+                  // falla en Android; de fallar, el efecto es que el diálogo
+                  // no se abre.
+                  final version = await ref.read(appVersionProvider.future);
+                  if (!context.mounted) return;
+                  await mostrarAcercaDeCareWell(context, version: version);
+                },
+              ),
             ],
           ),
 
