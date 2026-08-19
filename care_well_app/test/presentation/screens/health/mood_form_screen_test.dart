@@ -83,6 +83,13 @@ Future<void> _registrar(WidgetTester tester) async {
 
 Finder _campoObservacion() => find.byType(TextFormField);
 
+/// Dispara el gesto de "atrás" del sistema.
+Future<void> _volverAtras(WidgetTester tester) async {
+  final dynamic estado = tester.state(find.byType(WidgetsApp));
+  await estado.didPopRoute();
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('MoodFormScreen', () {
     testWidgets('arranca sin selección y con el botón bloqueado', (
@@ -333,5 +340,40 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+  });
+
+  group('MoodFormScreen · cambios sin guardar', () {
+    testWidgets('sin tocar nada el atrás cierra directo', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('elegir un nivel ya es algo que perder', (tester) async {
+      // Con el nivel solo el registro se puede guardar: salir sin avisar
+      // descartaría un formulario completo.
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Bien'));
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
+
+    testWidgets('la observación escrita también pregunta', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(_campoObservacion(), 'Durmió mal');
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
   });
 }

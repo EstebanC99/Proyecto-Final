@@ -97,6 +97,10 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
     );
   }
 
+  /// Hay algo que perder si ya se escribió la descripción. Elegir un tipo o
+  /// mover la fecha es un toque que se rehace; el texto no.
+  bool get _hayCambios => _descripcionCtrl.text.trim().isNotEmpty;
+
   Future<void> _guardar() async {
     final desc = _descripcionCtrl.text.trim();
     final tipoId = _tipoId;
@@ -148,59 +152,64 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
             child: child,
           );
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: ContextAppBar(
-        eyebrow: _esEdicion
-            ? 'Editar evento de salud'
-            : 'Nuevo evento de salud',
-        // El formulario muestra a quién se le registra, pero no deja cambiar
-        // de persona con los datos a medio cargar.
-        seleccionable: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.xl,
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: ContextAppBar(
+          eyebrow: _esEdicion
+              ? 'Editar evento de salud'
+              : 'Nuevo evento de salud',
+          // El formulario muestra a quién se le registra, pero no deja cambiar
+          // de persona con los datos a medio cargar.
+          seleccionable: false,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            animado(_tipoEvento(tiposAsync), 0),
-            animado(
-              FormTextField(
-                controller: _descripcionCtrl,
-                label: 'Descripción',
-                hintText: 'Describí el evento de salud...',
-                accent: context.colors.healthAccent,
-                enabled: !_loading,
-                maxLines: 8,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              animado(_tipoEvento(tiposAsync), 0),
+              animado(
+                FormTextField(
+                  controller: _descripcionCtrl,
+                  label: 'Descripción',
+                  hintText: 'Describí el evento de salud...',
+                  accent: context.colors.healthAccent,
+                  enabled: !_loading,
+                  maxLines: 8,
+                ),
+                50,
               ),
-              50,
-            ),
-            animado(_cuandoOcurrio(), 100),
-          ],
+              animado(_cuandoOcurrio(), 100),
+            ],
+          ),
         ),
-      ),
-      // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
-      // grilla de 13 tipos entera.
-      bottomNavigationBar: animado(
-        ValueListenableBuilder<TextEditingValue>(
-          valueListenable: _descripcionCtrl,
-          builder: (context, valor, _) {
-            final tieneDesc = valor.text.trim().isNotEmpty;
-            return FormBottomBar(
-              label: 'Registrar evento',
-              accent: context.colors.healthAccent,
-              loading: _loading,
-              onPressed: (tieneDesc && _tipoId != null) ? _guardar : null,
-              hint: tieneDesc ? null : 'Completá la descripción para continuar',
-            );
-          },
+        // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
+        // grilla de 13 tipos entera.
+        bottomNavigationBar: animado(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _descripcionCtrl,
+            builder: (context, valor, _) {
+              final tieneDesc = valor.text.trim().isNotEmpty;
+              return FormBottomBar(
+                label: 'Registrar evento',
+                accent: context.colors.healthAccent,
+                loading: _loading,
+                onPressed: (tieneDesc && _tipoId != null) ? _guardar : null,
+                hint: tieneDesc
+                    ? null
+                    : 'Completá la descripción para continuar',
+              );
+            },
+          ),
+          150,
         ),
-        150,
       ),
     );
   }

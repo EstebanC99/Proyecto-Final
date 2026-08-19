@@ -197,6 +197,13 @@ Future<void> _tapGuardar(WidgetTester tester, String label) async {
   await tester.pumpAndSettle();
 }
 
+/// Dispara el gesto de "atrás" del sistema.
+Future<void> _volverAtras(WidgetTester tester) async {
+  final dynamic estado = tester.state(find.byType(WidgetsApp));
+  await estado.didPopRoute();
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('AgendaEventScreen', () {
     testWidgets('al crear un evento la agenda salta a su día y semana', (
@@ -565,5 +572,75 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+  });
+
+  group('AgendaEventScreen · cambios sin guardar', () {
+    testWidgets('sin tocar nada el atrás cierra directo', (tester) async {
+      await _pushForm(tester, _container());
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('con título escrito el atrás pregunta', (tester) async {
+      await _pushForm(tester, _container());
+
+      await tester.enterText(find.byType(TextFormField).first, 'Control');
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
+
+    testWidgets('en edición, sin retocar nada el atrás cierra directo', (
+      tester,
+    ) async {
+      // La precarga deja el formulario igual al evento: nada que perder.
+      await _pushForm(
+        tester,
+        _container(
+          ocurrencias: [_ocurrencia(_hoy.add(const Duration(days: 2)))],
+        ),
+        eventId: 7,
+      );
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('en edición, retocar el título hace que pregunte', (
+      tester,
+    ) async {
+      await _pushForm(
+        tester,
+        _container(
+          ocurrencias: [_ocurrencia(_hoy.add(const Duration(days: 2)))],
+        ),
+        eventId: 7,
+      );
+
+      await tester.enterText(find.byType(TextFormField).first, 'Otro título');
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
+
+    testWidgets('en edición, tocar el switch también cuenta', (tester) async {
+      await _pushForm(
+        tester,
+        _container(
+          ocurrencias: [_ocurrencia(_hoy.add(const Duration(days: 2)))],
+        ),
+        eventId: 7,
+      );
+
+      await _tocar(tester, find.byType(SwitchListTile).first);
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
   });
 }

@@ -192,6 +192,13 @@ Future<void> _registrar(WidgetTester tester, String descripcion) async {
   await tester.pumpAndSettle();
 }
 
+/// Dispara el gesto de "atrás" del sistema.
+Future<void> _volverAtras(WidgetTester tester) async {
+  final dynamic estado = tester.state(find.byType(WidgetsApp));
+  await estado.didPopRoute();
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('HealthEventFormScreen', () {
     testWidgets('al registrar un evento se salta a su día y semana', (
@@ -567,5 +574,25 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+  });
+
+  group('HealthEventFormScreen · cambios sin guardar', () {
+    testWidgets('sin tocar nada el atrás cierra directo', (tester) async {
+      await _pushForm(tester, _container());
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('con descripción escrita el atrás pregunta', (tester) async {
+      await _pushForm(tester, _container());
+
+      await tester.enterText(find.byType(TextFormField), 'Control de presión');
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
   });
 }

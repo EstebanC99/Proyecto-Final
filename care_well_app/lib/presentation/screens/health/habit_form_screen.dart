@@ -35,6 +35,12 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   /// formulario sin tipo seleccionado y con el botón de guardar bloqueado.
   bool _precargaIntentada = false;
 
+  /// Valores de referencia para detectar cambios sin guardar. En alta quedan
+  /// en el estado inicial del formulario; en edición, en lo que trajo el
+  /// hábito. Mientras la precarga no llegó no hay nada que comparar.
+  String _descripcionInicial = '';
+  int? _tipoInicial;
+
   bool get _esEdicion => widget.habitId != null;
 
   @override
@@ -54,6 +60,8 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         setState(() {
           _tipoId = habito.tipo.id;
           _descripcionCtrl.text = habito.descripcion;
+          _tipoInicial = habito.tipo.id;
+          _descripcionInicial = habito.descripcion;
           _precargado = true;
         });
       }
@@ -84,6 +92,12 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         return 'Describí el hábito registrado...';
     }
   }
+
+  /// Hay algo que perder si la descripción o el tipo difieren del punto de
+  /// partida: el formulario vacío en alta, o el hábito precargado en edición.
+  bool get _hayCambios =>
+      _descripcionCtrl.text.trim() != _descripcionInicial ||
+      _tipoId != _tipoInicial;
 
   Future<void> _guardar() async {
     final desc = _descripcionCtrl.text.trim();
@@ -143,59 +157,62 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             child: child,
           );
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: ContextAppBar(
-        eyebrow: _esEdicion ? 'Editar hábito' : 'Nuevo hábito',
-        // El formulario muestra a quién se le registra, pero no deja cambiar
-        // de persona con los datos a medio cargar.
-        seleccionable: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.xl,
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: ContextAppBar(
+          eyebrow: _esEdicion ? 'Editar hábito' : 'Nuevo hábito',
+          // El formulario muestra a quién se le registra, pero no deja cambiar
+          // de persona con los datos a medio cargar.
+          seleccionable: false,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            animado(_categoria(tiposAsync), 0),
-            animado(
-              FormTextField(
-                controller: _descripcionCtrl,
-                label: 'Descripción',
-                hintText: _placeholder,
-                accent: context.colors.habitsAccent,
-                enabled: !_loading,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              animado(_categoria(tiposAsync), 0),
+              animado(
+                FormTextField(
+                  controller: _descripcionCtrl,
+                  label: 'Descripción',
+                  hintText: _placeholder,
+                  accent: context.colors.habitsAccent,
+                  enabled: !_loading,
+                ),
+                50,
               ),
-              50,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
-      // grilla de tipos entera.
-      bottomNavigationBar: animado(
-        ValueListenableBuilder<TextEditingValue>(
-          valueListenable: _descripcionCtrl,
-          builder: (context, valor, _) {
-            final tieneDescripcion = valor.text.trim().isNotEmpty;
-            return FormBottomBar(
-              label: _esEdicion ? 'Guardar cambios' : 'Registrar',
-              accent: context.colors.habitsAccent,
-              loading: _loading,
-              onPressed: (tieneDescripcion && _tipoId != null)
-                  ? _guardar
-                  : null,
-              hint: tieneDescripcion
-                  ? null
-                  : 'Completá la descripción para continuar',
-            );
-          },
+        // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
+        // grilla de tipos entera.
+        bottomNavigationBar: animado(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _descripcionCtrl,
+            builder: (context, valor, _) {
+              final tieneDescripcion = valor.text.trim().isNotEmpty;
+              return FormBottomBar(
+                label: _esEdicion ? 'Guardar cambios' : 'Registrar',
+                accent: context.colors.habitsAccent,
+                loading: _loading,
+                onPressed: (tieneDescripcion && _tipoId != null)
+                    ? _guardar
+                    : null,
+                hint: tieneDescripcion
+                    ? null
+                    : 'Completá la descripción para continuar',
+              );
+            },
+          ),
+          100,
         ),
-        100,
       ),
     );
   }
@@ -241,6 +258,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             // selección salta a otro tile a la vista del usuario.
             if (_tipoId == null && (!_esEdicion || _precargaIntentada)) {
               _tipoId = ordenados.first.id;
+              // El tipo por defecto es parte del estado inicial: elegirlo no
+              // cuenta como cambio pendiente.
+              _tipoInicial ??= _tipoId;
             }
 
             return TypeTileGrid(

@@ -57,6 +57,11 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
     );
   }
 
+  /// Hay algo que perder si ya se eligió un nivel —con eso solo el registro se
+  /// puede guardar— o si se escribió una observación.
+  bool get _hayCambios =>
+      _level != null || _observacionesCtrl.text.trim().isNotEmpty;
+
   Future<void> _registrar() async {
     final level = _level;
     if (level == null) return;
@@ -125,62 +130,65 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
             child: child,
           );
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: const ContextAppBar(
-        eyebrow: 'Estado de ánimo',
-        // El registro es de la persona de contexto: cambiarla a mitad de la
-        // carga movería el destino de lo ya elegido.
-        seleccionable: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.xl,
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: const ContextAppBar(
+          eyebrow: 'Estado de ánimo',
+          // El registro es de la persona de contexto: cambiarla a mitad de la
+          // carga movería el destino de lo ya elegido.
+          seleccionable: false,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            animado(_encabezado(nombrePersona), 0),
-            const SizedBox(height: AppSpacing.lg),
-            animado(
-              MoodScaleSelector(
-                selectedLevel: _level,
-                onChanged: (nivel) => setState(() => _level = nivel),
-                enabled: !_loading,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              animado(_encabezado(nombrePersona), 0),
+              const SizedBox(height: AppSpacing.lg),
+              animado(
+                MoodScaleSelector(
+                  selectedLevel: _level,
+                  onChanged: (nivel) => setState(() => _level = nivel),
+                  enabled: !_loading,
+                ),
+                50,
               ),
-              50,
-            ),
-            animado(
-              FormTextField(
-                controller: _observacionesCtrl,
-                label: 'Observación',
-                hintText: 'Ej. Estuvo tranquila, durmió bien',
-                accent: context.colors.moodAccent,
-                enabled: !_loading,
-                required: false,
-                maxLength: _maxObservacion,
+              animado(
+                FormTextField(
+                  controller: _observacionesCtrl,
+                  label: 'Observación',
+                  hintText: 'Ej. Estuvo tranquila, durmió bien',
+                  accent: context.colors.moodAccent,
+                  enabled: !_loading,
+                  required: false,
+                  maxLength: _maxObservacion,
+                ),
+                100,
               ),
-              100,
-            ),
-            animado(_sugerenciasChips(), 150),
-            animado(_ultimoRegistro(), 150),
-          ],
+              animado(_sugerenciasChips(), 150),
+              animado(_ultimoRegistro(), 150),
+            ],
+          ),
         ),
-      ),
-      // El botón depende del nivel elegido, no del texto: acá no hace falta
-      // escuchar al controller.
-      bottomNavigationBar: animado(
-        FormBottomBar(
-          label: 'Registrar estado',
-          accent: context.colors.moodAccent,
-          loading: _loading,
-          onPressed: _level == null ? null : _registrar,
-          hint: _level == null ? 'Elegí cómo se siente para continuar' : null,
+        // El botón depende del nivel elegido, no del texto: acá no hace falta
+        // escuchar al controller.
+        bottomNavigationBar: animado(
+          FormBottomBar(
+            label: 'Registrar estado',
+            accent: context.colors.moodAccent,
+            loading: _loading,
+            onPressed: _level == null ? null : _registrar,
+            hint: _level == null ? 'Elegí cómo se siente para continuar' : null,
+          ),
+          150,
         ),
-        150,
       ),
     );
   }

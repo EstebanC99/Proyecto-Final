@@ -146,6 +146,13 @@ Finder get _descripcion => find.byType(TextFormField);
 FilledButton _cta(WidgetTester tester) =>
     tester.widget<FilledButton>(find.byType(FilledButton));
 
+/// Dispara el gesto de "atrás" del sistema.
+Future<void> _volverAtras(WidgetTester tester) async {
+  final dynamic estado = tester.state(find.byType(WidgetsApp));
+  await estado.didPopRoute();
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('HabitFormScreen · alta', () {
     testWidgets('muestra el rótulo de alta y a la persona de contexto', (
@@ -447,6 +454,49 @@ void main() {
       final cta = tester.getRect(find.byType(FilledButton));
       expect(cta.bottom, lessThanOrEqualTo(640 - 300));
       expect(cta.height, greaterThan(0));
+    });
+  });
+
+  group('HabitFormScreen · cambios sin guardar', () {
+    testWidgets('sin tocar nada el atrás cierra directo', (tester) async {
+      // El tipo por defecto es parte del estado inicial: no cuenta como cambio.
+      await _pushForm(tester, _container());
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('con descripción escrita el atrás pregunta', (tester) async {
+      await _pushForm(tester, _container());
+
+      await tester.enterText(_descripcion, 'Caminata en el parque');
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
+
+    testWidgets('en edición, sin retocar nada el atrás cierra directo', (
+      tester,
+    ) async {
+      await _pushForm(tester, _container(), habitId: _habitoExistente.id);
+
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsNothing);
+    });
+
+    testWidgets('en edición, cambiar el tipo hace que pregunte', (
+      tester,
+    ) async {
+      await _pushForm(tester, _container(), habitId: _habitoExistente.id);
+
+      await tester.tap(find.text('Alimentación'));
+      await tester.pumpAndSettle();
+      await _volverAtras(tester);
+
+      expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
     });
   });
 }

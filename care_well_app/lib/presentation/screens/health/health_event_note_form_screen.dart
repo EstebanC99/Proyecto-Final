@@ -29,20 +29,8 @@ class _HealthEventNoteFormScreenState
     super.dispose();
   }
 
-  bool get _tieneContenido => _contenidoCtrl.text.trim().isNotEmpty;
-
-  Future<bool> _shouldPop() async {
-    if (!_tieneContenido) return true;
-    final confirmo = await ConfirmDialog.show(
-      context,
-      title: 'Tenés cambios sin guardar',
-      body: '¿Salir de todas formas?',
-      confirmLabel: 'Salir',
-      onConfirm: () async {},
-      icon: Icons.warning_amber_rounded,
-    );
-    return confirmo;
-  }
+  /// Hay algo que perder si ya se escribió la nota.
+  bool get _hayCambios => _contenidoCtrl.text.trim().isNotEmpty;
 
   Future<void> _guardar() async {
     final contenido = _contenidoCtrl.text.trim();
@@ -90,13 +78,8 @@ class _HealthEventNoteFormScreenState
             child: child,
           );
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) return;
-        final ok = await _shouldPop();
-        if (ok && context.mounted) Navigator.of(context).pop();
-      },
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
       child: Scaffold(
         backgroundColor: context.colors.background,
         appBar: const ContextAppBar(

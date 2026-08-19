@@ -78,8 +78,39 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     super.dispose();
   }
 
+  /// Ocurrencia que se está editando, para comparar contra ella al salir.
+  /// `null` en alta y mientras la precarga no llegó.
+  OcurrenciaEventoAgenda? _ocurrenciaOriginal;
+
+  /// Hay algo que perder si el usuario escribió algo (alta) o si algún campo
+  /// difiere del evento precargado (edición).
+  ///
+  /// La duración, el recordatorio y el switch no se miran en alta: son ajustes
+  /// de un toque sobre valores por defecto, y el formulario no se puede guardar
+  /// sin título.
+  bool get _hayCambios {
+    final original = _ocurrenciaOriginal;
+    if (original == null) {
+      return _tituloCtrl.text.trim().isNotEmpty ||
+          _descripcionCtrl.text.trim().isNotEmpty;
+    }
+
+    final inicio = original.fechaHoraInicio.toLocal();
+    return _tituloCtrl.text.trim() != original.titulo.trim() ||
+        _descripcionCtrl.text.trim() != (original.descripcion ?? '').trim() ||
+        _tipo?.id != original.tipo.id ||
+        _fechaHoraInicio != inicio ||
+        _duracion !=
+            original.fechaHoraFin
+                .difference(original.fechaHoraInicio)
+                .inMinutes ||
+        _anticipacion != original.minutosAnticipacionRecordatorio ||
+        _generarEventoSalud != original.generarEventoSalud;
+  }
+
   /// Precarga los campos a partir de una ocurrencia existente (edición).
   void _prefillDesde(OcurrenciaEventoAgenda ocu) {
+    _ocurrenciaOriginal = ocu;
     _tituloCtrl.text = ocu.titulo;
     _descripcionCtrl.text = ocu.descripcion ?? '';
     _tipo = ocu.tipo;
@@ -213,44 +244,47 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
       }
     }
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: ContextAppBar(
-        eyebrow: _esEdicion ? 'Editar evento' : 'Nuevo evento',
-        // El formulario muestra a quién se le agenda, pero no deja cambiar de
-        // persona con los datos a medio cargar.
-        seleccionable: false,
-      ),
-      body: tiposAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: InlineErrorBanner(
-              message: 'No se pudieron cargar los tipos de evento. $err',
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: ContextAppBar(
+          eyebrow: _esEdicion ? 'Editar evento' : 'Nuevo evento',
+          // El formulario muestra a quién se le agenda, pero no deja cambiar de
+          // persona con los datos a medio cargar.
+          seleccionable: false,
+        ),
+        body: tiposAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: InlineErrorBanner(
+                message: 'No se pudieron cargar los tipos de evento. $err',
+              ),
             ),
           ),
+          data: (tipos) => _buildForm(context, tipos),
         ),
-        data: (tipos) => _buildForm(context, tipos),
-      ),
-      // Sólo el botón depende del título: escuchando el controller acá, en vez
-      // de reconstruir la pantalla en cada tecla, no se redibujan la grilla de
-      // tipos, los steppers ni los carruseles al tipear.
-      bottomNavigationBar: _animado(
-        ValueListenableBuilder<TextEditingValue>(
-          valueListenable: _tituloCtrl,
-          builder: (context, valor, _) {
-            final tieneTitulo = valor.text.trim().isNotEmpty;
-            return FormBottomBar(
-              label: _esEdicion ? 'Guardar cambios' : 'Crear evento',
-              accent: context.colors.primary,
-              loading: _loading,
-              onPressed: (tieneTitulo && _tipo != null) ? _guardar : null,
-              hint: tieneTitulo ? null : 'Completá el título para continuar',
-            );
-          },
+        // Sólo el botón depende del título: escuchando el controller acá, en vez
+        // de reconstruir la pantalla en cada tecla, no se redibujan la grilla de
+        // tipos, los steppers ni los carruseles al tipear.
+        bottomNavigationBar: _animado(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _tituloCtrl,
+            builder: (context, valor, _) {
+              final tieneTitulo = valor.text.trim().isNotEmpty;
+              return FormBottomBar(
+                label: _esEdicion ? 'Guardar cambios' : 'Crear evento',
+                accent: context.colors.primary,
+                loading: _loading,
+                onPressed: (tieneTitulo && _tipo != null) ? _guardar : null,
+                hint: tieneTitulo ? null : 'Completá el título para continuar',
+              );
+            },
+          ),
+          200,
         ),
-        200,
       ),
     );
   }
