@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,8 +11,11 @@ import '../../widgets/widgets.dart';
 
 /// US-08/10/11 · Pantalla principal de Configuración.
 ///
-/// Agrupa las secciones: Cuenta, Seguridad y privacidad, Legal, Sesión.
-/// - US-08: navega a T&C.
+/// Agrupa las secciones: Seguridad y privacidad, Legal y Zona sensible, con la
+/// identidad del usuario arriba (acceso a "Mi Perfil") y el cierre de sesión
+/// como acción secundaria al pie.
+/// - US-06: la tarjeta de usuario navega al perfil.
+/// - US-08: navega a T&C y a la política de privacidad.
 /// - US-10: dialog de confirmación para cerrar sesión.
 /// - US-11: dialog de confirmación para eliminar cuenta (requiere tipear "DELETE").
 class SettingsScreen extends ConsumerWidget {
@@ -19,91 +23,174 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final sinAnimacion = MediaQuery.disableAnimationsOf(context);
+
+    Widget anim(Widget child, int delayMs) => sinAnimacion
+        ? child
+        : FadeInUp(
+            delay: Duration(milliseconds: delayMs),
+            child: child,
+          );
+
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(
-        backgroundColor: context.colors.surface,
-        title: const Text('Configuración'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: context.colors.outline),
-        ),
-      ),
+      appBar: AppBar(backgroundColor: context.colors.surface, elevation: 0),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         children: [
-          // Sección Cuenta
-          const SectionLabel(text: 'Cuenta'),
-          CardGroup(
-            children: [
-              SettingsItem(
-                icon: Icons.person_outline,
-                label: 'Mi Perfil',
-                onTap: () => context.pushNamed(AppRoutes.profileName),
+          // El título vive en el cuerpo, no en el AppBar: por eso el rol de
+          // encabezado hay que declararlo a mano.
+          Padding(
+            padding: const EdgeInsets.only(
+              top: AppSpacing.sm,
+              bottom: AppSpacing.lg,
+            ),
+            child: Semantics(
+              header: true,
+              child: Text(
+                'Configuración',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.6,
+                  color: context.colors.textPrimary,
+                ),
               ),
-            ],
+            ),
           ),
 
+          anim(const _TarjetaUsuario(), 0),
+
           // Sección Seguridad y privacidad
-          const SectionLabel(text: 'Seguridad y privacidad'),
-          CardGroup(
-            children: [
-              SettingsItem(
-                icon: Icons.security_outlined,
-                label: 'Cambiar contraseña',
-                onTap: () =>
-                    context.pushNamed(AppRoutes.settingsChangePasswordName),
-              ),
-              SettingsItem(
-                icon: Icons.delete_forever_outlined,
-                label: 'Eliminar cuenta',
-                destructive: true,
-                onTap: () => _mostrarDialogEliminarCuenta(context, ref),
-              ),
-            ],
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Seguridad y privacidad'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.lock_outline,
+                      label: 'Cambiar contraseña',
+                      subtitle: 'Se te pedirá tu contraseña actual',
+                      onTap: () => context.pushNamed(
+                        AppRoutes.settingsChangePasswordName,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            50,
           ),
 
           // Sección Legal
-          const SectionLabel(text: 'Legal'),
-          CardGroup(
-            children: [
-              SettingsItem(
-                icon: Icons.description_outlined,
-                label: 'Términos y condiciones',
-                onTap: () => context.pushNamed(AppRoutes.settingsTermsName),
-              ),
-              SettingsItem(
-                icon: Icons.privacy_tip_outlined,
-                label: 'Política de privacidad',
-                onTap: () => context.pushNamed(AppRoutes.settingsPrivacyName),
-              ),
-              SettingsItem(
-                icon: Icons.info_outline,
-                label: 'Acerca de CareWell',
-                onTap: () async {
-                  // Sin manejo de error: la lectura del paquete instalado no
-                  // falla en Android; de fallar, el efecto es que el diálogo
-                  // no se abre.
-                  final version = await ref.read(appVersionProvider.future);
-                  if (!context.mounted) return;
-                  await mostrarAcercaDeCareWell(context, version: version);
-                },
-              ),
-            ],
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Legal'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.description_outlined,
+                      label: 'Términos y condiciones',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () =>
+                          context.pushNamed(AppRoutes.settingsTermsName),
+                    ),
+                    SettingsItem(
+                      icon: Icons.privacy_tip_outlined,
+                      label: 'Política de privacidad',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () =>
+                          context.pushNamed(AppRoutes.settingsPrivacyName),
+                    ),
+                    SettingsItem(
+                      icon: Icons.info_outline,
+                      label: 'Acerca de CareWell',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () async {
+                        // Sin manejo de error: la lectura del paquete instalado
+                        // no falla en Android; de fallar, el efecto es que el
+                        // diálogo no se abre.
+                        final version = await ref.read(
+                          appVersionProvider.future,
+                        );
+                        if (!context.mounted) return;
+                        await mostrarAcercaDeCareWell(
+                          context,
+                          version: version,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            100,
           ),
 
-          // Sección Sesión
-          const SectionLabel(text: 'Sesión'),
-          CardGroup(
-            children: [
-              SettingsItem(
-                icon: Icons.logout,
-                label: 'Cerrar sesión',
-                destructive: true,
-                onTap: () => _mostrarDialogCerrarSesion(context, ref),
-              ),
-            ],
+          // Sección Zona sensible
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Zona sensible'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.delete_forever_outlined,
+                      label: 'Eliminar cuenta',
+                      destructive: true,
+                      showChevron: false,
+                      subtitle:
+                          'Perderás el acceso y tus datos dejarán de estar '
+                          'disponibles. No se puede deshacer.',
+                      subtitleMaxLines: 3,
+                      onTap: () => _mostrarDialogEliminarCuenta(context, ref),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            150,
           ),
+
+          // Cerrar sesión: acción secundaria, no destructiva. Gris deliberado
+          // (la cuenta no se pierde), fuera de las tarjetas para separarla de
+          // los ítems de navegación.
+          anim(
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xl),
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () => _mostrarDialogCerrarSesion(context, ref),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: context.colors.surface,
+                    foregroundColor: context.colors.textSecondary,
+                    side: BorderSide(color: context.colors.outline, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  child: const Text('Cerrar sesión'),
+                ),
+              ),
+            ),
+            200,
+          ),
+
+          const _PieDeVersion(),
           const SizedBox(height: AppSpacing.xxxl),
         ],
       ),
@@ -158,6 +245,60 @@ class SettingsScreen extends ConsumerWidget {
       barrierDismissible: true,
       barrierColor: context.colors.scrim,
       builder: (dialogCtx) => _EliminarCuentaDialog(ref: ref),
+    );
+  }
+}
+
+/// Tarjeta de identidad del usuario autenticado, con acceso al perfil.
+///
+/// Observa `authStateProvider` sólo acá y no envolviendo la pantalla: si la
+/// sesión no resuelve, Configuración tiene que seguir siendo usable (el usuario
+/// necesita poder llegar a "Cerrar sesión"). Por eso el estado de error —y el
+/// de usuario nulo— degradan a nada en lugar de bloquear la vista con un
+/// banner.
+class _TarjetaUsuario extends ConsumerWidget {
+  const _TarjetaUsuario();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(authStateProvider)
+        .when(
+          loading: () => const SettingsUserCardSkeleton(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (usuario) => usuario == null
+              ? const SizedBox.shrink()
+              : SettingsUserCard(
+                  persona: usuario.persona,
+                  onTap: () => context.pushNamed(AppRoutes.profileName),
+                ),
+        );
+  }
+}
+
+/// Pie con la versión instalada de la app.
+///
+/// Lee el `AsyncValue` por su getter nullable `value` a propósito (en Riverpod
+/// 3 es el equivalente al `valueOrNull` de 2.x): mientras carga —o si la
+/// lectura del paquete falla— muestra el texto sin versión, en lugar de dejar
+/// el pie vacío o desplazar el layout cuando el valor llega.
+class _PieDeVersion extends ConsumerWidget {
+  const _PieDeVersion();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final version = ref.watch(appVersionProvider).value;
+    final texto = version == null
+        ? 'CareWell · Bubisoft'
+        : 'CareWell v$version · Bubisoft';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      child: Text(
+        texto,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 11.5, color: context.colors.textDisabled),
+      ),
     );
   }
 }

@@ -18,6 +18,7 @@ class SettingsItem extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.subtitle,
+    this.subtitleMaxLines = 2,
     this.destructive = false,
     this.iconColor,
     this.iconBackground,
@@ -34,8 +35,13 @@ class SettingsItem extends StatelessWidget {
   /// Callback al tocar el ítem.
   final VoidCallback onTap;
 
-  /// Texto de apoyo bajo la etiqueta (hasta 2 líneas).
+  /// Texto de apoyo bajo la etiqueta (hasta [subtitleMaxLines] líneas).
   final String? subtitle;
+
+  /// Cantidad máxima de líneas del [subtitle] antes de recortar con elipsis.
+  /// Se sube a 3 en textos largos que no pueden perder su cierre (por ejemplo
+  /// la advertencia de "Eliminar cuenta").
+  final int subtitleMaxLines;
 
   /// Si es `true`, la etiqueta y el ícono se muestran en el color de error.
   final bool destructive;
@@ -102,7 +108,7 @@ class SettingsItem extends StatelessWidget {
                             fontSize: 12,
                             color: context.colors.textSecondary,
                           ),
-                          maxLines: 2,
+                          maxLines: subtitleMaxLines,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

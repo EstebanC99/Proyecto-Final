@@ -9,6 +9,7 @@ void main() {
       bool destructive = false,
       VoidCallback? onTap,
       String? subtitle,
+      int subtitleMaxLines = 2,
       bool showChevron = true,
       Widget? trailing,
     }) {
@@ -19,6 +20,7 @@ void main() {
             label: 'Mi Perfil',
             destructive: destructive,
             subtitle: subtitle,
+            subtitleMaxLines: subtitleMaxLines,
             showChevron: showChevron,
             trailing: trailing,
             onTap: onTap ?? () {},
@@ -70,6 +72,26 @@ void main() {
       await tester.pumpWidget(buildItem(subtitle: 'Última vez hace 3 meses'));
 
       expect(find.text('Última vez hace 3 meses'), findsOneWidget);
+    });
+
+    testWidgets('el subtítulo se recorta a 2 líneas por defecto', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildItem(subtitle: 'Un texto de apoyo'));
+
+      final texto = tester.widget<Text>(find.text('Un texto de apoyo'));
+      expect(texto.maxLines, 2);
+    });
+
+    testWidgets('subtitleMaxLines controla el recorte del subtítulo', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildItem(subtitle: 'Un texto de apoyo largo', subtitleMaxLines: 3),
+      );
+
+      final texto = tester.widget<Text>(find.text('Un texto de apoyo largo'));
+      expect(texto.maxLines, 3);
     });
 
     testWidgets('sin subtítulo solo muestra la etiqueta', (tester) async {
