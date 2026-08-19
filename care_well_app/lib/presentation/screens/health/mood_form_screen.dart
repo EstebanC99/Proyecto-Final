@@ -231,7 +231,11 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
                   onTap:
                       _loading ||
                           texto.contains(sugerencia) ||
-                          texto.characters.length + sugerencia.length + 2 >
+                          // Las dos longitudes en grafemas, que es la unidad
+                          // que limita `maxLength`. El +2 es el ". " que separa.
+                          texto.characters.length +
+                                  sugerencia.characters.length +
+                                  2 >
                               _maxObservacion
                       ? null
                       : () => _agregarSugerencia(sugerencia),
@@ -246,7 +250,11 @@ class _MoodFormScreenState extends ConsumerState<MoodFormScreen> {
   /// Recuerda el último registro del día, si lo hay.
   ///
   /// Es decorativo: mientras carga, o si todavía no se registró nada hoy, no
-  /// ocupa lugar. Registrar de nuevo sobrescribe, y este pie es el aviso.
+  /// ocupa lugar.
+  ///
+  /// Registrar de nuevo NO pisa lo anterior: el backend crea una entidad nueva
+  /// en cada alta y "el ánimo de hoy" es el más reciente de los del día. El pie
+  /// existe para que el usuario sepa que ya cargó uno, no porque se sobrescriba.
   Widget _ultimoRegistro() {
     final animo = ref
         .watch(animoHoyProvider)

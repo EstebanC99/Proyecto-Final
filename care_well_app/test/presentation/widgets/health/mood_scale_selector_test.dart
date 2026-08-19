@@ -1,3 +1,4 @@
+import 'package:care_well_app/config/theme/app_palette.dart';
 import 'package:care_well_app/config/theme/app_theme.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/widgets/widgets.dart';
@@ -169,6 +170,26 @@ void main() {
           .map((e) => (e.renderObject! as RenderBox).size.height)
           .toSet();
       expect(altos.length, 1, reason: 'las cinco tarjetas deben medir igual');
+    });
+
+    testWidgets('el label sin elegir usa textSecondary, no textDisabled', (
+      tester,
+    ) async {
+      // Son los nombres de las cinco opciones: a 10.5sp, `textDisabled` sobre
+      // `surface` no llega al contraste AA. Acá nos apartamos del mockup.
+      await tester.pumpWidget(wrap(selectedLevel: EstadosAnimoConst.bien));
+      await tester.pumpAndSettle();
+
+      final sinElegir = tester.widget<Text>(find.text('Muy mal'));
+      expect(sinElegir.style!.color, AppPalette.light.textSecondary);
+      expect(sinElegir.style!.color, isNot(AppPalette.light.textDisabled));
+
+      // El elegido sí se pinta con el color de su nivel.
+      final elegido = tester.widget<Text>(find.text('Bien'));
+      expect(
+        elegido.style!.color,
+        moodLevelColor(AppPalette.light, EstadosAnimoConst.bien),
+      );
     });
   });
 }

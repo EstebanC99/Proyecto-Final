@@ -129,7 +129,11 @@ class _MoodTile extends StatelessWidget {
                     fontWeight: seleccionado
                         ? FontWeight.w700
                         : FontWeight.w600,
-                    color: seleccionado ? color : colors.textDisabled,
+                    // Sin elegir va en `textSecondary` y no en `textDisabled`
+                    // como el mockup: son los nombres de las cinco opciones, o
+                    // sea el contenido principal de la pantalla, y a 10.5sp el
+                    // gris más claro no llega al contraste AA.
+                    color: seleccionado ? color : colors.textSecondary,
                   ),
                 ),
               ],

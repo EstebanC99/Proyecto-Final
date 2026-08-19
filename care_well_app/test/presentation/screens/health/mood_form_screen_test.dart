@@ -290,8 +290,8 @@ void main() {
     });
 
     testWidgets('el registro de hoy no precarga el formulario', (tester) async {
-      // Registrar sobrescribe: el pie avisa, pero el formulario arranca
-      // limpio para no dar por hecho que se repite el mismo estado.
+      // El pie avisa que ya hay uno cargado, pero el formulario arranca limpio:
+      // registrar de nuevo agrega otro registro, no repite el mismo estado.
       await tester.pumpWidget(_wrap(animoHoy: _animoDeHoy));
       await tester.pumpAndSettle();
 
