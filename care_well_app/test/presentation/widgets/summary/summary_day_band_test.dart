@@ -185,4 +185,33 @@ void main() {
       },
     );
   });
+
+  group('animaciones desactivadas', () {
+    testWidgets('la banda se ve con "reducir animaciones" activado', (
+      tester,
+    ) async {
+      // `animate: false` de animate_do no salta la animación: deja el
+      // controller en 0, o sea el hijo con opacidad 0 y desplazado. Sin el
+      // wrapper condicional, la banda quedaba invisible.
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: Scaffold(body: SummaryDayBand(fecha: DateTime(2026, 8, 8))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final opacidades = tester
+          .widgetList<Opacity>(find.byType(Opacity))
+          .map((o) => o.opacity);
+      expect(opacidades, everyElement(greaterThan(0.0)));
+
+      final traslaciones = tester.widgetList<Transform>(find.byType(Transform));
+      for (final t in traslaciones) {
+        expect(t.transform.getTranslation().y, 0.0);
+      }
+    });
+  });
 }

@@ -97,67 +97,73 @@ class SummarySectionCard extends StatelessWidget {
       trailing: trailing,
     );
 
-    return FadeInUp(
-      duration: const Duration(milliseconds: 400),
-      delay: delay,
-      from: 12,
-      animate: !sinAnimacion,
-      child: Container(
-        decoration: BoxDecoration(
-          color: _esWarning ? colors.warningContainer : colors.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          border: _esWarning
-              ? Border.all(color: colors.warning.withValues(alpha: 0.5))
-              : null,
-          boxShadow: _esWarning ? AppSpacing.elev0 : AppSpacing.elev1,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (onTapHeader == null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.md,
-                ),
-                child: header,
-              )
-            else
-              // Un único nodo semántico para todo el encabezado: se anuncia
-              // como botón, con el estado contraído/expandido y el texto ya
-              // reunido. Se excluye la semántica de los hijos (título, meta y
-              // chevron) para no repetir lo mismo tres veces.
-              Semantics(
-                container: true,
-                button: true,
-                expanded: expandido,
-                label: meta == null ? title : '$title, $meta',
-                onTap: onTapHeader,
-                excludeSemantics: true,
-                child: Material(
-                  color: Colors.transparent,
+    final tarjeta = Container(
+      decoration: BoxDecoration(
+        color: _esWarning ? colors.warningContainer : colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: _esWarning
+            ? Border.all(color: colors.warning.withValues(alpha: 0.5))
+            : null,
+        boxShadow: _esWarning ? AppSpacing.elev0 : AppSpacing.elev1,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (onTapHeader == null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.md,
+              ),
+              child: header,
+            )
+          else
+            // Un único nodo semántico para todo el encabezado: se anuncia
+            // como botón, con el estado contraído/expandido y el texto ya
+            // reunido. Se excluye la semántica de los hijos (título, meta y
+            // chevron) para no repetir lo mismo tres veces.
+            Semantics(
+              container: true,
+              button: true,
+              expanded: expandido,
+              label: meta == null ? title : '$title, $meta',
+              onTap: onTapHeader,
+              excludeSemantics: true,
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                child: InkWell(
+                  onTap: onTapHeader,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                  child: InkWell(
-                    onTap: onTapHeader,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minHeight: AppSpacing.minTapTarget,
-                        ),
-                        child: header,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minHeight: AppSpacing.minTapTarget,
                       ),
+                      child: header,
                     ),
                   ),
                 ),
               ),
-            if (child != null) Padding(padding: contentPadding, child: child),
-          ],
-        ),
+            ),
+          if (child != null) Padding(padding: contentPadding, child: child),
+        ],
       ),
+    );
+
+    // `animate: false` de animate_do no salta la animación: deja el controller
+    // en 0, o sea el hijo con opacidad 0 y desplazado. Con las animaciones del
+    // sistema apagadas hay que saltear el wrapper, no configurarlo.
+    if (sinAnimacion) return tarjeta;
+
+    return FadeInUp(
+      duration: const Duration(milliseconds: 400),
+      delay: delay,
+      from: 12,
+      child: tarjeta,
     );
   }
 }
