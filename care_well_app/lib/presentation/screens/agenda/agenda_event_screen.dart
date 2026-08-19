@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,6 +45,14 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
   bool _loading = false;
   bool _prefilled = false;
 
+  /// La búsqueda de la ocurrencia a editar ya terminó, la haya encontrado o no.
+  ///
+  /// Habilita el fallback al primer tipo del catálogo. Es "intentada" y no
+  /// "lograda" a propósito: si la ocurrencia no aparece (evento de otra semana,
+  /// lista vacía), el formulario igual necesita un tipo elegido o el botón de
+  /// guardar queda bloqueado para siempre.
+  bool _precargaIntentada = false;
+
   bool get _esEdicion => widget.eventId != null;
 
   @override
@@ -69,8 +78,39 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     super.dispose();
   }
 
+  /// Ocurrencia que se está editando, para comparar contra ella al salir.
+  /// `null` en alta y mientras la precarga no llegó.
+  OcurrenciaEventoAgenda? _ocurrenciaOriginal;
+
+  /// Hay algo que perder si el usuario escribió algo (alta) o si algún campo
+  /// difiere del evento precargado (edición).
+  ///
+  /// La duración, el recordatorio y el switch no se miran en alta: son ajustes
+  /// de un toque sobre valores por defecto, y el formulario no se puede guardar
+  /// sin título.
+  bool get _hayCambios {
+    final original = _ocurrenciaOriginal;
+    if (original == null) {
+      return _tituloCtrl.text.trim().isNotEmpty ||
+          _descripcionCtrl.text.trim().isNotEmpty;
+    }
+
+    final inicio = original.fechaHoraInicio.toLocal();
+    return _tituloCtrl.text.trim() != original.titulo.trim() ||
+        _descripcionCtrl.text.trim() != (original.descripcion ?? '').trim() ||
+        _tipo?.id != original.tipo.id ||
+        _fechaHoraInicio != inicio ||
+        _duracion !=
+            original.fechaHoraFin
+                .difference(original.fechaHoraInicio)
+                .inMinutes ||
+        _anticipacion != original.minutosAnticipacionRecordatorio ||
+        _generarEventoSalud != original.generarEventoSalud;
+  }
+
   /// Precarga los campos a partir de una ocurrencia existente (edición).
   void _prefillDesde(OcurrenciaEventoAgenda ocu) {
+    _ocurrenciaOriginal = ocu;
     _tituloCtrl.text = ocu.titulo;
     _descripcionCtrl.text = ocu.descripcion ?? '';
     _tipo = ocu.tipo;
@@ -89,12 +129,16 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
       firstDate: DateTime.now().subtract(const Duration(days: 1)),
       lastDate: DateTime(DateTime.now().year + 5),
     );
-    if (picked != null) setState(() => _fecha = picked);
+    // El diálogo es asíncrono: la pantalla puede haberse ido mientras estaba
+    // abierto.
+    if (picked == null || !mounted) return;
+    setState(() => _fecha = picked);
   }
 
   Future<void> _elegirHora() async {
     final picked = await showTimePicker(context: context, initialTime: _hora);
-    if (picked != null) setState(() => _hora = picked);
+    if (picked == null || !mounted) return;
+    setState(() => _hora = picked);
   }
 
   Future<void> _elegirFechaFin() async {
@@ -104,7 +148,8 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
       firstDate: _fecha,
       lastDate: DateTime(DateTime.now().year + 5),
     );
-    if (picked != null) setState(() => _fechaFin = picked);
+    if (picked == null || !mounted) return;
+    setState(() => _fechaFin = picked);
   }
 
   DateTime get _fechaHoraInicio =>
@@ -184,151 +229,219 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
 
     // Precarga de datos en edición (una sola vez, al disponer de las ocurrencias).
     if (_esEdicion && !_prefilled) {
-      final ocurrencias = ref.watch(ocurrenciasDeSemanaProvider).value;
-      final ocu = ocurrencias
-          ?.where((o) => o.eventoAgendaId == widget.eventId)
-          .firstOrNull;
-      if (ocu != null) {
-        _prefillDesde(ocu);
-        _prefilled = true;
+      final ocurrenciasAsync = ref.watch(ocurrenciasDeSemanaProvider);
+      if (!ocurrenciasAsync.isLoading) {
+        final ocu = ocurrenciasAsync.value
+            ?.where((o) => o.eventoAgendaId == widget.eventId)
+            .firstOrNull;
+        if (ocu != null) {
+          _prefillDesde(ocu);
+          _prefilled = true;
+        }
+        // Marca el intento aunque no se haya encontrado nada: recién ahí el
+        // formulario puede caer al tipo por defecto sin pisar el precargado.
+        _precargaIntentada = true;
       }
     }
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: Text(_esEdicion ? 'Editar evento' : 'Nuevo evento'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
-      body: tiposAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: InlineErrorBanner(
-              message: 'No se pudieron cargar los tipos de evento. $err',
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: ContextAppBar(
+          eyebrow: _esEdicion ? 'Editar evento' : 'Nuevo evento',
+          // El formulario muestra a quién se le agenda, pero no deja cambiar de
+          // persona con los datos a medio cargar.
+          seleccionable: false,
+        ),
+        body: tiposAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: InlineErrorBanner(
+                message: 'No se pudieron cargar los tipos de evento. $err',
+              ),
             ),
           ),
+          data: (tipos) => _buildForm(context, tipos),
         ),
-        data: (tipos) => _buildForm(context, tipos),
+        // Sólo el botón depende del título: escuchando el controller acá, en vez
+        // de reconstruir la pantalla en cada tecla, no se redibujan la grilla de
+        // tipos, los steppers ni los carruseles al tipear.
+        bottomNavigationBar: _animado(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _tituloCtrl,
+            builder: (context, valor, _) {
+              final tieneTitulo = valor.text.trim().isNotEmpty;
+              return FormBottomBar(
+                label: _esEdicion ? 'Guardar cambios' : 'Crear evento',
+                accent: context.colors.primary,
+                loading: _loading,
+                onPressed: (tieneTitulo && _tipo != null) ? _guardar : null,
+                hint: tieneTitulo ? null : 'Completá el título para continuar',
+              );
+            },
+          ),
+          200,
+        ),
       ),
     );
   }
 
+  /// Envuelve un bloque del formulario en la animación de entrada.
+  ///
+  /// `animate: false` de animate_do no desactiva la animación: deja el
+  /// controller en 0, o sea el hijo invisible. Con las animaciones apagadas hay
+  /// que saltear el wrapper, no configurarlo.
+  Widget _animado(Widget child, int delayMs) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return FadeInUp(
+      duration: const Duration(milliseconds: 400),
+      delay: Duration(milliseconds: delayMs),
+      from: 12,
+      child: child,
+    );
+  }
+
   Widget _buildForm(BuildContext context, List<TipoEvento> tipos) {
-    // Selección de tipo por defecto (o el precargado en edición).
-    _tipo ??= tipos.isNotEmpty ? tipos.first : null;
-    final tieneTitulo = _tituloCtrl.text.trim().isNotEmpty;
-    final puedeGuardar = tieneTitulo && _tipo != null && !_loading;
+    // El orden lo define el catálogo, no el backend: así "Otro" (el id más
+    // alto) queda siempre al final.
+    final ordenados = [...tipos]..sort((a, b) => a.id.compareTo(b.id));
+
+    // Selección por defecto: el primer tile de la grilla.
+    //
+    // En edición se espera a que termine la búsqueda de la ocurrencia: si no,
+    // el primer frame pinta el tile 1 elegido y la selección salta a otro tile
+    // a la vista del usuario cuando resuelven las ocurrencias.
+    if (_tipo == null &&
+        ordenados.isNotEmpty &&
+        (!_esEdicion || _precargaIntentada)) {
+      _tipo = ordenados.first;
+    }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.xl,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Tipo de evento.
-          const _SectionLabel('Tipo de evento *'),
-          const SizedBox(height: AppSpacing.sm),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: tipos.map((t) {
-                final selected = t.id == _tipo?.id;
-                return Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: ChoiceChip(
-                    label: Text(t.descripcion),
-                    selected: selected,
-                    onSelected: _loading
-                        ? null
-                        : (_) => setState(() => _tipo = t),
-                    selectedColor: TipoEventoTheme.accentFor(context, t.id),
-                    labelStyle: TextStyle(
-                      color: selected
-                          ? context.colors.onPrimary
-                          : context.colors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
+          _animado(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionLabel(
+                  text: 'Tipo de evento',
+                  required: true,
+                  padding: EdgeInsets.only(bottom: AppSpacing.sm),
+                ),
+                TypeTileGrid(
+                  options: [
+                    for (final tipo in ordenados)
+                      TypeTileOption(
+                        id: tipo.id,
+                        label: tipo.descripcion,
+                        icon: TipoEventoTheme.iconFor(tipo.id),
+                        accent: TipoEventoTheme.accentFor(context, tipo.id),
+                        container: TipoEventoTheme.containerFor(
+                          context,
+                          tipo.id,
+                        ),
+                      ),
+                  ],
+                  selectedId: _tipo?.id,
+                  // La grilla emite el id; el resto del formulario trabaja con
+                  // la entidad (`_guardar` usa `tipo.id`), así que se resuelve
+                  // acá en vez de cambiar el tipo del estado.
+                  onChanged: (id) => setState(
+                    () => _tipo = ordenados.firstWhere((t) => t.id == id),
                   ),
-                );
-              }).toList(),
+                  enabled: !_loading,
+                ),
+              ],
             ),
+            0,
           ),
-          const SizedBox(height: AppSpacing.lg),
 
           // Título.
-          const _SectionLabel('Título *'),
-          const SizedBox(height: AppSpacing.sm),
-          TextFormField(
-            controller: _tituloCtrl,
-            enabled: !_loading,
-            maxLength: 120,
-            textCapitalization: TextCapitalization.sentences,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
+          _animado(
+            FormTextField(
+              controller: _tituloCtrl,
+              label: 'Título',
               hintText: 'Ej.: Control cardiológico',
-              prefixIcon: const Icon(Icons.title_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
+              accent: context.colors.primary,
+              enabled: !_loading,
+              minLines: 1,
+              maxLines: 1,
+              maxLength: 120,
             ),
+            50,
           ),
-          const SizedBox(height: AppSpacing.sm),
 
-          // Descripción.
-          const _SectionLabel('Descripción'),
-          const SizedBox(height: AppSpacing.sm),
-          TextFormField(
-            controller: _descripcionCtrl,
-            enabled: !_loading,
-            minLines: 2,
-            maxLines: 5,
-            maxLength: 500,
-            textAlignVertical: TextAlignVertical.top,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(
+          // Descripción: el único campo opcional de los tres formularios.
+          _animado(
+            FormTextField(
+              controller: _descripcionCtrl,
+              label: 'Descripción',
               hintText: 'Notas adicionales (opcional)',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+              accent: context.colors.primary,
+              enabled: !_loading,
+              required: false,
+              minLines: 2,
+              maxLines: 5,
+              labelPadding: const EdgeInsets.only(bottom: AppSpacing.sm),
             ),
+            100,
           ),
-          const SizedBox(height: AppSpacing.md),
 
-          // Fecha y hora.
-          Row(
-            children: [
-              Expanded(
-                child: _PickerField(
-                  label: 'Fecha *',
-                  icon: Icons.calendar_today_outlined,
-                  value: '${_fecha.day}/${_fecha.month}/${_fecha.year}',
-                  onTap: _loading ? null : _elegirFecha,
+          // Cuándo: fecha y hora bajo un único rótulo. Van sin marca de
+          // obligatorio porque ambas arrancan con valor y no se pueden vaciar.
+          _animado(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionLabel(
+                  text: 'Cuándo',
+                  padding: EdgeInsets.only(
+                    top: AppSpacing.xl,
+                    bottom: AppSpacing.sm,
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _PickerField(
-                  label: 'Hora *',
-                  icon: Icons.schedule_outlined,
-                  value: _hora.format(context),
-                  onTap: _loading ? null : _elegirHora,
+                Row(
+                  children: [
+                    Expanded(
+                      child: PickerField.pill(
+                        icon: Icons.calendar_today_outlined,
+                        value: fechaCortaRelativa(_fecha),
+                        onTap: _loading ? null : _elegirFecha,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: PickerField.pill(
+                        icon: Icons.schedule_outlined,
+                        value: _hora.format(context),
+                        onTap: _loading ? null : _elegirHora,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
+            150,
           ),
           const SizedBox(height: AppSpacing.lg),
 
           // Duración.
-          const _SectionLabel('Duración'),
-          const SizedBox(height: AppSpacing.sm),
+          const SectionLabel(
+            text: 'Duración',
+            padding: EdgeInsets.only(bottom: AppSpacing.sm),
+          ),
           _DuracionStepper(
             valor: _duracion,
             onChanged: _loading ? null : (v) => setState(() => _duracion = v),
@@ -377,39 +490,6 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
               ),
             ),
           ),
-
-          const SizedBox(height: AppSpacing.xxl),
-
-          // Botón guardar.
-          SizedBox(
-            width: double.infinity,
-            height: AppSpacing.buttonHeight,
-            child: FilledButton(
-              onPressed: puedeGuardar ? _guardar : null,
-              style: FilledButton.styleFrom(
-                backgroundColor: context.colors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                ),
-              ),
-              child: _loading
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: context.colors.onPrimary,
-                      ),
-                    )
-                  : Text(
-                      _esEdicion ? 'Guardar cambios' : 'Crear evento',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-            ),
-          ),
         ],
       ),
     );
@@ -419,8 +499,10 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionLabel('Se repite de manera:'),
-        const SizedBox(height: AppSpacing.sm),
+        const SectionLabel(
+          text: 'Se repite de manera',
+          padding: EdgeInsets.only(bottom: AppSpacing.sm),
+        ),
         _FrecuenciaCarrusel(
           frecuencia: _frecuencia,
           onChanged: _loading
@@ -444,8 +526,10 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
                     children: [
                       Row(
                         children: [
-                          const _SectionLabel('Cada'),
-                          const SizedBox(width: AppSpacing.md),
+                          const SectionLabel(
+                            text: 'Cada',
+                            padding: EdgeInsets.only(right: AppSpacing.md),
+                          ),
                           _IntervaloStepper(
                             valor: _intervalo,
                             onChanged: _loading
@@ -463,7 +547,7 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
                         ],
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _PickerField(
+                      PickerField(
                         label: 'Hasta (opcional)',
                         icon: Icons.event_available_outlined,
                         value: _fechaFin == null
@@ -499,81 +583,6 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
 }
 
 // ─── Subwidgets ───────────────────────────────────────────────────────────────
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: context.colors.textSecondary,
-      ),
-    );
-  }
-}
-
-class _PickerField extends StatelessWidget {
-  const _PickerField({
-    required this.label,
-    required this.icon,
-    required this.value,
-    required this.onTap,
-    this.trailing,
-  });
-
-  final String label;
-  final IconData icon;
-  final String value;
-  final VoidCallback? onTap;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SectionLabel(label),
-        const SizedBox(height: AppSpacing.sm),
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
-            decoration: BoxDecoration(
-              border: Border.all(color: context.colors.outline),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              color: context.colors.surface,
-            ),
-            child: Row(
-              children: [
-                Icon(icon, size: 20, color: context.colors.textSecondary),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.colors.textPrimary,
-                    ),
-                  ),
-                ),
-                ?trailing,
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class _IntervaloStepper extends StatelessWidget {
   const _IntervaloStepper({required this.valor, required this.onChanged});

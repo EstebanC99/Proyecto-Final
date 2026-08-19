@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>CareWell</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--pri:#00897B;--pri-d:#00695C;--pri-s:#E0F2F0;--ink:#212121;--ink-2:#757575;
+        --bg:#F4F7F6;--line:#E5EAE6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Roboto',system-ui,sans-serif;background:#DDE5E3;color:var(--ink);display:flex;justify-content:center;padding:24px 12px}
+  .phone{width:100%;max-width:390px;background:var(--bg);border-radius:32px;overflow:hidden;position:relative;
+         box-shadow:0 24px 60px rgba(0,60,55,.25);padding-bottom:26px}
+  .status{display:flex;justify-content:space-between;padding:13px 22px 6px;font-size:12.5px;font-weight:500;color:#4A4A4A;background:#FFF}
+  .appbar{display:flex;align-items:center;gap:10px;padding:4px 14px 14px;background:#FFF}
+  .back{font-size:20px;width:26px;text-align:center}
+  .ctx{display:flex;align-items:center;gap:11px;flex:1;min-width:0}
+  .av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:19px;
+      background:linear-gradient(150deg,#FFE2BC,#F3C285);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--pri)}
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#9E9E9E}
+  .nmrow{display:flex;align-items:center;gap:7px;margin-top:1px;min-width:0}
+  .nm{font-size:17px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rel{background:var(--pri-s);color:var(--pri-d);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;flex:none}
+  .cv{color:var(--pri);font-size:12px}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .an{animation:up .4s cubic-bezier(.2,.7,.3,1) both}
+  .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+
+  .title{font-size:26px;font-weight:700;letter-spacing:-.6px;padding:2px 20px 16px;background:#FFF}
+  .me{display:flex;align-items:center;gap:13px;margin:14px 16px 0;background:#FFF;border-radius:16px;padding:14px;
+      box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .mav{width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:17px;font-weight:700;
+       color:#00544A;background:linear-gradient(150deg,#BBDDD6,#7FB5AB);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--pri)}
+  .mn{font-size:16.5px;font-weight:700;letter-spacing:-.3px}
+  .mm{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+  .mgo{margin-left:auto;background:var(--pri-s);color:var(--pri-d);border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:700}
+
+  .lab{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9AA5A0;padding:22px 20px 9px}
+  .grp{background:#FFF;border-radius:16px;margin:0 16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .row{display:flex;align-items:center;gap:13px;padding:14px;border-bottom:1px solid #F1F4F3}
+  .row:last-child{border-bottom:0}
+  .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:16px;flex:none;background:var(--pri-s)}
+  .ic.b{background:#E4EEF9}.ic.p{background:#EFEAF8}.ic.r{background:#FBE6E4}
+  .rt{flex:1;min-width:0}
+  .rt .t{font-size:14.5px;font-weight:500}
+  .rt .s{font-size:11.5px;color:#9AA5A0;margin-top:2px}
+  .act{font-size:15px;color:#C4CDCA}
+  .sw{width:42px;height:24px;border-radius:999px;background:var(--pri);position:relative;flex:none}
+  .sw:after{content:'';position:absolute;top:2.5px;right:2.5px;width:19px;height:19px;border-radius:50%;background:#fff}
+  .sw.off{background:#D6DEDB}
+  .sw.off:after{right:auto;left:2.5px}
+  .danger .rt .t{color:#C0392B}
+  .out{margin:22px 16px 0;background:#FFF;border:1.5px solid var(--line);border-radius:14px;padding:15px;
+       text-align:center;font-size:15px;font-weight:700;color:#5C6C6A}
+  .ver{text-align:center;font-size:11.5px;color:#B3BDB9;padding:18px 0 6px}
+</style></head><body><div class="phone">
+  <div class="status"><span>15:23</span><span>&#9679;&#9679;&#9679;&nbsp;&#9679;&#9679;</span></div>
+  <div class="appbar" style="padding-bottom:0"><div class="back">&#8592;</div></div>
+  <div class="title">Configuración</div>
+
+  <div class="me an">
+    <div class="mav">EC</div>
+    <div style="min-width:0">
+      <div class="mn">Esteban Carignani</div>
+      <div class="mm">estebancarignani99@gmail.com</div>
+    </div>
+    <div class="mgo">Ver perfil</div>
+  </div>
+
+  <div class="lab an d1">Seguridad y privacidad</div>
+  <div class="grp an d1">
+    <div class="row"><div class="ic">&#128272;</div><div class="rt"><div class="t">Cambiar contraseña</div><div class="s">Última vez: hace 3 meses</div></div><div class="act">&#8250;</div></div>
+    <div class="row"><div class="ic">&#128274;</div><div class="rt"><div class="t">Privacidad de los datos</div><div class="s">Quién puede ver la información</div></div><div class="act">&#8250;</div></div>
+  </div>
+
+  <div class="lab an d2">Legal</div>
+  <div class="grp an d2">
+    <div class="row"><div class="ic">&#128196;</div><div class="rt"><div class="t">Términos y condiciones</div></div><div class="act">&#8250;</div></div>
+    <div class="row"><div class="ic">&#8505;</div><div class="rt"><div class="t">Acerca de CareWell</div></div><div class="act">&#8250;</div></div>
+  </div>
+
+  <div class="lab an d4">Zona sensible</div>
+  <div class="grp an d4">
+    <div class="row danger"><div class="ic r">&#128465;</div><div class="rt"><div class="t">Eliminar cuenta</div><div class="s">Se borran todos tus datos. No se puede deshacer.</div></div></div>
+  </div>
+
+  <div class="out an d4">Cerrar sesión</div>
+  <div class="ver an d4">CareWell v1.0.0 · BubiSoft</div>
+</div></body></html>

@@ -141,6 +141,26 @@ void main() {
       expect(find.text('Visualizando a'), findsOneWidget);
     });
 
+    testWidgets(
+      "con seleccionable: false no muestra chevron ni abre el bottom sheet",
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            const ContextSelector(seleccionable: false),
+            overrides: _variosOpciones(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.expand_more), findsNothing);
+
+        await tester.tap(find.byType(ContextSelector));
+        await tester.pumpAndSettle();
+
+        expect(find.text("Visualizando a"), findsNothing);
+      },
+    );
+
     testWidgets('el bottom sheet lista todas las opciones disponibles', (
       tester,
     ) async {

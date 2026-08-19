@@ -1,7 +1,7 @@
 name: care_well_app
 description: "CareWell — aplicación móvil para cuidadores y responsables de personas dependientes."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.2.0
 
 environment:
   sdk: ^3.11.1

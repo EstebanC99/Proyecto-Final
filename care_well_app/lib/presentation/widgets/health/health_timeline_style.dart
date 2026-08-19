@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_palette.dart';
+import 'timeline_categorias.dart';
 
 /// Color de acento para una categoría de la línea de tiempo de salud.
 ///
@@ -8,11 +9,11 @@ import '../../../config/theme/app_palette.dart';
 /// `"Hábito"`, `"Evento"` y `"Ánimo"`.
 Color categoriaEventoColor(BuildContext context, String categoria) {
   switch (categoria) {
-    case 'Hábito':
+    case TimelineCategorias.habito:
       return context.colors.habitsAccent;
-    case 'Evento':
+    case TimelineCategorias.evento:
       return context.colors.healthAccent;
-    case 'Ánimo':
+    case TimelineCategorias.animo:
       return context.colors.moodAccent;
     default:
       return context.colors.textSecondary;
@@ -22,12 +23,47 @@ Color categoriaEventoColor(BuildContext context, String categoria) {
 /// Etiqueta legible para una categoría de la línea de tiempo de salud.
 String categoriaEventoLabel(String categoria) {
   switch (categoria) {
-    case 'Hábito':
+    case TimelineCategorias.habito:
       return 'Hábito';
-    case 'Evento':
+    case TimelineCategorias.evento:
       return 'Evento de salud';
-    case 'Ánimo':
+    case TimelineCategorias.animo:
       return 'Estado de ánimo';
+    default:
+      return categoria;
+  }
+}
+
+/// Color de fondo suave para una categoría de la línea de tiempo de salud.
+///
+/// Espejo de [categoriaEventoColor]: mismo criterio, tono contenedor. Los tres
+/// tokens ya existen en claro y en oscuro.
+Color categoriaEventoContainer(BuildContext context, String categoria) {
+  switch (categoria) {
+    case TimelineCategorias.habito:
+      return context.colors.habitsContainer;
+    case TimelineCategorias.evento:
+      return context.colors.healthContainer;
+    case TimelineCategorias.animo:
+      return context.colors.moodContainer;
+    default:
+      return context.colors.surfaceVariant;
+  }
+}
+
+/// Etiqueta breve para una categoría, para lugares donde el ancho manda.
+///
+/// Convive con [categoriaEventoLabel] a propósito: al agregar una categoría
+/// nueva las dos funciones quedan a la vista y se ve que hay dos rótulos que
+/// completar, no uno.
+String categoriaEventoLabelCorto(String categoria) {
+  switch (categoria) {
+    case TimelineCategorias.habito:
+      return 'Hábitos';
+    case TimelineCategorias.evento:
+      return 'Eventos';
+    case TimelineCategorias.animo:
+      return 'Ánimo';
     default:
       return categoria;
   }

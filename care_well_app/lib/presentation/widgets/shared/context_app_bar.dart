@@ -41,6 +41,7 @@ class ContextAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.bottom,
+    this.seleccionable = true,
   });
 
   /// Rótulo de la sección, en versales ("Calendario", "Salud", ...).
@@ -61,6 +62,12 @@ class ContextAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Widget al pie de la barra (por ejemplo, un borde de 1dp).
   final PreferredSizeWidget? bottom;
+
+  /// Habilita el cambio de persona de contexto desde la barra. En `false` el
+  /// selector se ve igual pero no reacciona al toque; lo usan los formularios,
+  /// donde cambiar de persona a mitad de la carga confundiría el destino de
+  /// los datos ya escritos.
+  final bool seleccionable;
 
   /// Alto del toolbar para una escala tipográfica dada.
   ///
@@ -113,6 +120,7 @@ class ContextAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: ContextSelector(
               variant: ContextSelectorVariant.appBar,
               eyebrow: eyebrow,
+              seleccionable: seleccionable,
             ),
           ),
         ),

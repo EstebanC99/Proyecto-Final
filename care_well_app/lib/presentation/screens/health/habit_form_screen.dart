@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,6 +30,17 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   bool _loading = false;
   bool _precargado = false;
 
+  /// La precarga ya terminó, con o sin éxito. Habilita el fallback al primer
+  /// tipo del catálogo: sin esto, un hábito que no se encuentra dejaría el
+  /// formulario sin tipo seleccionado y con el botón de guardar bloqueado.
+  bool _precargaIntentada = false;
+
+  /// Valores de referencia para detectar cambios sin guardar. En alta quedan
+  /// en el estado inicial del formulario; en edición, en lo que trajo el
+  /// hábito. Mientras la precarga no llegó no hay nada que comparar.
+  String _descripcionInicial = '';
+  int? _tipoInicial;
+
   bool get _esEdicion => widget.habitId != null;
 
   @override
@@ -48,11 +60,15 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         setState(() {
           _tipoId = habito.tipo.id;
           _descripcionCtrl.text = habito.descripcion;
+          _tipoInicial = habito.tipo.id;
+          _descripcionInicial = habito.descripcion;
           _precargado = true;
         });
       }
     } catch (_) {
       // Si falla la carga, el usuario puede completar el formulario manualmente.
+    } finally {
+      if (mounted) setState(() => _precargaIntentada = true);
     }
   }
 
@@ -76,6 +92,12 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         return 'Describí el hábito registrado...';
     }
   }
+
+  /// Hay algo que perder si la descripción o el tipo difieren del punto de
+  /// partida: el formulario vacío en alta, o el hábito precargado en edición.
+  bool get _hayCambios =>
+      _descripcionCtrl.text.trim() != _descripcionInicial ||
+      _tipoId != _tipoInicial;
 
   Future<void> _guardar() async {
     final desc = _descripcionCtrl.text.trim();
@@ -120,158 +142,148 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tieneDescripcion = _descripcionCtrl.text.trim().isNotEmpty;
     final tiposAsync = ref.watch(tiposHabitoVidaProvider);
 
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: AppBar(
-        title: Text(_esEdicion ? 'Editar hábito' : 'Nuevo hábito'),
-        backgroundColor: context.colors.surface,
-        foregroundColor: context.colors.textPrimary,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Categoría
-            const _SectionLabel('Categoría'),
-            const SizedBox(height: AppSpacing.sm),
-            tiposAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                child: SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                ),
-              ),
-              error: (err, _) => InlineErrorBanner(
-                message: 'No se pudieron cargar los tipos de hábito. $err',
-              ),
-              data: (tipos) {
-                if (tipos.isEmpty) {
-                  return Text(
-                    'No hay tipos de hábito disponibles.',
-                    style: TextStyle(color: context.colors.textSecondary),
-                  );
-                }
-                // Selección por defecto: primer tipo del catálogo.
-                _tipoId ??= tipos.first.id;
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: tipos.map((t) {
-                      final selected = t.id == _tipoId;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: AppSpacing.sm),
-                        child: ChoiceChip(
-                          label: Text(t.descripcion),
-                          selected: selected,
-                          onSelected: _loading
-                              ? null
-                              : (_) => setState(() {
-                                  _tipoId = t.id;
-                                  _descripcionCtrl.clear();
-                                }),
-                          selectedColor: context.colors.habitsAccent,
-                          labelStyle: TextStyle(
-                            color: selected
-                                ? context.colors.onPrimary
-                                : context.colors.textPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: AppSpacing.lg),
+    // `animate: false` de animate_do no desactiva la animación: deja el
+    // controller en 0, o sea el hijo invisible. Con las animaciones apagadas
+    // hay que saltear el wrapper, no configurarlo.
+    final sinAnimacion = MediaQuery.disableAnimationsOf(context);
+    Widget animado(Widget child, int delayMs) => sinAnimacion
+        ? child
+        : FadeInUp(
+            duration: const Duration(milliseconds: 400),
+            delay: Duration(milliseconds: delayMs),
+            from: 12,
+            child: child,
+          );
 
-            // Descripción
-            const _SectionLabel('Descripción *'),
-            const SizedBox(height: AppSpacing.sm),
-            TextFormField(
-              controller: _descripcionCtrl,
-              enabled: !_loading,
-              minLines: 3,
-              maxLines: 6,
-              textAlignVertical: TextAlignVertical.top,
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                hintText: _placeholder,
-                prefixIcon: const Padding(
-                  padding: EdgeInsets.only(top: 14),
-                  child: Icon(Icons.description_outlined),
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: ContextAppBar(
+          eyebrow: _esEdicion ? 'Editar hábito' : 'Nuevo hábito',
+          // El formulario muestra a quién se le registra, pero no deja cambiar
+          // de persona con los datos a medio cargar.
+          seleccionable: false,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              animado(_categoria(tiposAsync), 0),
+              animado(
+                FormTextField(
+                  controller: _descripcionCtrl,
+                  label: 'Descripción',
+                  hintText: _placeholder,
+                  accent: context.colors.habitsAccent,
+                  enabled: !_loading,
                 ),
-                prefixIconConstraints: const BoxConstraints(minWidth: 48),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                50,
               ),
-            ),
-            const SizedBox(height: AppSpacing.xxxl),
-
-            // Botón registrar
-            SizedBox(
-              width: double.infinity,
-              height: AppSpacing.buttonHeight,
-              child: FilledButton(
-                onPressed: (_loading || !tieneDescripcion || _tipoId == null)
+            ],
+          ),
+        ),
+        // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
+        // grilla de tipos entera.
+        bottomNavigationBar: animado(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _descripcionCtrl,
+            builder: (context, valor, _) {
+              final tieneDescripcion = valor.text.trim().isNotEmpty;
+              return FormBottomBar(
+                label: _esEdicion ? 'Guardar cambios' : 'Registrar',
+                accent: context.colors.habitsAccent,
+                loading: _loading,
+                onPressed: (tieneDescripcion && _tipoId != null)
+                    ? _guardar
+                    : null,
+                hint: tieneDescripcion
                     ? null
-                    : _guardar,
-                style: FilledButton.styleFrom(
-                  backgroundColor: context.colors.habitsAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                  ),
-                ),
-                child: _loading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: context.colors.onPrimary,
-                        ),
-                      )
-                    : Text(
-                        _esEdicion ? 'Guardar cambios' : 'Registrar',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            ),
-          ],
+                    : 'Completá la descripción para continuar',
+              );
+            },
+          ),
+          100,
         ),
       ),
     );
   }
-}
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-  final String text;
+  /// Bloque de selección de categoría del hábito.
+  Widget _categoria(AsyncValue<List<TipoHabitoVida>> tiposAsync) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Sin marca de obligatorio: la categoría siempre viene preseleccionada.
+        const SectionLabel(
+          text: 'Categoría',
+          padding: EdgeInsets.only(bottom: AppSpacing.sm),
+        ),
+        tiposAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+          ),
+          error: (err, _) => InlineErrorBanner(
+            message: 'No se pudieron cargar los tipos de hábito. $err',
+          ),
+          data: (tipos) {
+            if (tipos.isEmpty) {
+              return Text(
+                'No hay tipos de hábito disponibles.',
+                style: TextStyle(color: context.colors.textSecondary),
+              );
+            }
+            // El orden lo define el catálogo, no el backend: así "Otro" (el id
+            // más alto) queda siempre al final.
+            final ordenados = [...tipos]..sort((a, b) => a.id.compareTo(b.id));
 
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: context.colors.textSecondary,
-      ),
+            // Selección por defecto: el primer tile de la grilla, para que lo
+            // preseleccionado y lo que se ve arriba a la izquierda coincidan.
+            //
+            // En edición se espera a que termine la precarga: si no, el primer
+            // frame pinta el tile 1 elegido y al resolverse el hábito la
+            // selección salta a otro tile a la vista del usuario.
+            if (_tipoId == null && (!_esEdicion || _precargaIntentada)) {
+              _tipoId = ordenados.first.id;
+              // El tipo por defecto es parte del estado inicial: elegirlo no
+              // cuenta como cambio pendiente.
+              _tipoInicial ??= _tipoId;
+            }
+
+            return TypeTileGrid(
+              options: [
+                for (final tipo in ordenados)
+                  TypeTileOption(
+                    id: tipo.id,
+                    label: tipo.descripcion,
+                    icon: TipoHabitoTheme.iconFor(tipo.id),
+                    accent: TipoHabitoTheme.accentFor(context, tipo.id),
+                    container: TipoHabitoTheme.containerFor(context, tipo.id),
+                  ),
+              ],
+              selectedId: _tipoId,
+              // Cambiar de categoría NO toca la descripción: el hint sólo se
+              // ve con el campo vacío, así que no hay nada que "destrabar"
+              // borrando lo que el usuario ya escribió.
+              onChanged: (id) => setState(() => _tipoId = id),
+              enabled: !_loading,
+            );
+          },
+        ),
+      ],
     );
   }
 }

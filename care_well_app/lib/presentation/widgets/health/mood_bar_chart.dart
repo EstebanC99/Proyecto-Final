@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_palette.dart';
 import '../../../domain/entities/entities.dart';
-import 'mood_dial_selector.dart';
+import 'mood_scale.dart';
 
 /// Gráfico de barras de los últimos 7 días de estados de ánimo.
 ///

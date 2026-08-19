@@ -53,47 +53,53 @@ class SummaryDayBand extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
+    final contenido = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                formatearFecha(fecha),
+                style: TextStyle(fontSize: 13, color: colors.textSecondary),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (generadoEn != null) ...[
+              const SizedBox(width: AppSpacing.sm),
+              // `Flexible` reparte el ancho en mitades con el `Expanded` de
+              // la fecha, así que el chip necesita el `Align` para terminar
+              // contra el borde derecho —el mismo de las cards— y no a mitad
+              // de camino. El `Flexible` se mantiene como red: con la
+              // tipografía del sistema muy grande el chip se comprime en
+              // lugar de desbordar la fila.
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: SummaryGenerationChip(generadoEn: generadoEn!),
+                ),
+              ),
+            ],
+          ],
+        ),
+        if (estadoAnimo != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _MoodChip(estadoAnimo: estadoAnimo!),
+        ],
+      ],
+    );
+
+    // `animate: false` de animate_do no salta la animación: deja el controller
+    // en 0, o sea el hijo con opacidad 0 y desplazado. Con las animaciones del
+    // sistema apagadas hay que saltear el wrapper, no configurarlo.
+    if (MediaQuery.disableAnimationsOf(context)) return contenido;
+
     return FadeInUp(
       duration: const Duration(milliseconds: 400),
       delay: delay,
       from: 12,
-      animate: !MediaQuery.disableAnimationsOf(context),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  formatearFecha(fecha),
-                  style: TextStyle(fontSize: 13, color: colors.textSecondary),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (generadoEn != null) ...[
-                const SizedBox(width: AppSpacing.sm),
-                // `Flexible` reparte el ancho en mitades con el `Expanded` de
-                // la fecha, así que el chip necesita el `Align` para terminar
-                // contra el borde derecho —el mismo de las cards— y no a mitad
-                // de camino. El `Flexible` se mantiene como red: con la
-                // tipografía del sistema muy grande el chip se comprime en
-                // lugar de desbordar la fila.
-                Flexible(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: SummaryGenerationChip(generadoEn: generadoEn!),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          if (estadoAnimo != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            _MoodChip(estadoAnimo: estadoAnimo!),
-          ],
-        ],
-      ),
+      child: contenido,
     );
   }
 }

@@ -8,127 +8,93 @@ import 'health_timeline_style.dart';
 
 /// Fila de la línea de tiempo para un [EventoBase].
 ///
-/// Muestra un dot circular del color de la categoría del evento y una línea
-/// conectora vertical (excepto para el último elemento). A la derecha, una
-/// tarjeta de solo lectura con categoría, fecha y descripción truncada.
+/// Va dentro de la tarjeta del día, así que no dibuja fondo ni sombra propios:
+/// aporta una marca de categoría a la izquierda, la descripción y la categoría
+/// en el medio, y la hora a la derecha.
+///
+/// La marca es un cuadrado del tono contenedor de la categoría con un punto del
+/// acento adentro, sin ícono: `EventoBase` no trae el tipo concreto del
+/// registro, sólo su categoría, y no se le va a pedir al backend un campo nuevo
+/// por una decisión visual.
 class HealthTimelineTile extends StatelessWidget {
-  const HealthTimelineTile({
-    super.key,
-    required this.evento,
-    required this.isLast,
-  });
+  const HealthTimelineTile({super.key, required this.evento});
 
   final EventoBase evento;
 
-  /// Si es el último elemento, no se renderiza la línea conectora.
-  final bool isLast;
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final color = categoriaEventoColor(context, evento.categoriaEvento);
+    final fondo = categoriaEventoContainer(context, evento.categoriaEvento);
     final label = categoriaEventoLabel(evento.categoriaEvento);
-    final fechaStr = DateFormat(
-      'd MMM · HH:mm',
-      'es',
-    ).format(evento.fechaHora.toLocal());
+    final local = evento.fechaHora.toLocal();
+    final hora = DateFormat('HH:mm').format(local);
 
     return Semantics(
-      label: '$label: ${evento.descripcion}, $fechaStr',
-      child: IntrinsicHeight(
+      label: '$label: ${evento.descripcion}, $hora',
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Columna izquierda: dot + línea
-            SizedBox(
-              width: 36,
+            // Cuadrado fijo: contiene un punto, no texto, así que no necesita
+            // crecer con la escala tipográfica.
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: fondo,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              alignment: Alignment.center,
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Dot
-                  Container(
-                    width: 22,
-                    height: 22,
-                    margin: const EdgeInsets.only(top: 12),
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
+                  Text(
+                    evento.descripcion,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                      color: colors.textPrimary,
                     ),
                   ),
-                  // Línea conectora (salvo último)
-                  if (!isLast)
-                    Expanded(
-                      child: Center(
-                        child: Container(
-                          width: 2,
-                          color: context.colors.surfaceVariant,
-                        ),
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: colors.textSecondary,
                     ),
+                  ),
                 ],
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            // Columna derecha: tarjeta (solo lectura, sin acción)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.md,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    boxShadow: AppSpacing.elev1,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Chip de categoría
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusFull,
-                          ),
-                        ),
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: color,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Fecha
-                      Text(
-                        fechaStr,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: context.colors.textDisabled,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      // Título / descripción truncada
-                      Text(
-                        evento.descripcion,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: context.colors.textPrimary,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
+            Text(
+              hora,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: colors.textSecondary,
+                // Ancho de dígito uniforme: las horas de la columna quedan
+                // alineadas entre filas.
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ],

@@ -21,6 +21,12 @@ export 'shared/context_app_bar.dart';
 export 'shared/deleted_assignment_chip.dart';
 export 'shared/full_width_action_tile.dart';
 export 'shared/section_label.dart';
+export 'shared/picker_field.dart';
+export 'shared/type_tile_grid.dart';
+export 'shared/form_bottom_bar.dart';
+export 'shared/unsaved_changes_guard.dart';
+export 'shared/form_text_field.dart';
+export 'shared/date_labels.dart';
 
 export 'home/home_header.dart';
 export 'home/nav_tile.dart';
