@@ -30,13 +30,12 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         children: [
-          const SizedBox(height: AppSpacing.sm),
-
           // Sección Cuenta
-          SettingsSection(
-            title: 'Cuenta',
-            items: [
+          const SectionLabel(text: 'Cuenta'),
+          CardGroup(
+            children: [
               SettingsItem(
                 icon: Icons.person_outline,
                 label: 'Mi Perfil',
@@ -44,12 +43,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
 
           // Sección Seguridad y privacidad
-          SettingsSection(
-            title: 'Seguridad y privacidad',
-            items: [
+          const SectionLabel(text: 'Seguridad y privacidad'),
+          CardGroup(
+            children: [
               SettingsItem(
                 icon: Icons.security_outlined,
                 label: 'Cambiar contraseña',
@@ -64,12 +62,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
 
           // Sección Legal
-          SettingsSection(
-            title: 'Legal',
-            items: [
+          const SectionLabel(text: 'Legal'),
+          CardGroup(
+            children: [
               SettingsItem(
                 icon: Icons.description_outlined,
                 label: 'Términos y condiciones',
@@ -77,12 +74,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
 
           // Sección Sesión
-          SettingsSection(
-            title: 'Sesión',
-            items: [
+          const SectionLabel(text: 'Sesión'),
+          CardGroup(
+            children: [
               SettingsItem(
                 icon: Icons.logout,
                 label: 'Cerrar sesión',

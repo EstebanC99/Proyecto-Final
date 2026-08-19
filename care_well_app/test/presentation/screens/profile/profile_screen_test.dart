@@ -106,6 +106,9 @@ Widget _wrap(Widget child, {bool loggedIn = true}) {
       authRepositoryProvider.overrideWithValue(
         _FakeAuthRepository(_testUsuario),
       ),
+      rolEnSistemaProvider.overrideWith(
+        (ref) async => RolEnSistema.responsable,
+      ),
       personaImagenProvider.overrideWith((ref, id) async => null),
       if (loggedIn)
         authStateProvider.overrideWith(
@@ -133,6 +136,9 @@ void main() {
             authRepositoryProvider.overrideWithValue(
               _FakeAuthRepository(_testUsuario),
             ),
+            rolEnSistemaProvider.overrideWith(
+              (ref) async => RolEnSistema.responsable,
+            ),
             personaImagenProvider.overrideWith((ref, id) async => null),
             authStateProvider.overrideWith((ref) {
               final notifier = AuthNotifier(ref.watch(authRepositoryProvider));
@@ -159,6 +165,9 @@ void main() {
             authRepositoryProvider.overrideWithValue(
               _FakeAuthRepository(_testUsuario),
             ),
+            rolEnSistemaProvider.overrideWith(
+              (ref) async => RolEnSistema.responsable,
+            ),
             personaImagenProvider.overrideWith((ref, id) async => null),
             authStateProvider.overrideWith((ref) {
               final notifier = AuthNotifier(ref.watch(authRepositoryProvider));
@@ -184,6 +193,9 @@ void main() {
             authRepositoryProvider.overrideWithValue(
               _FakeAuthRepository(_testUsuario),
             ),
+            rolEnSistemaProvider.overrideWith(
+              (ref) async => RolEnSistema.responsable,
+            ),
           ],
           child: const MaterialApp(home: ProfileScreen()),
         ),
@@ -203,6 +215,9 @@ void main() {
           overrides: [
             authRepositoryProvider.overrideWithValue(
               _FakeAuthRepository(_testUsuario),
+            ),
+            rolEnSistemaProvider.overrideWith(
+              (ref) async => RolEnSistema.responsable,
             ),
             personaImagenProvider.overrideWith((ref, id) async => null),
             personaRepositoryProvider.overrideWithValue(

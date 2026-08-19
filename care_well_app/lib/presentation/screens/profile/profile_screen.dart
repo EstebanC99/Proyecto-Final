@@ -18,7 +18,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final rol = ref.watch(rolEnSistemaProvider);
+    final rol = ref.watch(rolEnSistemaProvider).value;
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -78,32 +78,44 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      RoleBadge(rol: rol),
+                      if (rol != null) RoleBadge(rol: rol.etiqueta),
                     ],
                   ),
                 ),
                 Divider(height: 1, thickness: 1, color: context.colors.outline),
 
                 // Sección de datos
-                ProfileDataRow(
-                  icon: Icons.email_outlined,
-                  label: 'Email',
-                  value: persona.email ?? '',
-                ),
-                ProfileDataRow(
-                  icon: Icons.phone_outlined,
-                  label: 'Teléfono',
-                  value: persona.telefono ?? '',
-                ),
-                ProfileDataRow(
-                  icon: Icons.badge_outlined,
-                  label: 'DNI',
-                  value: persona.documento,
-                ),
-                ProfileDataRow(
-                  icon: Icons.person_outlined,
-                  label: 'Rol en el sistema',
-                  value: rol,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    0,
+                  ),
+                  child: CardGroup(
+                    children: [
+                      ProfileDataRow(
+                        icon: Icons.email_outlined,
+                        label: 'Email',
+                        value: persona.email ?? '',
+                      ),
+                      ProfileDataRow(
+                        icon: Icons.phone_outlined,
+                        label: 'Teléfono',
+                        value: persona.telefono ?? '',
+                      ),
+                      ProfileDataRow(
+                        icon: Icons.badge_outlined,
+                        label: 'DNI',
+                        value: persona.documento,
+                      ),
+                      ProfileDataRow(
+                        icon: Icons.person_outlined,
+                        label: 'Rol en el sistema',
+                        value: rol?.etiqueta ?? '',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -159,58 +171,69 @@ class _ProfileSkeleton extends StatelessWidget {
             ),
           ),
           Divider(height: 1, thickness: 1, color: context.colors.outline),
-          for (int i = 0; i < 4; i++) ...[
-            Container(
-              constraints: const BoxConstraints(minHeight: 64),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.md,
-              ),
-              color: context.colors.surface,
-              child: Row(
-                children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              0,
+            ),
+            child: CardGroup(
+              children: [
+                for (int i = 0; i < 4; i++)
                   Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: context.colors.outline,
-                      borderRadius: BorderRadius.circular(4),
+                    constraints: const BoxConstraints(minHeight: 64),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.md,
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
                         Container(
-                          width: 60,
-                          height: 12,
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
                             color: context.colors.outline,
                             borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSm,
+                              AppSpacing.radiusMd,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          width: 140,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: context.colors.outline,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusSm,
-                            ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: context.colors.outline,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSm,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                width: 140,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: context.colors.outline,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSm,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
-            Divider(height: 1, thickness: 1, color: context.colors.outline),
-          ],
+          ),
         ],
       ),
     );

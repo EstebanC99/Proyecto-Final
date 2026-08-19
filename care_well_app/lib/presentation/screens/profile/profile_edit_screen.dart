@@ -104,7 +104,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final rol = ref.watch(rolEnSistemaProvider);
+    final rol = ref.watch(rolEnSistemaProvider).value;
 
     return PopScope(
       canPop: !_isLoading,
@@ -159,7 +159,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
-                        RoleBadge(rol: rol),
+                        if (rol != null) RoleBadge(rol: rol.etiqueta),
                       ],
                     ),
                   ),
@@ -169,70 +169,83 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     color: context.colors.outline,
                   ),
 
-                  // Nombre — editable
-                  ProfileDataRow(
-                    icon: Icons.person_outline,
-                    label: 'Nombre',
-                    value: persona.nombre,
-                    editable: true,
-                    keyboardType: TextInputType.name,
-                    validator: validateNombre,
-                    onSave: (v) => _guardarNombre(persona, v),
-                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      0,
+                    ),
+                    child: CardGroup(
+                      children: [
+                        // Nombre — editable
+                        ProfileDataRow(
+                          icon: Icons.person_outline,
+                          label: 'Nombre',
+                          value: persona.nombre,
+                          editable: true,
+                          keyboardType: TextInputType.name,
+                          validator: validateNombre,
+                          onSave: (v) => _guardarNombre(persona, v),
+                        ),
 
-                  // Apellido — editable
-                  ProfileDataRow(
-                    icon: Icons.person_outline,
-                    label: 'Apellido',
-                    value: persona.apellido,
-                    editable: true,
-                    keyboardType: TextInputType.name,
-                    validator: validateApellido,
-                    onSave: (v) => _guardarApellido(persona, v),
-                  ),
+                        // Apellido — editable
+                        ProfileDataRow(
+                          icon: Icons.person_outline,
+                          label: 'Apellido',
+                          value: persona.apellido,
+                          editable: true,
+                          keyboardType: TextInputType.name,
+                          validator: validateApellido,
+                          onSave: (v) => _guardarApellido(persona, v),
+                        ),
 
-                  // Email — solo lectura. Es concern de credenciales/Usuario y
-                  // aún no tiene endpoint de modificación en el backend.
-                  ProfileDataRow(
-                    icon: Icons.email_outlined,
-                    label: 'Email',
-                    value: persona.email ?? '',
-                  ),
+                        // Email — solo lectura. Es concern de
+                        // credenciales/Usuario y aún no tiene endpoint de
+                        // modificación en el backend.
+                        ProfileDataRow(
+                          icon: Icons.email_outlined,
+                          label: 'Email',
+                          value: persona.email ?? '',
+                        ),
 
-                  // Fecha de nacimiento — editable (selector de fecha)
-                  ProfileDateRow(
-                    icon: Icons.cake_outlined,
-                    label: 'Fecha de nacimiento',
-                    value: persona.fechaNacimiento,
-                    onSave: (v) => _guardarFechaNacimiento(persona, v),
-                  ),
+                        // Fecha de nacimiento — editable (selector de fecha)
+                        ProfileDateRow(
+                          icon: Icons.cake_outlined,
+                          label: 'Fecha de nacimiento',
+                          value: persona.fechaNacimiento,
+                          onSave: (v) => _guardarFechaNacimiento(persona, v),
+                        ),
 
-                  // Teléfono — editable
-                  ProfileDataRow(
-                    icon: Icons.phone_outlined,
-                    label: 'Teléfono',
-                    value: persona.telefono ?? '',
-                    editable: true,
-                    keyboardType: TextInputType.phone,
-                    validator: validateTelefono,
-                    onSave: (v) => _guardarTelefono(persona, v),
-                  ),
+                        // Teléfono — editable
+                        ProfileDataRow(
+                          icon: Icons.phone_outlined,
+                          label: 'Teléfono',
+                          value: persona.telefono ?? '',
+                          editable: true,
+                          keyboardType: TextInputType.phone,
+                          validator: validateTelefono,
+                          onSave: (v) => _guardarTelefono(persona, v),
+                        ),
 
-                  // DNI — editable
-                  ProfileDataRow(
-                    icon: Icons.badge_outlined,
-                    label: 'DNI',
-                    value: persona.documento,
-                    editable: true,
-                    keyboardType: TextInputType.number,
-                    onSave: (v) => _guardarDocumento(persona, v),
-                  ),
+                        // DNI — editable
+                        ProfileDataRow(
+                          icon: Icons.badge_outlined,
+                          label: 'DNI',
+                          value: persona.documento,
+                          editable: true,
+                          keyboardType: TextInputType.number,
+                          onSave: (v) => _guardarDocumento(persona, v),
+                        ),
 
-                  // Rol — solo lectura (sin lápiz)
-                  ProfileDataRow(
-                    icon: Icons.person_outlined,
-                    label: 'Rol en el sistema',
-                    value: rol,
+                        // Rol — solo lectura (sin lápiz)
+                        ProfileDataRow(
+                          icon: Icons.person_outlined,
+                          label: 'Rol en el sistema',
+                          value: rol?.etiqueta ?? '',
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

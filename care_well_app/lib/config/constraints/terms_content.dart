@@ -1,7 +1,8 @@
 /// Versión y texto de los Términos y Condiciones de CareWell.
 ///
 /// Fuente única compartida entre [TermsBottomSheet] (flujo de registro US-01)
-/// y [TermsScreen] (configuración US-08). Actualizar aquí impacta ambas pantallas.
+/// y [LegalTextScreen] (configuración US-08). Actualizar aquí impacta ambas
+/// pantallas.
 const String kTermsVersion = '1.0 — Junio 2025';
 
 const String kTermsContent = '''

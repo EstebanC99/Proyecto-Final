@@ -27,6 +27,8 @@ export 'shared/form_bottom_bar.dart';
 export 'shared/unsaved_changes_guard.dart';
 export 'shared/form_text_field.dart';
 export 'shared/date_labels.dart';
+export 'shared/card_group.dart';
+export 'shared/icon_square.dart';
 
 export 'home/home_header.dart';
 export 'home/nav_tile.dart';

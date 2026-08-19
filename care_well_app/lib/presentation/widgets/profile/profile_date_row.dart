@@ -3,12 +3,16 @@ import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../shared/icon_square.dart';
 
 /// Fila de dato de perfil para una fecha, con edición mediante [showDatePicker].
 ///
 /// Análoga a `ProfileDataRow` pero especializada para fechas: en lugar de un
 /// campo de texto, al tocar el ícono lápiz abre el selector de fecha nativo.
 /// Muestra un spinner mientras persiste el cambio.
+///
+/// Está pensada para vivir dentro de un `CardGroup`: no pinta fondo propio ni
+/// dibuja separadores, eso lo aporta la tarjeta que la contiene.
 class ProfileDateRow extends StatefulWidget {
   const ProfileDateRow({
     super.key,
@@ -78,83 +82,73 @@ class _ProfileDateRowState extends State<ProfileDateRow> {
   Widget build(BuildContext context) {
     final fechaStr = DateFormat('dd/MM/yyyy').format(widget.value);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          constraints: const BoxConstraints(minHeight: 64),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.md,
-          ),
-          color: context.colors.surface,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(widget.icon, size: 20, color: context.colors.textSecondary),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: context.colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      fechaStr,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: context.colors.textPrimary,
-                      ),
-                    ),
-                    if (_errorText != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        _errorText!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.colors.error,
-                        ),
-                      ),
-                    ],
-                  ],
+    return Container(
+      constraints: const BoxConstraints(minHeight: 64),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconSquare(icon: widget.icon),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: context.colors.textSecondary,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: AppSpacing.minTapTarget,
-                height: AppSpacing.minTapTarget,
-                child: _guardando
-                    ? Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: context.colors.primary,
-                          ),
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: _seleccionarFecha,
-                        icon: const Icon(Icons.edit, size: 20),
-                        color: context.colors.primary,
-                        tooltip: 'Editar ${widget.label}',
-                        padding: EdgeInsets.zero,
-                      ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  fechaStr,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: context.colors.textPrimary,
+                  ),
+                ),
+                if (_errorText != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    _errorText!,
+                    style: TextStyle(fontSize: 12, color: context.colors.error),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
-        Divider(height: 1, thickness: 1, color: context.colors.outline),
-      ],
+          SizedBox(
+            width: AppSpacing.minTapTarget,
+            height: AppSpacing.minTapTarget,
+            child: _guardando
+                ? Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: context.colors.primary,
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    onPressed: _seleccionarFecha,
+                    icon: const Icon(Icons.edit, size: 20),
+                    color: context.colors.primary,
+                    tooltip: 'Editar ${widget.label}',
+                    padding: EdgeInsets.zero,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

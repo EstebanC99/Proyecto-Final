@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/constraints/terms_content.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 
-/// US-08 · Pantalla de lectura de Términos y Condiciones.
+/// Pantalla genérica de lectura de un texto legal.
 ///
-/// El contenido proviene de [kTermsContent], la misma fuente que usa
-/// [TermsBottomSheet] en el flujo de registro. Solo lectura, sin acciones.
-class TermsScreen extends StatelessWidget {
-  const TermsScreen({super.key});
+/// La usan tanto los Términos y Condiciones (US-08) como la Política de
+/// privacidad: el contenido llega por parámetro, así que la pantalla no conoce
+/// ninguna de las dos fuentes ni depende de providers.
+class LegalTextScreen extends StatelessWidget {
+  const LegalTextScreen({
+    super.key,
+    required this.titulo,
+    required this.contenido,
+    this.version,
+    this.hintScroll,
+  });
+
+  /// Título de la pantalla (ej: "Términos y condiciones").
+  final String titulo;
+
+  /// Cuerpo del documento legal.
+  final String contenido;
+
+  /// Versión del documento. Si es nula no se muestra el encabezado de versión.
+  final String? version;
+
+  /// Ayuda al pie que indica que el contenido continúa. Opcional.
+  final String? hintScroll;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +37,7 @@ class TermsScreen extends StatelessWidget {
       backgroundColor: context.colors.background,
       appBar: AppBar(
         backgroundColor: context.colors.surface,
-        title: const Text('Términos y condiciones'),
+        title: Text(titulo),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: context.colors.outline),
@@ -37,28 +55,35 @@ class TermsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Versión $kTermsVersion',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: context.colors.textSecondary,
+                if (version != null) ...[
+                  Text(
+                    'Versión $version',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
                 Text(
-                  kTermsContent,
+                  contenido,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: context.colors.textPrimary,
                     height: 1.6,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Deslizá para leer más',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: context.colors.textDisabled,
+                if (hintScroll != null) ...[
+                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      hintScroll!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: context.colors.textDisabled,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                ],
               ],
             ),
           ),

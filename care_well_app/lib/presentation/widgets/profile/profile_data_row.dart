@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../shared/app_text_field.dart';
+import '../shared/icon_square.dart';
 
 /// Fila de dato de perfil con soporte para edición inline campo a campo.
+///
+/// Está pensada para vivir dentro de un `CardGroup`: no pinta fondo propio ni
+/// dibuja separadores, eso lo aporta la tarjeta que la contiene.
 ///
 /// Modos:
 /// - **Lectura:** ícono + label + valor + (si [editable]) ícono lápiz a la derecha.
@@ -136,20 +140,13 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          constraints: const BoxConstraints(minHeight: 64),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.md,
-          ),
-          color: context.colors.surface,
-          child: _editando ? _buildEditing() : _buildReading(),
-        ),
-        Divider(height: 1, thickness: 1, color: context.colors.outline),
-      ],
+    return Container(
+      constraints: const BoxConstraints(minHeight: 64),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      child: _editando ? _buildEditing() : _buildReading(),
     );
   }
 
@@ -157,7 +154,7 @@ class _ProfileDataRowState extends State<ProfileDataRow> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(widget.icon, size: 20, color: context.colors.textSecondary),
+        IconSquare(icon: widget.icon),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../presentation/providers/providers.dart';
 import '../../presentation/screens/screens.dart';
+import '../constraints/privacy_content.dart';
+import '../constraints/terms_content.dart';
 import 'app_routes.dart';
 
 /// Notifier que convierte los cambios de [authStateProvider] en notificaciones
@@ -119,7 +121,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'terms',
                 name: AppRoutes.settingsTermsName,
-                builder: (_, _) => const TermsScreen(),
+                builder: (_, _) => const LegalTextScreen(
+                  titulo: 'Términos y condiciones',
+                  contenido: kTermsContent,
+                  version: kTermsVersion,
+                  hintScroll: 'Deslizá para leer más',
+                ),
+              ),
+              GoRoute(
+                path: 'privacy',
+                name: AppRoutes.settingsPrivacyName,
+                builder: (_, _) => const LegalTextScreen(
+                  titulo: 'Política de privacidad',
+                  contenido: kPrivacyContent,
+                  version: kPrivacyVersion,
+                  hintScroll: 'Deslizá para leer más',
+                ),
               ),
               GoRoute(
                 path: 'change-password',
