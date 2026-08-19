@@ -137,6 +137,18 @@ Future<void> _tocar(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+/// Una hora de HOY que todavía no pasó, para probar el recorte de futuro.
+///
+/// Se calcula desde el reloj en vez de fijarse (un `23:59` literal deja de ser
+/// futuro a las 23:59). Devuelve `null` en los últimos minutos del día, donde
+/// el escenario no existe.
+TimeOfDay? _horaFuturaDeHoy() {
+  final ahora = DateTime.now();
+  final objetivo = ahora.add(const Duration(minutes: 5));
+  if (objetivo.day != ahora.day) return null;
+  return TimeOfDay.fromDateTime(objetivo);
+}
+
 /// Elige [hora] en el selector de hora.
 ///
 /// El diálogo arranca en modo reloj, imposible de manejar desde un test: se lo
@@ -425,7 +437,9 @@ void main() {
       container.read(diaEventosSaludSeleccionadoProvider.notifier).state = _hoy;
       await _pushForm(tester, container);
 
-      await _elegirHora(tester, const TimeOfDay(hour: 23, minute: 59));
+      final futura = _horaFuturaDeHoy();
+      if (futura == null) return; // últimos minutos del día
+      await _elegirHora(tester, futura);
 
       // El recorte deja de ser silencioso: antes se elegían las 23:59, se
       // guardaba la hora actual y nadie se lo decía al usuario.
@@ -493,7 +507,10 @@ void main() {
       container.read(diaEventosSaludSeleccionadoProvider.notifier).state = ayer;
       await _pushForm(tester, container);
 
-      await _elegirHora(tester, const TimeOfDay(hour: 23, minute: 30));
+      // Una hora que hoy sería futura, pero en un día pasado es válida.
+      final futura = _horaFuturaDeHoy();
+      if (futura == null) return; // últimos minutos del día
+      await _elegirHora(tester, futura);
       expect(find.textContaining('no puede ser futuro'), findsNothing);
 
       // Ahora se mueve la fecha a hoy: la combinación pasa a ser futura.
