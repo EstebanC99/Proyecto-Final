@@ -32,6 +32,9 @@ const nombresMes = [
   'diciembre',
 ];
 
+/// Abreviaturas de tres letras de los días, indexadas por `weekday - 1`.
+const nombresDiaCorto = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+
 /// Abreviaturas de tres letras de los meses, indexadas por `month - 1`.
 const nombresMesCorto = [
   'ene',

@@ -1,3 +1,4 @@
+import 'package:care_well_app/config/theme/app_theme.dart';
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/screens/screens.dart';
@@ -37,8 +38,12 @@ final _eventos = <EventoBase>[
     fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day, 20),
   ),
 ];
-
-Widget _wrap({List<EventoBase>? eventos, Persona? persona}) {
+Widget _wrap({
+  List<EventoBase>? eventos,
+  Persona? persona,
+  TextScaler textScaler = TextScaler.noScaling,
+  ThemeMode themeMode = ThemeMode.light,
+}) {
   return ProviderScope(
     overrides: [
       lineaTiempoDelMesProvider.overrideWith(
@@ -51,7 +56,16 @@ Widget _wrap({List<EventoBase>? eventos, Persona? persona}) {
       // golpee el repositorio real cayendo al fallback de iniciales.
       personaImagenProvider.overrideWith((ref, id) async => null),
     ],
-    child: const MaterialApp(home: HealthTimelineScreen()),
+    child: MaterialApp(
+      themeMode: themeMode,
+      theme: AppTheme().light,
+      darkTheme: AppTheme().dark,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+        child: child!,
+      ),
+      home: const HealthTimelineScreen(),
+    ),
   );
 }
 
@@ -87,5 +101,96 @@ void main() {
       await tester.pump();
       expect(find.text('Sin registros en este mes.'), findsOneWidget);
     });
+
+    // ─── Rediseño visual (fase 6) ───────────────────────────────────────────
+
+    testWidgets('el día más reciente queda arriba', (tester) async {
+      final ayer = _hoy.subtract(const Duration(days: 1));
+      await tester.pumpWidget(
+        _wrap(
+          eventos: [
+            EventoBase(
+              id: 10,
+              descripcion: 'Registro de ayer',
+              categoriaEvento: 'Hábito',
+              fechaHora: DateTime(ayer.year, ayer.month, ayer.day, 9),
+            ),
+            EventoBase(
+              id: 11,
+              descripcion: 'Registro de hoy',
+              categoriaEvento: 'Hábito',
+              fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day, 9),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final hoy = tester.getTopLeft(find.text('Registro de hoy'));
+      final ayerPos = tester.getTopLeft(find.text('Registro de ayer'));
+      expect(hoy.dy, lessThan(ayerPos.dy));
+      expect(find.text('Hoy'), findsOneWidget);
+      expect(find.text('Ayer'), findsOneWidget);
+    });
+
+    testWidgets('dentro del día lo más temprano va primero', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      final manana = tester.getTopLeft(find.text('Caminata matutina'));
+      final mediodia = tester.getTopLeft(find.text('Control cardiológico'));
+      final noche = tester.getTopLeft(find.text('Ánimo tranquilo'));
+      expect(manana.dy, lessThan(mediodia.dy));
+      expect(mediodia.dy, lessThan(noche.dy));
+    });
+
+    testWidgets('la lista arranca arriba, sin saltar al fondo', (tester) async {
+      // Los tres registros del día van en una sola tarjeta y ya no hay
+      // auto-scroll: el usuario ve el encabezado del día más reciente.
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      final scrollable = tester.widget<Scrollable>(
+        find.byType(Scrollable).first,
+      );
+      expect(scrollable.controller?.offset ?? 0, 0);
+      expect(find.byType(DayGroupHeader), findsOneWidget);
+    });
+
+    testWidgets('agrupa los registros del día en una sola tarjeta', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HealthTimelineTile), findsNWidgets(3));
+      expect(find.byType(DayGroupHeader), findsOneWidget);
+      expect(find.text('3 registros'), findsOneWidget);
+    });
+  });
+
+  group('HealthTimelineScreen · robustez de layout', () {
+    for (final (nombre, themeMode) in [
+      ('claro', ThemeMode.light),
+      ('oscuro', ThemeMode.dark),
+    ]) {
+      testWidgets('sin overflow en tema $nombre con textScaler 1.6', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(360 * 3, 640 * 3);
+        tester.view.devicePixelRatio = 3;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          _wrap(textScaler: const TextScaler.linear(1.6), themeMode: themeMode),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.byType(DayGroupHeader), findsOneWidget);
+        expect(find.byType(HealthTimelineTile), findsNWidgets(3));
+      });
+    }
   });
 }

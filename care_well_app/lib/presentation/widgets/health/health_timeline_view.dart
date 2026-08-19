@@ -1,8 +1,9 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
+import 'day_group_header.dart';
 import 'health_timeline_tile.dart';
 import 'timeline_grouping.dart';
 
@@ -22,6 +23,13 @@ class HealthTimelineView extends StatelessWidget {
     required this.onRefresh,
   });
 
+  /// Cantidad de grupos que entran con animación de aparición.
+  ///
+  /// Sólo los primeros: dentro de un `ListView.builder` los ítems se
+  /// reconstruyen al volver a entrar en pantalla, y animarlos todos haría que
+  /// la lista parpadee en cada scroll.
+  static const _gruposAnimados = 3;
+
   /// Registros del mes agrupados por día.
   final List<GrupoDiaTimeline> grupos;
 
@@ -30,6 +38,8 @@ class HealthTimelineView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sinAnimacion = MediaQuery.disableAnimationsOf(context);
+
     return RefreshIndicator(
       color: context.colors.healthAccent,
       onRefresh: onRefresh,
@@ -37,42 +47,75 @@ class HealthTimelineView extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
-          AppSpacing.sm,
+          AppSpacing.lg,
           AppSpacing.lg,
           AppSpacing.xxxl,
         ),
         itemCount: grupos.length,
         itemBuilder: (context, i) {
-          final grupo = grupos[i];
+          final grupo = _GrupoDia(grupo: grupos[i]);
+          if (sinAnimacion || i >= _gruposAnimados) return grupo;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 4, left: 40),
-                child: Text(
-                  DateFormat('EEEE d', 'es').format(grupo.dia),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                    color: context.colors.textDisabled,
-                  ),
-                ),
-              ),
-              for (var j = 0; j < grupo.eventos.length; j++)
-                HealthTimelineTile(
-                  // `EventoBase.id` no es único entre categorías: un hábito y
-                  // un ánimo pueden compartirlo.
-                  key: ValueKey(
-                    '${grupo.eventos[j].categoriaEvento}-${grupo.eventos[j].id}',
-                  ),
-                  evento: grupo.eventos[j],
-                  isLast: j == grupo.eventos.length - 1,
-                ),
-            ],
+          return FadeInUp(
+            duration: const Duration(milliseconds: 400),
+            delay: Duration(milliseconds: 50 * i),
+            from: 12,
+            child: grupo,
           );
         },
+      ),
+    );
+  }
+}
+
+/// Un día: encabezado y la tarjeta con sus registros.
+class _GrupoDia extends StatelessWidget {
+  const _GrupoDia({required this.grupo});
+
+  final GrupoDiaTimeline grupo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DayGroupHeader(dia: grupo.dia, cantidad: grupo.eventos.length),
+          const SizedBox(height: 9),
+          // Una sola tarjeta por día con las filas adentro. El `clipBehavior`
+          // recorta el radio: sin él, la primera y la última fila pisan las
+          // esquinas redondeadas.
+          Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: context.colors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              boxShadow: AppSpacing.elev1,
+            ),
+            child: Column(
+              children: [
+                for (var j = 0; j < grupo.eventos.length; j++) ...[
+                  if (j > 0)
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: context.colors.surfaceVariant,
+                    ),
+                  HealthTimelineTile(
+                    // `EventoBase.id` no es único entre categorías: un hábito y
+                    // un ánimo pueden compartirlo.
+                    key: ValueKey(
+                      '${grupo.eventos[j].categoriaEvento}-'
+                      '${grupo.eventos[j].id}',
+                    ),
+                    evento: grupo.eventos[j],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

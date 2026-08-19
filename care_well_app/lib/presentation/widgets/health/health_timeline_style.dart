@@ -32,3 +32,20 @@ String categoriaEventoLabel(String categoria) {
       return categoria;
   }
 }
+
+/// Color de fondo suave para una categoría de la línea de tiempo de salud.
+///
+/// Espejo de [categoriaEventoColor]: mismo criterio, tono contenedor. Los tres
+/// tokens ya existen en claro y en oscuro.
+Color categoriaEventoContainer(BuildContext context, String categoria) {
+  switch (categoria) {
+    case 'Hábito':
+      return context.colors.habitsContainer;
+    case 'Evento':
+      return context.colors.healthContainer;
+    case 'Ánimo':
+      return context.colors.moodContainer;
+    default:
+      return context.colors.surfaceVariant;
+  }
+}
