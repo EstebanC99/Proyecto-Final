@@ -269,15 +269,18 @@ void main() {
         await container.read(ocurrenciasDeSemanaProvider.future);
         final antes = repo.obtenerOcurrenciasCount;
 
-        container.read(semanaSeleccionadaProvider.notifier).state = DateTime(
-          2026,
-          8,
-          17,
-        );
+        // La semana destino se deriva de la actual en vez de fijarse a una
+        // fecha: con `DateTime(2026, 8, 17)` el test se rompía cada vez que ese
+        // lunes era el de la semana en curso, porque escribir el mismo valor en
+        // un StateProvider no notifica y el provider nunca se recalculaba.
+        final otraSemana = container
+            .read(semanaSeleccionadaProvider)
+            .add(const Duration(days: 7));
+        container.read(semanaSeleccionadaProvider.notifier).state = otraSemana;
         await container.read(ocurrenciasDeSemanaProvider.future);
 
         expect(repo.obtenerOcurrenciasCount, greaterThan(antes));
-        expect(repo.ultimoDesde, DateTime(2026, 8, 17));
+        expect(repo.ultimoDesde, otraSemana);
       });
     });
 
