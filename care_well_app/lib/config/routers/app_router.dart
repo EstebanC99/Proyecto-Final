@@ -103,13 +103,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.profile,
             name: AppRoutes.profileName,
             builder: (_, _) => const ProfileScreen(),
-            routes: [
-              GoRoute(
-                path: 'edit',
-                name: AppRoutes.profileEditName,
-                builder: (_, _) => const ProfileEditScreen(),
-              ),
-            ],
           ),
 
           // Settings

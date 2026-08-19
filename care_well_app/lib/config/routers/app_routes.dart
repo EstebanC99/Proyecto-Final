@@ -14,7 +14,6 @@ abstract final class AppRoutes {
   static const home = '/home';
 
   static const profile = '/profile';
-  static const profileEdit = '/profile/edit';
 
   static const settings = '/settings';
   static const settingsTerms = '/settings/terms';
@@ -64,7 +63,6 @@ abstract final class AppRoutes {
   static const accountCreatedName = 'account-created';
   static const homeName = 'home';
   static const profileName = 'profile';
-  static const profileEditName = 'profile-edit';
   static const settingsName = 'settings';
   static const settingsTermsName = 'settings-terms';
   static const settingsPrivacyName = 'settings-privacy';

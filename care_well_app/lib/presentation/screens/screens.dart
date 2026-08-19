@@ -12,7 +12,6 @@ export 'auth/account_created_screen.dart';
 export 'home/home_screen.dart';
 
 export 'profile/profile_screen.dart';
-export 'profile/profile_edit_screen.dart';
 
 export 'settings/settings_screen.dart';
 export 'settings/legal_text_screen.dart';
