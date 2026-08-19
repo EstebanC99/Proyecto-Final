@@ -50,3 +50,21 @@ Color categoriaEventoContainer(BuildContext context, String categoria) {
       return context.colors.surfaceVariant;
   }
 }
+
+/// Etiqueta breve para una categoría, para lugares donde el ancho manda.
+///
+/// Convive con [categoriaEventoLabel] a propósito: al agregar una categoría
+/// nueva las dos funciones quedan a la vista y se ve que hay dos rótulos que
+/// completar, no uno.
+String categoriaEventoLabelCorto(String categoria) {
+  switch (categoria) {
+    case TimelineCategorias.habito:
+      return 'Hábitos';
+    case TimelineCategorias.evento:
+      return 'Eventos';
+    case TimelineCategorias.animo:
+      return 'Ánimo';
+    default:
+      return categoria;
+  }
+}

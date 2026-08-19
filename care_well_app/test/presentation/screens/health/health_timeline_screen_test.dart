@@ -194,8 +194,11 @@ void main() {
     }
   });
 
-  /// Toca un chip del filtro. El finder se acota: el rótulo de la categoría
-  /// también aparece en cada fila.
+  /// Toca un chip del filtro.
+  ///
+  /// El finder se acota al filtro por robustez: hoy los rótulos del chip y de
+  /// la fila difieren ("Hábitos" vs "Hábito"), pero si vuelven a coincidir el
+  /// test tiene que fallar por la razón correcta y no tocar otra cosa.
   Future<void> tocarChip(WidgetTester tester, String texto) async {
     await tester.tap(
       find.descendant(
@@ -223,7 +226,7 @@ void main() {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
 
-      await tocarChip(tester, 'Hábito');
+      await tocarChip(tester, 'Hábitos');
 
       expect(find.text('Caminata matutina'), findsOneWidget);
       expect(find.text('Control cardiológico'), findsNothing);
@@ -235,7 +238,7 @@ void main() {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
 
-      await tocarChip(tester, 'Hábito');
+      await tocarChip(tester, 'Hábitos');
       expect(find.byType(HealthTimelineTile), findsOneWidget);
 
       await tocarChip(tester, 'Todo');
@@ -262,7 +265,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tocarChip(tester, 'Evento de salud');
+      await tocarChip(tester, 'Eventos');
 
       expect(
         find.text('Sin registros de evento de salud en este mes.'),

@@ -24,16 +24,16 @@ class TimelineCategoryFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      // Con la tipografía del sistema grande los cuatro chips no entran en el
-      // ancho de un teléfono: se desplazan en lugar de comprimirse.
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
+    // Sin alto fijo: la fila mide lo que miden los chips y crece con la
+    // tipografía del sistema. Con un alto clavado el texto se recorta por
+    // abajo, y en una lista horizontal eso no lanza ninguna excepción.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
         children: [
           _Chip(
             texto: 'Todo',
@@ -43,7 +43,10 @@ class TimelineCategoryFilter extends StatelessWidget {
           for (final categoria in TimelineCategorias.todas) ...[
             const SizedBox(width: 7),
             _Chip(
-              texto: categoriaEventoLabel(categoria),
+              // Rótulo breve: con el largo de la fila ("Evento de salud",
+              // "Estado de ánimo") los cuatro chips no entran en el ancho de
+              // un teléfono y el último nace fuera de cuadro.
+              texto: categoriaEventoLabelCorto(categoria),
               activo: seleccionada == categoria,
               color: categoriaEventoColor(context, categoria),
               onTap: () => onChanged(categoria),
