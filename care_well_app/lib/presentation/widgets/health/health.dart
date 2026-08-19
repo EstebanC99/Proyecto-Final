@@ -16,8 +16,10 @@ export 'habito_card.dart';
 export 'habits_day_progress_header.dart';
 export 'tipo_habito_theme.dart';
 export 'ultimo_registro_format.dart';
+export 'timeline_categorias.dart';
 export 'timeline_grouping.dart';
 export 'day_group_header.dart';
+export 'timeline_category_filter.dart';
 // Ficha de salud (US-35)
 export 'ficha_salud_list_type.dart';
 export 'persona_context_header_card.dart';

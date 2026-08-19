@@ -27,6 +27,7 @@ class HealthTimelineScreen extends ConsumerWidget {
     final gruposAsync = ref.watch(lineaTiempoAgrupadaProvider);
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final mes = ref.watch(mesLineaTiempoProvider);
+    final filtro = ref.watch(filtroCategoriaTimelineProvider);
 
     void irMesAnterior() {
       ref.read(mesLineaTiempoProvider.notifier).state = DateTime(
@@ -55,6 +56,14 @@ class HealthTimelineScreen extends ConsumerWidget {
             mes: mes,
             onPrevious: irMesAnterior,
             onNext: _esUltimoMes(mes) ? null : irMesSiguiente,
+          ),
+
+          // Filtrado en cliente sobre los registros del mes ya cargados.
+          TimelineCategoryFilter(
+            seleccionada: filtro,
+            onChanged: (categoria) =>
+                ref.read(filtroCategoriaTimelineProvider.notifier).state =
+                    categoria,
           ),
 
           Expanded(
@@ -87,7 +96,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                 }
 
                 if (grupos.isEmpty) {
-                  return const _EmptyMonthState();
+                  return _EmptyMonthState(filtro: filtro);
                 }
 
                 Future<void> onRefresh() async {
@@ -108,20 +117,33 @@ class HealthTimelineScreen extends ConsumerWidget {
 // ─── Estado vacío del mes ─────────────────────────────────────────────────────
 
 class _EmptyMonthState extends StatelessWidget {
-  const _EmptyMonthState();
+  const _EmptyMonthState({this.filtro});
+
+  /// Categoría activa. Con una puesta, el vacío es del filtro y no del mes: si
+  /// dijera "sin registros en este mes" el usuario podría creer que no cargó
+  /// nada, cuando en realidad hay registros de otras categorías.
+  final String? filtro;
 
   @override
   Widget build(BuildContext context) {
+    final categoria = filtro;
+    final mensaje = categoria == null
+        ? 'Sin registros en este mes.'
+        : 'Sin registros de '
+              '${categoriaEventoLabel(categoria).toLowerCase()} '
+              'en este mes.';
+
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.timeline, size: 64, color: context.colors.textDisabled),
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
             Text(
-              'Sin registros en este mes.',
+              mensaje,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

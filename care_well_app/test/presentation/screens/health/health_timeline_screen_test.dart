@@ -193,4 +193,91 @@ void main() {
       });
     }
   });
+
+  /// Toca un chip del filtro. El finder se acota: el rótulo de la categoría
+  /// también aparece en cada fila.
+  Future<void> tocarChip(WidgetTester tester, String texto) async {
+    await tester.tap(
+      find.descendant(
+        of: find.byType(TimelineCategoryFilter),
+        matching: find.text(texto),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
+  group('HealthTimelineScreen · filtro por categoría', () {
+    testWidgets('arranca en "Todo" y muestra las tres categorías', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TimelineCategoryFilter), findsOneWidget);
+      expect(find.byType(HealthTimelineTile), findsNWidgets(3));
+    });
+
+    testWidgets('filtrar deja sólo los registros de esa categoría', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      await tocarChip(tester, 'Hábito');
+
+      expect(find.text('Caminata matutina'), findsOneWidget);
+      expect(find.text('Control cardiológico'), findsNothing);
+      expect(find.text('Ánimo tranquilo'), findsNothing);
+      expect(find.text('1 registro'), findsOneWidget);
+    });
+
+    testWidgets('"Todo" restaura la lista completa', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      await tocarChip(tester, 'Hábito');
+      expect(find.byType(HealthTimelineTile), findsOneWidget);
+
+      await tocarChip(tester, 'Todo');
+
+      expect(find.byType(HealthTimelineTile), findsNWidgets(3));
+    });
+
+    testWidgets('un filtro sin resultados muestra su propio vacío', (
+      tester,
+    ) async {
+      // Sólo hay un hábito: al pedir eventos de salud no queda nada, y el
+      // mensaje tiene que decir que es por el filtro, no que el mes esté vacío.
+      await tester.pumpWidget(
+        _wrap(
+          eventos: [
+            EventoBase(
+              id: 1,
+              descripcion: 'Caminata matutina',
+              categoriaEvento: 'Hábito',
+              fechaHora: DateTime(_hoy.year, _hoy.month, _hoy.day, 8),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tocarChip(tester, 'Evento de salud');
+
+      expect(
+        find.text('Sin registros de evento de salud en este mes.'),
+        findsOneWidget,
+      );
+      expect(find.text('Sin registros en este mes.'), findsNothing);
+      // El filtro sigue a la vista para poder volver atrás.
+      expect(find.byType(TimelineCategoryFilter), findsOneWidget);
+    });
+
+    testWidgets('el mes vacío conserva su mensaje propio', (tester) async {
+      await tester.pumpWidget(_wrap(eventos: []));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sin registros en este mes.'), findsOneWidget);
+    });
+  });
 }

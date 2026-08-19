@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme/app_palette.dart';
+import 'timeline_categorias.dart';
 
 /// Color de acento para una categoría de la línea de tiempo de salud.
 ///
@@ -8,11 +9,11 @@ import '../../../config/theme/app_palette.dart';
 /// `"Hábito"`, `"Evento"` y `"Ánimo"`.
 Color categoriaEventoColor(BuildContext context, String categoria) {
   switch (categoria) {
-    case 'Hábito':
+    case TimelineCategorias.habito:
       return context.colors.habitsAccent;
-    case 'Evento':
+    case TimelineCategorias.evento:
       return context.colors.healthAccent;
-    case 'Ánimo':
+    case TimelineCategorias.animo:
       return context.colors.moodAccent;
     default:
       return context.colors.textSecondary;
@@ -22,11 +23,11 @@ Color categoriaEventoColor(BuildContext context, String categoria) {
 /// Etiqueta legible para una categoría de la línea de tiempo de salud.
 String categoriaEventoLabel(String categoria) {
   switch (categoria) {
-    case 'Hábito':
+    case TimelineCategorias.habito:
       return 'Hábito';
-    case 'Evento':
+    case TimelineCategorias.evento:
       return 'Evento de salud';
-    case 'Ánimo':
+    case TimelineCategorias.animo:
       return 'Estado de ánimo';
     default:
       return categoria;
@@ -39,11 +40,11 @@ String categoriaEventoLabel(String categoria) {
 /// tokens ya existen en claro y en oscuro.
 Color categoriaEventoContainer(BuildContext context, String categoria) {
   switch (categoria) {
-    case 'Hábito':
+    case TimelineCategorias.habito:
       return context.colors.habitsContainer;
-    case 'Evento':
+    case TimelineCategorias.evento:
       return context.colors.healthContainer;
-    case 'Ánimo':
+    case TimelineCategorias.animo:
       return context.colors.moodContainer;
     default:
       return context.colors.surfaceVariant;
