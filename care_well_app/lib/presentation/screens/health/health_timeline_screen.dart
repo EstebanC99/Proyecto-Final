@@ -24,7 +24,7 @@ class HealthTimelineScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventosAsync = ref.watch(lineaTiempoDelMesProvider);
+    final gruposAsync = ref.watch(lineaTiempoAgrupadaProvider);
     final personaAsync = ref.watch(personaVisualizacionSeleccionadaProvider);
     final mes = ref.watch(mesLineaTiempoProvider);
 
@@ -58,7 +58,7 @@ class HealthTimelineScreen extends ConsumerWidget {
           ),
 
           Expanded(
-            child: eventosAsync.when(
+            child: gruposAsync.when(
               loading: () => const _TimelineSkeleton(),
               error: (err, _) => Center(
                 child: Padding(
@@ -68,7 +68,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              data: (eventos) {
+              data: (grupos) {
                 if (personaAsync.value == null) {
                   return Center(
                     child: Padding(
@@ -86,7 +86,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                   );
                 }
 
-                if (eventos.isEmpty) {
+                if (grupos.isEmpty) {
                   return const _EmptyMonthState();
                 }
 
@@ -95,10 +95,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                   await ref.read(lineaTiempoDelMesProvider.future);
                 }
 
-                return HealthTimelineView(
-                  eventos: eventos,
-                  onRefresh: onRefresh,
-                );
+                return HealthTimelineView(grupos: grupos, onRefresh: onRefresh);
               },
             ),
           ),

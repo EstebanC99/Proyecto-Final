@@ -3,79 +3,37 @@ import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
-import '../../../domain/entities/entities.dart';
 import 'health_timeline_tile.dart';
+import 'timeline_grouping.dart';
 
-/// Vista de línea de tiempo de salud en orden cronológico ascendente.
+/// Vista de línea de tiempo de salud, agrupada por día.
 ///
-/// Renderiza los [EventoBase] (hábitos realizados, eventos de salud y estados
-/// de ánimo mezclados) como una secuencia de [HealthTimelineTile] con
-/// separadores de día discretos cuando cambia la fecha respecto del anterior.
+/// Los días van del más reciente al más antiguo y, dentro de cada uno, los
+/// registros de la mañana a la noche. Lo último registrado queda arriba sin
+/// necesidad de mover la lista: antes se saltaba al fondo tras cada carga, lo
+/// que además pisaba la posición del usuario en cada refresh.
 ///
-/// Al montarse y cada vez que cambian los eventos (cambio de mes o refresh),
-/// desplaza la lista hasta el fondo para mostrar el registro más reciente, que
-/// es el último por estar ordenados ascendentemente.
-class HealthTimelineView extends StatefulWidget {
+/// Recibe los grupos ya armados ([agruparPorDia]) en vez de calcularlos: así no
+/// se reagrupa en cada rebuild y el widget se puede probar aislado.
+class HealthTimelineView extends StatelessWidget {
   const HealthTimelineView({
     super.key,
-    required this.eventos,
+    required this.grupos,
     required this.onRefresh,
   });
 
-  /// Eventos del mes ya cargados (se ordenan por fecha internamente).
-  final List<EventoBase> eventos;
+  /// Registros del mes agrupados por día.
+  final List<GrupoDiaTimeline> grupos;
 
   /// Callback del [RefreshIndicator].
   final Future<void> Function() onRefresh;
 
   @override
-  State<HealthTimelineView> createState() => _HealthTimelineViewState();
-}
-
-class _HealthTimelineViewState extends State<HealthTimelineView> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _programarScrollAlFondo();
-  }
-
-  @override
-  void didUpdateWidget(covariant HealthTimelineView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Al recargar por cambio de mes o refresh (incluido el manual) volvemos al
-    // fondo para priorizar el registro más reciente.
-    if (!identical(oldWidget.eventos, widget.eventos)) {
-      _programarScrollAlFondo();
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  /// Programa un salto al final de la lista tras el primer frame, cuando el
-  /// [ScrollController] ya tiene dimensiones válidas.
-  void _programarScrollAlFondo() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_scrollController.hasClients) return;
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final ordenados = [...widget.eventos]
-      ..sort((a, b) => a.fechaHora.compareTo(b.fechaHora));
-
     return RefreshIndicator(
       color: context.colors.healthAccent,
-      onRefresh: widget.onRefresh,
+      onRefresh: onRefresh,
       child: ListView.builder(
-        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
@@ -83,47 +41,39 @@ class _HealthTimelineViewState extends State<HealthTimelineView> {
           AppSpacing.lg,
           AppSpacing.xxxl,
         ),
-        itemCount: ordenados.length,
+        itemCount: grupos.length,
         itemBuilder: (context, i) {
-          final evento = ordenados[i];
-          final mostrarSeparador =
-              i == 0 ||
-              !_mismoDia(ordenados[i - 1].fechaHora, evento.fechaHora);
+          final grupo = grupos[i];
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (mostrarSeparador)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 4, left: 40),
-                  child: Text(
-                    DateFormat(
-                      'EEEE d',
-                      'es',
-                    ).format(evento.fechaHora.toLocal()),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: context.colors.textDisabled,
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 4, left: 40),
+                child: Text(
+                  DateFormat('EEEE d', 'es').format(grupo.dia),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: context.colors.textDisabled,
                   ),
                 ),
-              HealthTimelineTile(
-                evento: evento,
-                isLast: i == ordenados.length - 1,
               ),
+              for (var j = 0; j < grupo.eventos.length; j++)
+                HealthTimelineTile(
+                  // `EventoBase.id` no es único entre categorías: un hábito y
+                  // un ánimo pueden compartirlo.
+                  key: ValueKey(
+                    '${grupo.eventos[j].categoriaEvento}-${grupo.eventos[j].id}',
+                  ),
+                  evento: grupo.eventos[j],
+                  isLast: j == grupo.eventos.length - 1,
+                ),
             ],
           );
         },
       ),
     );
-  }
-
-  /// Indica si dos fechas corresponden al mismo día calendario (hora local).
-  bool _mismoDia(DateTime a, DateTime b) {
-    final la = a.toLocal();
-    final lb = b.toLocal();
-    return la.year == lb.year && la.month == lb.month && la.day == lb.day;
   }
 }
