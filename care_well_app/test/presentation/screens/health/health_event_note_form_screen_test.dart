@@ -120,6 +120,10 @@ void main() {
       expect(find.byType(ContextAppBar), findsOneWidget);
       expect(find.text('NUEVA NOTA'), findsOneWidget);
       expect(find.text('Control cardiológico anual'), findsOneWidget);
+      // Con la fecha y la hora: dos eventos del mismo tipo en el mismo día
+      // serían indistinguibles sin ellas.
+      expect(find.textContaining('18 ago'), findsOneWidget);
+      expect(find.textContaining('10:00'), findsOneWidget);
     });
 
     testWidgets('sin el evento cargado la línea de contexto no se dibuja', (

@@ -164,35 +164,60 @@ class _HealthEventNoteFormScreenState
         .maybeWhen(data: (e) => e, orElse: () => null);
     if (evento == null) return const SizedBox.shrink();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            TipoEventoTheme.iconFor(evento.tipo.id),
-            size: 18,
-            color: TipoEventoTheme.accentFor(context, evento.tipo.id),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              evento.descripcion,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                color: context.colors.textSecondary,
+    final cuando =
+        '${fechaCortaRelativa(evento.fechaHora)} · '
+        '${TimeOfDay.fromDateTime(evento.fechaHora).format(context)}';
+
+    // El espaciado inferior lo pone el bloque, no el campo de abajo: así el
+    // formulario no queda con un hueco cuando el evento no resuelve.
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceVariant,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              TipoEventoTheme.iconFor(evento.tipo.id),
+              size: 18,
+              color: TipoEventoTheme.accentFor(context, evento.tipo.id),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    evento.descripcion,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                  // Dos eventos del mismo tipo en el mismo día son
+                  // indistinguibles sin la fecha y la hora.
+                  Text(
+                    cuando,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: context.colors.textDisabled,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

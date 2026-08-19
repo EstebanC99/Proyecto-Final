@@ -31,7 +31,11 @@ class FormTextField extends StatefulWidget {
     this.maxLines = 6,
     this.required = true,
     this.labelPadding,
-  });
+  }) : assert(
+         minLines <= maxLines,
+         'minLines no puede superar a maxLines: para un campo de una línea hay '
+         'que bajar los dos (minLines: 1, maxLines: 1).',
+       );
 
   final TextEditingController controller;
 
