@@ -19,7 +19,7 @@ void main() {
     return MaterialApp(
       theme: AppTheme().light,
       home: Scaffold(
-        body: DescriptionField(
+        body: FormTextField(
           controller: controller,
           label: 'Descripción',
           hintText: 'Describí el hábito registrado...',
@@ -33,7 +33,7 @@ void main() {
     );
   }
 
-  group('DescriptionField', () {
+  group('FormTextField', () {
     testWidgets('muestra rótulo, hint y contador en cero', (tester) async {
       await tester.pumpWidget(wrap());
 
@@ -109,6 +109,47 @@ void main() {
 
       final campo = tester.widget<TextField>(find.byType(TextField));
       expect(campo.enabled, isFalse);
+    });
+
+    testWidgets('en una sola línea mantiene rótulo y contador', (tester) async {
+      // El título de un evento de agenda: mismo widget, una sola línea.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme().light,
+          home: Scaffold(
+            body: FormTextField(
+              controller: controller,
+              label: 'Título',
+              hintText: 'Ej.: Control cardiológico',
+              accent: AppPalette.light.primary,
+              minLines: 1,
+              maxLines: 1,
+              maxLength: 120,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.bySemanticsLabel('TÍTULO, obligatorio'), findsOneWidget);
+      expect(find.text('0 / 120'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextFormField), 'Control anual');
+      await tester.pump();
+
+      expect(find.text('13 / 120'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).maxLines, 1);
+    });
+
+    testWidgets('el contador cuenta grafemas, no unidades UTF-16', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap());
+
+      // Un emoji es un solo carácter para `maxLength`, pero dos para `.length`.
+      await tester.enterText(find.byType(TextFormField), 'ok 👍');
+      await tester.pump();
+
+      expect(find.text('4 / 500'), findsOneWidget);
     });
   });
 }

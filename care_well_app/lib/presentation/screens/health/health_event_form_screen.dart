@@ -170,7 +170,7 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
           children: [
             animado(_tipoEvento(tiposAsync), 0),
             animado(
-              DescriptionField(
+              FormTextField(
                 controller: _descripcionCtrl,
                 label: 'Descripción',
                 hintText: 'Describí el evento de salud...',

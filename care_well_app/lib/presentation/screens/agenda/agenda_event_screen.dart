@@ -255,14 +255,6 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     );
   }
 
-  /// Borde del campo de título, al mismo estilo que [DescriptionField].
-  OutlineInputBorder _bordeCampo(Color color, {double ancho = 1}) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      borderSide: BorderSide(color: color, width: ancho),
-    );
-  }
-
   /// Envuelve un bloque del formulario en la animación de entrada.
   ///
   /// `animate: false` de animate_do no desactiva la animación: deja el
@@ -342,46 +334,24 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
             0,
           ),
 
-          // Título. Se deja con el contador nativo: es de una línea y el campo
-          // no se repite en ninguna otra pantalla.
+          // Título.
           _animado(
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionLabel(
-                  text: 'Título',
-                  required: true,
-                  padding: EdgeInsets.only(
-                    top: AppSpacing.xl,
-                    bottom: AppSpacing.sm,
-                  ),
-                ),
-                TextFormField(
-                  controller: _tituloCtrl,
-                  enabled: !_loading,
-                  maxLength: 120,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    hintText: 'Ej.: Control cardiológico',
-                    filled: true,
-                    fillColor: context.colors.surface,
-                    border: _bordeCampo(context.colors.outline),
-                    enabledBorder: _bordeCampo(context.colors.outline),
-                    disabledBorder: _bordeCampo(context.colors.outline),
-                    focusedBorder: _bordeCampo(
-                      context.colors.primary,
-                      ancho: 1.5,
-                    ),
-                  ),
-                ),
-              ],
+            FormTextField(
+              controller: _tituloCtrl,
+              label: 'Título',
+              hintText: 'Ej.: Control cardiológico',
+              accent: context.colors.primary,
+              enabled: !_loading,
+              minLines: 1,
+              maxLines: 1,
+              maxLength: 120,
             ),
             50,
           ),
 
           // Descripción: el único campo opcional de los tres formularios.
           _animado(
-            DescriptionField(
+            FormTextField(
               controller: _descripcionCtrl,
               label: 'Descripción',
               hintText: 'Notas adicionales (opcional)',

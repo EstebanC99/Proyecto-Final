@@ -4,17 +4,21 @@ import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import 'section_label.dart';
 
-/// Campo de texto largo con rótulo y contador propio de caracteres.
+/// Campo de texto de formulario: rótulo, campo en tarjeta y contador propio.
 ///
-/// Es el bloque "descripción" de los formularios: rótulo en versales, área de
-/// texto en tarjeta y contador alineado a la derecha. El contador nativo de
-/// `TextField` se apaga porque queda pegado al borde y con otra tipografía.
+/// Sirve tanto para áreas de texto (descripciones, notas) como para campos de
+/// una línea ([maxLines] `1`, como el título de un evento): la diferencia es
+/// sólo cuántas líneas ocupa. El contador nativo de `TextField` se apaga porque
+/// queda pegado al borde y con otra tipografía que el resto del formulario.
+///
+/// El contador cuenta grafemas (`characters.length`), que es la unidad que
+/// limita `maxLength`: con `.length` los emojis lo desincronizan.
 ///
 /// Se suscribe al [controller] para redibujar su contador por su cuenta; el
 /// padre sólo necesita [onChanged] si tiene que reevaluar algo propio (por
 /// ejemplo, habilitar el botón de guardar).
-class DescriptionField extends StatefulWidget {
-  const DescriptionField({
+class FormTextField extends StatefulWidget {
+  const FormTextField({
     super.key,
     required this.controller,
     required this.label,
@@ -60,10 +64,10 @@ class DescriptionField extends StatefulWidget {
   final EdgeInsets? labelPadding;
 
   @override
-  State<DescriptionField> createState() => _DescriptionFieldState();
+  State<FormTextField> createState() => _FormTextFieldState();
 }
 
-class _DescriptionFieldState extends State<DescriptionField> {
+class _FormTextFieldState extends State<FormTextField> {
   @override
   void initState() {
     super.initState();
@@ -71,7 +75,7 @@ class _DescriptionFieldState extends State<DescriptionField> {
   }
 
   @override
-  void didUpdateWidget(covariant DescriptionField oldWidget) {
+  void didUpdateWidget(covariant FormTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_alCambiarTexto);

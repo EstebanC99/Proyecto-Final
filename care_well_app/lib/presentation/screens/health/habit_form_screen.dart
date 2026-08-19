@@ -163,7 +163,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
           children: [
             animado(_categoria(tiposAsync), 0),
             animado(
-              DescriptionField(
+              FormTextField(
                 controller: _descripcionCtrl,
                 label: 'Descripción',
                 hintText: _placeholder,
