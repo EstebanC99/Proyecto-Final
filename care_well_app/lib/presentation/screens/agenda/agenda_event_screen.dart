@@ -98,12 +98,16 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
       firstDate: DateTime.now().subtract(const Duration(days: 1)),
       lastDate: DateTime(DateTime.now().year + 5),
     );
-    if (picked != null) setState(() => _fecha = picked);
+    // El diálogo es asíncrono: la pantalla puede haberse ido mientras estaba
+    // abierto.
+    if (picked == null || !mounted) return;
+    setState(() => _fecha = picked);
   }
 
   Future<void> _elegirHora() async {
     final picked = await showTimePicker(context: context, initialTime: _hora);
-    if (picked != null) setState(() => _hora = picked);
+    if (picked == null || !mounted) return;
+    setState(() => _hora = picked);
   }
 
   Future<void> _elegirFechaFin() async {
@@ -113,7 +117,8 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
       firstDate: _fecha,
       lastDate: DateTime(DateTime.now().year + 5),
     );
-    if (picked != null) setState(() => _fechaFin = picked);
+    if (picked == null || !mounted) return;
+    setState(() => _fechaFin = picked);
   }
 
   DateTime get _fechaHoraInicio =>
@@ -426,7 +431,6 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
             ),
             150,
           ),
-          const SizedBox(height: AppSpacing.lg),
           const SizedBox(height: AppSpacing.lg),
 
           // Duración.
