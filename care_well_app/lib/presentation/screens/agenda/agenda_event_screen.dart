@@ -220,8 +220,6 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
   Widget _buildForm(BuildContext context, List<TipoEvento> tipos) {
     // Selección de tipo por defecto (o el precargado en edición).
     _tipo ??= tipos.isNotEmpty ? tipos.first : null;
-    final tieneTitulo = _tituloCtrl.text.trim().isNotEmpty;
-    final puedeGuardar = tieneTitulo && _tipo != null && !_loading;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -379,36 +377,46 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
           ),
 
           const SizedBox(height: AppSpacing.xxl),
-
           // Botón guardar.
-          SizedBox(
-            width: double.infinity,
-            height: AppSpacing.buttonHeight,
-            child: FilledButton(
-              onPressed: puedeGuardar ? _guardar : null,
-              style: FilledButton.styleFrom(
-                backgroundColor: context.colors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                ),
-              ),
-              child: _loading
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: context.colors.onPrimary,
-                      ),
-                    )
-                  : Text(
-                      _esEdicion ? 'Guardar cambios' : 'Crear evento',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+          //
+          // Sólo el botón depende del título: escuchando el controller acá, en
+          // vez de reconstruir la pantalla en cada tecla, no se redibujan la
+          // grilla de tipos, los steppers ni los carruseles al tipear.
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _tituloCtrl,
+            builder: (context, valor, _) {
+              final puedeGuardar =
+                  valor.text.trim().isNotEmpty && _tipo != null && !_loading;
+              return SizedBox(
+                width: double.infinity,
+                height: AppSpacing.buttonHeight,
+                child: FilledButton(
+                  onPressed: puedeGuardar ? _guardar : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: context.colors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
-            ),
+                  ),
+                  child: _loading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: context.colors.onPrimary,
+                          ),
+                        )
+                      : Text(
+                          _esEdicion ? 'Guardar cambios' : 'Crear evento',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              );
+            },
           ),
         ],
       ),

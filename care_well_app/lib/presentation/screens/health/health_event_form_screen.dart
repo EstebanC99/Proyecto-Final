@@ -61,7 +61,9 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
-    if (picked == null) return;
+    // El diálogo es asíncrono: la pantalla puede haberse ido mientras estaba
+    // abierto.
+    if (picked == null || !mounted) return;
     setState(() => _fecha = picked);
     // Mover la fecha a hoy puede volver futura una hora que era válida ayer.
     _clampearSiEsFutura();
@@ -69,7 +71,7 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
 
   Future<void> _elegirHora() async {
     final picked = await showTimePicker(context: context, initialTime: _hora);
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     setState(() => _hora = picked);
     _clampearSiEsFutura();
   }
@@ -80,11 +82,12 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
   /// silencioso y el usuario elegía las 23:00, se guardaban las 15:22 y nadie
   /// se lo decía.
   void _clampearSiEsFutura() {
+    if (!mounted) return;
+
     final ahora = DateTime.now();
     if (!_fechaHora.isAfter(ahora)) return;
 
     setState(() => _hora = TimeOfDay.fromDateTime(ahora));
-    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
@@ -130,7 +133,6 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tieneDesc = _descripcionCtrl.text.trim().isNotEmpty;
     final tiposAsync = ref.watch(tiposEventoProvider);
 
     // `animate: false` de animate_do no desactiva la animación: deja el
@@ -175,7 +177,6 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
                 accent: context.colors.healthAccent,
                 enabled: !_loading,
                 maxLines: 8,
-                onChanged: (_) => setState(() {}),
               ),
               50,
             ),
@@ -183,13 +184,21 @@ class _HealthEventFormScreenState extends ConsumerState<HealthEventFormScreen> {
           ],
         ),
       ),
+      // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
+      // grilla de 13 tipos entera.
       bottomNavigationBar: animado(
-        FormBottomBar(
-          label: 'Registrar evento',
-          accent: context.colors.healthAccent,
-          loading: _loading,
-          onPressed: (tieneDesc && _tipoId != null) ? _guardar : null,
-          hint: tieneDesc ? null : 'Completá la descripción para continuar',
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _descripcionCtrl,
+          builder: (context, valor, _) {
+            final tieneDesc = valor.text.trim().isNotEmpty;
+            return FormBottomBar(
+              label: 'Registrar evento',
+              accent: context.colors.healthAccent,
+              loading: _loading,
+              onPressed: (tieneDesc && _tipoId != null) ? _guardar : null,
+              hint: tieneDesc ? null : 'Completá la descripción para continuar',
+            );
+          },
         ),
         150,
       ),

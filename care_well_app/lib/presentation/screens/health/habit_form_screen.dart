@@ -128,7 +128,6 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tieneDescripcion = _descripcionCtrl.text.trim().isNotEmpty;
     final tiposAsync = ref.watch(tiposHabitoVidaProvider);
 
     // `animate: false` de animate_do no desactiva la animación: deja el
@@ -170,22 +169,31 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                 hintText: _placeholder,
                 accent: context.colors.habitsAccent,
                 enabled: !_loading,
-                onChanged: (_) => setState(() {}),
               ),
               50,
             ),
           ],
         ),
       ),
+      // Sólo la barra depende del texto: sin esto, cada tecla redibujaría la
+      // grilla de tipos entera.
       bottomNavigationBar: animado(
-        FormBottomBar(
-          label: _esEdicion ? 'Guardar cambios' : 'Registrar',
-          accent: context.colors.habitsAccent,
-          loading: _loading,
-          onPressed: (tieneDescripcion && _tipoId != null) ? _guardar : null,
-          hint: tieneDescripcion
-              ? null
-              : 'Completá la descripción para continuar',
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _descripcionCtrl,
+          builder: (context, valor, _) {
+            final tieneDescripcion = valor.text.trim().isNotEmpty;
+            return FormBottomBar(
+              label: _esEdicion ? 'Guardar cambios' : 'Registrar',
+              accent: context.colors.habitsAccent,
+              loading: _loading,
+              onPressed: (tieneDescripcion && _tipoId != null)
+                  ? _guardar
+                  : null,
+              hint: tieneDescripcion
+                  ? null
+                  : 'Completá la descripción para continuar',
+            );
+          },
         ),
         100,
       ),
