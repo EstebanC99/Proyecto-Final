@@ -187,9 +187,8 @@ void _testDeLayout(
   bool cambioFalla = false,
   Future<void> Function(WidgetTester tester)? interaccion,
   void Function(WidgetTester tester)? verificaciones,
-  bool skip = false,
 }) {
-  testWidgets(descripcion, skip: skip, (tester) async {
+  testWidgets(descripcion, (tester) async {
     _usarPantallaDeTelefono(tester);
     await tester.pumpWidget(
       _app(
@@ -264,17 +263,6 @@ void main() {
         home: const SettingsScreen(),
         oscuro: oscuro,
         escala: escala,
-        // DEFECTO CONOCIDO, pendiente de corrección: el `Row` de
-        // `SettingsUserCard` (settings_user_card.dart:64) mezcla un `Expanded`
-        // —nombre y email— con el pill "Ver perfil", que no es flexible ni
-        // recorta su texto. A partir de una escala tipográfica de ~1.6 el pill
-        // pide más ancho del que queda y la fila desborda.
-        //
-        // El caso queda escrito y saltado (no borrado ni bajado de escala) para
-        // que el día que se corrija alcance con sacar este `skip`. La
-        // corrección es de producción y no entra en este commit de
-        // verificación.
-        skip: escala >= 1.6,
       );
 
       _testDeLayout(
@@ -347,15 +335,11 @@ void main() {
           expect(find.text('Nombre y apellido'), findsOneWidget),
     );
 
-    // A 1.5 y no a 2.0 como el resto: el diálogo se abre sobre
-    // `SettingsScreen`, así que a 2.0 arrastraría el desborde conocido de
-    // `SettingsUserCard` y este caso reportaría un problema que no es suyo.
-    // 1.5 es la escala más alta a la que la pantalla de fondo está sana.
     _testDeLayout(
-      'el diálogo Acerca de CareWell renderiza en tema $tema con escala 1.5',
+      'el diálogo Acerca de CareWell renderiza en tema $tema con escala 2.0',
       home: const SettingsScreen(),
       oscuro: oscuro,
-      escala: 1.5,
+      escala: 2.0,
       interaccion: _abrirAcercaDe,
       verificaciones: (_) {
         expect(find.byType(AboutDialog), findsOneWidget);
@@ -365,7 +349,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.text('Contacto: terminos_condiciones@bubisoft.com'),
+          find.text('Contacto: carewell.project.team@gmail.com'),
           findsOneWidget,
         );
       },

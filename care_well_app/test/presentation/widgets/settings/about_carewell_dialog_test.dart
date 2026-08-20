@@ -58,7 +58,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.text('Contacto: terminos_condiciones@bubisoft.com'),
+          find.text('Contacto: carewell.project.team@gmail.com'),
           findsOneWidget,
         );
         expect(find.text('© Bubisoft'), findsOneWidget);

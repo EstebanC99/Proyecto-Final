@@ -50,10 +50,7 @@ Future<void> mostrarAcercaDeCareWell(
           style: estiloCuerpo,
         ),
         const SizedBox(height: AppSpacing.md),
-        Text(
-          'Contacto: terminos_condiciones@bubisoft.com',
-          style: estiloCuerpo,
-        ),
+        Text('Contacto: carewell.project.team@gmail.com', style: estiloCuerpo),
       ],
     ),
   );

@@ -95,8 +95,16 @@ class SettingsUserCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    const _VerPerfilPill(),
+                    // Con el texto muy agrandado el pill se comería el ancho
+                    // del nombre y del email —los dos datos que la tarjeta
+                    // existe para mostrar—, así que se retira junto con su
+                    // separación. Es afordancia decorativa: la tarjeta entera
+                    // sigue siendo tocable y su label accesible sigue diciendo
+                    // "Ver perfil".
+                    if (_VerPerfilPill.entraEn(context)) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      const _VerPerfilPill(),
+                    ],
                   ],
                 ),
               ),
@@ -136,27 +144,62 @@ class _AvatarConAnillo extends StatelessWidget {
 ///
 /// No es un botón: la acción la tiene la tarjeta entera. Se excluye de la
 /// semántica para no anunciar un segundo control.
+///
+/// Compite por el ancho con el nombre y el email, así que su comportamiento
+/// frente a la escala tipográfica tiene dos escalones: hasta [_escalaOculta]
+/// acompaña el agrandado pero con tope ([_escalaMaxima]), y por encima de
+/// [_escalaOculta] quien lo monta lo retira. Ambas decisiones viven acá para
+/// que la tarjeta y su esqueleto no puedan divergir.
 class _VerPerfilPill extends StatelessWidget {
   const _VerPerfilPill();
 
+  /// Tamaño del texto del pill.
+  static const double _fontSize = 12.5;
+
+  /// Tope de escala tipográfica del propio pill: más allá desborda la fila.
+  static const double _escalaMaxima = 1.3;
+
+  /// Escala efectiva a partir de la cual el pill deja de mostrarse.
+  ///
+  /// Sobre los ~296dp útiles de la fila, a escala 2.0 el pill pediría ~149dp y
+  /// al nombre le quedarían ~67dp: dos caracteres. Acotar la escala evita la
+  /// excepción de render, pero sólo retirarlo devuelve un ancho legible.
+  static const double _escalaOculta = 1.5;
+
+  /// Si el pill entra sin comerse el ancho del nombre y el email.
+  ///
+  /// La escala se mide sobre el tamaño real del texto del pill y no sobre 1sp
+  /// (como hace `habits_progress_ring.dart`): desde Android 14 el escalado del
+  /// sistema es **no lineal**, así que el factor que se aplica a 1sp no es el
+  /// que se aplica a 12.5sp — medir a 1sp sería medir otra cosa.
+  static bool entraEn(BuildContext context) =>
+      MediaQuery.textScalerOf(context).scale(_fontSize) / _fontSize <=
+      _escalaOculta;
+
   @override
   Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: context.colors.primaryContainer,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        ),
-        child: Text(
-          'Ver perfil',
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w700,
-            color: context.colors.onPrimaryContainer,
+    // El pill acota su propia escala en vez de que lo haga quien lo monta
+    // (mismo criterio que `StatsPerfilCard` y `DayGroupHeader`): el resto de la
+    // tarjeta escala libre.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: _escalaMaxima,
+      child: ExcludeSemantics(
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: context.colors.primaryContainer,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          ),
+          child: Text(
+            'Ver perfil',
+            style: TextStyle(
+              fontSize: _fontSize,
+              fontWeight: FontWeight.w700,
+              color: context.colors.onPrimaryContainer,
+            ),
           ),
         ),
       ),
@@ -208,8 +251,13 @@ class SettingsUserCardSkeleton extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            const _BloqueGris(width: 72, height: 30),
+            // Misma regla que la tarjeta real —y desde la misma constante—:
+            // si allá el pill no se muestra, acá tampoco se reserva su lugar,
+            // o la transición loading → data cambiaría el ancho del nombre.
+            if (_VerPerfilPill.entraEn(context)) ...[
+              const SizedBox(width: AppSpacing.sm),
+              const _BloqueGris(width: 72, height: 30),
+            ],
           ],
         ),
       ),

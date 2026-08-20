@@ -79,29 +79,42 @@ class ProfileHero extends StatelessWidget {
             bottom: -70,
             left: -50,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.lg,
-              AppSpacing.lg,
-              AppSpacing.xxl,
-            ),
-            child: Column(
-              children: [
-                ProfileHeroAvatar(
-                  nombre: persona.nombre,
-                  imagen: imagen,
-                  onVerFoto: onVerFoto,
-                  onCambiarFoto: onCambiarFoto,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _FilaNombre(
-                  nombre: persona.nombreCompleto,
-                  color: onHero,
-                  onTap: onEditarNombre,
-                ),
-                _ZonaRol(rol: rol, esClaro: esClaro),
-              ],
+          // El `SizedBox` no es redundante: un hijo NO posicionado de un
+          // `Stack` recibe constraints sueltas y se ubica según
+          // `Stack.alignment`, que por defecto es `topStart`. Sin él la
+          // `Column` se encoge al ancho de su hijo más ancho y el bloque
+          // entero queda pegado a la izquierda, por más que sus hijos estén
+          // centrados dentro de ese ancho.
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.lg,
+                AppSpacing.xxl,
+              ),
+              child: Column(
+                // Explícito aunque sea el valor por defecto: el bug que
+                // corrigió este `SizedBox` demuestra que acá conviene que se
+                // lea la intención.
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ProfileHeroAvatar(
+                    nombre: persona.nombre,
+                    imagen: imagen,
+                    onVerFoto: onVerFoto,
+                    onCambiarFoto: onCambiarFoto,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _FilaNombre(
+                    nombre: persona.nombreCompleto,
+                    color: onHero,
+                    onTap: onEditarNombre,
+                  ),
+                  _ZonaRol(rol: rol, esClaro: esClaro),
+                ],
+              ),
             ),
           ),
         ],
@@ -223,13 +236,17 @@ class _ZonaRol extends StatelessWidget {
     final valor = rol.value;
     if (valor == null) return const SizedBox.shrink();
 
-    return _RolChip(texto: valor.etiqueta, esClaro: esClaro);
+    return _RolChip(
+      key: const Key('rol-chip'),
+      texto: valor.etiqueta,
+      esClaro: esClaro,
+    );
   }
 }
 
 /// Pastilla con el rol del usuario.
 class _RolChip extends StatelessWidget {
-  const _RolChip({required this.texto, required this.esClaro});
+  const _RolChip({super.key, required this.texto, required this.esClaro});
 
   final String texto;
   final bool esClaro;

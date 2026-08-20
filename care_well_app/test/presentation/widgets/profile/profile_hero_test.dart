@@ -169,6 +169,38 @@ void main() {
       expect(alto, greaterThanOrEqualTo(48));
     });
 
+    testWidgets('el avatar, el nombre y el chip quedan centrados en el hero', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(_hero()));
+
+      final centroDelHero = tester.getCenter(find.byType(ProfileHero)).dx;
+
+      // El avatar: su `Stack` mide lo que el círculo (el badge es `Positioned`
+      // y no aporta tamaño), así que su centro es el centro visual de la foto.
+      expect(
+        tester.getCenter(find.byType(ProfileHeroAvatar)).dx,
+        closeTo(centroDelHero, 1.0),
+      );
+      // La fila del nombre —el único `InkWell` del hero, el avatar usa
+      // `GestureDetector`— y no el `Text`: el lápiz de al lado corre el texto
+      // a la izquierda del centro aun con la fila perfectamente centrada.
+      expect(
+        tester.getCenter(find.byType(InkWell)).dx,
+        closeTo(centroDelHero, 1.0),
+      );
+      // Ídem el chip: se mide la pastilla completa, no su texto, que el ícono
+      // desplaza.
+      expect(
+        tester.getCenter(find.byKey(const Key('rol-chip'))).dx,
+        closeTo(centroDelHero, 1.0),
+      );
+    });
+
+    // Un solo caso, en tema claro: el centrado sale del mismo árbol de widgets
+    // en ambos temas (sólo cambian los colores), así que repetirlo en oscuro no
+    // agregaría un motivo nuevo por el que pudiera fallar.
+
     testWidgets('un nombre largo no desborda', (tester) async {
       tester.view.physicalSize = const Size(320, 700);
       tester.view.devicePixelRatio = 1.0;

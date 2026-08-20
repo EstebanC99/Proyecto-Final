@@ -188,12 +188,15 @@ Future<void> _pumpSettingsConRouter(WidgetTester tester) async {
 
 void main() {
   group('SettingsScreen', () {
-    testWidgets('muestra el título de la pantalla como encabezado', (
+    testWidgets('muestra el título de la pantalla en el AppBar', (
       tester,
     ) async {
       await _pumpSettings(tester);
 
-      expect(find.text('Configuración'), findsOneWidget);
+      // Se afirma dónde vive el título y no sólo que exista: el AppBar de
+      // Material ya aporta la semántica de encabezado, que antes había que
+      // declarar a mano cuando el título estaba en el cuerpo.
+      expect(find.widgetWithText(AppBar, 'Configuración'), findsOneWidget);
     });
 
     testWidgets('muestra todas las secciones', (tester) async {

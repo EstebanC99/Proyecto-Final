@@ -34,31 +34,25 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(backgroundColor: context.colors.surface, elevation: 0),
+      appBar: AppBar(
+        backgroundColor: context.colors.surface,
+        elevation: 0,
+        // El título va en la barra y con la tipografía del tema, como el resto
+        // de la app: un título grande propio en el cuerpo hacía que esta
+        // pantalla se leyera distinta de todas las demás.
+        title: const Text('Configuración'),
+      ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        // El `top` reemplaza el aire que aportaba el título del cuerpo: sin él
+        // la tarjeta de usuario queda pegada al AppBar. El bottom es 0 porque
+        // el `SizedBox` del final ya deja el colchón de scroll.
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          0,
+        ),
         children: [
-          // El título vive en el cuerpo, no en el AppBar: por eso el rol de
-          // encabezado hay que declararlo a mano.
-          Padding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.sm,
-              bottom: AppSpacing.lg,
-            ),
-            child: Semantics(
-              header: true,
-              child: Text(
-                'Configuración',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.6,
-                  color: context.colors.textPrimary,
-                ),
-              ),
-            ),
-          ),
-
           anim(const _TarjetaUsuario(), 0),
 
           // Sección Seguridad y privacidad
