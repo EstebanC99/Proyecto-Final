@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -251,11 +251,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
           backgroundColor: context.colors.success,
         ),
       );
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.goNamed(AppRoutes.dependentsName);
-      }
+      context.volverA(AppRoutes.dependents);
     }
   }
 
@@ -286,11 +282,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
           backgroundColor: context.colors.success,
         ),
       );
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.goNamed(AppRoutes.dependentsName);
-      }
+      context.volverA(AppRoutes.dependents);
     }
   }
 
@@ -318,11 +310,7 @@ class _DependentDetailScreenState extends ConsumerState<DependentDetailScreen> {
           backgroundColor: context.colors.success,
         ),
       );
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        context.goNamed(AppRoutes.dependentsName);
-      }
+      context.volverA(AppRoutes.dependents);
     }
   }
 

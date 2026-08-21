@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -60,11 +61,13 @@ class HealthEventDetailScreen extends ConsumerWidget {
                     );
                   },
                 );
-                // El diálogo ya cerró su propia página; navegamos con
-                // go_router a la lista para no vaciar el stack (evita el pop
-                // duplicado que dejaba la pantalla en negro).
+                // El pop va acá, después de `await`: para entonces el diálogo
+                // ya cerró su propia ruta, así que se desapila esta pantalla y
+                // no la del diálogo (popear dentro de `onConfirm` sacaría dos
+                // rutas). La lista de abajo sigue montada y se refresca sola:
+                // `eliminarEventoSaludProvider` invalida sus providers.
                 if (eliminado && context.mounted) {
-                  context.go(AppRoutes.healthEvents);
+                  context.volverA(AppRoutes.healthEvents);
                 }
               },
             ),

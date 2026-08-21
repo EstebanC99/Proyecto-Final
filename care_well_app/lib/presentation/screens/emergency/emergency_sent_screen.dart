@@ -1,9 +1,9 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -12,8 +12,10 @@ import '../../widgets/widgets.dart';
 
 /// Pantalla de confirmación de emergencia enviada (US-34).
 ///
-/// Estado terminal: se accede via `context.go()`, no `push()`.
-/// El gesto back del sistema navega al inicio, no a EmergencyScreen (anti-reenvío).
+/// Estado terminal: se accede vía `context.pushReplacementNamed()`, que
+/// reemplaza a EmergencyScreen en el tope del stack sin perder las páginas
+/// inferiores (Home). El gesto back del sistema navega al inicio y nunca a
+/// EmergencyScreen, que ya no está apilada (anti-reenvío).
 class EmergencySentScreen extends ConsumerWidget {
   const EmergencySentScreen({super.key});
 
@@ -26,7 +28,7 @@ class EmergencySentScreen extends ConsumerWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) context.goNamed(AppRoutes.homeName);
+        if (!didPop) context.volverA(AppRoutes.home);
       },
       child: Scaffold(
         backgroundColor: context.colors.surface,
@@ -154,7 +156,7 @@ class EmergencySentScreen extends ConsumerWidget {
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton(
-                      onPressed: () => context.goNamed(AppRoutes.homeName),
+                      onPressed: () => context.volverA(AppRoutes.home),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
                           color: context.colors.primary,
