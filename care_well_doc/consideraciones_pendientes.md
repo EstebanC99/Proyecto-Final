@@ -16,4 +16,4 @@
 - Al eliminar un registro de **Evento de Salud** se rompe el AppBar y no se puede volver atrás, provocando el cierre de la app. *Investigar si pasa en cada uno de los "Eliminar".*
 - No se puede eliminar una serie a futuro ya iniciada. La idea es poder ponerle una **Fecha de Fin** por si queres cancelar la serie futura.
 - Error inesperado al intentar registrar un **Evento de agenda** con repetición.
-- No esta llegando la notificación de **Emergencia** a los dispositivos. *Revisar el google-services.json en el server.*
+- ~~No esta llegando la notificación de **Emergencia** a los dispositivos. *Revisar el google-services.json en el server.*~~ -> El error era debido a la ausenscia del archivo ***google-services.json*** en la ruta ***care_well_app/Android/app/***
