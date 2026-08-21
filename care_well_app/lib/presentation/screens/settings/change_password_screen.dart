@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -170,7 +170,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         title: 'Contraseña actualizada',
         subtitle: 'Tu nueva contraseña ya está activa.',
         primaryButtonLabel: 'Volver a Configuración',
-        onPrimaryTap: () => context.go(AppRoutes.settings),
+        onPrimaryTap: () => context.volverA(AppRoutes.settings),
       );
     }
 
