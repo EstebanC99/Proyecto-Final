@@ -14,6 +14,22 @@ abstract class NotificationScheduler {
   /// Retorna `true` si el permiso fue otorgado.
   Future<bool> requestPermission();
 
+  /// Indica si el sistema permite programar alarmas exactas.
+  ///
+  /// En Android 12 el usuario puede revocar el permiso desde Ajustes; si no
+  /// está disponible, los recordatorios se degradan a modo inexacto y pueden
+  /// dispararse con atraso.
+  Future<bool> puedeProgramarAlarmasExactas();
+
+  /// Abre la pantalla del sistema donde el usuario habilita las alarmas
+  /// exactas.
+  ///
+  /// Existe para que presentation pueda ofrecer la acción sin conocer la API
+  /// de la plataforma. No retorna el resultado: la pantalla es externa a la
+  /// app, así que el estado se vuelve a consultar con
+  /// [puedeProgramarAlarmasExactas] al regresar.
+  Future<void> solicitarPermisoAlarmasExactas();
+
   /// Programa un recordatorio para el evento indicado.
   ///
   /// Si [fechaHora] ya pasó, la implementación NO debe programar la notificación.
