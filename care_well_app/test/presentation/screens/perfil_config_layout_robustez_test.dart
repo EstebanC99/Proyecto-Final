@@ -245,6 +245,27 @@ Future<void> _abrirAcercaDe(WidgetTester tester) async {
   await tester.tap(item);
 }
 
+/// Abre el diálogo de eliminación de cuenta desde la sección Zona sensible.
+///
+/// A diferencia de [_abrirAcercaDe], acá no alcanza con `ensureVisible`: el
+/// ítem es el último de la lista y con escala 2.0 queda fuera del viewport y de
+/// su `cacheExtent`, así que el `ListView` todavía no lo construyó y ningún
+/// finder lo encuentra. Hay que scrollear hasta que exista.
+Future<void> _abrirEliminarCuenta(WidgetTester tester) async {
+  final item = find.text('Eliminar cuenta');
+  if (!tester.any(item)) {
+    await tester.scrollUntilVisible(
+      item,
+      80,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 30,
+    );
+  }
+  await tester.ensureVisible(item);
+  await tester.pumpAndSettle();
+  await tester.tap(item);
+}
+
 void main() {
   // ── Matriz tema × escala sobre las cuatro pantallas del ciclo ──────────────
   for (final oscuro in [false, true]) {
@@ -352,6 +373,23 @@ void main() {
           find.text('Contacto: carewell.project.team@gmail.com'),
           findsOneWidget,
         );
+      },
+    );
+
+    _testDeLayout(
+      'el diálogo de eliminar cuenta renderiza en tema $tema con escala 2.0',
+      home: const SettingsScreen(),
+      oscuro: oscuro,
+      escala: 2.0,
+      interaccion: _abrirEliminarCuenta,
+      // Es el diálogo más alto de Configuración: texto de tres líneas, label y
+      // campo de confirmación. Por eso el `AlertDialog` es `scrollable`.
+      verificaciones: (_) {
+        expect(find.text('¿Eliminar tu cuenta?'), findsOneWidget);
+        // Sin esto el caso podría quedar verde por vacío: si el campo de
+        // confirmación desapareciera, no habría excepción pero tampoco
+        // estaríamos tensando el diálogo completo.
+        expect(find.byType(TextField), findsOneWidget);
       },
     );
   }

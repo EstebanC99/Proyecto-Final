@@ -374,6 +374,36 @@ void main() {
         expect(btn.onPressed, isNull);
       },
     );
+
+    testWidgets(
+      'dialog eliminar: el cuerpo describe la baja lógica, no un borrado total',
+      (tester) async {
+        await _pumpSettings(tester);
+        await _asegurarVisible(tester, find.text('Eliminar cuenta'));
+
+        await tester.tap(find.text('Eliminar cuenta'));
+        await tester.pumpAndSettle();
+
+        // Los finders se acotan al diálogo y usan `findRichText: true` por dos
+        // motivos distintos. El segundo, porque el cuerpo es un `RichText`
+        // (parte va en negrita) y sin esa bandera no lo encuentran. El
+        // primero, porque el ítem de la lista que quedó detrás del diálogo
+        // cierra con esta misma frase —esa consistencia es deliberada— y sin
+        // acotar, el finder devolvería los dos.
+        Finder enElDialogo(String texto) => find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.textContaining(texto, findRichText: true),
+        );
+
+        expect(enElDialogo('No se puede deshacer'), findsOneWidget);
+        // La explicación de por qué la información sobrevive: sin este assert
+        // se podría borrar la oración entera y el caso seguiría verde.
+        expect(enElDialogo('historial de las personas'), findsOneWidget);
+        // Assert negativo deliberado: la baja es lógica, el diálogo no puede
+        // volver a prometer que se eliminan todos los datos.
+        expect(enElDialogo('Se eliminarán todos tus datos'), findsNothing);
+      },
+    );
   });
 
   group('SettingsScreen · tarjeta de usuario', () {

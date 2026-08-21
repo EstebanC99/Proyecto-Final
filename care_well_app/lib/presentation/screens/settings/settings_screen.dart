@@ -301,6 +301,14 @@ class _PieDeVersion extends ConsumerWidget {
 ///
 /// Requiere que el usuario tipee "DELETE" (case-sensitive, sin espacios
 /// adicionales) para habilitar el botón destructivo.
+///
+/// El cuerpo describe una **baja lógica**, no un borrado físico: la cuenta
+/// pierde el acceso y sus datos dejan de estar disponibles en la app, pero el
+/// registro de la persona se conserva porque puede integrar el equipo de
+/// cuidado de terceros y formar parte de su historial. Por eso el texto no
+/// promete que se eliminen todos los datos: no sería cierto
+/// (CuidadoPersonas.tex, "Zona sensible — Eliminar cuenta" y "Baja de
+/// usuarios").
 class _EliminarCuentaDialog extends StatefulWidget {
   const _EliminarCuentaDialog({required this.ref});
 
@@ -348,6 +356,10 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
+      // El contenido combina un texto de varias líneas con el campo de
+      // confirmación: con escala tipográfica grande y el teclado abierto no
+      // entra en la altura disponible. Sin efecto visual a escala normal.
+      scrollable: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       ),
@@ -368,16 +380,22 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
                 height: 1.5,
               ),
               children: const [
-                TextSpan(text: 'Esta acción es '),
                 TextSpan(
-                  text: 'irreversible',
+                  text:
+                      'Perderás el acceso a CareWell y tus datos dejarán de '
+                      'estar disponibles. ',
+                ),
+                // Mismo cierre que el subtítulo del ítem en la lista: el
+                // usuario lee la misma frase en los dos lugares.
+                TextSpan(
+                  text: 'No se puede deshacer.',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
                   text:
-                      '. Se eliminarán todos tus datos, personas a cargo y '
-                      'membresías en equipos de cuidado. No podrás recuperar '
-                      'tu cuenta.',
+                      ' Tu información no se borra de inmediato: puede seguir '
+                      'formando parte del historial de las personas que '
+                      'cuidás.',
                 ),
               ],
             ),
