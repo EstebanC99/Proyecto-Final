@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -8,6 +9,21 @@ import '../../domain/notifications/notification_channel.dart';
 import '../../domain/notifications/notification_id.dart';
 import '../../domain/notifications/notification_payload.dart';
 import '../../domain/notifications/notification_scheduler.dart';
+
+/// Traduce la disponibilidad de alarmas exactas al modo de programación de
+/// Android.
+///
+/// Vive fuera de la clase para poder verificarse sin el plugin ni el binding
+/// de Flutter: es la única decisión con lógica de todo el camino.
+///
+/// - `true`  → [AndroidScheduleMode.exactAllowWhileIdle]: dispara a la hora
+///   exacta incluso con el dispositivo en Doze.
+/// - `false` → [AndroidScheduleMode.inexactAllowWhileIdle]: el sistema agrupa
+///   la alarma y puede atrasarla de minutos a horas.
+AndroidScheduleMode resolveScheduleMode(bool canScheduleExact) =>
+    canScheduleExact
+    ? AndroidScheduleMode.exactAllowWhileIdle
+    : AndroidScheduleMode.inexactAllowWhileIdle;
 
 /// Implementación concreta de [NotificationScheduler] usando
 /// `flutter_local_notifications` y `timezone`.
@@ -32,6 +48,24 @@ class LocalNotificationScheduler implements NotificationScheduler {
 
   /// Payload de la notificación que abrió la app, resuelto en [init].
   NotificationPayload? _launchPayload;
+
+  /// Última respuesta conocida de `canScheduleExactNotifications()`.
+  ///
+  /// Arranca en `false` (degradación segura): programar en modo exacto sin
+  /// permiso lanza una excepción de plataforma.
+  bool _puedeExactas = false;
+
+  /// Momento en que se resolvió [_puedeExactas]; `null` si la caché está sucia.
+  DateTime? _puedeExactasAt;
+
+  /// Vigencia de [_puedeExactas] durante la programación.
+  ///
+  /// Una resincronización programa cientos de recordatorios y consultar el
+  /// permiso en cada uno serían cientos de round-trips al platform channel
+  /// durante el arranque. Con esta ventana, una corrida completa lo consulta
+  /// una sola vez. El permiso solo cambia si el usuario sale a Ajustes, y ese
+  /// camino invalida la caché explícitamente.
+  static const _vigenciaPuedeExactas = Duration(seconds: 60);
 
   /// Retorna un id de notificación positivo a partir del id entero del evento.
   ///
@@ -74,10 +108,7 @@ class LocalNotificationScheduler implements NotificationScheduler {
       );
     }
 
-    final androidPlugin = _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
+    final androidPlugin = _androidPlugin;
 
     await androidPlugin?.createNotificationChannel(
       const AndroidNotificationChannel(
@@ -99,11 +130,27 @@ class LocalNotificationScheduler implements NotificationScheduler {
 
   @override
   Future<bool> requestPermission() async {
-    final android = _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-    return await android?.requestNotificationsPermission() ?? false;
+    final android = _androidPlugin;
+    final concedido = await android?.requestNotificationsPermission() ?? false;
+
+    // En Android 12 abre el diálogo de alarmas exactas; en 33+ es un no-op
+    // porque USE_EXACT_ALARM viene concedido. El resultado NO altera el valor
+    // de retorno: acá se responde por el permiso de notificaciones.
+    await android?.requestExactAlarmsPermission();
+    await _refrescarPuedeExactas();
+
+    return concedido;
+  }
+
+  @override
+  Future<bool> puedeProgramarAlarmasExactas() => _refrescarPuedeExactas();
+
+  @override
+  Future<void> solicitarPermisoAlarmasExactas() async {
+    await _androidPlugin?.requestExactAlarmsPermission();
+    // El usuario resuelve en una pantalla del sistema: al volver, la caché
+    // quedó vieja y hay que invalidarla para que el banner refleje la realidad.
+    _puedeExactasAt = null;
   }
 
   @override
@@ -118,22 +165,33 @@ class LocalNotificationScheduler implements NotificationScheduler {
     if (!fechaHora.isAfter(DateTime.now())) return;
 
     final tzDateTime = tz.TZDateTime.from(fechaHora, tz.local);
-    await _plugin.zonedSchedule(
-      id: notificationId,
-      title: titulo,
-      body: cuerpo,
-      scheduledDate: tzDateTime,
-      notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      payload: payload,
-    );
+    final modo = resolveScheduleMode(await _puedeExactasCacheado());
+
+    try {
+      await _zonedSchedule(
+        notificationId: notificationId,
+        titulo: titulo,
+        cuerpo: cuerpo,
+        cuando: tzDateTime,
+        modo: modo,
+        payload: payload,
+      );
+    } on PlatformException {
+      // El permiso pudo revocarse entre la consulta y la programación. Antes de
+      // dejar al usuario sin recordatorio, se reintenta en modo inexacto: llega
+      // tarde, pero llega.
+      if (modo == AndroidScheduleMode.inexactAllowWhileIdle) rethrow;
+      _puedeExactas = false;
+      _puedeExactasAt = DateTime.now();
+      await _zonedSchedule(
+        notificationId: notificationId,
+        titulo: titulo,
+        cuerpo: cuerpo,
+        cuando: tzDateTime,
+        modo: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: payload,
+      );
+    }
   }
 
   @override
@@ -176,6 +234,58 @@ class LocalNotificationScheduler implements NotificationScheduler {
   /// En producción no tiene llamador: el scheduler se crea en `main.dart` y
   /// vive todo el proceso. Existe para que los tests no filtren el stream.
   Future<void> dispose() => _tapController.close();
+
+  /// Implementación Android del plugin; `null` en el resto de las plataformas.
+  AndroidFlutterLocalNotificationsPlugin? get _androidPlugin => _plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
+
+  /// Consulta el permiso al sistema y actualiza la caché.
+  ///
+  /// Fuera de Android no hay alarmas exactas que negociar: se responde `false`
+  /// y los recordatorios quedan en modo inexacto.
+  Future<bool> _refrescarPuedeExactas() async {
+    final android = _androidPlugin;
+    if (android == null) {
+      _puedeExactas = false;
+      _puedeExactasAt = DateTime.now();
+      return false;
+    }
+    _puedeExactas = await android.canScheduleExactNotifications() ?? false;
+    _puedeExactasAt = DateTime.now();
+    return _puedeExactas;
+  }
+
+  /// Valor de [_puedeExactas] vigente, refrescándolo solo si venció.
+  Future<bool> _puedeExactasCacheado() async {
+    final resuelto = _puedeExactasAt;
+    if (resuelto != null &&
+        DateTime.now().difference(resuelto) < _vigenciaPuedeExactas) {
+      return _puedeExactas;
+    }
+    return _refrescarPuedeExactas();
+  }
+
+  /// Programa la notificación en el [modo] indicado.
+  Future<void> _zonedSchedule({
+    required int notificationId,
+    required String titulo,
+    required String cuerpo,
+    required tz.TZDateTime cuando,
+    required AndroidScheduleMode modo,
+    String? payload,
+  }) => _plugin.zonedSchedule(
+    id: notificationId,
+    title: titulo,
+    body: cuerpo,
+    scheduledDate: cuando,
+    notificationDetails: NotificationDetails(
+      android: _androidDetailsFor(NotificationChannel.agenda),
+    ),
+    androidScheduleMode: modo,
+    payload: payload,
+  );
 
   /// Traduce el canal del dominio a la configuración concreta de Android.
   AndroidNotificationDetails _androidDetailsFor(NotificationChannel canal) {

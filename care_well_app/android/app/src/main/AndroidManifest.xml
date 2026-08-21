@@ -1,7 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Alarmas exactas: los recordatorios de medicación y turnos médicos deben
+         dispararse a la hora indicada, no "en algún momento" de la ventana que
+         elija el sistema.
+         USE_EXACT_ALARM (API 33+) se auto-concede y no se puede revocar.
+         SCHEDULE_EXACT_ALARM cubre Android 12 (API 31-32), donde el permiso
+         anterior no existe; ahí el usuario SÍ puede revocarlo desde Ajustes y
+         los recordatorios se degradan a modo inexacto. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 

@@ -23,6 +23,7 @@ class InlineErrorBanner extends StatelessWidget {
     this.icon,
     this.actionLabel,
     this.onAction,
+    this.onDismiss,
   });
 
   final String message;
@@ -38,6 +39,12 @@ class InlineErrorBanner extends StatelessWidget {
 
   /// Callback de la acción secundaria. Requerido junto con [actionLabel].
   final VoidCallback? onAction;
+
+  /// Callback del descarte. Si es `null` el banner no se puede cerrar.
+  ///
+  /// Reservado para avisos no bloqueantes que el usuario puede convivir con
+  /// ellos: un error que exige corrección no debería poder ocultarse.
+  final VoidCallback? onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +97,24 @@ class InlineErrorBanner extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onDismiss != null)
+                IconButton(
+                  onPressed: onDismiss,
+                  icon: const Icon(Icons.close),
+                  iconSize: 18,
+                  color: foreground,
+                  tooltip: 'Descartar aviso',
+                  padding: EdgeInsets.zero,
+                  // El ícono es chico por jerarquía visual, pero el área
+                  // tocable respeta el mínimo accesible.
+                  constraints: const BoxConstraints(
+                    minWidth: AppSpacing.minTapTarget,
+                    minHeight: AppSpacing.minTapTarget,
+                  ),
+                  // Alinea la cruz con el ícono del tono, en vez de centrarla
+                  // en los 48dp del área tocable.
+                  alignment: Alignment.topCenter,
+                ),
             ],
           ),
           if (actionLabel != null && onAction != null)

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:care_well_app/domain/entities/entities.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/screens/agenda/agenda_screen.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../_fakes/fake_notification_scheduler.dart';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -52,6 +56,10 @@ Widget _wrap({
   List<OcurrenciaEventoAgenda> ocurrenciasSemana = const [],
   OcurrenciaEventoAgenda? proxima,
   bool puedeGestionar = true,
+
+  /// Scheduler inyectado. Por defecto responde que las alarmas exactas están
+  /// disponibles, para que el aviso no interfiera con el resto de los tests.
+  FakeNotificationScheduler? scheduler,
   Persona? persona,
   List<Override> overrides = const [],
 }) {
@@ -76,6 +84,9 @@ Widget _wrap({
       ),
       proximaOcurrenciaProvider.overrideWith((ref) async => proxima),
       puedeGestionarAgendaProvider.overrideWith((ref) async => puedeGestionar),
+      notificationSchedulerProvider.overrideWithValue(
+        scheduler ?? FakeNotificationScheduler(),
+      ),
       ...overrides,
     ],
     child: const MaterialApp(home: AgendaScreen()),
@@ -314,6 +325,98 @@ void main() {
           tester.element(find.byType(AgendaScreen)),
         );
         expect(container.read(semanaSeleccionadaProvider), _lunes);
+      });
+    });
+
+    group('aviso de alarmas exactas', () {
+      const mensaje =
+          'Los recordatorios de la agenda podrían llegar tarde. Activá las '
+          'alarmas exactas para que avisen a tiempo.';
+
+      FakeNotificationScheduler fake({bool puedeExactas = false}) {
+        final scheduler = FakeNotificationScheduler(
+          puedeAlarmasExactas: puedeExactas,
+        );
+        addTearDown(scheduler.dispose);
+        return scheduler;
+      }
+
+      testWidgets('sin alarmas exactas se muestra el aviso', (tester) async {
+        await tester.pumpWidget(_wrap(scheduler: fake()));
+        await tester.pumpAndSettle();
+
+        expect(find.text(mensaje), findsOneWidget);
+        expect(find.byIcon(Icons.alarm_off_outlined), findsOneWidget);
+        expect(find.text('Activar'), findsOneWidget);
+      });
+
+      testWidgets('con alarmas exactas no se muestra nada', (tester) async {
+        await tester.pumpWidget(_wrap(scheduler: fake(puedeExactas: true)));
+        await tester.pumpAndSettle();
+
+        expect(find.text(mensaje), findsNothing);
+      });
+
+      testWidgets('mientras el permiso no se resolvió el aviso se calla', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(
+            overrides: [
+              // Sin resolver: representa tanto la carga como una falla del
+              // chequeo. En ambos casos la agenda no debe mostrar ruido.
+              puedeProgramarAlarmasExactasProvider.overrideWith(
+                (ref) => Completer<bool>().future,
+              ),
+            ],
+          ),
+        );
+        await tester.pump();
+
+        expect(find.text(mensaje), findsNothing);
+      });
+
+      testWidgets('al descartarlo desaparece', (tester) async {
+        await tester.pumpWidget(_wrap(scheduler: fake()));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byTooltip('Descartar aviso'));
+        await tester.pumpAndSettle();
+
+        expect(find.text(mensaje), findsNothing);
+      });
+
+      testWidgets('Activar delega en el scheduler la apertura de Ajustes', (
+        tester,
+      ) async {
+        final scheduler = fake();
+        await tester.pumpWidget(_wrap(scheduler: scheduler));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Activar'));
+        await tester.pumpAndSettle();
+
+        expect(scheduler.solicitarAlarmasExactasCount, 1);
+      });
+
+      testWidgets('al volver de Ajustes con el permiso activo se va solo', (
+        tester,
+      ) async {
+        final scheduler = fake();
+        await tester.pumpWidget(_wrap(scheduler: scheduler));
+        await tester.pumpAndSettle();
+        expect(find.text(mensaje), findsOneWidget);
+
+        // El usuario activa el permiso en Ajustes: la pantalla del sistema no
+        // devuelve resultado, así que el aviso solo puede irse si la vuelta a
+        // foreground vuelve a consultar.
+        scheduler.puedeAlarmasExactas = true;
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text(mensaje), findsNothing);
       });
     });
   });

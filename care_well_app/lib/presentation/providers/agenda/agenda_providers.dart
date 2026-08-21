@@ -317,6 +317,25 @@ final agendaSyncThrottleProvider = Provider<AgendaSyncThrottle>(
   (ref) => AgendaSyncThrottle(),
 );
 
+/// Recordatorio ya resuelto y listo para programarse en el sistema operativo.
+///
+/// Existe para separar la etapa de recolección (que puede fallar por red) de la
+/// de publicación (que destruye el estado vigente): nada se cancela hasta tener
+/// el universo completo armado en memoria.
+class _RecordatorioProgramable {
+  const _RecordatorioProgramable({
+    required this.notificationId,
+    required this.fechaHora,
+    required this.titulo,
+    required this.cuerpo,
+  });
+
+  final int notificationId;
+  final DateTime fechaHora;
+  final String titulo;
+  final String cuerpo;
+}
+
 /// Resincroniza las notificaciones locales de TODAS las personas que el usuario
 /// puede visualizar (propio + responsable + cuidador): cancela todo lo
 /// programado una sola vez y reprograma los recordatorios de las ocurrencias
@@ -325,6 +344,11 @@ final agendaSyncThrottleProvider = Provider<AgendaSyncThrottle>(
 /// El disparo por [SyncMotivo.resume] se saltea si el throttle indica que la
 /// última corrida fue hace menos de la ventana configurada (15 min). Los
 /// motivos [SyncMotivo.ingreso] y [SyncMotivo.mutacion] corren siempre.
+///
+/// Corre en dos etapas para ser resistente a fallas de red: primero recolecta
+/// (etapa A) y recién después cancela y reprograma (etapa B). Un fallo durante
+/// la recolección nunca deja al usuario sin recordatorios: en el peor caso
+/// quedan vigentes los de la corrida anterior.
 final sincronizarNotificacionesAgendaProvider =
     Provider<Future<void> Function({required SyncMotivo motivo})>(
       (ref) => ({required motivo}) async {
@@ -332,24 +356,33 @@ final sincronizarNotificacionesAgendaProvider =
         if (motivo == SyncMotivo.resume && !throttle.deberiaCorrer()) return;
 
         final opciones = await ref.read(personasSeleccionablesProvider.future);
+        // Sin personas visibles (típicamente, sin sesión) no hay nada que
+        // reprogramar: se sale antes de cancelar para no dejar la agenda muda.
         if (opciones.isEmpty) return;
-
-        final scheduler = ref.read(notificationSchedulerProvider);
-        // cancelAll se llama una sola vez porque a continuación se reprograma el
-        // universo completo de personas (no una sola de contexto).
-        await scheduler.cancelAll();
 
         final ahora = DateTime.now();
         final hasta = ahora.add(const Duration(days: 30));
         final agendaRepository = ref.read(agendaRepositoryProvider);
 
+        // ─── Etapa A: recolección ───────────────────────────────────────────
+        // Todavía no se tocó nada de lo programado.
+        final recordatorios = <_RecordatorioProgramable>[];
+        var personasResueltas = 0;
+
         for (final opcion in opciones) {
           final persona = opcion.persona;
-          final ocurrencias = await agendaRepository.obtenerOcurrencias(
-            personaId: persona.id,
-            desde: ahora,
-            hasta: hasta,
-          );
+          final List<OcurrenciaEventoAgenda> ocurrencias;
+          try {
+            ocurrencias = await agendaRepository.obtenerOcurrencias(
+              personaId: persona.id,
+              desde: ahora,
+              hasta: hasta,
+            );
+          } catch (_) {
+            // El fallo de una persona no debe impedir programar las demás.
+            continue;
+          }
+          personasResueltas++;
 
           for (final ocu in ocurrencias) {
             final anticipacion = ocu.minutosAnticipacionRecordatorio;
@@ -357,29 +390,69 @@ final sincronizarNotificacionesAgendaProvider =
             final notifTime = ocu.fechaHoraInicio.subtract(
               Duration(minutes: anticipacion),
             );
-            if (notifTime.isAfter(ahora)) {
-              final horario = _formatHoraNotificacion(
-                ocu.fechaHoraInicio.toLocal(),
-              );
-              final tieneDesc =
-                  ocu.descripcion != null && ocu.descripcion!.isNotEmpty;
-              final titulo = 'Recordatorio de ${persona.nombreCompleto}.';
-              final cuerpo =
-                  '${ocu.titulo}: $horario.'
-                  '${tieneDesc ? ' ${ocu.descripcion!}' : ''}';
-              await scheduler.scheduleEventReminder(
+            if (!notifTime.isAfter(ahora)) continue;
+
+            final horario = _formatHoraNotificacion(
+              ocu.fechaHoraInicio.toLocal(),
+            );
+            final tieneDesc =
+                ocu.descripcion != null && ocu.descripcion!.isNotEmpty;
+            recordatorios.add(
+              _RecordatorioProgramable(
                 notificationId: NotificationId.forOcurrencia(
                   ocu.eventoAgendaId,
                   ocu.fechaHoraInicio,
                 ),
                 fechaHora: notifTime,
-                titulo: titulo,
-                cuerpo: cuerpo,
-              );
-            }
+                titulo: 'Recordatorio de ${persona.nombreCompleto}.',
+                cuerpo:
+                    '${ocu.titulo}: $horario.'
+                    '${tieneDesc ? ' ${ocu.descripcion!}' : ''}',
+              ),
+            );
           }
+        }
+
+        // Fallaron todas: se conserva lo programado y NO se marca el throttle,
+        // para que el próximo resume reintente sin esperar la ventana de 15 min.
+        if (personasResueltas == 0) return;
+
+        // ─── Etapa B: publicación ───────────────────────────────────────────
+        // cancelAll se llama una sola vez porque a continuación se reprograma el
+        // universo completo de personas (no una sola de contexto).
+        final scheduler = ref.read(notificationSchedulerProvider);
+        await scheduler.cancelAll();
+
+        for (final recordatorio in recordatorios) {
+          await scheduler.scheduleEventReminder(
+            notificationId: recordatorio.notificationId,
+            fechaHora: recordatorio.fechaHora,
+            titulo: recordatorio.titulo,
+            cuerpo: recordatorio.cuerpo,
+          );
         }
 
         throttle.marcarCorrida();
       },
     );
+
+// ─── Alarmas exactas ─────────────────────────────────────────────────────────
+
+/// Indica si el sistema permite programar alarmas exactas.
+///
+/// Se invalida al volver de background (ver `_AlarmasExactasBanner`): el
+/// permiso se concede en una pantalla de Ajustes externa a la app, que no
+/// devuelve resultado, así que la única forma de enterarse es reconsultarlo.
+final puedeProgramarAlarmasExactasProvider = FutureProvider<bool>(
+  (ref) =>
+      ref.watch(notificationSchedulerProvider).puedeProgramarAlarmasExactas(),
+);
+
+/// Marca si el usuario descartó el aviso de alarmas exactas.
+///
+/// Es estado de sesión, deliberadamente sin persistencia en disco: al reiniciar
+/// el proceso el aviso vuelve a evaluarse. Un descarte no debería silenciar
+/// para siempre algo que degrada todos los recordatorios.
+final alarmasExactasBannerDescartadoProvider = StateProvider<bool>(
+  (ref) => false,
+);

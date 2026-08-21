@@ -9,7 +9,22 @@ import 'package:care_well_app/domain/notifications/notification_scheduler.dart';
 /// Registra los IDs de notificaciones programadas, canceladas y mostradas
 /// sin invocar ninguna API del sistema operativo.
 class FakeNotificationScheduler implements NotificationScheduler {
-  FakeNotificationScheduler({this.launchPayload});
+  FakeNotificationScheduler({
+    this.launchPayload,
+    this.puedeAlarmasExactas = true,
+  });
+
+  /// Respuesta simulada de [puedeProgramarAlarmasExactas].
+  bool puedeAlarmasExactas;
+
+  /// Cantidad de veces que se consultó el permiso de alarmas exactas.
+  ///
+  /// Permite verificar que una corrida de sincronización no lo consulte una
+  /// vez por notificación.
+  int puedeAlarmasExactasCount = 0;
+
+  /// Cantidad de veces que se pidió abrir los Ajustes de alarmas exactas.
+  int solicitarAlarmasExactasCount = 0;
 
   /// Payload de la notificación local que "abrió la app", si se simula.
   NotificationPayload? launchPayload;
@@ -52,6 +67,17 @@ class FakeNotificationScheduler implements NotificationScheduler {
 
   @override
   Future<bool> requestPermission() async => true;
+
+  @override
+  Future<bool> puedeProgramarAlarmasExactas() async {
+    puedeAlarmasExactasCount++;
+    return puedeAlarmasExactas;
+  }
+
+  @override
+  Future<void> solicitarPermisoAlarmasExactas() async {
+    solicitarAlarmasExactasCount++;
+  }
 
   @override
   Future<void> scheduleEventReminder({
