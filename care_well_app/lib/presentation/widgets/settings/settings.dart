@@ -1,3 +1,4 @@
 // Barrel de widgets del módulo de configuración.
-export 'settings_section.dart';
+export 'about_carewell_dialog.dart';
 export 'settings_item.dart';
+export 'settings_user_card.dart';

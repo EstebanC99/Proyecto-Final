@@ -6,14 +6,21 @@ import '../../../config/constraints/validators.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
 /// US-09 · Cambio de contraseña para el usuario autenticado.
 ///
-/// La sesión se mantiene activa tras el cambio exitoso.
-/// Al confirmar el éxito muestra un estado visual de confirmación con CTA
-/// para volver a Configuración.
+/// La sesión se mantiene activa tras el cambio exitoso; al confirmarlo se
+/// muestra un [SuccessView] con el CTA para volver a Configuración.
+///
+/// ## Validación
+/// No usa `Form`/`GlobalKey<FormState>`: con el CTA fijo al pie
+/// ([FormBottomBar]) la validación vive en el estado de la pantalla, igual que
+/// en `ResetPasswordScreen`. El botón queda siempre habilitado y valida al
+/// tocarlo, así cada problema se explica como `errorText` bajo su propio campo
+/// (en vez de retar al usuario antes del primer intento).
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
@@ -23,33 +30,95 @@ class ChangePasswordScreen extends ConsumerStatefulWidget {
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-
   final _actualController = TextEditingController();
   final _nuevaController = TextEditingController();
   final _confirmarController = TextEditingController();
 
+  final _actualFocus = FocusNode();
+  final _nuevaFocus = FocusNode();
+  final _confirmarFocus = FocusNode();
+
   bool _mostrarActual = false;
   bool _mostrarNueva = false;
+  bool _mostrarConfirmar = false;
 
   bool _isLoading = false;
   bool _exitoso = false;
+
   String? _errorActual;
+  String? _errorNueva;
+  String? _errorConfirmar;
+  String? _errorGeneral;
 
   @override
   void dispose() {
     _actualController.dispose();
     _nuevaController.dispose();
     _confirmarController.dispose();
+    _actualFocus.dispose();
+    _nuevaFocus.dispose();
+    _confirmarFocus.dispose();
     super.dispose();
   }
 
+  /// Hay algo que perder si ya se escribió en cualquiera de los tres campos.
+  bool get _hayCambios =>
+      _actualController.text.isNotEmpty ||
+      _nuevaController.text.isNotEmpty ||
+      _confirmarController.text.isNotEmpty;
+
+  // ── Validación local ─────────────────────────────────────────────────────────
+
+  /// Valida los tres campos y deja el mensaje concreto bajo cada uno.
+  ///
+  /// Devuelve `true` si se puede seguir con el guardado.
+  bool _validar() {
+    // La contraseña ACTUAL se valida sólo como requerida, a propósito: no se le
+    // aplica `validatePassword` porque una cuenta creada antes del mínimo de 8
+    // caracteres tiene hoy una contraseña más corta y quedaría sin poder
+    // cambiarla nunca. La exigencia de complejidad rige sobre la NUEVA.
+    final actualError = _actualController.text.isEmpty
+        ? 'Ingresá tu contraseña actual.'
+        : null;
+    // La nueva pasa por el mismo validador que el alta de la cuenta.
+    final nuevaError = validatePassword(_nuevaController.text);
+    final confirmarError = validatePasswordMatch(
+      _confirmarController.text,
+      _nuevaController.text,
+    );
+
+    setState(() {
+      _errorActual = actualError;
+      _errorNueva = nuevaError;
+      _errorConfirmar = confirmarError;
+      _errorGeneral = null;
+    });
+
+    // El foco va al primer campo con problema: además de ahorrar el scroll, es
+    // lo que hace que un lector de pantalla anuncie el `errorText`.
+    FocusNode? primerProblema;
+    if (actualError != null) {
+      primerProblema = _actualFocus;
+    } else if (nuevaError != null) {
+      primerProblema = _nuevaFocus;
+    } else if (confirmarError != null) {
+      primerProblema = _confirmarFocus;
+    }
+    primerProblema?.requestFocus();
+
+    return primerProblema == null;
+  }
+
+  // ── Guardado ─────────────────────────────────────────────────────────────────
+
   Future<void> _guardar() async {
-    setState(() => _errorActual = null);
+    if (!_validar()) return;
 
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    setState(() {
+      _isLoading = true;
+      _errorGeneral = null;
+    });
 
-    setState(() => _isLoading = true);
     try {
       await ref
           .read(authStateProvider.notifier)
@@ -57,64 +126,84 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             contrasenaActual: _actualController.text,
             nuevaContrasena: _nuevaController.text,
           );
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _exitoso = true;
-        });
-      }
-    } on Exception catch (e) {
-      if (mounted) {
-        final mensaje = e.toString().replaceFirst('Exception: ', '');
-        // Si el datasource lanza "incorrecta", lo mostramos en el campo actual.
-        if (mensaje.toLowerCase().contains('incorrecta') ||
-            mensaje.toLowerCase().contains('actual')) {
-          setState(() {
-            _isLoading = false;
-            _errorActual = 'Contraseña incorrecta';
-          });
+      if (mounted) setState(() => _exitoso = true);
+    } catch (error) {
+      // `catch` sin filtro de tipo (y no `on Exception`): el datasource de la
+      // API todavía lanza `UnimplementedError` —un `Error`, no una
+      // `Exception`— porque el endpoint está pendiente en el backend. Con el
+      // filtro, esa falla escapaba y dejaba el botón cargando para siempre.
+      if (!mounted) return;
+      setState(() {
+        if (error is SinConexionException) {
+          _errorGeneral = 'Sin conexión. Verificá tu red e intentá de nuevo.';
+        } else if (error is Exception && _esContrasenaIncorrecta(error)) {
+          _errorActual = 'Contraseña incorrecta';
         } else {
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(mensaje)));
+          // Cualquier otra falla se explica en términos del usuario: el texto
+          // crudo de un error técnico no se muestra en pantalla.
+          _errorGeneral = 'No pudimos cambiar tu contraseña. Intentá de nuevo.';
         }
-      }
+      });
+    } finally {
+      // Siempre, pase lo que pase: ninguna falla puede dejar el CTA girando.
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_exitoso) return _buildExito(context);
-    return _buildFormulario(context);
+  /// Reconoce el rechazo del backend por contraseña actual equivocada, para
+  /// mostrarlo en el campo que lo causó y no como error general.
+  bool _esContrasenaIncorrecta(Exception error) {
+    final mensaje = error
+        .toString()
+        .replaceFirst('Exception: ', '')
+        .toLowerCase();
+    return mensaje.contains('incorrecta') || mensaje.contains('actual');
   }
 
-  // ── Estado formulario ────────────────────────────────────────────────────────
+  // ── Build ────────────────────────────────────────────────────────────────────
 
-  Widget _buildFormulario(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      appBar: AppBar(
-        backgroundColor: context.colors.surface,
-        title: const Text('Cambiar contraseña'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: context.colors.outline),
+  @override
+  Widget build(BuildContext context) {
+    if (_exitoso) {
+      // Sin el guard: después de guardar no queda nada que perder.
+      return SuccessView(
+        title: 'Contraseña actualizada',
+        subtitle: 'Tu nueva contraseña ya está activa.',
+        primaryButtonLabel: 'Volver a Configuración',
+        onPrimaryTap: () => context.go(AppRoutes.settings),
+      );
+    }
+
+    // El guard sale con `Navigator.pop`: la pantalla se abre con `pushNamed`
+    // desde Configuración, así que siempre hay una ruta debajo.
+    return UnsavedChangesGuard(
+      hayCambios: () => _hayCambios,
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        appBar: AppBar(
+          backgroundColor: context.colors.surface,
+          // Sin `leading` propio: el back de Material llama a `maybePop`, que
+          // es lo que hace pasar la salida por el guard. Un `context.pop()` a
+          // mano lo saltearía.
+          title: const Text('Cambiar contraseña'),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Form(
-            key: _formKey,
+        body: SafeArea(
+          // Sin padding de teclado: ya lo suma `FormBottomBar`.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.xl,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Nueva contraseña',
+                  'Actualizá tu contraseña',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                     color: context.colors.textPrimary,
                   ),
                 ),
@@ -126,130 +215,104 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     color: context.colors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xl),
 
-                // Campo contraseña actual
-                AppTextField(
+                // El error general va arriba, no al pie del scroll: el CTA está
+                // fijo en la barra inferior, así que un banner al final podría
+                // quedar fuera de vista justo cuando hace falta leerlo.
+                if (_errorGeneral != null) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  InlineErrorBanner(message: _errorGeneral!),
+                ],
+
+                _PasswordField(
                   label: 'Contraseña actual',
-                  controller: _actualController,
-                  obscureText: !_mostrarActual,
-                  enabled: !_isLoading,
-                  errorText: _errorActual,
+                  hint: 'Ingresá tu contraseña actual',
                   prefixIcon: const Icon(Icons.lock_outline, size: 20),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _mostrarActual
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      size: 20,
-                    ),
-                    onPressed: () =>
-                        setState(() => _mostrarActual = !_mostrarActual),
-                  ),
-                  keyboardType: TextInputType.visiblePassword,
-                  autocorrect: false,
+                  controller: _actualController,
+                  focusNode: _actualFocus,
+                  errorText: _errorActual,
+                  enabled: !_isLoading,
+                  obscure: !_mostrarActual,
+                  onToggleObscure: () =>
+                      setState(() => _mostrarActual = !_mostrarActual),
+                  autofillHints: const [AutofillHints.password],
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: (_) => _nuevaFocus.requestFocus(),
                   onChanged: (_) {
                     if (_errorActual != null) {
                       setState(() => _errorActual = null);
                     }
                   },
                 ),
-                const SizedBox(height: AppSpacing.lg),
 
-                // Campo nueva contraseña
-                _NuevaContrasenaField(
+                _PasswordField(
+                  label: 'Nueva contraseña',
+                  hint: 'Ingresá tu nueva contraseña',
+                  prefixIcon: const Icon(Icons.lock_outline, size: 20),
                   controller: _nuevaController,
-                  mostrar: _mostrarNueva,
+                  focusNode: _nuevaFocus,
+                  errorText: _errorNueva,
+                  // El medidor de fortaleza sólo aparece con texto: con el
+                  // campo vacío, la exigencia se dice acá.
+                  helperText: _errorNueva == null
+                      ? 'Mínimo 8 caracteres.'
+                      : null,
                   enabled: !_isLoading,
-                  onToggleVisibility: () =>
+                  obscure: !_mostrarNueva,
+                  onToggleObscure: () =>
                       setState(() => _mostrarNueva = !_mostrarNueva),
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: (_) => _confirmarFocus.requestFocus(),
+                  onChanged: (_) {
+                    if (_errorNueva != null) {
+                      setState(() => _errorNueva = null);
+                    }
+                  },
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                // El medidor se suscribe al controller: se actualiza al tipear
+                // sin redibujar el resto del formulario.
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _nuevaController,
+                  builder: (context, valor, _) => valor.text.isEmpty
+                      ? const SizedBox.shrink()
+                      : Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.sm),
+                          child: PasswordStrengthMeter(password: valor.text),
+                        ),
+                ),
 
-                // Campo confirmar nueva contraseña
-                _ConfirmarContrasenaField(
+                _PasswordField(
+                  label: 'Confirmar nueva contraseña',
+                  hint: 'Repetí tu nueva contraseña',
+                  prefixIcon: const Icon(Icons.lock_outline, size: 20),
                   controller: _confirmarController,
-                  nuevaController: _nuevaController,
+                  focusNode: _confirmarFocus,
+                  errorText: _errorConfirmar,
                   enabled: !_isLoading,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-
-                // Botón guardar
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    label: 'Guardar cambios',
-                    onPressed: _isLoading ? null : _guardar,
-                    isLoading: _isLoading,
-                  ),
+                  obscure: !_mostrarConfirmar,
+                  onToggleObscure: () =>
+                      setState(() => _mostrarConfirmar = !_mostrarConfirmar),
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _guardar(),
+                  onChanged: (_) {
+                    if (_errorConfirmar != null) {
+                      setState(() => _errorConfirmar = null);
+                    }
+                  },
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // ── Estado éxito ─────────────────────────────────────────────────────────────
-
-  Widget _buildExito(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Círculo con ícono check
-              Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  color: context.colors.successContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_circle,
-                  size: 80,
-                  color: context.colors.success,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-
-              // Título
-              Text(
-                'Contraseña actualizada',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: context.colors.textPrimary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // Subtítulo
-              Text(
-                'Tu nueva contraseña ya está activa.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: context.colors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xxxl),
-
-              // CTA
-              SizedBox(
-                width: double.infinity,
-                child: PrimaryButton(
-                  label: 'Volver a Configuración',
-                  onPressed: () => context.go(AppRoutes.settings),
-                ),
-              ),
-            ],
-          ),
+        bottomNavigationBar: FormBottomBar(
+          label: 'Guardar cambios',
+          accent: context.colors.primary,
+          loading: _isLoading,
+          onPressed: _guardar,
+          // Sin `hint`: los tres problemas posibles tienen un campo propio
+          // donde mostrarse. El hint queda para lo que no tiene campo.
         ),
       ),
     );
@@ -258,85 +321,96 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
 // ── Widgets internos ──────────────────────────────────────────────────────────
 
-class _NuevaContrasenaField extends StatefulWidget {
-  const _NuevaContrasenaField({
+/// Variante de credencial del campo de formulario del ciclo.
+///
+/// Mismo rótulo en versalitas que [FormTextField] —el lenguaje visual de los
+/// formularios rediseñados— pero **sin contador de caracteres**, que revelaría
+/// la longitud de la contraseña a quien mire la pantalla, y **con
+/// `obscureText` + ojo** para mostrarla u ocultarla.
+///
+/// No define estilo propio: el borde, el relleno y los colores salen del
+/// `inputDecorationTheme`, igual que en `AppTextField`. Si en algún momento
+/// parece más simple reemplazarlo por [FormTextField] (vuelve el contador) o
+/// por `AppTextField` (vuelve el rótulo en otro estilo), es que se perdió el
+/// motivo por el que existe.
+class _PasswordField extends StatelessWidget {
+  const _PasswordField({
+    required this.label,
     required this.controller,
-    required this.mostrar,
-    required this.enabled,
-    required this.onToggleVisibility,
+    required this.obscure,
+    required this.onToggleObscure,
+    this.hint,
+    this.errorText,
+    this.helperText,
+    this.enabled = true,
+    this.focusNode,
+    this.autofillHints,
+    this.textInputAction,
+    this.onSubmitted,
+    this.onChanged,
+    this.prefixIcon,
   });
 
+  /// Rótulo del campo. Se dibuja con [SectionLabel] (siempre obligatorio).
+  final String label;
+
   final TextEditingController controller;
-  final bool mostrar;
+
+  /// `true` oculta el texto tipeado.
+  final bool obscure;
+
+  /// Alterna [obscure]. Lo dispara el ojo del final del campo.
+  final VoidCallback onToggleObscure;
+
+  final String? hint;
+  final String? errorText;
+  final String? helperText;
   final bool enabled;
-  final VoidCallback onToggleVisibility;
+  final FocusNode? focusNode;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
+  final Widget? prefixIcon;
 
-  @override
-  State<_NuevaContrasenaField> createState() => _NuevaContrasenaFieldState();
-}
-
-class _NuevaContrasenaFieldState extends State<_NuevaContrasenaField> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppTextField(
-          label: 'Nueva contraseña',
-          controller: widget.controller,
-          obscureText: !widget.mostrar,
-          enabled: widget.enabled,
-          prefixIcon: const Icon(Icons.lock_outline, size: 20),
-          suffixIcon: IconButton(
-            icon: Icon(
-              widget.mostrar
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              size: 20,
-            ),
-            onPressed: widget.onToggleVisibility,
-          ),
-          keyboardType: TextInputType.visiblePassword,
-          autocorrect: false,
-          onChanged: (_) => setState(() {}),
-        ),
-        if (widget.controller.text.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.sm),
-          PasswordStrengthMeter(password: widget.controller.text),
-        ],
-      ],
-    );
-  }
-}
-
-class _ConfirmarContrasenaField extends StatelessWidget {
-  const _ConfirmarContrasenaField({
-    required this.controller,
-    required this.nuevaController,
-    required this.enabled,
-  });
-
-  final TextEditingController controller;
-  final TextEditingController nuevaController;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    return FormField<String>(
-      validator: (_) =>
-          validatePasswordMatch(controller.text, nuevaController.text),
-      builder: (field) {
-        return AppTextField(
-          label: 'Confirmar nueva contraseña',
+        SectionLabel(text: label, required: true),
+        TextField(
           controller: controller,
-          obscureText: true,
+          focusNode: focusNode,
           enabled: enabled,
-          prefixIcon: const Icon(Icons.lock_outline, size: 20),
-          errorText: field.errorText,
-          keyboardType: TextInputType.visiblePassword,
+          obscureText: obscure,
+          // Un teclado que corrige o sugiere sobre una contraseña sólo mete
+          // ruido (y la filtra al diccionario del sistema).
           autocorrect: false,
-        );
-      },
+          keyboardType: TextInputType.visiblePassword,
+          autofillHints: autofillHints,
+          textInputAction: textInputAction,
+          onSubmitted: onSubmitted,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: prefixIcon,
+            errorText: errorText,
+            helperText: helperText,
+            suffixIcon: IconButton(
+              onPressed: enabled ? onToggleObscure : null,
+              icon: Icon(
+                obscure
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                size: 20,
+                color: context.colors.textSecondary,
+              ),
+              tooltip: obscure ? 'Mostrar contraseña' : 'Ocultar contraseña',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

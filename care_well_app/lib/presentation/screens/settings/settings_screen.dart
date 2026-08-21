@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,8 +11,11 @@ import '../../widgets/widgets.dart';
 
 /// US-08/10/11 · Pantalla principal de Configuración.
 ///
-/// Agrupa las secciones: Cuenta, Seguridad y privacidad, Legal, Sesión.
-/// - US-08: navega a T&C.
+/// Agrupa las secciones: Seguridad y privacidad, Legal y Zona sensible, con la
+/// identidad del usuario arriba (acceso a "Mi Perfil") y el cierre de sesión
+/// como acción secundaria al pie.
+/// - US-06: la tarjeta de usuario navega al perfil.
+/// - US-08: navega a T&C y a la política de privacidad.
 /// - US-10: dialog de confirmación para cerrar sesión.
 /// - US-11: dialog de confirmación para eliminar cuenta (requiere tipear "DELETE").
 class SettingsScreen extends ConsumerWidget {
@@ -19,78 +23,168 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final sinAnimacion = MediaQuery.disableAnimationsOf(context);
+
+    Widget anim(Widget child, int delayMs) => sinAnimacion
+        ? child
+        : FadeInUp(
+            delay: Duration(milliseconds: delayMs),
+            child: child,
+          );
+
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
         backgroundColor: context.colors.surface,
+        elevation: 0,
+        // El título va en la barra y con la tipografía del tema, como el resto
+        // de la app: un título grande propio en el cuerpo hacía que esta
+        // pantalla se leyera distinta de todas las demás.
         title: const Text('Configuración'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: context.colors.outline),
-        ),
       ),
       body: ListView(
+        // El `top` reemplaza el aire que aportaba el título del cuerpo: sin él
+        // la tarjeta de usuario queda pegada al AppBar. El bottom es 0 porque
+        // el `SizedBox` del final ya deja el colchón de scroll.
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          0,
+        ),
         children: [
-          const SizedBox(height: AppSpacing.sm),
-
-          // Sección Cuenta
-          SettingsSection(
-            title: 'Cuenta',
-            items: [
-              SettingsItem(
-                icon: Icons.person_outline,
-                label: 'Mi Perfil',
-                onTap: () => context.pushNamed(AppRoutes.profileName),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          anim(const _TarjetaUsuario(), 0),
 
           // Sección Seguridad y privacidad
-          SettingsSection(
-            title: 'Seguridad y privacidad',
-            items: [
-              SettingsItem(
-                icon: Icons.security_outlined,
-                label: 'Cambiar contraseña',
-                onTap: () =>
-                    context.pushNamed(AppRoutes.settingsChangePasswordName),
-              ),
-              SettingsItem(
-                icon: Icons.delete_forever_outlined,
-                label: 'Eliminar cuenta',
-                destructive: true,
-                onTap: () => _mostrarDialogEliminarCuenta(context, ref),
-              ),
-            ],
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Seguridad y privacidad'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.lock_outline,
+                      label: 'Cambiar contraseña',
+                      subtitle: 'Se te pedirá tu contraseña actual',
+                      onTap: () => context.pushNamed(
+                        AppRoutes.settingsChangePasswordName,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            50,
           ),
-          const SizedBox(height: AppSpacing.lg),
 
           // Sección Legal
-          SettingsSection(
-            title: 'Legal',
-            items: [
-              SettingsItem(
-                icon: Icons.description_outlined,
-                label: 'Términos y condiciones',
-                onTap: () => context.pushNamed(AppRoutes.settingsTermsName),
-              ),
-            ],
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Legal'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.description_outlined,
+                      label: 'Términos y condiciones',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () =>
+                          context.pushNamed(AppRoutes.settingsTermsName),
+                    ),
+                    SettingsItem(
+                      icon: Icons.privacy_tip_outlined,
+                      label: 'Política de privacidad',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () =>
+                          context.pushNamed(AppRoutes.settingsPrivacyName),
+                    ),
+                    SettingsItem(
+                      icon: Icons.info_outline,
+                      label: 'Acerca de CareWell',
+                      iconColor: context.colors.info,
+                      iconBackground: context.colors.infoContainer,
+                      onTap: () async {
+                        // Sin manejo de error: la lectura del paquete instalado
+                        // no falla en Android; de fallar, el efecto es que el
+                        // diálogo no se abre.
+                        final version = await ref.read(
+                          appVersionProvider.future,
+                        );
+                        if (!context.mounted) return;
+                        await mostrarAcercaDeCareWell(
+                          context,
+                          version: version,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            100,
           ),
-          const SizedBox(height: AppSpacing.lg),
 
-          // Sección Sesión
-          SettingsSection(
-            title: 'Sesión',
-            items: [
-              SettingsItem(
-                icon: Icons.logout,
-                label: 'Cerrar sesión',
-                destructive: true,
-                onTap: () => _mostrarDialogCerrarSesion(context, ref),
-              ),
-            ],
+          // Sección Zona sensible
+          anim(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionLabel(text: 'Zona sensible'),
+                CardGroup(
+                  children: [
+                    SettingsItem(
+                      icon: Icons.delete_forever_outlined,
+                      label: 'Eliminar cuenta',
+                      destructive: true,
+                      showChevron: false,
+                      subtitle:
+                          'Perderás el acceso y tus datos dejarán de estar '
+                          'disponibles. No se puede deshacer.',
+                      subtitleMaxLines: 3,
+                      onTap: () => _mostrarDialogEliminarCuenta(context, ref),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            150,
           ),
+
+          // Cerrar sesión: acción secundaria, no destructiva. Gris deliberado
+          // (la cuenta no se pierde), fuera de las tarjetas para separarla de
+          // los ítems de navegación.
+          anim(
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xl),
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () => _mostrarDialogCerrarSesion(context, ref),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: context.colors.surface,
+                    foregroundColor: context.colors.textSecondary,
+                    side: BorderSide(color: context.colors.outline, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  child: const Text('Cerrar sesión'),
+                ),
+              ),
+            ),
+            200,
+          ),
+
+          const _PieDeVersion(),
           const SizedBox(height: AppSpacing.xxxl),
         ],
       ),
@@ -149,10 +243,72 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
+/// Tarjeta de identidad del usuario autenticado, con acceso al perfil.
+///
+/// Observa `authStateProvider` sólo acá y no envolviendo la pantalla: si la
+/// sesión no resuelve, Configuración tiene que seguir siendo usable (el usuario
+/// necesita poder llegar a "Cerrar sesión"). Por eso el estado de error —y el
+/// de usuario nulo— degradan a nada en lugar de bloquear la vista con un
+/// banner.
+class _TarjetaUsuario extends ConsumerWidget {
+  const _TarjetaUsuario();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(authStateProvider)
+        .when(
+          loading: () => const SettingsUserCardSkeleton(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (usuario) => usuario == null
+              ? const SizedBox.shrink()
+              : SettingsUserCard(
+                  persona: usuario.persona,
+                  onTap: () => context.pushNamed(AppRoutes.profileName),
+                ),
+        );
+  }
+}
+
+/// Pie con la versión instalada de la app.
+///
+/// Lee el `AsyncValue` por su getter nullable `value` a propósito (en Riverpod
+/// 3 es el equivalente al `valueOrNull` de 2.x): mientras carga —o si la
+/// lectura del paquete falla— muestra el texto sin versión, en lugar de dejar
+/// el pie vacío o desplazar el layout cuando el valor llega.
+class _PieDeVersion extends ConsumerWidget {
+  const _PieDeVersion();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final version = ref.watch(appVersionProvider).value;
+    final texto = version == null
+        ? 'CareWell · Bubisoft'
+        : 'CareWell v$version · Bubisoft';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      child: Text(
+        texto,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 11.5, color: context.colors.textDisabled),
+      ),
+    );
+  }
+}
+
 /// Dialog de confirmación de eliminación de cuenta (US-11).
 ///
 /// Requiere que el usuario tipee "DELETE" (case-sensitive, sin espacios
 /// adicionales) para habilitar el botón destructivo.
+///
+/// El cuerpo describe una **baja lógica**, no un borrado físico: la cuenta
+/// pierde el acceso y sus datos dejan de estar disponibles en la app, pero el
+/// registro de la persona se conserva porque puede integrar el equipo de
+/// cuidado de terceros y formar parte de su historial. Por eso el texto no
+/// promete que se eliminen todos los datos: no sería cierto
+/// (CuidadoPersonas.tex, "Zona sensible — Eliminar cuenta" y "Baja de
+/// usuarios").
 class _EliminarCuentaDialog extends StatefulWidget {
   const _EliminarCuentaDialog({required this.ref});
 
@@ -200,6 +356,10 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
+      // El contenido combina un texto de varias líneas con el campo de
+      // confirmación: con escala tipográfica grande y el teclado abierto no
+      // entra en la altura disponible. Sin efecto visual a escala normal.
+      scrollable: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       ),
@@ -220,16 +380,22 @@ class _EliminarCuentaDialogState extends State<_EliminarCuentaDialog> {
                 height: 1.5,
               ),
               children: const [
-                TextSpan(text: 'Esta acción es '),
                 TextSpan(
-                  text: 'irreversible',
+                  text:
+                      'Perderás el acceso a CareWell y tus datos dejarán de '
+                      'estar disponibles. ',
+                ),
+                // Mismo cierre que el subtítulo del ítem en la lista: el
+                // usuario lee la misma frase en los dos lugares.
+                TextSpan(
+                  text: 'No se puede deshacer.',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
                   text:
-                      '. Se eliminarán todos tus datos, personas a cargo y '
-                      'membresías en equipos de cuidado. No podrás recuperar '
-                      'tu cuenta.',
+                      ' Tu información no se borra de inmediato: puede seguir '
+                      'formando parte del historial de las personas que '
+                      'cuidás.',
                 ),
               ],
             ),

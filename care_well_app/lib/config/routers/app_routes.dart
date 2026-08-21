@@ -14,10 +14,10 @@ abstract final class AppRoutes {
   static const home = '/home';
 
   static const profile = '/profile';
-  static const profileEdit = '/profile/edit';
 
   static const settings = '/settings';
   static const settingsTerms = '/settings/terms';
+  static const settingsPrivacy = '/settings/privacy';
   static const settingsChangePassword = '/settings/change-password';
 
   static const dependents = '/dependents';
@@ -63,9 +63,9 @@ abstract final class AppRoutes {
   static const accountCreatedName = 'account-created';
   static const homeName = 'home';
   static const profileName = 'profile';
-  static const profileEditName = 'profile-edit';
   static const settingsName = 'settings';
   static const settingsTermsName = 'settings-terms';
+  static const settingsPrivacyName = 'settings-privacy';
   static const settingsChangePasswordName = 'settings-change-password';
   static const dependentsName = 'dependents';
   static const dependentsNewName = 'dependents-new';

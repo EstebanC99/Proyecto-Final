@@ -47,6 +47,9 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_messaging: ^15.1.5
 
+  # Metadatos del paquete instalado (versión de la app en Configuración)
+  package_info_plus: ^10.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
