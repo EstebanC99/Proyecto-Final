@@ -53,6 +53,10 @@ class _FakeAgendaRepository implements AgendaRepository {
   /// prioridad sobre [ocurrencias] (usado en los tests multi-persona).
   final Map<int, List<OcurrenciaEventoAgenda>> ocurrenciasPorPersona;
 
+  /// Personas para las que [obtenerOcurrencias] falla, simulando un error de
+  /// red o de permisos acotado a esa consulta.
+  final Set<int> personaIdsQueFallan;
+
   int obtenerOcurrenciasCount = 0;
   DateTime? ultimoDesde;
   DateTime? ultimoHasta;
@@ -63,9 +67,11 @@ class _FakeAgendaRepository implements AgendaRepository {
     List<OcurrenciaEventoAgenda>? ocurrencias,
     List<TipoEvento>? tipos,
     Map<int, List<OcurrenciaEventoAgenda>>? ocurrenciasPorPersona,
+    Set<int>? personaIdsQueFallan,
   }) : ocurrencias = ocurrencias ?? [],
        tipos = tipos ?? [],
-       ocurrenciasPorPersona = ocurrenciasPorPersona ?? {};
+       ocurrenciasPorPersona = ocurrenciasPorPersona ?? {},
+       personaIdsQueFallan = personaIdsQueFallan ?? {};
 
   @override
   Future<List<OcurrenciaEventoAgenda>> obtenerOcurrencias({
@@ -75,6 +81,9 @@ class _FakeAgendaRepository implements AgendaRepository {
   }) async {
     obtenerOcurrenciasCount++;
     personaIdsConsultados.add(personaId);
+    if (personaIdsQueFallan.contains(personaId)) {
+      throw Exception('Fallo simulado para la persona $personaId');
+    }
     ultimoDesde = desde;
     ultimoHasta = hasta;
     // Copia defensiva: el provider ordena la lista in-place.
@@ -568,6 +577,155 @@ void main() {
         },
       );
 
+      group('resistencia a fallos de la recolección', () {
+        // Universo de tres personas; la del medio es la que se hace fallar.
+        Persona persona(int id) => Persona(
+          id: id,
+          nombre: 'Persona $id',
+          apellido: 'Apellido',
+          documento: '$id',
+          fechaNacimiento: DateTime(1950, 1, 1),
+        );
+
+        List<PersonaContextOption> tresPersonas() => [
+          PersonaContextOption(
+            persona: persona(1),
+            rol: PersonaContextRol.propio,
+          ),
+          PersonaContextOption(
+            persona: persona(2),
+            rol: PersonaContextRol.responsable,
+          ),
+          PersonaContextOption(
+            persona: persona(3),
+            rol: PersonaContextRol.cuidador,
+          ),
+        ];
+
+        Map<int, List<OcurrenciaEventoAgenda>> ocurrenciasDeCadaUna(
+          DateTime ahora,
+        ) => {
+          for (final id in [1, 2, 3])
+            id: [
+              _ocurrencia(
+                eventoAgendaId: id * 10,
+                inicio: ahora.add(Duration(days: id)),
+                minutosAnticipacion: 30,
+                personaId: id,
+              ),
+            ],
+        };
+
+        test(
+          'un fallo aislado no impide programar a las demás personas',
+          () async {
+            final ahora = DateTime.now();
+            final scheduler = FakeNotificationScheduler();
+            final repo = _FakeAgendaRepository(
+              ocurrenciasPorPersona: ocurrenciasDeCadaUna(ahora),
+              personaIdsQueFallan: {2},
+            );
+            final container = _makeContainer(
+              repo: repo,
+              scheduler: scheduler,
+              seleccionables: tresPersonas(),
+            );
+            addTearDown(container.dispose);
+
+            await container.read(sincronizarNotificacionesAgendaProvider)(
+              motivo: SyncMotivo.ingreso,
+            );
+
+            // Se consultó a las tres: el fallo de la 2 no cortó el recorrido.
+            expect(repo.personaIdsConsultados, [1, 2, 3]);
+            expect(scheduler.scheduled, [
+              NotificationId.forOcurrencia(
+                10,
+                ahora.add(const Duration(days: 1)),
+              ),
+              NotificationId.forOcurrencia(
+                30,
+                ahora.add(const Duration(days: 3)),
+              ),
+            ]);
+          },
+        );
+
+        test(
+          'si fallan todas, no se cancela lo que ya estaba programado',
+          () async {
+            final ahora = DateTime.now();
+            final scheduler = FakeNotificationScheduler();
+            final repo = _FakeAgendaRepository(
+              ocurrenciasPorPersona: ocurrenciasDeCadaUna(ahora),
+              personaIdsQueFallan: {1, 2, 3},
+            );
+            final container = _makeContainer(
+              repo: repo,
+              scheduler: scheduler,
+              seleccionables: tresPersonas(),
+            );
+            addTearDown(container.dispose);
+
+            await container.read(sincronizarNotificacionesAgendaProvider)(
+              motivo: SyncMotivo.ingreso,
+            );
+
+            // Sin cancelAll, los recordatorios de la corrida anterior siguen
+            // vivos: es preferible una agenda desactualizada a una muda.
+            expect(scheduler.cancelAllCount, 0);
+            expect(scheduler.scheduled, isEmpty);
+          },
+        );
+
+        test('si fallan todas, el throttle no se marca', () async {
+          final ahora = DateTime(2026, 7, 8, 10, 0);
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository(
+            ocurrenciasPorPersona: ocurrenciasDeCadaUna(DateTime.now()),
+            personaIdsQueFallan: {1, 2, 3},
+          );
+          final throttle = AgendaSyncThrottle(clock: () => ahora);
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            seleccionables: tresPersonas(),
+            throttle: throttle,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.ingreso,
+          );
+
+          // El próximo resume reintenta enseguida, sin esperar los 15 min.
+          expect(throttle.deberiaCorrer(), isTrue);
+        });
+
+        test('un éxito parcial sí marca el throttle', () async {
+          final ahora = DateTime(2026, 7, 8, 10, 0);
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository(
+            ocurrenciasPorPersona: ocurrenciasDeCadaUna(DateTime.now()),
+            personaIdsQueFallan: {1, 2},
+          );
+          final throttle = AgendaSyncThrottle(clock: () => ahora);
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            seleccionables: tresPersonas(),
+            throttle: throttle,
+          );
+          addTearDown(container.dispose);
+
+          await container.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.ingreso,
+          );
+
+          expect(scheduler.cancelAllCount, 1);
+          expect(throttle.deberiaCorrer(), isFalse);
+        });
+      });
       group('throttle del motivo resume', () {
         test('resume se saltea si la última corrida fue reciente', () async {
           final scheduler = FakeNotificationScheduler();
