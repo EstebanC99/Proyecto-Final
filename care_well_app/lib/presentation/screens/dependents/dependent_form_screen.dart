@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/constraints/validators.dart';
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -189,11 +189,7 @@ class _DependentFormScreenState extends ConsumerState<DependentFormScreen> {
         subtitle: ' fue agregado a tu lista de personas a cargo.',
         primaryButtonLabel: 'Ver personas a cargo',
         onPrimaryTap: () {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.goNamed(AppRoutes.dependentsName);
-          }
+          context.volverA(AppRoutes.dependents);
         },
         secondaryButtonLabel: 'Agregar otra persona',
         onSecondaryTap: _resetForm,

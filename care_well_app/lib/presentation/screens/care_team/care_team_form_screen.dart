@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../config/constraints/validators.dart';
+import '../../../config/routers/app_navigation.dart';
 import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
@@ -148,11 +148,7 @@ class _CareTeamFormScreenState extends ConsumerState<CareTeamFormScreen> {
               ref.invalidate(asignacionesPorPersonaCuidadaProvider(p.id));
             }
           });
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.goNamed(AppRoutes.careTeamName);
-          }
+          context.volverA(AppRoutes.careTeam);
         },
       );
     }
