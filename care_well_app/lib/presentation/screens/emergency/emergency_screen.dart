@@ -204,7 +204,11 @@ class EmergencyScreen extends ConsumerWidget {
     );
 
     if (confirmo == true && context.mounted) {
-      context.goNamed(AppRoutes.emergencySentName);
+      // `pushReplacement` y no `go`: reemplaza esta pantalla por la de
+      // confirmación —que no se pueda volver al botón es intencional
+      // (anti-reenvío)— sin destruir las páginas de abajo, así el back del
+      // sistema sigue teniendo a dónde volver.
+      context.pushReplacementNamed(AppRoutes.emergencySentName);
     }
   }
 }
