@@ -163,6 +163,10 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
             onNextWeek: _irASemanaSiguiente,
           ),
 
+          // Aviso de alarmas exactas: va debajo de la tira para no empujar la
+          // navegación de la semana, y no bloquea nada de la pantalla.
+          const _AlarmasExactasBanner(),
+
           Expanded(
             child: ocurrenciasAsync.when(
               loading: () => const _OcurrenciasSkeleton(),
@@ -449,26 +453,100 @@ class _OcurrenciasSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    // ListView y no Column: los bloques son de alto fijo y, dentro del Expanded
+    // del body, desbordaban en viewports cortos (pantallas chicas, landscape,
+    // fuente ampliada). Además espeja al contenido real, que también es lista.
+    return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.xl,
         AppSpacing.lg,
         0,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(
-          3,
-          (_) => Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-            height: 84,
-            decoration: BoxDecoration(
-              color: context.colors.surfaceVariant,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            ),
+      physics: const NeverScrollableScrollPhysics(),
+      children: List.generate(
+        3,
+        (_) => Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+          height: 84,
+          decoration: BoxDecoration(
+            color: context.colors.surfaceVariant,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Aviso de que las alarmas exactas no están disponibles.
+///
+/// Sin ellas Android agrupa los recordatorios y puede atrasarlos de minutos a
+/// horas: en medicación y turnos médicos eso es una falla funcional, así que se
+/// le ofrece al usuario activarlas. Solo aparece en Android 12, que es donde el
+/// permiso se puede revocar.
+///
+/// Observa el ciclo de vida por su cuenta en lugar de delegarlo en el
+/// `AppShell` porque la activación ocurre en una pantalla de Ajustes del
+/// sistema que no devuelve resultado: hay que reconsultar el permiso al volver
+/// a foreground. Tener el observer acá acota ese re-chequeo al tiempo en que la
+/// agenda está montada.
+class _AlarmasExactasBanner extends ConsumerStatefulWidget {
+  const _AlarmasExactasBanner();
+
+  @override
+  ConsumerState<_AlarmasExactasBanner> createState() =>
+      _AlarmasExactasBannerState();
+}
+
+class _AlarmasExactasBannerState extends ConsumerState<_AlarmasExactasBanner>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(puedeProgramarAlarmasExactasProvider);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final puedeExactas = ref.watch(puedeProgramarAlarmasExactasProvider).value;
+    final descartado = ref.watch(alarmasExactasBannerDescartadoProvider);
+
+    // `null` cubre tanto la carga inicial como una falla del chequeo: en ambos
+    // casos el banner se calla. No tiene sentido informar un error de
+    // plataforma encima de la agenda.
+    if (puedeExactas == null || puedeExactas || descartado) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: InlineErrorBanner(
+        message:
+            'Los recordatorios de la agenda podrían llegar tarde. Activá las '
+            'alarmas exactas para que avisen a tiempo.',
+        tone: BannerTone.warning,
+        icon: Icons.alarm_off_outlined,
+        actionLabel: 'Activar',
+        onAction: () => ref
+            .read(notificationSchedulerProvider)
+            .solicitarPermisoAlarmasExactas(),
+        onDismiss: () =>
+            ref.read(alarmasExactasBannerDescartadoProvider.notifier).state =
+                true,
       ),
     );
   }

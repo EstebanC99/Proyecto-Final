@@ -435,3 +435,24 @@ final sincronizarNotificacionesAgendaProvider =
         throttle.marcarCorrida();
       },
     );
+
+// ─── Alarmas exactas ─────────────────────────────────────────────────────────
+
+/// Indica si el sistema permite programar alarmas exactas.
+///
+/// Se invalida al volver de background (ver `_AlarmasExactasBanner`): el
+/// permiso se concede en una pantalla de Ajustes externa a la app, que no
+/// devuelve resultado, así que la única forma de enterarse es reconsultarlo.
+final puedeProgramarAlarmasExactasProvider = FutureProvider<bool>(
+  (ref) =>
+      ref.watch(notificationSchedulerProvider).puedeProgramarAlarmasExactas(),
+);
+
+/// Marca si el usuario descartó el aviso de alarmas exactas.
+///
+/// Es estado de sesión, deliberadamente sin persistencia en disco: al reiniciar
+/// el proceso el aviso vuelve a evaluarse. Un descarte no debería silenciar
+/// para siempre algo que degrada todos los recordatorios.
+final alarmasExactasBannerDescartadoProvider = StateProvider<bool>(
+  (ref) => false,
+);
