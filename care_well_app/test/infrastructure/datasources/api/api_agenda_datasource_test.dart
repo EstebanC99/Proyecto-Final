@@ -221,5 +221,29 @@ void main() {
         },
       );
     });
+
+    group('cancelarSerieDesde', () {
+      test(
+        'envía el path correcto y el body { eventoAgendaID, fechaOcurrencia }',
+        () async {
+          final (dio, adapter) = _buildDio();
+          final datasource = ApiAgendaDatasource(dio);
+
+          final fecha = DateTime(2026, 7, 15, 9, 30);
+
+          await datasource.cancelarSerieDesde(
+            eventoAgendaId: 501,
+            fechaOcurrencia: fecha,
+          );
+
+          expect(adapter.lastRequest!.path, ApiConfig.cancelarSerieAgendaPath);
+
+          final body = adapter.lastRequest!.data as Map<String, dynamic>;
+          expect(body.keys, containsAll(['eventoAgendaID', 'fechaOcurrencia']));
+          expect(body['eventoAgendaID'], 501);
+          expect(body['fechaOcurrencia'], fecha.toIso8601String());
+        },
+      );
+    });
   });
 }

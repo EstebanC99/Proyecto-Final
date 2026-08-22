@@ -57,14 +57,51 @@ namespace CareWell.BusinessService.Test.Agenda
             }
 
             [Fact]
-            public void Si_la_FechaFin_tiene_valor_y_es_menor_a_la_FechaaHoraInicio_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            public void Si_la_FechaFin_es_anterior_al_dia_de_la_FechaHoraInicio_arroja_un_ValidacionDominioException_con_mensaje_informativo()
             {
                 // Arrange
-                this.definirRecurrencia = this.definirRecurrencia with { FechaFin = this.fechaHoraInicio.AddMinutes(-1) };
+                this.definirRecurrencia = this.definirRecurrencia with { FechaFin = this.fechaHoraInicio.Date.AddDays(-1) };
 
                 // Action & Assert
                 var exception = Assert.Throws<ValidacionDominioException>(() => this.Action());
                 Assert.Equal(Mensajes.FechaFinRecurrenciaInvalida, exception.Message);
+            }
+
+            [Fact]
+            public void Si_la_FechaFin_es_el_mismo_dia_que_la_FechaHoraInicio_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.definirRecurrencia = this.definirRecurrencia with { FechaFin = this.fechaHoraInicio.Date };
+
+                // Action & Assert
+                var exception = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.FechaFinRecurrenciaInvalida, exception.Message);
+            }
+
+            [Fact]
+            public void Si_la_FechaFin_tiene_valor_la_regla_incluye_el_UNTIL_expresado_en_UTC()
+            {
+                // Arrange
+                this.fechaHoraInicio = new DateTime(2026, 9, 1, 18, 0, 0);
+                this.definirRecurrencia = this.definirRecurrencia with { FechaFin = new DateTime(2026, 9, 30) };
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Contains("UNTIL=20261001T025959Z", resultado);
+            }
+
+            [Fact]
+            public void Si_la_FechaFin_no_tiene_valor_la_regla_no_incluye_UNTIL()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.DoesNotContain("UNTIL", resultado);
             }
 
             [Fact]
@@ -227,6 +264,64 @@ namespace CareWell.BusinessService.Test.Agenda
 
                 // Assert
                 Assert.IsType<List<DateTime>>(resultado);
+            }
+        }
+
+        public class ElMetodo_EstablecerFinRegla : ExpansorRecurrenciaBusinessTest
+        {
+            private string regla;
+            private DateTime fecha;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.regla = "FREQ=DAILY;INTERVAL=1";
+                this.fecha = new DateTime(2026, 9, 30, 17, 59, 59);
+            }
+
+            private string Action()
+            {
+                return this.Target.TruncarReglaDesde(this.regla, this.fecha);
+            }
+
+            [Fact]
+            public void Agrega_el_UNTIL_en_UTC_a_una_regla_sin_fecha_de_fin_con_un_segundo_menos_a_la_fecha_enviada()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Contains("UNTIL=20260930T205958Z", resultado);
+            }
+
+            [Fact]
+            public void Reemplaza_el_UNTIL_de_una_regla_que_ya_tenia_fecha_de_fin_con_la_enviada_y_un_segundo_menos()
+            {
+                // Arrange
+                this.regla = "FREQ=DAILY;INTERVAL=1;UNTIL=20261001T025959Z";
+                this.fecha = new DateTime(2026, 9, 10, 17, 59, 59);
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.Contains("UNTIL=20260910T205958Z", resultado);
+                Assert.DoesNotContain("20261001", resultado);
+            }
+
+            [Fact]
+            public void Retorna_un_string()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.IsType<string>(resultado);
             }
         }
     }

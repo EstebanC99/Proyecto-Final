@@ -62,6 +62,8 @@ class _FakeAgendaRepository implements AgendaRepository {
   DateTime? ultimoHasta;
   final List<int> personaIdsConsultados = [];
   int? eliminadoId;
+  int? serieCortadaId;
+  DateTime? serieCortadaDesde;
 
   _FakeAgendaRepository({
     List<OcurrenciaEventoAgenda>? ocurrencias,
@@ -130,6 +132,15 @@ class _FakeAgendaRepository implements AgendaRepository {
     required int eventoAgendaId,
     required DateTime fechaOcurrencia,
   }) async {}
+
+  @override
+  Future<void> cancelarSerieDesde({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  }) async {
+    serieCortadaId = eventoAgendaId;
+    serieCortadaDesde = fechaOcurrencia;
+  }
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -416,6 +427,46 @@ void main() {
           // Se eliminó en el repo.
           expect(repo.eliminadoId, 77);
           // Se resincronizaron notificaciones (cancelAll + relectura de ocurrencias).
+          expect(scheduler.cancelAllCount, 1);
+          expect(repo.obtenerOcurrenciasCount, greaterThan(llamadasPrevias));
+
+          // Al releer, ambas vistas vuelven a consultar (fueron invalidadas).
+          final antes = repo.obtenerOcurrenciasCount;
+          await container.read(ocurrenciasDeSemanaProvider.future);
+          await container.read(proximaOcurrenciaProvider.future);
+          expect(repo.obtenerOcurrenciasCount, antes + 2);
+        },
+      );
+    });
+
+    group('cancelarSerieDesdeProvider', () {
+      test(
+        'corta la serie en el repo, invalida ocurrencias y resincroniza notificaciones',
+        () async {
+          final scheduler = FakeNotificationScheduler();
+          final repo = _FakeAgendaRepository();
+          final container = _makeContainer(
+            repo: repo,
+            scheduler: scheduler,
+            persona: _persona,
+          );
+          addTearDown(container.dispose);
+
+          // Precarga las vistas de ocurrencias para observar la invalidación.
+          await container.read(ocurrenciasDeSemanaProvider.future);
+          await container.read(proximaOcurrenciaProvider.future);
+          final llamadasPrevias = repo.obtenerOcurrenciasCount;
+
+          final desde = DateTime(2026, 8, 20, 9, 30);
+          await container.read(cancelarSerieDesdeProvider)(
+            eventoAgendaId: 88,
+            fechaOcurrencia: desde,
+          );
+
+          // Se delegó al repo con la ocurrencia elegida como corte.
+          expect(repo.serieCortadaId, 88);
+          expect(repo.serieCortadaDesde, desde);
+          // Se resincronizaron notificaciones (cancelAll + relectura).
           expect(scheduler.cancelAllCount, 1);
           expect(repo.obtenerOcurrenciasCount, greaterThan(llamadasPrevias));
 

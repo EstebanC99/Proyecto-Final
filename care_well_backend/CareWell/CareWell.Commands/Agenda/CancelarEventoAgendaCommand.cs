@@ -1,6 +1,6 @@
 ﻿namespace CareWell.Commands.Agenda
 {
-    public class CancelarOcurrenciaEventoAgendaCommand
+    public class CancelarEventoAgendaCommand
     {
         public int EventoAgendaID { get; set; }
 

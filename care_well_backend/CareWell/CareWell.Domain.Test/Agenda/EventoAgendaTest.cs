@@ -763,7 +763,7 @@ namespace CareWell.Domain.Test.Agenda
 
                 // Action & Assert
                 var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
-                Assert.Equal(Mensajes.NoSePuedeCancelarOcurrenciaPasada, excepcionEsperada.Message);
+                Assert.Equal(Mensajes.NoSePuedeCancelarSerieOcurrenciaDesdeEventoPasado, excepcionEsperada.Message);
             }
 
             [Fact]
@@ -1354,6 +1354,166 @@ namespace CareWell.Domain.Test.Agenda
 
                 // Assert
                 Assert.IsType<List<DateTime>>(resultado);
+            }
+        }
+
+        public class ElMetodo_CancelarSerieDesde : EventoAgendaTest
+        {
+            private DateTime fechaOcurrencia;
+            private Persona solicitante;
+            private Mock<IExpansorRecurrenciaDomainService> expansorRecurrenciaDomainService;
+            private Mock<IValidadorPermisoAccion> validadorPermisoAccion;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.fechaOcurrencia = DateTime.Now.AddDays(2);
+                this.solicitante = Mock.Of<Persona>();
+
+                this.expansorRecurrenciaDomainService = new Mock<IExpansorRecurrenciaDomainService>();
+
+                this.validadorPermisoAccion = new Mock<IValidadorPermisoAccion>();
+
+                #region Crear
+
+                var crearEventoAgenda = new CrearEventoAgenda
+                (
+                    Persona: Mock.Of<Persona>(),
+                    Creador: Mock.Of<Persona>(),
+                    Titulo: "Titulo de prueba",
+                    Descripcion: "Descripcion de prueba",
+                    Tipo: Mock.Of<TipoEvento>(t => t.Agendable == true),
+                    FechaHoraInicio: DateTime.Now.AddDays(1),
+                    Duracion: TimeSpan.FromHours(1),
+                    Recurrencia: new DefinirRecurrenciaEventoAgenda
+                    (
+                        FrecuenciaRecurrencia: FrecuenciaRecurrenciaEnum.Semanal,
+                        Intervalo: 1,
+                        FechaFin: DateTime.Now.AddDays(2)
+                    ),
+                    GenerarEventoSalud: true,
+                    MinutosAnticipacionRecordatorio: 15
+                );
+
+                var expansorRecurrenciaDomainService = Mock.Of<IExpansorRecurrenciaDomainService>(e => e.ConstruirRegla(It.IsAny<DefinirRecurrenciaEventoAgenda>(), It.IsAny<DateTime>()) == "REGLA");
+                var validadorPermisoAccion = Mock.Of<IValidadorPermisoAccion>();
+
+                this.Target.Crear(crearEventoAgenda,
+                                  expansorRecurrenciaDomainService,
+                                  validadorPermisoAccion);
+
+                #endregion
+            }
+
+            private bool Action()
+            {
+                return this.Target.CancelarSerieDesde(
+                    this.fechaOcurrencia,
+                    this.solicitante,
+                    this.expansorRecurrenciaDomainService.Object,
+                    this.validadorPermisoAccion.Object
+                );
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_PermiteAdministrarAgenda_del_ValidadorPermisoAccion()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.validadorPermisoAccion.Verify(v => v.ValidarPuedeAdministrarAgenda(this.Target.Persona, this.solicitante), Times.Once);
+            }
+
+            [Fact]
+            public void Si_la_ReglaRecurrencia_es_null_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.Target = new EventoAgenda();
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.ElEventoNoEsRecurrente, excepcionEsperada.Message);
+            }
+
+            [Fact]
+            public void Si_la_FechaOcurrencia_es_menor_a_la_actual_arroja_un_ValidacionDominioException_con_mensaje_informativo()
+            {
+                // Arrange
+                this.fechaOcurrencia = DateTime.Now.AddMinutes(-1);
+
+                // Action & Assert
+                var excepcionEsperada = Assert.Throws<ValidacionDominioException>(() => this.Action());
+                Assert.Equal(Mensajes.NoSePuedeCancelarSerieOcurrenciaDesdeEventoPasado, excepcionEsperada.Message);
+            }
+
+            [Theory]
+            [InlineData(0)]
+            [InlineData(1)]
+            public void Si_la_FechaOcurrencia_es_menor_o_igual_a_la_FechaHoraInicio_retorna_true(int minutosAtrasar)
+            {
+                // Arrange
+                this.fechaOcurrencia = this.Target.FechaHoraInicio.AddMinutes(-minutosAtrasar);
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.True(resultado);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_TruncarReglaDesde_del_ExpansorRecurrenciaDomainService()
+            {
+                // Arrange
+                var reglaPrevia = this.Target.ReglaRecurrencia;
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.expansorRecurrenciaDomainService.Verify(v => v.TruncarReglaDesde(reglaPrevia!, this.fechaOcurrencia), Times.Once);
+            }
+
+            [Fact]
+            public void Setea_la_nueva_ReglaRecurrencia()
+            {
+                // Arrange
+                var reglaNueva = "REGLA_ACTUALIZADA";
+                this.expansorRecurrenciaDomainService.Setup(s => s.TruncarReglaDesde(It.IsAny<string>(), It.IsAny<DateTime>())).Returns(reglaNueva);
+
+                // Action
+                this.Action();
+
+                // Assert
+                Assert.Equal(reglaNueva, this.Target.ReglaRecurrencia);
+            }
+
+            [Fact]
+            public void Retorna_false_si_la_FechaOcurrencia_es_mayor_a_la_FechaHoraInicio()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.False(resultado);
+            }
+
+            [Fact]
+            public void Retorna_un_bool()
+            {
+                // Arrange
+
+                // Action
+                var resultado = this.Action();
+
+                // Assert
+                Assert.IsType<bool>(resultado);
             }
         }
     }

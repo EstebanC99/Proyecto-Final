@@ -131,4 +131,22 @@ class ApiAgendaDatasource implements AgendaDatasource {
       throw ApiExceptionMapper.map(e);
     }
   }
+
+  @override
+  Future<void> cancelarSerieDesde({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  }) async {
+    try {
+      await _dio.post(
+        ApiConfig.cancelarSerieAgendaPath,
+        data: {
+          'eventoAgendaID': eventoAgendaId,
+          'fechaOcurrencia': fechaOcurrencia.toIso8601String(),
+        },
+      );
+    } on DioException catch (e) {
+      throw ApiExceptionMapper.map(e);
+    }
+  }
 }

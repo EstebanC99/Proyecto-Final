@@ -78,4 +78,13 @@ class AgendaRepositoryImpl implements AgendaRepository {
     eventoAgendaId: eventoAgendaId,
     fechaOcurrencia: fechaOcurrencia,
   );
+
+  @override
+  Future<void> cancelarSerieDesde({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  }) => _datasource.cancelarSerieDesde(
+    eventoAgendaId: eventoAgendaId,
+    fechaOcurrencia: fechaOcurrencia,
+  );
 }

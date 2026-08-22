@@ -271,6 +271,37 @@ final cancelarOcurrenciaProvider =
       },
     );
 
+/// Elimina una ocurrencia de un evento recurrente y todas las posteriores,
+/// refresca las ocurrencias visibles y resincroniza las notificaciones locales.
+///
+/// Es la forma de "dar de baja" una serie ya iniciada: [eliminarEventoAgendaProvider]
+/// sólo sirve para eventos que todavía no ocurrieron, porque el backend no
+/// borra historial.
+final cancelarSerieDesdeProvider =
+    Provider<
+      Future<void> Function({
+        required int eventoAgendaId,
+        required DateTime fechaOcurrencia,
+      })
+    >(
+      (ref) => ({required eventoAgendaId, required fechaOcurrencia}) async {
+        await ref
+            .read(agendaRepositoryProvider)
+            .cancelarSerieDesde(
+              eventoAgendaId: eventoAgendaId,
+              fechaOcurrencia: fechaOcurrencia,
+            );
+        _invalidarOcurrencias(ref);
+        try {
+          await ref.read(sincronizarNotificacionesAgendaProvider)(
+            motivo: SyncMotivo.mutacion,
+          );
+        } catch (_) {
+          // sincronización de notificaciones es best-effort; no afecta el resultado
+        }
+      },
+    );
+
 // ─── Sincronización de notificaciones locales ───────────────────────────────
 
 /// Formatea la hora en 24h (`HH:mm`), consistente con
