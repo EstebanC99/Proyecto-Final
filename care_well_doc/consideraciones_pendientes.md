@@ -14,7 +14,7 @@
 
 # Bugs a corregir
 ## Críticos
-- (*done*) ~~Al eliminar un registro de **Evento de Salud** se rompe el AppBar y no se puede volver atrás, provocando el cierre de la app. *Investigar si pasa en cada uno de los "Eliminar".*~~ -> Se volvía con `context.go()`, que reemplaza el stack completo y borra la historia (Home incluido). Se agregó `context.volverA()` (`config/routers/app_navigation.dart`) y se corrigieron los dos casos rotos (eliminar evento de salud y éxito de *Cambiar contraseña*), los cinco *fallbacks* latentes (personas a cargo y equipo) y la navegación de **Emergencia**, que ahora usa `pushReplacement`. El resto de los "Eliminar" ya volvían con `pop` y estaban sanos.
-- No se puede eliminar una serie a futuro ya iniciada. La idea es poder ponerle una **Fecha de Fin** por si queres cancelar la serie futura.
-- Error inesperado al intentar registrar un **Evento de agenda** con repetición.
+- (*done*) ~~Al eliminar un registro de **Evento de Salud** se rompe el AppBar y no se puede volver atrás, provocando el cierre de la app. *Investigar si pasa en cada uno de los "Eliminar".*~~
+- (*done*) ~~No se puede eliminar una serie a futuro ya iniciada. La idea es poder ponerle una **Fecha de Fin** por si queres cancelar la serie futura.~~
+- (*done*) ~~Error inesperado al intentar registrar un **Evento de agenda** con repetición.~~
 - (*done*) ~~No esta llegando la notificación de **Emergencia** a los dispositivos. *Revisar el google-services.json en el server.*~~ -> El error era debido a la ausenscia del archivo ***google-services.json*** en la ruta ***care_well_app/Android/app/***
