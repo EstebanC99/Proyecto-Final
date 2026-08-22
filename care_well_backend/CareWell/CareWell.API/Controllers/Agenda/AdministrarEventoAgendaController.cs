@@ -42,9 +42,15 @@ namespace CareWell.API.Controllers.Agenda
         }
 
         [HttpPost("cancelar-ocurrencia")]
-        public void CancelarOcurrencia([FromBody] CancelarOcurrenciaEventoAgendaCommand command)
+        public void CancelarOcurrencia([FromBody] CancelarEventoAgendaCommand command)
         {
             this.AdministrarEventoAgendaBusinessService.CancelarOcurrencia(command);
+        }
+
+        [HttpPost("cancelar-serie")]
+        public void CancelarSerie([FromBody] CancelarEventoAgendaCommand command)
+        {
+            this.AdministrarEventoAgendaBusinessService.CancelarSerie(command);
         }
     }
 }

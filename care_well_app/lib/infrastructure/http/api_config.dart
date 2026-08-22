@@ -74,6 +74,8 @@ class ApiConfig {
       '/api/AdministrarEventoAgenda/eliminar';
   static const cancelarOcurrenciaAgendaPath =
       '/api/AdministrarEventoAgenda/cancelar-ocurrencia';
+  static const cancelarSerieAgendaPath =
+      '/api/AdministrarEventoAgenda/cancelar-serie';
   static const obtenerTiposEventoPath =
       '/api/AdministrarTipoEvento/obtener-todos';
 

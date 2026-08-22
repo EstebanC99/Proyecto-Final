@@ -54,7 +54,7 @@
         public const string NoSePudoEncontrarLaRealizacionDeHabitoSeleccionada = "No se pudo encontrar la realización de hábito seleccionada.";
         public const string NoSePudoLeerDocumento = "No pudimos leer el documento. Sacá la foto con buena luz, sin reflejos y bien encuadrada.";
         public const string NoSePuedeActivarUnaAsignacionConEstadoDiferentePendiente = "No es posible activar una asignación con estado diferente a 'Pendiente'.";
-        public const string NoSePuedeCancelarOcurrenciaPasada = "No se puede cancelar una ocurrencia de evento pasado.";
+        public const string NoSePuedeCancelarSerieOcurrenciaDesdeEventoPasado = "No se puede cancelar la serie/ocurrencia desde un evento pasado. Seleccioná una fecha futura.";
         public const string NoSePuedeEliminarEventoYaIniciado = "No se puede eliminar un evento ya iniciado.";
         public const string NoSePuedeIndicarRealizacionDeUnHabitoInactivo = "No se puede indicar una realización de un hábito inactivo.";
         public const string NoSePuedeModificarEventoYaIniciado = "No se puede modificar un evento ya iniciado.";

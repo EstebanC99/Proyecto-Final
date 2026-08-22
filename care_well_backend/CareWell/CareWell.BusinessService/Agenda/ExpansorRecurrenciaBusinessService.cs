@@ -31,10 +31,12 @@ namespace CareWell.BusinessService.Agenda
 
             if (definirRecurrencia.FechaFin.HasValue)
             {
-                if (definirRecurrencia.FechaFin.Value <= fechaHoraInicio)
+                if (definirRecurrencia.FechaFin.Value.Date <= fechaHoraInicio.Date)
                     throw new ValidacionDominioException(Mensajes.FechaFinRecurrenciaInvalida);
 
-                patronRecurrencia.Until = IcalNetHelper.DateTimeToCalDateTimeArgentina(definirRecurrencia.FechaFin.Value);
+                var finDeRecurrencia = definirRecurrencia.FechaFin.Value.Date.AddDays(1).AddSeconds(-1);
+
+                patronRecurrencia.Until = IcalNetHelper.DateTimeArgentinaToCalDateTimeUtc(finDeRecurrencia);
             }
 
             return new RecurrenceRuleSerializer().SerializeToString(patronRecurrencia);
@@ -78,6 +80,16 @@ namespace CareWell.BusinessService.Agenda
                 .Select(o => DateTime.SpecifyKind(o.Period.StartTime.ToTimeZone(ZonasHorarias.Argentina).Value, DateTimeKind.Unspecified))
                 .OrderBy(d => d)
                 .ToList();
+        }
+
+        public string TruncarReglaDesde(string regla, DateTime fechaFin)
+        {
+            var patronRecurrencia = new RecurrencePattern(IcalNetHelper.ParseRule(regla))
+            {
+                Until = IcalNetHelper.DateTimeArgentinaToCalDateTimeUtc(fechaFin.AddSeconds(-1))
+            };
+
+            return new RecurrenceRuleSerializer().SerializeToString(patronRecurrencia);
         }
     }
 }

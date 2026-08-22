@@ -662,14 +662,14 @@ namespace CareWell.BusinessService.Test.Agenda
 
         public class ElMetodo_CancelarOcurrencia : AdministrarEventoAgendaBusinessTest
         {
-            private CancelarOcurrenciaEventoAgendaCommand command;
+            private CancelarEventoAgendaCommand command;
             private Mock<EventoAgenda> eventoAgenda;
 
             protected override void InitializeTest()
             {
                 base.InitializeTest();
 
-                this.command = Mock.Of<CancelarOcurrenciaEventoAgendaCommand>(c =>
+                this.command = Mock.Of<CancelarEventoAgendaCommand>(c =>
                     c.EventoAgendaID == 1 &&
                     c.FechaOcurrencia == DateTime.Now
                 );
@@ -736,6 +736,123 @@ namespace CareWell.BusinessService.Test.Agenda
                                                                    It.IsAny<Persona>(),
                                                                    this.serializadorFechasExceptuadasDomainService.Object,
                                                                    this.validadorPermisoAccion.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_SaveChanges_del_UnitOfWork()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.unitOfWork.Verify(s => s.SaveChanges(), Times.Once);
+            }
+        }
+
+        public class ElMetodo_CancelarSerie : AdministrarEventoAgendaBusinessTest
+        {
+            private CancelarEventoAgendaCommand command;
+            private Mock<EventoAgenda> eventoAgenda;
+
+            protected override void InitializeTest()
+            {
+                base.InitializeTest();
+
+                this.command = Mock.Of<CancelarEventoAgendaCommand>(c =>
+                    c.EventoAgendaID == 1 &&
+                    c.FechaOcurrencia == DateTime.Now
+                );
+
+                this.eventoAgenda = new Mock<EventoAgenda>();
+
+                this.userContext.Setup(s => s.UsuarioID).Returns(99);
+                this.entityLoaderDomainService.Setup(s => s.GetByID<Usuario>(It.IsAny<int>())).Returns(Mock.Of<Usuario>(u => u.Persona == Mock.Of<Persona>()));
+
+                this.eventoAgendaRepository.Setup(s => s.GetByID(this.command.EventoAgendaID)).Returns(this.eventoAgenda.Object);
+            }
+
+            private void Action()
+            {
+                this.Target.CancelarSerie(this.command);
+            }
+
+            [Fact]
+            public void Lee_el_UsuarioID_del_UserContext()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.userContext.Verify(s => s.UsuarioID, Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_Usuario_del_EntityLoaderDomainService()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.entityLoaderDomainService.Verify(s => s.GetByID<Usuario>(this.userContext.Object.UsuarioID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_GetByID_del_EventoAgendaRepository()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.eventoAgendaRepository.Verify(s => s.GetByID(this.command.EventoAgendaID), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_CancelarSerieDesde_del_EventoAgenda()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.eventoAgenda.Verify(s => s.CancelarSerieDesde(this.command.FechaOcurrencia,
+                                                                   It.IsAny<Persona>(),
+                                                                   this.expansorRecurrenciaDomainService.Object,
+                                                                   this.validadorPermisoAccion.Object), Times.Once);
+            }
+
+            [Fact]
+            public void Llama_una_vez_al_metodo_Remove_del_EventoAgendaRepository_si_el_metodo_CancelarSerieDesde_del_EventoAgenda_retorna_true()
+            {
+                // Arrange
+                this.eventoAgenda.Setup(s => s.CancelarSerieDesde(It.IsAny<DateTime>(), It.IsAny<Persona>(), this.expansorRecurrenciaDomainService.Object, this.validadorPermisoAccion.Object))
+                    .Returns(true);
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.eventoAgendaRepository.Verify(s => s.Remove(this.eventoAgenda.Object), Times.Once);
+            }
+
+            [Fact]
+            public void No_llama_una_vez_al_metodo_Remove_del_EventoAgendaRepository_si_el_metodo_CancelarSerieDesde_del_EventoAgenda_retorna_false()
+            {
+                // Arrange
+
+                // Action
+                this.Action();
+
+                // Assert
+                this.eventoAgendaRepository.Verify(s => s.Remove(It.IsAny<EventoAgenda>()), Times.Never);
             }
 
             [Fact]

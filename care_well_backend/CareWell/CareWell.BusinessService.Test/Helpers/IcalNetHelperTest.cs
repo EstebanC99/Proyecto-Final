@@ -98,5 +98,36 @@ namespace CareWell.BusinessService.Test.Helpers
                 Assert.Equal("FREQ=DAILY;INTERVAL=2", resultado);
             }
         }
+
+        public class ElMetodo_DateTimeArgentinaToCalDateTimeUtc : IcalNetHelperTest
+        {
+            private DateTime fecha;
+
+            [Fact]
+            public void Retorna_un_CalDateTime_en_UTC()
+            {
+                // Arrange
+                this.fecha = new DateTime(2026, 9, 30, 23, 59, 59);
+
+                // Action
+                var resultado = IcalNetHelper.DateTimeArgentinaToCalDateTimeUtc(this.fecha);
+
+                // Assert
+                Assert.True(resultado.IsUtc);
+            }
+
+            [Fact]
+            public void Retorna_un_CalDateTime_con_el_desfasaje_horario_de_Argentina_aplicado()
+            {
+                // Arrange
+                this.fecha = new DateTime(2026, 9, 30, 23, 59, 59);
+
+                // Action
+                var resultado = IcalNetHelper.DateTimeArgentinaToCalDateTimeUtc(this.fecha);
+
+                // Assert
+                Assert.Equal(new DateTime(2026, 10, 1, 2, 59, 59), resultado.Value);
+            }
+        }
     }
 }

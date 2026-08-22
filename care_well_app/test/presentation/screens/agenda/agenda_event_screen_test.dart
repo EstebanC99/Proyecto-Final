@@ -197,6 +197,13 @@ Future<void> _tapGuardar(WidgetTester tester, String label) async {
   await tester.pumpAndSettle();
 }
 
+/// Celda del [dia] dentro del calendario abierto (evita chocar con números
+/// sueltos del formulario que quedó detrás del diálogo).
+Finder _diaDelCalendario(int dia) => find.descendant(
+  of: find.byType(DatePickerDialog),
+  matching: find.text('$dia'),
+);
+
 /// Dispara el gesto de "atrás" del sistema.
 Future<void> _volverAtras(WidgetTester tester) async {
   final dynamic estado = tester.state(find.byType(WidgetsApp));
@@ -641,6 +648,92 @@ void main() {
       await _volverAtras(tester);
 
       expect(find.text('Tenés cambios sin guardar'), findsOneWidget);
+    });
+  });
+
+  // El fin de recurrencia se cuenta desde el evento: el backend rechaza el
+  // mismo día del inicio y el selector debe abrir sobre el mes del evento.
+  group('AgendaEventScreen · fin de recurrencia', () {
+    // Día 10 del mes que viene: siempre futuro y lejos de los bordes del mes,
+    // así "el día siguiente" cae en el mismo mes se corran los tests el día que
+    // se corran.
+    final fechaEvento = DateTime(_hoy.year, _hoy.month + 1, 10);
+
+    /// Monta el alta parada en [fechaEvento], con la recurrencia diaria abierta
+    /// (es la que despliega el campo "Hasta (opcional)").
+    Future<void> abrirAltaConRecurrencia(WidgetTester tester) async {
+      final container = _container();
+      container.read(diaSeleccionadoProvider.notifier).state = fechaEvento;
+      container.read(semanaSeleccionadaProvider.notifier).state =
+          lunesDeLaSemana(fechaEvento);
+
+      await _pushForm(tester, container);
+      await _tocar(
+        tester,
+        find
+            .descendant(
+              of: find.ancestor(
+                of: find.text('Nunca'),
+                matching: find.byType(Row),
+              ),
+              matching: find.byIcon(Icons.chevron_right_rounded),
+            )
+            .first,
+      );
+      expect(find.text('Diaria'), findsOneWidget);
+    }
+
+    testWidgets('el selector abre en el mes del evento y no ofrece ese día', (
+      tester,
+    ) async {
+      await abrirAltaConRecurrencia(tester);
+      await _tocar(tester, find.text('Sin fecha de fin'));
+
+      // Antes arrancaba 30 días después y el calendario aparecía un mes
+      // adelante.
+      expect(
+        find.text(
+          const DefaultMaterialLocalizations().formatMonthYear(fechaEvento),
+        ),
+        findsOneWidget,
+      );
+
+      // El día del evento está deshabilitado: tocarlo no mueve nada y aceptar
+      // confirma el día siguiente, que es el preseleccionado.
+      await tester.tap(_diaDelCalendario(fechaEvento.day), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      await _tocar(tester, find.text('OK'));
+
+      final siguiente = fechaEvento.add(const Duration(days: 1));
+      expect(
+        find.text('${siguiente.day}/${siguiente.month}/${siguiente.year}'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('mover el evento más allá del fin elegido lo limpia', (
+      tester,
+    ) async {
+      await abrirAltaConRecurrencia(tester);
+
+      // Fin de recurrencia dos días después del evento.
+      await _tocar(tester, find.text('Sin fecha de fin'));
+      await _tocar(tester, _diaDelCalendario(fechaEvento.day + 2));
+      await _tocar(tester, find.text('OK'));
+
+      final fin = fechaEvento.add(const Duration(days: 2));
+      expect(find.text('${fin.day}/${fin.month}/${fin.year}'), findsOneWidget);
+
+      // El evento se corre una semana: el fin quedaría antes de su inicio.
+      await _tocar(tester, find.text(fechaCortaRelativa(fechaEvento)));
+      await _tocar(tester, _diaDelCalendario(fechaEvento.day + 7));
+      await _tocar(tester, find.text('OK'));
+
+      expect(find.text('Sin fecha de fin'), findsOneWidget);
+      expect(
+        find.text('Se quitó la fecha de fin: quedaba antes del evento'),
+        findsOneWidget,
+      );
     });
   });
 }

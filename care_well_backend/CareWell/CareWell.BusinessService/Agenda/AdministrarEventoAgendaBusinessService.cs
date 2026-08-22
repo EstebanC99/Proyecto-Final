@@ -159,7 +159,7 @@ namespace CareWell.BusinessService.Agenda
             this.UnitOfWork.SaveChanges();
         }
 
-        public void CancelarOcurrencia(CancelarOcurrenciaEventoAgendaCommand command)
+        public void CancelarOcurrencia(CancelarEventoAgendaCommand command)
         {
             var usuario = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
             var eventoAgenda = this.EventoAgendaRepository.GetByID(command.EventoAgendaID);
@@ -168,6 +168,22 @@ namespace CareWell.BusinessService.Agenda
                                             usuario.Persona,
                                             this.SerializadorFechasExceptuadasDomainService,
                                             this.ValidadorPermisoAccion);
+
+            this.UnitOfWork.SaveChanges();
+        }
+
+        public void CancelarSerie(CancelarEventoAgendaCommand command)
+        {
+            var usuario = this.EntityLoaderDomainService.GetByID<Usuario>(this.UserContext.UsuarioID);
+            var eventoAgenda = this.EventoAgendaRepository.GetByID(command.EventoAgendaID);
+
+            var quedaSinOcurrencias = eventoAgenda.CancelarSerieDesde(command.FechaOcurrencia,
+                                                                      usuario.Persona,
+                                                                      this.ExpansorRecurrenciaDomainService,
+                                                                      this.ValidadorPermisoAccion);
+
+            if (quedaSinOcurrencias)
+                this.EventoAgendaRepository.Remove(eventoAgenda);
 
             this.UnitOfWork.SaveChanges();
         }

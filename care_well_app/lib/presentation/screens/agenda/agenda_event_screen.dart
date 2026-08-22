@@ -122,6 +122,15 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     _generarEventoSalud = ocu.generarEventoSalud;
   }
 
+  /// Primer día que el backend acepta como fin de recurrencia: el siguiente al
+  /// del evento (el mismo día lo rechaza con un 400).
+  ///
+  /// Se normaliza a medianoche porque [_fecha] arrastra la hora (de `now()` o
+  /// de la precarga) y [_fechaFin] siempre llega del selector sin hora: sin
+  /// esto, "mismo día" y "día siguiente" se confunden por unas horas.
+  DateTime get _primeraFechaFinValida =>
+      DateUtils.dateOnly(_fecha).add(const Duration(days: 1));
+
   Future<void> _elegirFecha() async {
     final picked = await showDatePicker(
       context: context,
@@ -132,7 +141,24 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
     // El diálogo es asíncrono: la pantalla puede haberse ido mientras estaba
     // abierto.
     if (picked == null || !mounted) return;
-    setState(() => _fecha = picked);
+
+    // Mover el evento más allá del fin de recurrencia ya elegido dejaría una
+    // combinación que el backend rechaza. El campo es opcional: se limpia y se
+    // avisa, en vez de reubicarlo y cambiar en silencio cuánto dura la serie.
+    final fechaFinInvalidada =
+        _fechaFin != null && !_fechaFin!.isAfter(DateUtils.dateOnly(picked));
+
+    setState(() {
+      _fecha = picked;
+      if (fechaFinInvalidada) _fechaFin = null;
+    });
+
+    if (!fechaFinInvalidada) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Se quitó la fecha de fin: quedaba antes del evento'),
+      ),
+    );
   }
 
   Future<void> _elegirHora() async {
@@ -142,10 +168,19 @@ class _AgendaEventScreenState extends ConsumerState<AgendaEventScreen> {
   }
 
   Future<void> _elegirFechaFin() async {
+    final primeraFechaValida = _primeraFechaFinValida;
+    // Sin fin elegido, el selector abre sobre el mes del evento (antes abría un
+    // mes adelante). El clamp es defensivo: `showDatePicker` falla con un
+    // assert si la fecha inicial queda antes del primer día habilitado.
+    final fechaFin = _fechaFin;
+    final inicial = fechaFin == null || fechaFin.isBefore(primeraFechaValida)
+        ? primeraFechaValida
+        : fechaFin;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _fechaFin ?? _fecha.add(const Duration(days: 30)),
-      firstDate: _fecha,
+      initialDate: inicial,
+      firstDate: primeraFechaValida,
       lastDate: DateTime(DateTime.now().year + 5),
     );
     if (picked == null || !mounted) return;

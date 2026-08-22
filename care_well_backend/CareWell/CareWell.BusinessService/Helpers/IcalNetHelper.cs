@@ -32,5 +32,10 @@ namespace CareWell.BusinessService.Helpers
         {
             return regla.Replace("RRULE:", string.Empty);
         }
+
+        public static CalDateTime DateTimeArgentinaToCalDateTimeUtc(DateTime fecha)
+        {
+            return DateTimeToCalDateTimeArgentina(fecha, hasTime: true).ToTimeZone(CalDateTime.UtcTzId);
+        }
     }
 }

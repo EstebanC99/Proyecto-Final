@@ -11,6 +11,7 @@ namespace CareWell.BusinessService.Abstractions.Agenda
         void Crear(CrearEventoAgendaCommand command);
         void Modificar(ModificarEventoAgendaCommand command);
         void Eliminar(int eventoAgendaID);
-        void CancelarOcurrencia(CancelarOcurrenciaEventoAgendaCommand command);
+        void CancelarOcurrencia(CancelarEventoAgendaCommand command);
+        void CancelarSerie(CancelarEventoAgendaCommand command);
     }
 }

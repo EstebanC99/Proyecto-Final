@@ -69,13 +69,7 @@ namespace CareWell.Domain.Agenda
                                                ISerializadorFechasExceptuadasDomainService serializadorFechasExceptuadas,
                                                IValidadorPermisoAccion validadorPermisoAccion)
         {
-            validadorPermisoAccion.ValidarPuedeAdministrarAgenda(this.Persona, solicitante);
-
-            if (string.IsNullOrEmpty(this.ReglaRecurrencia))
-                throw new ValidacionDominioException(Mensajes.ElEventoNoEsRecurrente);
-
-            if (fechaOcurrencia <= DateTime.Now)
-                throw new ValidacionDominioException(Mensajes.NoSePuedeCancelarOcurrenciaPasada);
+            this.ValidarCancelar(fechaOcurrencia, solicitante, validadorPermisoAccion);
 
             var fechasExceptuadas = serializadorFechasExceptuadas.DeserializarFechasExceptuadas(this.FechasExceptuadas);
 
@@ -127,6 +121,21 @@ namespace CareWell.Domain.Agenda
             return new List<DateTime>();
         }
 
+        public virtual bool CancelarSerieDesde(DateTime fechaOcurrencia,
+                                               Persona solicitante,
+                                               IExpansorRecurrenciaDomainService expansorRecurrenciaDomainService,
+                                               IValidadorPermisoAccion validadorPermisoAccion)
+        {
+            this.ValidarCancelar(fechaOcurrencia, solicitante, validadorPermisoAccion);
+
+            if (fechaOcurrencia <= this.FechaHoraInicio)
+                return true;
+
+            this.ReglaRecurrencia = expansorRecurrenciaDomainService.TruncarReglaDesde(this.ReglaRecurrencia!, fechaOcurrencia);
+
+            return false;
+        }
+
         #region Metodos Privados
 
         private static void ValidarCamposObligatorios(CrearEventoAgenda crearEventoAgenda)
@@ -170,6 +179,17 @@ namespace CareWell.Domain.Agenda
                 this.FechasExceptuadas = null;
 
             this.ReglaRecurrencia = reglaRecurrenciaGenerada;
+        }
+
+        private void ValidarCancelar(DateTime fechaOcurrencia, Persona solicitante, IValidadorPermisoAccion validadorPermisoAccion)
+        {
+            validadorPermisoAccion.ValidarPuedeAdministrarAgenda(this.Persona, solicitante);
+
+            if (string.IsNullOrEmpty(this.ReglaRecurrencia))
+                throw new ValidacionDominioException(Mensajes.ElEventoNoEsRecurrente);
+
+            if (fechaOcurrencia <= DateTime.Now)
+                throw new ValidacionDominioException(Mensajes.NoSePuedeCancelarSerieOcurrenciaDesdeEventoPasado);
         }
 
         #endregion

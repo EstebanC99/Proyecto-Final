@@ -7,5 +7,6 @@ namespace CareWell.Domain.DomainServices.Agenda
         string ConstruirRegla(DefinirRecurrenciaEventoAgenda definirRecurrencia, DateTime fechaHoraInicio);
         bool EsReglaValida(string regla);
         List<DateTime> ExpandirOcurrencias(string regla, DateTime inicioBase, string? excepciones, DateTime desde, DateTime hasta);
+        string TruncarReglaDesde(string regla, DateTime fechaFin);
     }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:care_well_app/domain/entities/entities.dart';
+import 'package:care_well_app/domain/exceptions/exceptions.dart';
 import 'package:care_well_app/presentation/providers/providers.dart';
 import 'package:care_well_app/presentation/screens/agenda/agenda_screen.dart';
 import 'package:care_well_app/presentation/widgets/widgets.dart';
@@ -34,6 +35,7 @@ OcurrenciaEventoAgenda _ocurrencia({
   required int id,
   required DateTime inicio,
   String? titulo,
+  bool esRecurrente = false,
 }) => OcurrenciaEventoAgenda(
   id: id,
   eventoAgendaId: id,
@@ -42,7 +44,7 @@ OcurrenciaEventoAgenda _ocurrencia({
   tipo: _tipo,
   fechaHoraInicio: inicio,
   fechaHoraFin: inicio.add(const Duration(hours: 1)),
-  esRecurrente: false,
+  esRecurrente: esRecurrente,
   generarEventoSalud: false,
 );
 
@@ -266,6 +268,110 @@ void main() {
 
         // La tira ahora muestra la semana del evento y su día quedó activo.
         expect(find.text('${proximoDia.day}'), findsWidgets);
+      });
+    });
+
+    // La baja de una serie ya iniciada se hace recortando desde la ocurrencia
+    // elegida: el backend rechaza borrar el evento completo.
+    group('eliminar esta y las siguientes', () {
+      /// Ocurrencia recurrente del lunes que viene: siempre futura, así la
+      /// tarjeta es accionable (las pasadas no abren la hoja de acciones).
+      final proximoLunes = _lunes.add(const Duration(days: 7));
+      final ocurrencia = _ocurrencia(
+        id: 9,
+        inicio: proximoLunes.add(const Duration(hours: 9)),
+        titulo: 'Medicación diaria',
+        esRecurrente: true,
+      );
+
+      /// Deja la pantalla con la hoja de acciones abierta sobre [ocurrencia].
+      Future<void> abrirHoja(
+        WidgetTester tester,
+        List<Override> overrides,
+      ) async {
+        await tester.pumpWidget(
+          _wrap(ocurrenciasSemana: [ocurrencia], overrides: overrides),
+        );
+        await tester.pumpAndSettle();
+
+        // La agenda se abre en hoy: hay que ir a la semana de la ocurrencia y
+        // pararse en su día.
+        await tester.tap(
+          find.descendant(
+            of: find.byType(WeekStrip),
+            matching: find.byIcon(Icons.chevron_right_rounded),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('${proximoLunes.day}'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Medicación diaria'));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('corta la serie desde la ocurrencia elegida', (tester) async {
+        int? eventoRecibido;
+        DateTime? fechaRecibida;
+
+        await abrirHoja(tester, [
+          cancelarSerieDesdeProvider.overrideWithValue(({
+            required eventoAgendaId,
+            required fechaOcurrencia,
+          }) async {
+            eventoRecibido = eventoAgendaId;
+            fechaRecibida = fechaOcurrencia;
+          }),
+        ]);
+
+        await tester.tap(find.text('Eliminar esta y las siguientes'));
+        await tester.pumpAndSettle();
+
+        // El diálogo aclara que lo anterior se conserva.
+        expect(find.text('¿Eliminar esta y las siguientes?'), findsOneWidget);
+        expect(
+          find.textContaining('Las anteriores se conservan en el historial.'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        expect(eventoRecibido, 9);
+        expect(fechaRecibida, ocurrencia.fechaHoraInicio);
+        expect(
+          find.text('Se eliminaron esta ocurrencia y las siguientes.'),
+          findsOneWidget,
+        );
+      });
+
+      // El backend valida la fecha y el tipo de evento: su mensaje es lo único
+      // que explica por qué no se pudo.
+      testWidgets('muestra el mensaje del backend cuando falla', (
+        tester,
+      ) async {
+        await abrirHoja(tester, [
+          cancelarSerieDesdeProvider.overrideWithValue(({
+            required eventoAgendaId,
+            required fechaOcurrencia,
+          }) async {
+            throw const ValidacionException(
+              'No se puede eliminar una ocurrencia pasada.',
+            );
+          }),
+        ]);
+
+        await tester.tap(find.text('Eliminar esta y las siguientes'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Eliminar'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('No se puede eliminar una ocurrencia pasada.'),
+          findsOneWidget,
+        );
+        // El diálogo se cerró: el aviso queda a la vista.
+        expect(find.text('¿Eliminar esta y las siguientes?'), findsNothing);
       });
     });
 

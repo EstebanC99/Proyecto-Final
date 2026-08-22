@@ -38,4 +38,13 @@ abstract class AgendaRepository {
     required int eventoAgendaId,
     required DateTime fechaOcurrencia,
   });
+
+  /// Elimina la ocurrencia de [fechaOcurrencia] y todas las posteriores de un
+  /// evento recurrente; las anteriores se conservan en el historial.
+  ///
+  /// El backend sólo lo acepta sobre eventos recurrentes y ocurrencias futuras.
+  Future<void> cancelarSerieDesde({
+    required int eventoAgendaId,
+    required DateTime fechaOcurrencia,
+  });
 }

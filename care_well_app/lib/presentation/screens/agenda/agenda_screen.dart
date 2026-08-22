@@ -6,6 +6,7 @@ import '../../../config/routers/app_routes.dart';
 import '../../../config/theme/app_palette.dart';
 import '../../../config/theme/app_spacing.dart';
 import '../../../domain/entities/entities.dart';
+import '../../../domain/exceptions/exceptions.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 
@@ -94,49 +95,130 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
         );
       case OcurrenciaAccion.cancelarOcurrencia:
         await _confirmarCancelarOcurrencia(context, ocurrencia);
-      case OcurrenciaAccion.eliminar:
-        await _confirmarEliminar(context, ocurrencia);
+      case OcurrenciaAccion.eliminarEvento:
+        await _confirmarEliminarEvento(context, ocurrencia);
+      case OcurrenciaAccion.eliminarSerieDesde:
+        await _confirmarEliminarSerieDesde(context, ocurrencia);
     }
   }
 
   Future<void> _confirmarCancelarOcurrencia(
     BuildContext context,
     OcurrenciaEventoAgenda ocurrencia,
-  ) async {
-    await ConfirmDialog.show(
+  ) => _confirmarYEjecutar(
+    context,
+    title: '¿Cancelar esta ocurrencia?',
+    body:
+        'Se cancelará únicamente el evento del día seleccionado. El resto de '
+        'la serie se mantiene.',
+    confirmLabel: 'Cancelar ocurrencia',
+    icon: Icons.event_busy_outlined,
+    accion: () => ref.read(cancelarOcurrenciaProvider)(
+      eventoAgendaId: ocurrencia.eventoAgendaId,
+      fechaOcurrencia: ocurrencia.fechaHoraInicio,
+    ),
+    exito: 'Se canceló la ocurrencia.',
+  );
+
+  /// Baja de un evento único: no hay serie que recortar, se elimina entero.
+  Future<void> _confirmarEliminarEvento(
+    BuildContext context,
+    OcurrenciaEventoAgenda ocurrencia,
+  ) => _confirmarYEjecutar(
+    context,
+    title: '¿Eliminar evento?',
+    body: 'Esta acción no se puede deshacer.',
+    confirmLabel: 'Eliminar',
+    icon: Icons.delete_outline,
+    accion: () =>
+        ref.read(eliminarEventoAgendaProvider)(ocurrencia.eventoAgendaId),
+    exito: 'Se eliminó el evento.',
+  );
+
+  /// Baja de una serie desde la ocurrencia elegida hacia adelante.
+  ///
+  /// No se elimina el evento completo porque el backend rechaza borrar series
+  /// ya iniciadas: lo pasado queda como historial de cuidado.
+  Future<void> _confirmarEliminarSerieDesde(
+    BuildContext context,
+    OcurrenciaEventoAgenda ocurrencia,
+  ) {
+    final dia = ocurrencia.fechaHoraInicio.toLocal();
+    return _confirmarYEjecutar(
       context,
-      title: '¿Cancelar esta ocurrencia?',
+      title: '¿Eliminar esta y las siguientes?',
       body:
-          'Se cancelará únicamente el evento del día seleccionado. El resto de '
-          'la serie se mantiene.',
-      confirmLabel: 'Cancelar ocurrencia',
-      icon: Icons.event_busy_outlined,
-      onConfirm: () => ref.read(cancelarOcurrenciaProvider)(
+          'Se eliminarán la ocurrencia del ${dia.day} de '
+          '${nombresMes[dia.month - 1]} y todas las posteriores. Las anteriores '
+          'se conservan en el historial.',
+      confirmLabel: 'Eliminar',
+      icon: Icons.delete_outline,
+      accion: () => ref.read(cancelarSerieDesdeProvider)(
         eventoAgendaId: ocurrencia.eventoAgendaId,
         fechaOcurrencia: ocurrencia.fechaHoraInicio,
+      ),
+      exito: 'Se eliminaron esta ocurrencia y las siguientes.',
+    );
+  }
+
+  /// Pide confirmación y ejecuta [accion], avisando el resultado por snackbar.
+  ///
+  /// La falla se atrapa acá adentro a propósito: [ConfirmDialog] re-lanza lo
+  /// que explote en `onConfirm` desde un `onPressed`, así que la excepción
+  /// terminaba como error sin dueño y el usuario se quedaba con el diálogo
+  /// abierto sin saber por qué no pasó nada. Atrapándola, el diálogo cierra y
+  /// el motivo que manda el backend en los 400 (ocurrencia pasada, evento no
+  /// recurrente, sin permisos) se ve en pantalla.
+  Future<void> _confirmarYEjecutar(
+    BuildContext context, {
+    required String title,
+    required String body,
+    required String confirmLabel,
+    required IconData icon,
+    required Future<void> Function() accion,
+    required String exito,
+  }) async {
+    Object? falla;
+    final confirmo = await ConfirmDialog.show(
+      context,
+      title: title,
+      body: body,
+      confirmLabel: confirmLabel,
+      icon: icon,
+      onConfirm: () async {
+        try {
+          await accion();
+        } catch (e) {
+          falla = e;
+        }
+      },
+    );
+    if (!confirmo || !context.mounted) return;
+
+    final error = falla;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error == null ? exito : _mensajeDeError(error)),
+        backgroundColor: error == null
+            ? context.colors.success
+            : context.colors.error,
       ),
     );
   }
 
-  Future<void> _confirmarEliminar(
-    BuildContext context,
-    OcurrenciaEventoAgenda ocurrencia,
-  ) async {
-    await ConfirmDialog.show(
-      context,
-      title: ocurrencia.esRecurrente
-          ? '¿Eliminar toda la serie?'
-          : '¿Eliminar evento?',
-      body: ocurrencia.esRecurrente
-          ? 'Se eliminarán todas las ocurrencias de este evento recurrente. '
-                'Esta acción no se puede deshacer.'
-          : 'Esta acción no se puede deshacer.',
-      confirmLabel: 'Eliminar',
-      icon: Icons.delete_outline,
-      onConfirm: () =>
-          ref.read(eliminarEventoAgendaProvider)(ocurrencia.eventoAgendaId),
-    );
-  }
+  /// Texto para el usuario de una acción que falló.
+  ///
+  /// Las excepciones de dominio ya traen redactado el mensaje del backend, así
+  /// que se muestran tal cual. Cualquier otra falla (un bug, un parseo) se
+  /// resume: volcar su `toString()` sería detalle técnico sin valor.
+  String _mensajeDeError(Object err) => switch (err) {
+    ValidacionException() ||
+    CredencialesInvalidasException() ||
+    RecursoNoEncontradoException() ||
+    ServicioNoDisponibleException() ||
+    SinConexionException() => err.toString(),
+    _ => 'No se pudo completar la acción. Intentá de nuevo.',
+  };
 
   @override
   Widget build(BuildContext context) {
